@@ -20,7 +20,6 @@ interface Training {
 }
 
 export default function ClientSchedule({ onBack }: { onBack: () => void }) {
-  const [date, setDate] = useState(() => dayjs().startOf('day'));
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -28,7 +27,7 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
   const token = getToken();
 
   const loadTrainings = async () => {
-    const res = await fetch(`${API}/api/trainings?date=${date.format('YYYY-MM-DD')}`, {
+    const res = await fetch(`${API}/api/trainings`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -38,7 +37,16 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
     }
 
     const data = await res.json();
-    setTrainings(data);
+
+    const sorted = data
+      .filter((t: Training) => dayjs(t.date).isAfter(dayjs().subtract(1, 'day')))
+      .sort((a: Training, b: Training) => {
+        const d1 = dayjs(a.date).add(a.hour, 'hour');
+        const d2 = dayjs(b.date).add(b.hour, 'hour');
+        return d1.diff(d2);
+      });
+
+    setTrainings(sorted);
   };
 
   const updateStatus = async (id: string, status: 'CONFIRMED' | 'DECLINED') => {
@@ -56,24 +64,15 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
 
   useEffect(() => {
     loadTrainings();
-  }, [date]);
+  }, []);
 
   return (
     <Container>
       <Title order={2} mb="md">Мои тренировки</Title>
 
-      <Group mb="sm">
-        <Button variant="default" onClick={() => setDate(date.subtract(1, 'day'))}>
-          ← Назад
-        </Button>
-        <Button variant="default" onClick={() => setDate(date.add(1, 'day'))}>
-          Вперёд →
-        </Button>
-      </Group>
-
       <Stack spacing="sm">
         {trainings.length === 0 ? (
-          <Text>На выбранную дату нет тренировок.</Text>
+          <Text>У вас пока нет назначенных тренировок.</Text>
         ) : (
           trainings.map((t) => (
             <Card key={t.id} withBorder shadow="xs" radius="md" p="md">
@@ -86,10 +85,10 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
                   t.status === 'DECLINED' ? 'red' : 'gray'
                 }>
                   {t.status === 'CONFIRMED'
-                    ? 'Приду'
+                    ? 'ПОДТВЕРЖДЕНО'
                     : t.status === 'DECLINED'
-                    ? 'Не приду'
-                    : 'Ожидание'}
+                    ? 'ОТМЕНЕНО'
+                    : 'ОЖИДАНИЕ'}
                 </Badge>
               </Group>
 
