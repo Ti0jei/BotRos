@@ -29,9 +29,11 @@ function App() {
           setProfile(data);
           setView('profile');
 
-          // ✅ Сохраняем telegramId при наличии
           const tg = window.Telegram?.WebApp;
           const telegramId = tg?.initDataUnsafe?.user?.id;
+
+          // 🐞 DEBUG: логируем для отладки
+          console.log('[TG]', telegramId, 'Token:', token);
 
           if (telegramId) {
             await fetch(`${API}/api/auth/telegram-connect`, {
