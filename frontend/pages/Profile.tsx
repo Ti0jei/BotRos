@@ -36,6 +36,40 @@ export default function Profile({
     onLogout();
   };
 
+  const handleTelegramConnect = async () => {
+    const tg = window.Telegram?.WebApp;
+    const token = localStorage.getItem('token');
+
+    if (!tg || !token) {
+      alert('❌ Telegram WebApp недоступен или вы не авторизованы');
+      return;
+    }
+
+    tg.ready();
+
+    const telegramId = tg?.initDataUnsafe?.user?.id;
+
+    if (!telegramId) {
+      alert('⚠️ Не удалось получить Telegram ID. Откройте приложение через Telegram.');
+      return;
+    }
+
+    const res = await fetch(`${API}/api/auth/telegram-connect`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ telegramId }),
+    });
+
+    if (res.ok) {
+      alert('✅ Уведомления включены!');
+    } else {
+      alert('❌ Ошибка при подключении Telegram ID');
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -62,6 +96,10 @@ export default function Profile({
 
           <Button fullWidth variant="light" color="gray" disabled>
             Материал для изучения
+          </Button>
+
+          <Button fullWidth color="teal" onClick={handleTelegramConnect}>
+            🔔 Включить уведомления
           </Button>
 
           {user.role === 'ADMIN' && (
