@@ -7,7 +7,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
-//Временное создание тренера
+// Временное создание тренера
 (async () => {
   const adminExists = await prisma.user.findUnique({ where: { email: 'admin@fit.com' } });
   if (!adminExists) {
@@ -17,7 +17,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
         password: await bcrypt.hash('admin123', 10),
         name: 'Главный тренер',
         age: 30,
-        role: 'ADMIN'
+        role: 'ADMIN',
       }
     });
     console.log('✅ Админ создан: admin@fit.com / admin123');
@@ -64,6 +64,23 @@ router.post('/login', async (req, res) => {
 
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
   res.json({ token });
+});
+
+// ✅ Сохраняем Telegram ID
+router.post('/telegram-connect', async (req, res) => {
+  const userId = req.user.userId;
+  const { telegramId } = req.body;
+
+  if (!telegramId) {
+    return res.status(400).json({ error: 'telegramId не передан' });
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { telegramId: String(telegramId) },
+  });
+
+  res.json({ success: true });
 });
 
 export default router;

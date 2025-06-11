@@ -24,10 +24,25 @@ function App() {
       headers: { Authorization: 'Bearer ' + token },
     })
       .then(res => (res.ok ? res.json() : null))
-      .then(data => {
+      .then(async data => {
         if (data) {
           setProfile(data);
           setView('profile');
+
+          // ✅ Сохраняем telegramId при наличии
+          const tg = window.Telegram?.WebApp;
+          const telegramId = tg?.initDataUnsafe?.user?.id;
+
+          if (telegramId) {
+            await fetch(`${API}/api/auth/telegram-connect`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ telegramId }),
+            });
+          }
         } else {
           localStorage.removeItem('token');
           setView('login');
