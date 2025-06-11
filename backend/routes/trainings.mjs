@@ -1,0 +1,125 @@
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import { notifyTelegram } from '../utils/telegram.mjs';
+
+const router = express.Router();
+const prisma = new PrismaClient();
+
+// Получить тренировки
+router.get('/', async (req, res) => {
+  const userId = req.user.userId;
+  const role = req.user.role;
+  const { date } = req.query;
+
+  let dateFilter = {};
+
+  if (date) {
+    const startDate = new Date(`${date}T00:00:00`);
+    const endDate = new Date(`${date}T23:59:59`);
+    dateFilter = {
+      date: {
+        gte: startDate,
+        lte: endDate,
+      },
+    };
+  }
+
+  const where = role === 'ADMIN'
+    ? dateFilter
+    : { userId, ...dateFilter };
+
+  const trainings = await prisma.training.findMany({
+    where,
+    include: role === 'ADMIN' ? { user: true } : undefined,
+    orderBy: [{ date: 'asc' }, { hour: 'asc' }],
+  });
+
+  res.json(trainings);
+});
+
+// Назначить тренировку
+router.post('/', async (req, res) => {
+  const { userId, date, hour } = req.body;
+
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can assign trainings' });
+  }
+
+  const training = await prisma.training.create({
+    data: {
+      userId,
+      date: new Date(`${date}T00:00:00`),
+      hour: parseInt(hour),
+    },
+  });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (user?.telegramId) {
+    await notifyTelegram(
+      user.telegramId,
+      `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00`
+    );
+  }
+
+  res.json(training);
+});
+
+// Удалить тренировку
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can delete trainings' });
+  }
+
+  const training = await prisma.training.findUnique({
+    where: { id },
+    include: { user: true },
+  });
+
+  if (!training) return res.status(404).json({ error: 'Not found' });
+
+  await prisma.training.delete({ where: { id } });
+
+  if (training.user?.telegramId) {
+    await notifyTelegram(
+      training.user.telegramId,
+      `❌ Ваша тренировка на ${new Date(training.date).toLocaleDateString()} в ${training.hour}:00 была отменена`
+    );
+  }
+
+  res.json({ success: true });
+});
+
+// Подтвердить/отменить тренировку
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const userId = req.user.userId;
+
+  const training = await prisma.training.findUnique({ where: { id } });
+
+  if (!training || training.userId !== userId) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  const updated = await prisma.training.update({
+    where: { id },
+    data: { status },
+  });
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (user?.telegramId) {
+    const text =
+      status === 'CONFIRMED'
+        ? '✅ вы подтвердили участие'
+        : '🚫 вы отказались от тренировки';
+    await notifyTelegram(user.telegramId, `📌 Вы обновили статус тренировки: ${text}`);
+  }
+
+  res.json(updated);
+});
+
+export default router;
