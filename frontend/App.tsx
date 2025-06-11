@@ -23,27 +23,31 @@ function App() {
     fetch(`${API}/api/profile`, {
       headers: { Authorization: 'Bearer ' + token },
     })
-      .then(res => (res.ok ? res.json() : null))
-      .then(async data => {
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
         if (data) {
           setProfile(data);
           setView('profile');
 
+          // === Инициализация Telegram ===
           const tg = window.Telegram?.WebApp;
-          const telegramId = tg?.initDataUnsafe?.user?.id;
+          if (tg) {
+            tg.ready();
+            setTimeout(() => {
+              const telegramId = tg?.initDataUnsafe?.user?.id;
+              console.log('[TG]', telegramId, 'Token:', token);
 
-          // 🐞 DEBUG: логируем для отладки
-          console.log('[TG]', telegramId, 'Token:', token);
-
-          if (telegramId) {
-            await fetch(`${API}/api/auth/telegram-connect`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ telegramId }),
-            });
+              if (telegramId) {
+                fetch(`${API}/api/auth/telegram-connect`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ telegramId }),
+                });
+              }
+            }, 300);
           }
         } else {
           localStorage.removeItem('token');
