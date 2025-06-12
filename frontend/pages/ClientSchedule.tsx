@@ -13,6 +13,9 @@ import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
+
+
 
 interface Training {
   id: string;

@@ -19,6 +19,9 @@ import { getToken } from '../utils/auth';
 import { IconCheck, IconTrash } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
+
+
 
 interface User {
   id: string;
