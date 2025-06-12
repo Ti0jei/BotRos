@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -141,13 +142,20 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 onChange={setDate}
                 locale="ru"
                 dropdownType="popover"
-                popoverProps={{ withinPortal: true, position: 'bottom-start' }}
+                clearable={false}
                 radius="md"
                 size="md"
-                clearable={false}
+                nextIcon={<IconChevronRight size={16} />}
+                previousIcon={<IconChevronLeft size={16} />}
+                popoverProps={{
+                  withinPortal: true,
+                  shadow: 'md',
+                  radius: 'md',
+                  position: 'bottom-start',
+                }}
                 styles={{
-                  day: { borderRadius: 6 },
-                  daySelected: { backgroundColor: '#1c7ed6', color: '#fff' },
+                  dropdown: { maxWidth: 280 },
+                  calendarHeaderControl: { fontSize: 14 },
                 }}
               />
               <NumberInput label="Кол-во тренировок" value={sessions} onChange={(v) => setSessions(Number(v))} min={1} />
@@ -180,15 +188,23 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         onChange={setDate}
         locale="ru"
         dropdownType="popover"
-        popoverProps={{ withinPortal: true, position: 'bottom-start' }}
+        clearable={false}
         radius="md"
         size="md"
-        clearable={false}
+        nextIcon={<IconChevronRight size={16} />}
+        previousIcon={<IconChevronLeft size={16} />}
+        popoverProps={{
+          withinPortal: true,
+          shadow: 'md',
+          radius: 'md',
+          position: 'bottom-start',
+        }}
         styles={{
-          day: { borderRadius: 6 },
-          daySelected: { backgroundColor: '#1c7ed6', color: '#fff' },
+          dropdown: { maxWidth: 280 },
+          calendarHeaderControl: { fontSize: 14 },
         }}
       />
+
       <NumberInput
         label="Кол-во тренировок"
         value={sessions}
