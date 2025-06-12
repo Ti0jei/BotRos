@@ -1,33 +1,17 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import { Telegraf } from 'telegraf';
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const API_URL = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-export async function notifyTelegram(telegramId, message) {
-  if (!telegramId || !TOKEN) {
-    console.warn('❗ notifyTelegram: отсутствует telegramId или токен');
+export async function notifyTelegram(telegramId, text) {
+  if (!telegramId) {
+    console.warn('❗ Нет telegramId для отправки уведомления');
     return;
   }
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: telegramId,
-        text: message,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      console.error('❌ Telegram API error:', data);
-    } else {
-      console.log('✅ Уведомление отправлено пользователю:', telegramId);
-    }
-  } catch (err) {
-    console.error('❌ Ошибка при отправке уведомления:', err);
+    await bot.telegram.sendMessage(telegramId, text);
+    console.log(`✅ Уведомление отправлено: ${telegramId}`);
+  } catch (error) {
+    console.error('❌ Ошибка при отправке сообщения:', error.response?.description || error.message);
   }
 }

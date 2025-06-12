@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useEffect, useState } from 'react';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -17,6 +16,16 @@ function App() {
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
+  // 🟡 1. Сохраняем telegramId из URL, если есть
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tid = params.get('tid');
+    if (tid) {
+      localStorage.setItem('telegramId', tid);
+    }
+  }, []);
+
+  // 🔐 2. После входа — загружаем профиль, и если есть telegramId — привязываем
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -29,6 +38,23 @@ function App() {
         if (data) {
           setProfile(data);
           setView('profile');
+
+          const telegramId = localStorage.getItem('telegramId');
+          if (telegramId) {
+            fetch(`${API}/api/auth/telegram-connect`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ telegramId: parseInt(telegramId, 10) }),
+            })
+              .then(() => {
+                console.log('[TG] Telegram ID привязан');
+                localStorage.removeItem('telegramId');
+              })
+              .catch((err) => console.error('[TG] Ошибка при привязке telegramId:', err));
+          }
         } else {
           localStorage.removeItem('token');
           setView('login');

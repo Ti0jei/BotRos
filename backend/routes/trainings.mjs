@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
   if (user?.telegramId) {
     await notifyTelegram(
       user.telegramId,
-      `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00`
+      `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00\nПодтвердите участие в приложении ✅❌`
     );
   }
 
@@ -98,7 +98,10 @@ router.patch('/:id', async (req, res) => {
   const { status } = req.body;
   const userId = req.user.userId;
 
-  const training = await prisma.training.findUnique({ where: { id } });
+  const training = await prisma.training.findUnique({
+    where: { id },
+    include: { user: true },
+  });
 
   if (!training || training.userId !== userId) {
     return res.status(404).json({ error: 'Not found' });
@@ -109,14 +112,30 @@ router.patch('/:id', async (req, res) => {
     data: { status },
   });
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = training.user;
 
+  // Уведомление клиенту
   if (user?.telegramId) {
     const text =
       status === 'CONFIRMED'
         ? '✅ вы подтвердили участие'
         : '🚫 вы отказались от тренировки';
     await notifyTelegram(user.telegramId, `📌 Вы обновили статус тренировки: ${text}`);
+  }
+
+  // Уведомление тренеру
+  const trainer = await prisma.user.findFirst({
+    where: { role: 'ADMIN' },
+  });
+
+  if (trainer?.telegramId) {
+    const formattedDate = new Date(training.date).toLocaleDateString();
+    const trainerText =
+      status === 'CONFIRMED'
+        ? `👤 ${user.name} подтвердил участие на тренировке ${formattedDate} в ${training.hour}:00`
+        : `👤 ${user.name} не подтвердил участие на тренировке ${formattedDate} в ${training.hour}:00`;
+
+    await notifyTelegram(trainer.telegramId, trainerText);
   }
 
   res.json(updated);
