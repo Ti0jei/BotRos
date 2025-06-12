@@ -1,3 +1,4 @@
+// frontend/pages/ClientPayments.tsx
 import {
   Container,
   Title,
@@ -139,8 +140,9 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 value={date}
                 onChange={setDate}
                 locale="ru"
-                allowDeselect={false}
+                dropdownType="popover"
                 popoverProps={{ withinPortal: true }}
+                clearable={false}
               />
               <NumberInput label="Кол-во тренировок" value={sessions} onChange={(v) => setSessions(Number(v))} min={1} />
               <NumberInput label="Цена за тренировку, ₽" value={price} onChange={(v) => setPrice(Number(v))} min={1} />
@@ -164,7 +166,6 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       )}
 
       <Divider my="sm" />
-
       <Title order={4} mb="xs">➕ Добавить блок</Title>
 
       <DatePickerInput
@@ -172,8 +173,9 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         value={date}
         onChange={setDate}
         locale="ru"
-        allowDeselect={false}
+        dropdownType="popover"
         popoverProps={{ withinPortal: true }}
+        clearable={false}
       />
       <NumberInput
         label="Кол-во тренировок"
