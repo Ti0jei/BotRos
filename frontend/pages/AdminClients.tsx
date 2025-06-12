@@ -10,7 +10,7 @@ import {
   Loader,
   Badge,
 } from '@mantine/core';
-import ClientPayments from './ClientPayments'; // ← импорт страницы оплат
+import ClientPayments from './ClientPayments';
 
 interface Client {
   id: string;
@@ -29,30 +29,52 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [statsMap, setStatsMap] = useState<Record<string, Stats>>({});
   const [loading, setLoading] = useState(true);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null); // ← новый state
+  const [error, setError] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const loadClients = async () => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API}/api/clients`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setClients(data);
-    setLoading(false);
 
-    for (const client of data) {
-      loadStats(client.id);
+    try {
+      const res = await fetch(`${API}/api/clients`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        setError('Ошибка доступа или авторизации');
+        setClients([]);
+        setLoading(false);
+        return;
+      }
+
+      setClients(data);
+      setLoading(false);
+
+      for (const client of data) {
+        loadStats(client.id);
+      }
+
+    } catch (err) {
+      console.error('Ошибка запроса:', err);
+      setError('Сервер недоступен');
+      setLoading(false);
     }
   };
 
   const loadStats = async (userId: string) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`${API}/api/trainings/user/${userId}/stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setStatsMap((prev) => ({ ...prev, [userId]: data }));
+    try {
+      const res = await fetch(`${API}/api/trainings/user/${userId}/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setStatsMap((prev) => ({ ...prev, [userId]: data }));
+    } catch (err) {
+      console.error(`Ошибка загрузки статистики для ${userId}:`, err);
+    }
   };
 
   const deleteClient = async (id: string) => {
@@ -69,7 +91,7 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
   };
 
   const openPayments = (client: Client) => {
-    setSelectedClient(client); // ← переключаемся на страницу оплаты
+    setSelectedClient(client);
   };
 
   useEffect(() => {
@@ -80,7 +102,7 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
     return (
       <ClientPayments
         client={selectedClient}
-        onBack={() => setSelectedClient(null)} // ← вернуться назад к списку клиентов
+        onBack={() => setSelectedClient(null)}
       />
     );
   }
@@ -91,6 +113,8 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
 
       {loading ? (
         <Loader />
+      ) : error ? (
+        <Text color="red" size="md">{error}</Text>
       ) : (
         <Stack>
           {clients.map((client) => {
