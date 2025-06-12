@@ -15,7 +15,7 @@ router.get('/user/:userId/active', authMiddleware, async (req, res) => {
       active: true,
     },
     orderBy: {
-      date: 'desc',
+      paidAt: 'desc',
     },
   });
 
@@ -26,15 +26,14 @@ router.get('/user/:userId/active', authMiddleware, async (req, res) => {
 
 // Добавить новый блок оплаты
 router.post('/', authMiddleware, async (req, res) => {
-  const { userId, date, sessions, price } = req.body;
+  const { userId, paidAt, paidTrainings, pricePerTraining } = req.body;
 
   const newBlock = await prisma.paymentBlock.create({
     data: {
       userId,
-      date: new Date(date),
-      sessions: Number(sessions),
-      price: Number(price),
-      used: 0,
+      paidAt: new Date(paidAt),
+      paidTrainings: Number(paidTrainings),
+      pricePerTraining: Number(pricePerTraining),
       active: true,
     },
   });
@@ -58,15 +57,14 @@ router.post('/', authMiddleware, async (req, res) => {
 // Обновить существующий блок оплаты
 router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { date, sessions, price, used } = req.body;
+  const { paidAt, paidTrainings, pricePerTraining } = req.body;
 
   const updated = await prisma.paymentBlock.update({
     where: { id },
     data: {
-      date: new Date(date),
-      sessions: Number(sessions),
-      price: Number(price),
-      used: Number(used),
+      paidAt: new Date(paidAt),
+      paidTrainings: Number(paidTrainings),
+      pricePerTraining: Number(pricePerTraining),
     },
   });
 
