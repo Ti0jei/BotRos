@@ -15,6 +15,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
 
 interface Client {
   id: string;
@@ -141,8 +142,14 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 onChange={setDate}
                 locale="ru"
                 dropdownType="popover"
-                popoverProps={{ withinPortal: true }}
+                popoverProps={{ withinPortal: true, position: 'bottom-start' }}
+                radius="md"
+                size="md"
                 clearable={false}
+                styles={{
+                  day: { borderRadius: 6 },
+                  daySelected: { backgroundColor: '#1c7ed6', color: '#fff' },
+                }}
               />
               <NumberInput label="Кол-во тренировок" value={sessions} onChange={(v) => setSessions(Number(v))} min={1} />
               <NumberInput label="Цена за тренировку, ₽" value={price} onChange={(v) => setPrice(Number(v))} min={1} />
@@ -174,8 +181,14 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         onChange={setDate}
         locale="ru"
         dropdownType="popover"
-        popoverProps={{ withinPortal: true }}
+        popoverProps={{ withinPortal: true, position: 'bottom-start' }}
+        radius="md"
+        size="md"
         clearable={false}
+        styles={{
+          day: { borderRadius: 6 },
+          daySelected: { backgroundColor: '#1c7ed6', color: '#fff' },
+        }}
       />
       <NumberInput
         label="Кол-во тренировок"
