@@ -1,11 +1,12 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import { authMiddleware } from '../middleware/auth.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Получить активный блок оплаты клиента
-router.get('/user/:userId/active', async (req, res) => {
+router.get('/user/:userId/active', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
   const block = await prisma.paymentBlock.findFirst({
@@ -24,7 +25,7 @@ router.get('/user/:userId/active', async (req, res) => {
 });
 
 // Добавить новый блок оплаты
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, sessions, price } = req.body;
 
   const newBlock = await prisma.paymentBlock.create({
@@ -55,7 +56,7 @@ router.post('/', async (req, res) => {
 });
 
 // Обновить существующий блок оплаты
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { date, sessions, price, used } = req.body;
 

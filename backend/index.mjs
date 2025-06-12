@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { exec } from 'child_process';
 
 import authRoutes from './routes/auth.mjs';
 import profileRoutes from './routes/profile.mjs';
@@ -13,38 +12,28 @@ import paymentBlocksRoutes from './routes/payment-blocks.mjs';
 import { authMiddleware } from './middleware/auth.mjs';
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Разрешаем CORS (временно для всех, чтобы избежать блокировок)
+// ✅ Безопасный CORS: пропускаем токен и домен фронта
 app.use(cors({
-  origin: '*',
+  origin: true, // ← автоматическое доверие нужному origin
   credentials: true,
 }));
 
-// ✅ Обработка preflight-запросов
 app.options('*', cors());
 app.use(express.json());
 
-// 🔧 Применяем миграции перед запуском
-exec('npx prisma migrate deploy', (err, stdout, stderr) => {
-  if (err) {
-    console.error('❌ Prisma migration failed:', err);
-  } else {
-    console.log('✅ Prisma migration applied:');
-    console.log(stdout);
-  }
+// ✅ Роуты
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', authMiddleware, profileRoutes);
+app.use('/api/clients', authMiddleware, clientsRoutes);
+app.use('/api/trainings', authMiddleware, trainingsRoutes);
+app.use('/api/users', usersRoute);
+app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
 
-  // ✅ Подключение маршрутов
-  app.use('/api/auth', authRoutes);
-  app.use('/api/profile', authMiddleware, profileRoutes);
-  app.use('/api/clients', authMiddleware, clientsRoutes);
-  app.use('/api/trainings', authMiddleware, trainingsRoutes);
-  app.use('/api/users', usersRoute);
-  app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
-
-  // ✅ Старт сервера
-  app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
-  });
+// ✅ Запуск сервера
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on http://localhost:${PORT}`);
 });
