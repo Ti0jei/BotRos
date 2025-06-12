@@ -162,4 +162,24 @@ router.patch('/:id/attended', async (req, res) => {
   res.json(updated);
 });
 
+// 📊 Получить статистику по клиенту
+router.get('/user/:userId/stats', async (req, res) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can view stats' });
+  }
+
+  const { userId } = req.params;
+
+  const all = await prisma.training.findMany({ where: { userId } });
+
+  const stats = {
+    total: all.length,
+    confirmed: all.filter(t => t.status === 'CONFIRMED').length,
+    attended: all.filter(t => t.attended === true).length,
+    missed: all.filter(t => t.attended === false).length,
+  };
+
+  res.json(stats);
+});
+
 export default router;

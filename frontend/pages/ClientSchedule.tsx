@@ -11,6 +11,8 @@ import {
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 interface Training {
   id: string;
