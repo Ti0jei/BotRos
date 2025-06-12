@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Container, Stack, Title, Text } from '@mantine/core';
-import ClientSchedule from './ClientSchedule'; // используется для section === 'trainings'
+import ClientSchedule from './ClientSchedule';
 
 interface User {
   name: string;
@@ -29,6 +29,11 @@ export default function Profile({
     })
       .then(res => res.json())
       .then(data => setUser(data));
+
+    // 💬 Telegram отладка
+    const tg = window.Telegram?.WebApp;
+    console.log('[DEBUG] Telegram:', tg);
+    console.log('[DEBUG] initDataUnsafe:', tg?.initDataUnsafe);
   }, []);
 
   const handleLogout = () => {
@@ -70,6 +75,17 @@ export default function Profile({
     }
   };
 
+  const debugShowTelegramUser = () => {
+    const tg = window.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
+
+    if (user) {
+      alert(`✅ Telegram ID: ${user.id}\nUsername: ${user.username}`);
+    } else {
+      alert('❌ Telegram user не найден');
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -82,24 +98,17 @@ export default function Profile({
             Мои тренировки
           </Button>
 
-          <Button fullWidth color="blue" disabled>
-            Питание (скоро)
-          </Button>
-
-          <Button fullWidth color="blue" disabled>
-            Замеры (скоро)
-          </Button>
-
-          <Button fullWidth color="blue" disabled>
-            Фото (скоро)
-          </Button>
-
-          <Button fullWidth variant="light" color="gray" disabled>
-            Материал для изучения
-          </Button>
+          <Button fullWidth color="blue" disabled>Питание (скоро)</Button>
+          <Button fullWidth color="blue" disabled>Замеры (скоро)</Button>
+          <Button fullWidth color="blue" disabled>Фото (скоро)</Button>
+          <Button fullWidth variant="light" color="gray" disabled>Материал для изучения</Button>
 
           <Button fullWidth color="teal" onClick={handleTelegramConnect}>
             🔔 Включить уведомления
+          </Button>
+
+          <Button fullWidth color="gray" variant="default" onClick={debugShowTelegramUser}>
+            🔍 Проверить Telegram ID
           </Button>
 
           {user.role === 'ADMIN' && (
@@ -127,12 +136,8 @@ export default function Profile({
               photos: 'Фото',
             }[section]}
           </Title>
-
           <Text size="sm" color="dimmed">[Раздел в разработке]</Text>
-
-          <Button variant="light" onClick={() => setSection('main')}>
-            ← Назад
-          </Button>
+          <Button variant="light" onClick={() => setSection('main')}>← Назад</Button>
         </Stack>
       )}
     </Container>
