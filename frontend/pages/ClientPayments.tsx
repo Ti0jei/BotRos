@@ -1,3 +1,4 @@
+// frontend/pages/ClientPayments.tsx
 import {
     Container,
     Title,
@@ -13,6 +14,7 @@ import {
   import { DateInput } from '@mantine/dates';
   import { showNotification } from '@mantine/notifications';
   import { useEffect, useState } from 'react';
+  import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
   import dayjs from 'dayjs';
   
   interface Client {
@@ -154,6 +156,11 @@ import {
                   label="Дата оплаты"
                   value={date}
                   onChange={setDate}
+                  leftSection={<IconChevronLeft size={16} />}
+                  rightSection={<IconChevronRight size={16} />}
+                  styles={{
+                    input: { width: '100%' },
+                  }}
                 />
                 <NumberInput
                   label="Кол-во тренировок"
@@ -200,6 +207,11 @@ import {
           label="Дата оплаты"
           value={date}
           onChange={setDate}
+          leftSection={<IconChevronLeft size={16} />}
+          rightSection={<IconChevronRight size={16} />}
+          styles={{
+            input: { width: '100%' },
+          }}
         />
         <NumberInput
           label="Кол-во тренировок"
