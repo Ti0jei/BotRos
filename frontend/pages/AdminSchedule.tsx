@@ -15,13 +15,11 @@ import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { getToken } from '../utils/auth';
-import { IconCheck, IconTrash } from '@tabler/icons-react';
-import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 
-
+import { getToken } from '../utils/auth';
+import { IconCheck, IconTrash } from '@tabler/icons-react';
 
 interface User {
   id: string;
@@ -149,6 +147,7 @@ export default function AdminSchedule() {
           value={date.toDate()}
           onChange={(val) => val && setDate(dayjs(val))}
           clearable={false}
+          dropdownType="modal"
         />
         <Button variant="default" onClick={() => setDate(date.add(1, 'day'))}>
           Вперёд →
