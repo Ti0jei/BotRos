@@ -34,6 +34,7 @@ interface PaymentBlock {
 export default function ClientPayments({ client, onBack }: { client: Client; onBack: () => void }) {
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
+  const telegramId = localStorage.getItem('telegramId');
 
   const [block, setBlock] = useState<PaymentBlock | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,10 +47,13 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   const [editMode, setEditMode] = useState(false);
 
   const loadBlock = async () => {
+    if (!telegramId) return;
+
     setLoading(true);
-    const res = await fetch(`${API}/api/payment-blocks/user/${client.id}/active`, {
+    const res = await fetch(`${API}/api/payment-blocks/telegram/${telegramId}/active`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     if (res.ok) {
       const data = await res.json();
       setBlock(data);
@@ -60,6 +64,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     } else {
       setBlock(null);
     }
+
     setLoading(false);
   };
 
@@ -72,9 +77,9 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       },
       body: JSON.stringify({
         userId: client.id,
-        date,
-        sessions,
-        price,
+        paidAt: date,
+        paidTrainings: sessions,
+        pricePerTraining: price,
       }),
     });
 
@@ -99,9 +104,9 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        date,
-        sessions,
-        price,
+        paidAt: date,
+        paidTrainings: sessions,
+        pricePerTraining: price,
         used,
       }),
     });
@@ -158,9 +163,29 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                   calendarHeaderControl: { fontSize: 14 },
                 }}
               />
-              <NumberInput label="Кол-во тренировок" value={sessions} onChange={(v) => setSessions(Number(v))} min={1} />
-              <NumberInput label="Цена за тренировку, ₽" value={price} onChange={(v) => setPrice(Number(v))} min={1} />
-              <NumberInput label="Уже использовано" value={used} onChange={(v) => setUsed(Number(v))} min={0} max={sessions} />
+
+              <NumberInput
+                label="Кол-во тренировок"
+                value={sessions}
+                onChange={(v) => setSessions(Number(v))}
+                min={1}
+              />
+
+              <NumberInput
+                label="Цена за тренировку, ₽"
+                value={price}
+                onChange={(v) => setPrice(Number(v))}
+                min={1}
+              />
+
+              <NumberInput
+                label="Уже использовано"
+                value={used}
+                onChange={(v) => setUsed(Number(v))}
+                min={0}
+                max={sessions}
+              />
+
               <Button onClick={updateBlock} color="blue">💾 Сохранить изменения</Button>
             </Stack>
           ) : (
@@ -212,6 +237,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         min={1}
         mt="sm"
       />
+
       <NumberInput
         label="Цена за тренировку, ₽"
         value={price}

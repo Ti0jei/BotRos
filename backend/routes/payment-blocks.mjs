@@ -5,7 +5,7 @@ import { authMiddleware } from '../middleware/auth.mjs';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Получить активный блок оплаты клиента
+// 🔹 Получить активный блок оплаты по userId
 router.get('/user/:userId/active', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
@@ -24,7 +24,32 @@ router.get('/user/:userId/active', authMiddleware, async (req, res) => {
   res.json(block);
 });
 
-// Добавить новый блок оплаты
+// 🔹 Получить активный блок оплаты по telegramId
+router.get('/telegram/:telegramId/active', authMiddleware, async (req, res) => {
+  const { telegramId } = req.params;
+
+  const user = await prisma.user.findUnique({
+    where: { telegramId },
+  });
+
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const block = await prisma.paymentBlock.findFirst({
+    where: {
+      userId: user.id,
+      active: true,
+    },
+    orderBy: {
+      paidAt: 'desc',
+    },
+  });
+
+  if (!block) return res.status(404).json({ error: 'No active block found' });
+
+  res.json(block);
+});
+
+// 🔹 Добавить новый блок оплаты
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, paidAt, paidTrainings, pricePerTraining } = req.body;
 
@@ -38,23 +63,19 @@ router.post('/', authMiddleware, async (req, res) => {
     },
   });
 
-  // Деактивировать предыдущие блоки (если есть)
+  // Деактивировать предыдущие блоки
   await prisma.paymentBlock.updateMany({
     where: {
       userId,
-      id: {
-        not: newBlock.id,
-      },
+      id: { not: newBlock.id },
     },
-    data: {
-      active: false,
-    },
+    data: { active: false },
   });
 
   res.json(newBlock);
 });
 
-// Обновить существующий блок оплаты
+// 🔹 Обновить существующий блок оплаты
 router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { paidAt, paidTrainings, pricePerTraining } = req.body;
