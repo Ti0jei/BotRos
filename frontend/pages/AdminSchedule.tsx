@@ -19,7 +19,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 
 import { getToken } from '../utils/auth';
-import { IconCheck, IconTrash } from '@tabler/icons-react';
+import { IconCheck, IconTrash, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 interface User {
   id: string;
@@ -150,6 +150,8 @@ export default function AdminSchedule() {
             onChange={(val) => val && setDate(dayjs(val))}
             clearable={false}
             dropdownType="popover"
+            nextIcon={<IconChevronRight size={16} />}
+            previousIcon={<IconChevronLeft size={16} />}
             popoverProps={{
               withinPortal: true,
               shadow: 'md',
