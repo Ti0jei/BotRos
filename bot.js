@@ -1,14 +1,35 @@
 import { Telegraf } from 'telegraf';
+import dotenv from 'dotenv';
 
-const bot = new Telegraf('7863771715:AAHAmYE17-8yefTNGX4rvJo5a1qrdgZ2_RQ'); // ← подставь сюда токен от BotFather
+dotenv.config();
 
-const WEB_APP_URL = 'https://bot-ros-frontend.vercel.app/';
+const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const WEB_APP_URL = process.env.WEB_APP_URL;
 
-bot.on('message', (ctx) => {
-  ctx.reply('Нажми кнопку ниже, чтобы открыть фитнес-приложение 💪', {
+if (!TOKEN || !WEB_APP_URL) {
+  console.error('❌ TELEGRAM_BOT_TOKEN или WEB_APP_URL не указаны в .env');
+  process.exit(1);
+}
+
+const bot = new Telegraf(TOKEN);
+
+bot.start((ctx) => {
+  ctx.reply('Привет! Нажми кнопку ниже, чтобы открыть мини-приложение 👇', {
     reply_markup: {
       keyboard: [
-        [{ text: 'Открыть приложение', web_app: { url: WEB_APP_URL } }]
+        [{ text: 'Открыть приложение', web_app: { url: WEB_APP_URL } }],
+      ],
+      resize_keyboard: true,
+      is_persistent: true,
+    },
+  });
+});
+
+bot.on('message', (ctx) => {
+  ctx.reply('Вот кнопка для входа в мини-приложение 👇', {
+    reply_markup: {
+      keyboard: [
+        [{ text: 'Открыть приложение', web_app: { url: WEB_APP_URL } }],
       ],
       resize_keyboard: true,
       is_persistent: true,
@@ -17,4 +38,4 @@ bot.on('message', (ctx) => {
 });
 
 bot.launch();
-console.log('🤖 Бот запущен');
+console.log('🤖 Бот запущен. Ждёт входящих сообщений...');

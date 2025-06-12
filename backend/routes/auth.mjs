@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { authMiddleware } from '../middleware/auth.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -66,21 +67,28 @@ router.post('/login', async (req, res) => {
   res.json({ token });
 });
 
-// ✅ Сохраняем Telegram ID
-router.post('/telegram-connect', async (req, res) => {
+// ✅ Подключение Telegram ID
+router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { telegramId } = req.body;
 
-  if (!telegramId) {
-    return res.status(400).json({ error: 'telegramId не передан' });
+  if (!telegramId || typeof telegramId !== 'number') {
+    console.warn('⚠️ Неверный telegramId:', telegramId);
+    return res.status(400).json({ error: 'Invalid telegramId' });
   }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { telegramId: String(telegramId) },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { telegramId: String(telegramId) },
+    });
 
-  res.json({ success: true });
+    console.log(`✅ Telegram ID ${telegramId} сохранён для userId ${userId}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ Ошибка при сохранении telegramId:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 export default router;

@@ -15,9 +15,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Разрешаем только фронтенд на Vercel
+// ✅ Разрешаем все нужные фронтенды
 app.use(cors({
-  origin: 'https://bot-ros-frontend.vercel.app',
+  origin: [
+    'https://bot-ros-frontend.vercel.app',
+    'https://fittelega-frontend.vercel.app',
+    'http://localhost:5173'
+  ],
   credentials: true
 }));
 

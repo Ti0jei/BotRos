@@ -29,26 +29,35 @@ function App() {
           setProfile(data);
           setView('profile');
 
-          // === Инициализация Telegram ===
+          // === Telegram WebApp: привязка telegramId ===
           const tg = window.Telegram?.WebApp;
-          if (tg) {
-            tg.ready();
-            setTimeout(() => {
-              const telegramId = tg?.initDataUnsafe?.user?.id;
-              console.log('[TG]', telegramId, 'Token:', token);
+          tg?.ready();
 
-              if (telegramId) {
-                fetch(`${API}/api/auth/telegram-connect`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({ telegramId }),
-                });
-              }
-            }, 300);
-          }
+          const interval = setInterval(() => {
+            const telegramId = tg?.initDataUnsafe?.user?.id;
+
+            if (telegramId) {
+              console.log('[TG] ✅ Получен telegramId:', telegramId);
+
+              fetch(`${API}/api/auth/telegram-connect`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ telegramId }),
+              })
+                .then((res) => res.json())
+                .then((data) => console.log('[TG] Connect OK:', data))
+                .catch((err) => console.error('[TG] Connect FAIL:', err));
+
+              clearInterval(interval);
+            } else {
+              console.warn('[TG] Ждём initDataUnsafe...');
+            }
+          }, 500);
+
+          return () => clearInterval(interval);
         } else {
           localStorage.removeItem('token');
           setView('login');
@@ -115,9 +124,7 @@ function App() {
       )}
 
       {view === 'clients' && profile?.role === 'ADMIN' && (
-        <>
-          <AdminClients onBack={() => setView('profile')} />
-        </>
+        <AdminClients onBack={() => setView('profile')} />
       )}
     </Container>
   );
