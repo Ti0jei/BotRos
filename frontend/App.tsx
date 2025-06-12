@@ -7,6 +7,7 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import { Container, Button } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 
 function App() {
   const [view, setView] = useState<
@@ -15,6 +16,17 @@ function App() {
   const [profile, setProfile] = useState<any>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
+
+  // ✅ инициализируем Telegram SDK один раз
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      console.log('[TG] SDK готов');
+    } else {
+      console.warn('[TG] WebApp не найден');
+    }
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -29,15 +41,13 @@ function App() {
           setProfile(data);
           setView('profile');
 
-          // === Telegram WebApp: привязка telegramId ===
+          // ✅ пытаемся привязать Telegram ID
           const tg = window.Telegram?.WebApp;
-          tg?.ready();
-
           const interval = setInterval(() => {
             const telegramId = tg?.initDataUnsafe?.user?.id;
 
             if (telegramId) {
-              console.log('[TG] ✅ Получен telegramId:', telegramId);
+              console.log('[TG] ✅ Telegram ID:', telegramId);
 
               fetch(`${API}/api/auth/telegram-connect`, {
                 method: 'POST',
@@ -53,7 +63,7 @@ function App() {
 
               clearInterval(interval);
             } else {
-              console.warn('[TG] Ждём initDataUnsafe...');
+              console.log('[TG] ⏳ Ждём initDataUnsafe...');
             }
           }, 500);
 
