@@ -50,7 +50,7 @@ router.post('/register', async (req, res) => {
   });
 
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
-  res.json({ token });
+  res.json({ token, user });
 });
 
 // Вход
@@ -64,7 +64,7 @@ router.post('/login', async (req, res) => {
   if (!valid) return res.status(400).json({ error: 'Invalid password' });
 
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
-  res.json({ token });
+  res.json({ token, user });
 });
 
 // ✅ Подключение Telegram ID
@@ -78,6 +78,13 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
   }
 
   try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (user.telegramId && user.telegramId === String(telegramId)) {
+      console.log('ℹ️ Telegram ID уже привязан');
+      return res.json({ success: true });
+    }
+
     await prisma.user.update({
       where: { id: userId },
       data: { telegramId: String(telegramId) },
