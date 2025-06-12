@@ -143,12 +143,25 @@ export default function AdminSchedule() {
         <Button variant="default" onClick={() => setDate(date.subtract(1, 'day'))}>
           ← Назад
         </Button>
-        <DatePickerInput
-          value={date.toDate()}
-          onChange={(val) => val && setDate(dayjs(val))}
-          clearable={false}
-          dropdownType="modal"
-        />
+
+        <div style={{ maxWidth: 220 }}>
+          <DatePickerInput
+            value={date.toDate()}
+            onChange={(val) => val && setDate(dayjs(val))}
+            clearable={false}
+            dropdownType="popover"
+            popoverProps={{
+              withinPortal: true,
+              shadow: 'md',
+              radius: 'md',
+            }}
+            styles={{
+              dropdown: { maxWidth: 280 },
+              calendarHeaderControl: { fontSize: 14 },
+            }}
+          />
+        </div>
+
         <Button variant="default" onClick={() => setDate(date.add(1, 'day'))}>
           Вперёд →
         </Button>
