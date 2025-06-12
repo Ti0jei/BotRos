@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
   res.json({ token, user });
 });
 
-// ✅ Подключение Telegram ID (из WebApp)
+// ✅ Подключение Telegram ID (из WebApp, с авторизацией)
 router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { telegramId } = req.body;
@@ -116,8 +116,22 @@ router.post('/telegram-direct', async (req, res) => {
       return res.json({ status: 'already linked' });
     }
 
-    console.log(`✅ Telegram ID ${telegramId} получен от @${username || 'noname'}`);
-    res.json({ status: 'ok' });
+    const admin = await prisma.user.findFirst({
+      where: { role: 'ADMIN' },
+    });
+
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    await prisma.user.update({
+      where: { id: admin.id },
+      data: { telegramId: String(telegramId) },
+    });
+
+    console.log(`✅ Telegram ID ${telegramId} записан для администратора ${admin.email}`);
+    res.json({ status: 'linked' });
+
   } catch (err) {
     console.error('❌ Ошибка при telegram-direct:', err);
     res.status(500).json({ error: 'Server error' });
