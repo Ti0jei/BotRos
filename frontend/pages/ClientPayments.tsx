@@ -10,7 +10,7 @@ import {
   Divider,
   Paper,
 } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
@@ -77,21 +77,13 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     });
 
     if (res.ok) {
-      showNotification({
-        title: 'Блок создан',
-        message: 'Новая оплата успешно добавлена',
-        color: 'green',
-      });
+      showNotification({ title: 'Блок создан', message: 'Новая оплата успешно добавлена', color: 'green' });
       setDate(new Date());
       setSessions(8);
       setPrice(600);
       await loadBlock();
     } else {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Не удалось добавить блок оплаты',
-        color: 'red',
-      });
+      showNotification({ title: 'Ошибка', message: 'Не удалось добавить блок оплаты', color: 'red' });
     }
   };
 
@@ -113,19 +105,11 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     });
 
     if (res.ok) {
-      showNotification({
-        title: 'Обновлено',
-        message: 'Блок оплаты обновлён',
-        color: 'green',
-      });
+      showNotification({ title: 'Обновлено', message: 'Блок оплаты обновлён', color: 'green' });
       setEditMode(false);
       await loadBlock();
     } else {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Не удалось обновить',
-        color: 'red',
-      });
+      showNotification({ title: 'Ошибка', message: 'Не удалось обновить', color: 'red' });
     }
   };
 
@@ -150,32 +134,17 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
 
           {editMode ? (
             <Stack>
-              <DatePicker
+              <DatePickerInput
                 label="Дата оплаты"
                 value={date}
                 onChange={setDate}
                 locale="ru"
                 allowDeselect={false}
+                popoverProps={{ withinPortal: true }}
               />
-              <NumberInput
-                label="Кол-во тренировок"
-                value={sessions}
-                onChange={(v) => setSessions(Number(v))}
-                min={1}
-              />
-              <NumberInput
-                label="Цена за тренировку, ₽"
-                value={price}
-                onChange={(v) => setPrice(Number(v))}
-                min={1}
-              />
-              <NumberInput
-                label="Уже использовано"
-                value={used}
-                onChange={(v) => setUsed(Number(v))}
-                min={0}
-                max={sessions}
-              />
+              <NumberInput label="Кол-во тренировок" value={sessions} onChange={(v) => setSessions(Number(v))} min={1} />
+              <NumberInput label="Цена за тренировку, ₽" value={price} onChange={(v) => setPrice(Number(v))} min={1} />
+              <NumberInput label="Уже использовано" value={used} onChange={(v) => setUsed(Number(v))} min={0} max={sessions} />
               <Button onClick={updateBlock} color="blue">💾 Сохранить изменения</Button>
             </Stack>
           ) : (
@@ -198,12 +167,13 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
 
       <Title order={4} mb="xs">➕ Добавить блок</Title>
 
-      <DatePicker
+      <DatePickerInput
         label="Дата оплаты"
         value={date}
         onChange={setDate}
         locale="ru"
         allowDeselect={false}
+        popoverProps={{ withinPortal: true }}
       />
       <NumberInput
         label="Кол-во тренировок"
