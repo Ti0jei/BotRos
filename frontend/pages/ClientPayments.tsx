@@ -7,10 +7,10 @@ import {
     Stack,
     Button,
     NumberInput,
-    DateInput,
     Divider,
     Paper,
   } from '@mantine/core';
+  import { DateInput } from '@mantine/dates';
   import { showNotification } from '@mantine/notifications';
   import { useEffect, useState } from 'react';
   import dayjs from 'dayjs';
