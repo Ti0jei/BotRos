@@ -16,9 +16,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Безопасный CORS: пропускаем токен и домен фронта
+// ✅ Безопасный CORS: разрешаем запросы с фронтенда на Vercel
 app.use(cors({
-  origin: true, // ← автоматическое доверие нужному origin
+  origin: 'https://bot-ros-frontend.vercel.app',
   credentials: true,
 }));
 
