@@ -1,4 +1,3 @@
-// frontend/pages/ClientPayments.tsx
 import {
   Container,
   Title,
