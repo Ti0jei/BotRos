@@ -123,6 +123,11 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
           {clients.map((client) => {
             const block = blockMap[client.id];
 
+            const remaining =
+              typeof block?.used === 'number' && typeof block?.paidTrainings === 'number'
+                ? block.paidTrainings - block.used
+                : 0;
+
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
@@ -133,10 +138,10 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                 {block ? (
                   <Group spacing="xs" mb="xs">
                     <Badge color="green">
-                      Осталось: {block.paidTrainings - block.used}
+                      Осталось: {remaining}
                     </Badge>
                     <Badge color="teal">
-                      Цена: {block.pricePerTraining} ₽
+                      Цена: {block.pricePerTraining ?? 0} ₽
                     </Badge>
                   </Group>
                 ) : (
