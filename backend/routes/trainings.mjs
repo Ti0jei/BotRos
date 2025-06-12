@@ -1,12 +1,13 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../utils/telegram.mjs';
+import { authMiddleware } from '../middleware/auth.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Получить тренировки
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const role = req.user.role;
   const { date } = req.query;
@@ -38,7 +39,7 @@ router.get('/', async (req, res) => {
 });
 
 // Назначить тренировку
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, hour } = req.body;
 
   if (req.user.role !== 'ADMIN') {
@@ -66,7 +67,7 @@ router.post('/', async (req, res) => {
 });
 
 // Удалить тренировку
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   if (req.user.role !== 'ADMIN') {
@@ -93,7 +94,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Подтвердить/отменить тренировку
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const userId = req.user.userId;
@@ -140,7 +141,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // ✅ Отметить присутствие тренером и учесть в оплате
-router.patch('/:id/attended', async (req, res) => {
+router.patch('/:id/attended', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { attended } = req.body;
 
@@ -168,14 +169,15 @@ router.patch('/:id/attended', async (req, res) => {
     });
 
     if (activeBlock) {
-      const nextUsed = activeBlock.used + 1;
+      const currentUsed = typeof activeBlock.used === 'number' ? activeBlock.used : 0;
+      const nextUsed = currentUsed + 1;
 
       await prisma.paymentBlock.update({
         where: { id: activeBlock.id },
         data: { used: nextUsed },
       });
 
-      if (nextUsed >= activeBlock.sessions) {
+      if (nextUsed >= activeBlock.paidTrainings) {
         await prisma.paymentBlock.update({
           where: { id: activeBlock.id },
           data: { active: false },
@@ -188,7 +190,7 @@ router.patch('/:id/attended', async (req, res) => {
         if (trainer?.telegramId) {
           await notifyTelegram(
             trainer.telegramId,
-            `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.sessions}). Напомните ему о необходимости оплаты.`
+            `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему о необходимости оплаты.`
           );
         }
       }
@@ -199,7 +201,7 @@ router.patch('/:id/attended', async (req, res) => {
 });
 
 // 📊 Получить статистику по клиенту
-router.get('/user/:userId/stats', async (req, res) => {
+router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   if (req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Only admin can view stats' });
   }
