@@ -18,19 +18,19 @@ interface Client {
   age: number;
 }
 
-interface Stats {
-  total: number;
-  confirmed: number;
-  attended: number;
-  missed: number;
+interface PaymentBlock {
+  id: string;
+  paidTrainings: number;
+  pricePerTraining: number;
+  used: number;
 }
 
 export default function AdminClients({ onBack }: { onBack: () => void }) {
   const [clients, setClients] = useState<Client[]>([]);
-  const [statsMap, setStatsMap] = useState<Record<string, Stats>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const loadClients = async () => {
@@ -54,9 +54,8 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
       setLoading(false);
 
       for (const client of data) {
-        loadStats(client.id);
+        loadBlock(client.id);
       }
-
     } catch (err) {
       console.error('Ошибка запроса:', err);
       setError('Сервер недоступен');
@@ -64,16 +63,20 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
     }
   };
 
-  const loadStats = async (userId: string) => {
+  const loadBlock = async (userId: string) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${API}/api/trainings/user/${userId}/stats`, {
+      const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      setStatsMap((prev) => ({ ...prev, [userId]: data }));
+      if (res.ok) {
+        const data = await res.json();
+        setBlockMap((prev) => ({ ...prev, [userId]: data }));
+      } else {
+        setBlockMap((prev) => ({ ...prev, [userId]: null }));
+      }
     } catch (err) {
-      console.error(`Ошибка загрузки статистики для ${userId}:`, err);
+      console.error(`Ошибка загрузки блока оплаты для ${userId}:`, err);
     }
   };
 
@@ -118,7 +121,8 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
       ) : (
         <Stack>
           {clients.map((client) => {
-            const stats = statsMap[client.id];
+            const block = blockMap[client.id];
+
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
@@ -126,23 +130,25 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 
-                {stats ? (
+                {block ? (
                   <Group spacing="xs" mb="xs">
-                    <Badge color="gray">Назначено: {stats.total}</Badge>
-                    <Badge color="blue">Подтвердил: {stats.confirmed}</Badge>
-                    <Badge color="green">Был: {stats.attended}</Badge>
-                    <Badge color="red">Пропустил: {stats.missed}</Badge>
+                    <Badge color="green">
+                      Осталось: {block.paidTrainings - block.used}
+                    </Badge>
+                    <Badge color="teal">
+                      Цена: {block.pricePerTraining} ₽
+                    </Badge>
                   </Group>
                 ) : (
-                  <Text size="sm" color="dimmed">Загрузка статистики...</Text>
+                  <Text size="sm" color="dimmed">Нет активной оплаты</Text>
                 )}
 
                 <Group grow>
                   <Button variant="light" color="blue" onClick={() => viewClient(client)}>
-                    Посмотреть
+                    Посещения
                   </Button>
                   <Button variant="light" color="teal" onClick={() => openPayments(client)}>
-                    💸 Оплаты
+                    💸 Оплата
                   </Button>
                   <Button variant="light" color="gray" disabled>
                     💬 Комм

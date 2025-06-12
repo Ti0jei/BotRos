@@ -34,7 +34,6 @@ interface PaymentBlock {
 export default function ClientPayments({ client, onBack }: { client: Client; onBack: () => void }) {
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
-  const telegramId = localStorage.getItem('telegramId');
 
   const [block, setBlock] = useState<PaymentBlock | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,10 +46,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   const [editMode, setEditMode] = useState(false);
 
   const loadBlock = async () => {
-    if (!telegramId) return;
-
     setLoading(true);
-    const res = await fetch(`${API}/api/payment-blocks/telegram/${telegramId}/active`, {
+    const res = await fetch(`${API}/api/payment-blocks/user/${client.id}/active`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
