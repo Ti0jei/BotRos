@@ -114,7 +114,6 @@ router.patch('/:id', async (req, res) => {
 
   const user = training.user;
 
-  // Уведомление клиенту
   if (user?.telegramId) {
     const text =
       status === 'CONFIRMED'
@@ -123,7 +122,6 @@ router.patch('/:id', async (req, res) => {
     await notifyTelegram(user.telegramId, `📌 Вы обновили статус тренировки: ${text}`);
   }
 
-  // Уведомление тренеру
   const trainer = await prisma.user.findFirst({
     where: { role: 'ADMIN' },
   });
@@ -137,6 +135,29 @@ router.patch('/:id', async (req, res) => {
 
     await notifyTelegram(trainer.telegramId, trainerText);
   }
+
+  res.json(updated);
+});
+
+// ✅ Отметить присутствие тренером
+router.patch('/:id/attended', async (req, res) => {
+  const { id } = req.params;
+  const { attended } = req.body;
+
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can mark attendance' });
+  }
+
+  const training = await prisma.training.findUnique({ where: { id } });
+
+  if (!training) {
+    return res.status(404).json({ error: 'Training not found' });
+  }
+
+  const updated = await prisma.training.update({
+    where: { id },
+    data: { attended },
+  });
 
   res.json(updated);
 });

@@ -11,6 +11,7 @@ import {
   Badge,
   Text,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
@@ -28,6 +29,7 @@ interface Training {
   date: string;
   hour: number;
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
+  attended: boolean | null;
   user: { name: string };
 }
 
@@ -61,7 +63,7 @@ export default function AdminSchedule() {
   const assignTraining = async () => {
     if (!selectedUser || selectedHour === null) return;
 
-    const trainingDate = date.format('YYYY-MM-DD'); // ← фикс
+    const trainingDate = date.format('YYYY-MM-DD');
 
     await fetch(`${API}/api/trainings`, {
       method: 'POST',
@@ -105,11 +107,23 @@ export default function AdminSchedule() {
     await loadTrainings();
   };
 
-  const hours = Array.from({ length: 15 }, (_, i) => i + 8); // 8–22
+  const markAttendance = async (id: string, attended: boolean) => {
+    await fetch(`${API}/api/trainings/${id}/attended`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ attended }),
+    });
 
-  const getTrainingAt = (hour: number) => {
-    return trainings.find((t) => t.hour === hour);
+    await loadTrainings();
   };
+
+  const hours = Array.from({ length: 15 }, (_, i) => i + 8);
+
+  const getTrainingsAt = (hour: number) =>
+    trainings.filter((t) => t.hour === hour);
 
   useEffect(() => {
     loadClients();
@@ -118,12 +132,19 @@ export default function AdminSchedule() {
 
   return (
     <Container>
-      <Title order={2} mb="md">Расписание на {date.format('DD.MM.YYYY')}</Title>
+      <Title order={2} mb="md">
+        Расписание на {date.format('DD.MM.YYYY')}
+      </Title>
 
-      <Group mb="sm">
+      <Group mb="md">
         <Button variant="default" onClick={() => setDate(date.subtract(1, 'day'))}>
           ← Назад
         </Button>
+        <DatePickerInput
+          value={date.toDate()}
+          onChange={(val) => val && setDate(dayjs(val))}
+          clearable={false}
+        />
         <Button variant="default" onClick={() => setDate(date.add(1, 'day'))}>
           Вперёд →
         </Button>
@@ -132,44 +153,69 @@ export default function AdminSchedule() {
       <ScrollArea>
         <Grid>
           {hours.map((hour) => {
-            const training = getTrainingAt(hour);
+            const hourTrainings = getTrainingsAt(hour);
             return (
               <Grid.Col span={12} key={hour}>
                 <Paper withBorder p="sm" shadow="xs">
                   <Group position="apart">
                     <Text weight={500}>{hour}:00</Text>
-                    {training ? (
-                      <Group spacing="xs">
-                        <Text>{training.user.name}</Text>
-                        <Badge
-                          color={
-                            training.status === 'CONFIRMED'
-                              ? 'green'
-                              : training.status === 'DECLINED'
-                              ? 'red'
-                              : 'gray'
-                          }
-                        >
-                          {training.status}
-                        </Badge>
-                        <Button
-                          variant="subtle"
-                          color="red"
-                          size="xs"
-                          onClick={() => deleteTraining(training.id)}
-                        >
-                          Отменить
-                        </Button>
-                      </Group>
-                    ) : (
-                      <Button size="xs" onClick={() => {
+                    <Button
+                      size="xs"
+                      onClick={() => {
                         setSelectedHour(hour);
                         setModalOpen(true);
-                      }}>
-                        Назначить
-                      </Button>
-                    )}
+                      }}
+                    >
+                      Назначить
+                    </Button>
                   </Group>
+
+                  {hourTrainings.map((training) => (
+                    <Group key={training.id} spacing="xs" mt="xs">
+                      <Text>{training.user.name}</Text>
+                      <Badge
+                        color={
+                          training.status === 'CONFIRMED'
+                            ? 'green'
+                            : training.status === 'DECLINED'
+                            ? 'red'
+                            : 'gray'
+                        }
+                      >
+                        {training.status}
+                      </Badge>
+
+                      {dayjs(training.date).isSameOrBefore(dayjs(), 'day') ? (
+                        <>
+                          <Button
+                            size="xs"
+                            variant={training.attended === true ? 'filled' : 'light'}
+                            color="green"
+                            onClick={() => markAttendance(training.id, true)}
+                          >
+                            Был
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant={training.attended === false ? 'filled' : 'light'}
+                            color="red"
+                            onClick={() => markAttendance(training.id, false)}
+                          >
+                            Не был
+                          </Button>
+                        </>
+                      ) : null}
+
+                      <Button
+                        variant="subtle"
+                        color="red"
+                        size="xs"
+                        onClick={() => deleteTraining(training.id)}
+                      >
+                        Отменить
+                      </Button>
+                    </Group>
+                  ))}
                 </Paper>
               </Grid.Col>
             );

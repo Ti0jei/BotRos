@@ -32,6 +32,7 @@ model Training {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   status    Status   @default(PENDING)
+  attended  Boolean? // ← Новое поле
   createdAt DateTime @default(now())
 }
 
