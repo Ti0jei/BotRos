@@ -8,8 +8,10 @@ import authRoutes from './routes/auth.mjs';
 import profileRoutes from './routes/profile.mjs';
 import clientsRoutes from './routes/clients.mjs';
 import trainingsRoutes from './routes/trainings.mjs';
-import { authMiddleware } from './middleware/auth.mjs';
 import usersRoute from './routes/users.mjs';
+import paymentBlocksRoutes from './routes/payment-blocks.mjs'; // ← добавлено
+
+import { authMiddleware } from './middleware/auth.mjs';
 
 dotenv.config();
 const app = express();
@@ -44,6 +46,7 @@ exec('npx prisma migrate deploy', (err, stdout, stderr) => {
   app.use('/api/clients', authMiddleware, clientsRoutes);
   app.use('/api/trainings', authMiddleware, trainingsRoutes);
   app.use('/api/users', usersRoute);
+  app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes); // ← добавлено
 
   // ✅ Старт сервера
   app.listen(PORT, () => {

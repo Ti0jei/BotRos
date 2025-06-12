@@ -8,21 +8,17 @@ datasource db {
 }
 
 model User {
-  id         String     @id @default(cuid())
-  email      String     @unique
+  id         String          @id @default(cuid())
+  email      String          @unique
   password   String
   name       String
   age        Int
-  telegramId String? // ← должно быть
-  role       Role       @default(USER)
+  telegramId String?
+  role       Role            @default(USER)
   trainings  Training[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-}
-
-enum Role {
-  USER
-  ADMIN
+  payments   PaymentBlock[]  // ← связь с оплатами
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 }
 
 model Training {
@@ -32,8 +28,25 @@ model Training {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   status    Status   @default(PENDING)
-  attended  Boolean? // ← Новое поле
+  attended  Boolean?
   createdAt DateTime @default(now())
+}
+
+model PaymentBlock {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime
+  sessions  Int      // сколько тренировок оплачено
+  price     Int      // цена за одну тренировку
+  used      Int      @default(0) // сколько уже посещено
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 enum Status {

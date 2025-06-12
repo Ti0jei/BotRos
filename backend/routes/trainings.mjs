@@ -139,7 +139,7 @@ router.patch('/:id', async (req, res) => {
   res.json(updated);
 });
 
-// ✅ Отметить присутствие тренером
+// ✅ Отметить присутствие тренером и учесть в оплате
 router.patch('/:id/attended', async (req, res) => {
   const { id } = req.params;
   const { attended } = req.body;
@@ -148,7 +148,10 @@ router.patch('/:id/attended', async (req, res) => {
     return res.status(403).json({ error: 'Only admin can mark attendance' });
   }
 
-  const training = await prisma.training.findUnique({ where: { id } });
+  const training = await prisma.training.findUnique({
+    where: { id },
+    include: { user: true },
+  });
 
   if (!training) {
     return res.status(404).json({ error: 'Training not found' });
@@ -158,6 +161,39 @@ router.patch('/:id/attended', async (req, res) => {
     where: { id },
     data: { attended },
   });
+
+  if (attended === true) {
+    const activeBlock = await prisma.paymentBlock.findFirst({
+      where: { userId: training.userId, active: true },
+    });
+
+    if (activeBlock) {
+      const nextUsed = activeBlock.used + 1;
+
+      await prisma.paymentBlock.update({
+        where: { id: activeBlock.id },
+        data: { used: nextUsed },
+      });
+
+      if (nextUsed >= activeBlock.sessions) {
+        await prisma.paymentBlock.update({
+          where: { id: activeBlock.id },
+          data: { active: false },
+        });
+
+        const trainer = await prisma.user.findFirst({
+          where: { role: 'ADMIN' },
+        });
+
+        if (trainer?.telegramId) {
+          await notifyTelegram(
+            trainer.telegramId,
+            `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.sessions}). Напомните ему о необходимости оплаты.`
+          );
+        }
+      }
+    }
+  }
 
   res.json(updated);
 });

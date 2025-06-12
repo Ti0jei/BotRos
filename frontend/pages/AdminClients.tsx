@@ -10,6 +10,7 @@ import {
   Loader,
   Badge,
 } from '@mantine/core';
+import ClientPayments from './ClientPayments'; // ← импорт страницы оплат
 
 interface Client {
   id: string;
@@ -28,6 +29,7 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [statsMap, setStatsMap] = useState<Record<string, Stats>>({});
   const [loading, setLoading] = useState(true);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null); // ← новый state
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const loadClients = async () => {
@@ -39,7 +41,6 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
     setClients(data);
     setLoading(false);
 
-    // Загрузим статистику по каждому клиенту
     for (const client of data) {
       loadStats(client.id);
     }
@@ -67,9 +68,22 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
     alert(`Раздел "Питание клиента ${client.name}" в разработке`);
   };
 
+  const openPayments = (client: Client) => {
+    setSelectedClient(client); // ← переключаемся на страницу оплаты
+  };
+
   useEffect(() => {
     loadClients();
   }, []);
+
+  if (selectedClient) {
+    return (
+      <ClientPayments
+        client={selectedClient}
+        onBack={() => setSelectedClient(null)} // ← вернуться назад к списку клиентов
+      />
+    );
+  }
 
   return (
     <Container>
@@ -102,6 +116,9 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                 <Group grow>
                   <Button variant="light" color="blue" onClick={() => viewClient(client)}>
                     Посмотреть
+                  </Button>
+                  <Button variant="light" color="teal" onClick={() => openPayments(client)}>
+                    💸 Оплаты
                   </Button>
                   <Button variant="light" color="gray" disabled>
                     💬 Комм
