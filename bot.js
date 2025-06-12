@@ -19,7 +19,7 @@ bot.start(async (ctx) => {
   const telegramId = ctx.from.id;
   const username = ctx.from.username || '';
 
-  // Отправляем telegramId на backend
+  // 🔁 Отправляем telegramId на backend (необязательно, но можно оставить)
   try {
     await fetch(`${API_URL}/api/auth/telegram-direct`, {
       method: 'POST',
@@ -31,11 +31,18 @@ bot.start(async (ctx) => {
     console.error('❌ Ошибка при отправке telegramId:', e);
   }
 
-  // Отправляем кнопку входа
+  // 🟢 Отправляем кнопку с tid-параметром
   ctx.reply('Нажми, чтобы открыть мини-приложение 👇', {
     reply_markup: {
       inline_keyboard: [
-        [{ text: 'Открыть приложение', web_app: { url: WEB_APP_URL } }],
+        [
+          {
+            text: 'Открыть приложение',
+            web_app: {
+              url: `${WEB_APP_URL}?tid=${telegramId}`,
+            },
+          },
+        ],
       ],
     },
   });

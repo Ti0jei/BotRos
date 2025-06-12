@@ -21,6 +21,7 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     const tid = params.get('tid');
     if (tid) {
+      console.log('[TG] Сохраняем telegramId из URL:', tid);
       localStorage.setItem('telegramId', tid);
     }
   }, []);
@@ -41,6 +42,7 @@ function App() {
 
           const telegramId = localStorage.getItem('telegramId');
           if (telegramId) {
+            console.log('[TG] Привязываем Telegram ID:', telegramId);
             fetch(`${API}/api/auth/telegram-connect`, {
               method: 'POST',
               headers: {
@@ -50,10 +52,10 @@ function App() {
               body: JSON.stringify({ telegramId: parseInt(telegramId, 10) }),
             })
               .then(() => {
-                console.log('[TG] Telegram ID привязан');
+                console.log('[TG] ✅ Telegram ID привязан');
                 localStorage.removeItem('telegramId');
               })
-              .catch((err) => console.error('[TG] Ошибка при привязке telegramId:', err));
+              .catch((err) => console.error('[TG] ❌ Ошибка при привязке telegramId:', err));
           }
         } else {
           localStorage.removeItem('token');
