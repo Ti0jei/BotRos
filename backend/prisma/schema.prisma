@@ -8,45 +8,35 @@ datasource db {
 }
 
 model User {
-  id         String          @id @default(cuid())
-  email      String          @unique
-  password   String
-  name       String
-  age        Int
-  telegramId String?
-  role       Role            @default(USER)
-  trainings  Training[]
-  payments   PaymentBlock[]  // ← связь с оплатами
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  id        String         @id @default(cuid())
+  email     String         @unique
+  password  String
+  name      String
+  age       Int
+  role      String         @default("USER")
+  createdAt DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
+  payments  PaymentBlock[]
+  trainings Training[]
 }
 
 model Training {
-  id        String   @id @default(cuid())
-  date      DateTime
+  id        String    @id @default(cuid())
+  date      DateTime  @db.Timestamp(6)
   hour      Int
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  status    Status   @default(PENDING)
-  attended  Boolean?
-  createdAt DateTime @default(now())
+  status    Status    @default(PENDING)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
 }
 
 model PaymentBlock {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  date      DateTime
-  sessions  Int      // сколько тренировок оплачено
-  price     Int      // цена за одну тренировку
-  used      Int      @default(0) // сколько уже посещено
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-}
-
-enum Role {
-  USER
-  ADMIN
+  id               String   @id @default(cuid())
+  userId           String
+  paidTrainings    Int
+  pricePerTraining Int
+  paidAt           DateTime @default(now()) @db.Timestamp(6)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_payment_user")
 }
 
 enum Status {
