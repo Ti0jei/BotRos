@@ -18,29 +18,6 @@ function App() {
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const tg = window.Telegram?.WebApp;
-
-      if (tg) {
-        tg.ready();
-        console.log('[TG] ✅ Telegram WebApp готов');
-
-        if (tg.initDataUnsafe?.user) {
-          console.log('[TG] ✅ Пользователь Telegram:', tg.initDataUnsafe.user);
-        } else {
-          console.log('[TG] ⏳ Пользователь есть, но без initDataUnsafe.user');
-        }
-
-        clearInterval(interval);
-      } else {
-        console.log('[TG] ⏳ Ждём Telegram.WebApp...');
-      }
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
@@ -52,23 +29,6 @@ function App() {
         if (data) {
           setProfile(data);
           setView('profile');
-
-          const tg = window.Telegram?.WebApp;
-          const telegramId = tg?.initDataUnsafe?.user?.id;
-
-          if (telegramId) {
-            fetch(`${API}/api/auth/telegram-connect`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ telegramId }),
-            })
-              .then((res) => res.json())
-              .then(() => console.log('[TG] Привязка telegramId выполнена'))
-              .catch(() => console.error('[TG] Ошибка привязки telegramId'));
-          }
         } else {
           localStorage.removeItem('token');
           setView('login');

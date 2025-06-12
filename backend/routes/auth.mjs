@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
   res.json({ token, user });
 });
 
-// ✅ Подключение Telegram ID
+// ✅ Подключение Telegram ID (из WebApp)
 router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { telegramId } = req.body;
@@ -94,6 +94,32 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('❌ Ошибка при сохранении telegramId:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// 📩 Прямая привязка Telegram ID без авторизации (через бот)
+router.post('/telegram-direct', async (req, res) => {
+  const { telegramId, username } = req.body;
+
+  if (!telegramId) {
+    return res.status(400).json({ error: 'Missing telegramId' });
+  }
+
+  try {
+    const existing = await prisma.user.findFirst({
+      where: { telegramId: String(telegramId) },
+    });
+
+    if (existing) {
+      console.log(`ℹ️ Telegram ID ${telegramId} уже привязан`);
+      return res.json({ status: 'already linked' });
+    }
+
+    console.log(`✅ Telegram ID ${telegramId} получен от @${username || 'noname'}`);
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('❌ Ошибка при telegram-direct:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
