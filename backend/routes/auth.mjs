@@ -25,7 +25,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
   }
 })();
 
-// Регистрация с поддержкой Telegram ID
+// Регистрация
 router.post('/register', async (req, res) => {
   const { email, password, name, age, telegramId } = req.body;
   if (!email || !password || !name || !age) {
@@ -38,7 +38,9 @@ router.post('/register', async (req, res) => {
   }
 
   if (telegramId) {
-    const existingTg = await prisma.user.findFirst({ where: { telegramId: String(telegramId) } });
+    const existingTg = await prisma.user.findFirst({
+      where: { telegramId: String(telegramId) },
+    });
     if (existingTg) {
       return res.status(400).json({ error: 'Telegram ID already linked to another user' });
     }
@@ -75,22 +77,25 @@ router.post('/login', async (req, res) => {
   res.json({ token, user });
 });
 
-// ✅ Привязка Telegram ID (авторизованная)
+// ✅ Привязка Telegram ID (авторизованная, WebApp)
 router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { telegramId } = req.body;
 
   if (!telegramId || typeof telegramId !== 'number') {
-    console.warn('⚠️ Неверный telegramId:', telegramId);
     return res.status(400).json({ error: 'Invalid telegramId' });
   }
 
   try {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const existing = await prisma.user.findFirst({
+      where: {
+        telegramId: String(telegramId),
+        NOT: { id: userId }, // Не привязывать, если уже есть у другого
+      },
+    });
 
-    if (user.telegramId && user.telegramId === String(telegramId)) {
-      console.log('ℹ️ Telegram ID уже привязан');
-      return res.json({ success: true });
+    if (existing) {
+      return res.status(400).json({ error: 'This Telegram ID is already linked to another account' });
     }
 
     await prisma.user.update({
@@ -101,12 +106,12 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
     console.log(`✅ Telegram ID ${telegramId} сохранён для userId ${userId}`);
     res.json({ success: true });
   } catch (err) {
-    console.error('❌ Ошибка при сохранении telegramId:', err);
+    console.error('❌ Ошибка при telegram-connect:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// 📩 Telegram ID через бота
+// 📩 Telegram ID через бота (один раз, только если Telegram ID нигде не записан)
 router.post('/telegram-direct', async (req, res) => {
   const { telegramId, username } = req.body;
 
@@ -125,11 +130,11 @@ router.post('/telegram-direct', async (req, res) => {
     }
 
     const admin = await prisma.user.findFirst({
-      where: { role: 'ADMIN' },
+      where: { role: 'ADMIN', telegramId: null },
     });
 
     if (!admin) {
-      return res.status(404).json({ error: 'Admin not found' });
+      return res.status(404).json({ error: 'No available admin to link Telegram ID' });
     }
 
     await prisma.user.update({
