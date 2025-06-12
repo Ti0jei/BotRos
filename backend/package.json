@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
+    "@tabler/icons": "^3.33.0",
     "@tabler/icons-react": "^3.34.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
