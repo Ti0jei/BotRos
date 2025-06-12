@@ -25,9 +25,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
   }
 })();
 
-// Регистрация
+// Регистрация с поддержкой Telegram ID
 router.post('/register', async (req, res) => {
-  const { email, password, name, age } = req.body;
+  const { email, password, name, age, telegramId } = req.body;
   if (!email || !password || !name || !age) {
     return res.status(400).json({ error: 'Missing fields' });
   }
@@ -35,6 +35,13 @@ router.post('/register', async (req, res) => {
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return res.status(400).json({ error: 'User already exists' });
+  }
+
+  if (telegramId) {
+    const existingTg = await prisma.user.findFirst({ where: { telegramId: String(telegramId) } });
+    if (existingTg) {
+      return res.status(400).json({ error: 'Telegram ID already linked to another user' });
+    }
   }
 
   const hashed = await bcrypt.hash(password, 10);
@@ -45,7 +52,8 @@ router.post('/register', async (req, res) => {
       password: hashed,
       name,
       age: parseInt(age),
-      role: 'USER'
+      role: 'USER',
+      telegramId: telegramId ? String(telegramId) : null,
     }
   });
 
@@ -67,7 +75,7 @@ router.post('/login', async (req, res) => {
   res.json({ token, user });
 });
 
-// ✅ Подключение Telegram ID (из WebApp, с авторизацией)
+// ✅ Привязка Telegram ID (авторизованная)
 router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { telegramId } = req.body;
@@ -98,7 +106,7 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
   }
 });
 
-// 📩 Прямая привязка Telegram ID без авторизации (через бот)
+// 📩 Telegram ID через бота
 router.post('/telegram-direct', async (req, res) => {
   const { telegramId, username } = req.body;
 
