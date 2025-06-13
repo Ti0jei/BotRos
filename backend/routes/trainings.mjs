@@ -129,13 +129,8 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.json(updated);
   }
 
-  // Обновить attended и списать из блока
-  const updated = await prisma.training.update({
-    where: { id },
-    data: { attended },
-  });
-
-  if (attended === true && training.wasCounted !== true) {
+  // Обновить attended и списать из блока и при прогулe
+  if ((attended === true || attended === false) && training.wasCounted !== true) {
     const trainingDate = new Date(training.date);
     const activeBlock = await prisma.paymentBlock.findFirst({
       where: { userId: training.userId, active: true },
