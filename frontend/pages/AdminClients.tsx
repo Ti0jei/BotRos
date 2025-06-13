@@ -181,7 +181,7 @@ export default function AdminClients({
                       color="yellow"
                       variant="outline"
                       size="sm"
-                      style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
+                      style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', minWidth: 120 }}
                       onClick={() => onOpenHistory(client.id)}
                     >
                       📊 История оплат
