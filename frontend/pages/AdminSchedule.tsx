@@ -84,6 +84,18 @@ export default function AdminSchedule() {
   const assignTraining = async () => {
     if (!selectedUser || selectedHour === null) return;
 
+    // 🔒 Проверка: если не выбрана "Разовая оплата", то у пользователя должен быть активный блок
+    if (!isSinglePaid) {
+      const res = await fetch(`${API}/api/payment-blocks/user/${selectedUser}/active`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const block = res.ok ? await res.json() : null;
+      if (!block) {
+        alert('У клиента нет активного блока. Включите "Разовая оплата", чтобы назначить тренировку.');
+        return;
+      }
+    }
+
     const trainingDate = date.format('YYYY-MM-DD');
 
     await fetch(`${API}/api/trainings`, {
