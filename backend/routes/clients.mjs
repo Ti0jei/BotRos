@@ -19,6 +19,7 @@ router.get('/', authMiddleware, async (req, res) => {
       select: {
         id: true,
         name: true,
+        lastName: true,        // ← добавлено!
         internalTag: true,
         email: true,
         age: true,
