@@ -129,7 +129,12 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.json(updated);
   }
 
-  // Обновить attended и списать из блока и при прогулe
+  // Обновить attended и списать из блока (включая прогул)
+  let updated = await prisma.training.update({
+    where: { id },
+    data: { attended },
+  });
+
   if ((attended === true || attended === false) && training.wasCounted !== true) {
     const trainingDate = new Date(training.date);
     const activeBlock = await prisma.paymentBlock.findFirst({
@@ -147,7 +152,7 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
         data: { used: nextUsed },
       });
 
-      await prisma.training.update({
+      updated = await prisma.training.update({
         where: { id },
         data: { wasCounted: true },
       });
@@ -169,7 +174,7 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     }
   }
 
-  res.json(updated);
+  return res.json(updated);
 });
 
 // Статистика
