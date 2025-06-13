@@ -1,3 +1,4 @@
+// frontend/src/pages/AdminSchedule.tsx
 import {
   Container,
   Title,
@@ -11,6 +12,9 @@ import {
   Badge,
   Text,
   Checkbox,
+  Divider,
+  Stack,
+  Box,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -184,58 +188,98 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   }, [date]);
 
   return (
-    <Container size="sm">
+    <Container size="sm" p="md">
       <Group position="apart" mt="sm" mb="md">
         <Title order={2}>Расписание на {date.format('DD.MM.YYYY')}</Title>
-        <Button variant="light" onClick={onBack}>Назад к профилю</Button>
+        <Button
+          onClick={onBack}
+          variant="light"
+          leftIcon={<IconArrowLeft size={16} />}
+        >
+          Назад к профилю
+        </Button>
       </Group>
 
-      <Group mb="md" spacing="xs" position="center">
-        <Button variant="light" onClick={() => setDate(date.subtract(1, 'day'))}>
-          ← Назад
+      <Group mb="md" position="center" spacing="xs">
+        <Button
+          variant="default"
+          onClick={() => setDate(date.subtract(1, 'day'))}
+          leftIcon={<IconChevronLeft size={14} />}
+        >
+          Назад
         </Button>
+
         <DatePickerInput
           value={date.toDate()}
           onChange={(val) => val && setDate(dayjs(val))}
           clearable={false}
           dropdownType="popover"
+          size="sm"
+          styles={{ input: { textAlign: 'center', minWidth: 120 } }}
         />
-        <Button variant="light" onClick={() => setDate(date.add(1, 'day'))}>
-          Вперёд →
+
+        <Button
+          variant="default"
+          onClick={() => setDate(date.add(1, 'day'))}
+          rightIcon={<IconChevronRight size={14} />}
+        >
+          Вперёд
         </Button>
       </Group>
 
-      <ScrollArea>
-        <Grid gutter="xs">
+      <Divider my="sm" />
+
+      <ScrollArea h="65vh" offsetScrollbars>
+        <Stack spacing="sm">
           {hours.map((hour) => {
             const hourTrainings = getTrainingsAt(hour);
             return (
-              <Grid.Col span={12} key={hour}>
-                <Group position="apart" mb="xs">
+              <Box key={hour}>
+                <Group position="apart" mb={4}>
                   <Text fw={600}>{hour}:00</Text>
-                  <Button variant="filled" color="blue" size="xs" onClick={() => {
-                    setSelectedHour(hour);
-                    setModalOpen(true);
-                  }}>
+                  <Button
+                    size="xs"
+                    variant="filled"
+                    color="blue"
+                    onClick={() => {
+                      setSelectedHour(hour);
+                      setModalOpen(true);
+                    }}
+                  >
                     Назначить
                   </Button>
                 </Group>
 
                 {hourTrainings.map((training) => (
-                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md">
+                  <Paper
+                    key={training.id}
+                    withBorder
+                    shadow="xs"
+                    radius="md"
+                    p="sm"
+                    mb="xs"
+                  >
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
-                        {training.user.name} {training.user.lastName ?? ''} {training.user.internalTag ? `(${training.user.internalTag})` : ''}
-                        {training.isSinglePaid && <span title="Разовая оплата"> 💸</span>}
+                        {training.user.name} {training.user.lastName ?? ''}{' '}
+                        {training.user.internalTag && (
+                          <Text span color="dimmed">
+                            ({training.user.internalTag})
+                          </Text>
+                        )}
+                        {training.isSinglePaid && (
+                          <span title="Разовая оплата"> 💸</span>
+                        )}
                       </Text>
                       <Badge color={
                         training.status === 'CONFIRMED'
                           ? 'green'
                           : training.status === 'DECLINED'
-                          ? 'red'
-                          : 'gray'
+                            ? 'red'
+                            : 'gray'
                       }>
-                        {training.status === 'CONFIRMED' ? 'Придёт' : training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
+                        {training.status === 'CONFIRMED' ? 'Придёт' :
+                          training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
                       </Badge>
                     </Group>
 
@@ -271,12 +315,13 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                     </Group>
                   </Paper>
                 ))}
-              </Grid.Col>
+              </Box>
             );
           })}
-        </Grid>
+        </Stack>
       </ScrollArea>
 
+      {/* Модалка назначения */}
       <Modal
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -303,6 +348,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         </Button>
       </Modal>
 
+      {/* Модалка подтверждения */}
       <Modal
         opened={confirmModal}
         onClose={() => setConfirmModal(false)}
@@ -318,10 +364,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
           </Button>
         </Group>
       </Modal>
-
-      <Button mt="lg" variant="light" leftIcon={<IconArrowLeft size={16} />} onClick={onBack} fullWidth>
-        Назад к профилю
-      </Button>
     </Container>
   );
 }
