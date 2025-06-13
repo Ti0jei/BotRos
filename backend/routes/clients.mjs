@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 router.get('/', authMiddleware, async (req, res) => {
-  console.log('req.user:', req.user); // <-- Добавить лог
+  console.log('req.user:', req.user); // Для отладки
 
   if (!req.user || req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Access denied' });
@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
       select: {
         id: true,
         name: true,
-        extraName: true,
+        internalTag: true,  // Правильное имя поля
         email: true,
         age: true,
         createdAt: true,
