@@ -88,6 +88,9 @@ export default function AdminClients({
   };
 
   const deleteClient = async (id: string) => {
+    if (!window.confirm('Вы точно хотите удалить клиента? Это действие необратимо.')) {
+      return;
+    }
     const token = localStorage.getItem('token');
     await fetch(`${API}/api/clients/${id}`, {
       method: 'DELETE',
@@ -167,7 +170,7 @@ export default function AdminClients({
                 <Stack mt="xs" spacing="xs">
                   <Group grow>
                     <Button color="blue" onClick={() => viewClient(client)}>
-                      Посещения
+                      Питание
                     </Button>
                     <Button color="teal" onClick={() => openPayments(client)}>
                       💸 Оплата
@@ -177,6 +180,8 @@ export default function AdminClients({
                     <Button
                       color="yellow"
                       variant="outline"
+                      size="sm"
+                      style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
                       onClick={() => onOpenHistory(client.id)}
                     >
                       📊 История оплат
