@@ -6,17 +6,18 @@ import CoachProfile from './pages/CoachProfile';
 import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
+import PaymentHistory from './pages/PaymentHistory'; // ⬅️ Новый импорт
 import { Container, Button } from '@mantine/core';
 
 function App() {
   const [view, setView] = useState<
-    'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar'
+    'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar' | 'history'
   >('login');
   const [profile, setProfile] = useState<any>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null); // ⬅️ Новый стейт
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  // 🟡 1. Сохраняем telegramId из URL, если есть
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tid = params.get('tid');
@@ -26,7 +27,6 @@ function App() {
     }
   }, []);
 
-  // 🔐 2. После входа — загружаем профиль, и если есть telegramId — привязываем
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -123,7 +123,17 @@ function App() {
       )}
 
       {view === 'clients' && profile?.role === 'ADMIN' && (
-        <AdminClients onBack={() => setView('profile')} />
+        <AdminClients
+          onBack={() => setView('profile')}
+          onOpenHistory={(userId) => {
+            setSelectedClientId(userId);
+            setView('history');
+          }}
+        />
+      )}
+
+      {view === 'history' && selectedClientId && (
+        <PaymentHistory userId={selectedClientId} onBack={() => setView('clients')} />
       )}
     </Container>
   );

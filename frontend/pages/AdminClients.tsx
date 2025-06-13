@@ -10,6 +10,7 @@ import {
   Loader,
   Badge,
 } from '@mantine/core';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -25,7 +26,13 @@ interface PaymentBlock {
   used: number;
 }
 
-export default function AdminClients({ onBack }: { onBack: () => void }) {
+export default function AdminClients({
+  onBack,
+  onOpenHistory,
+}: {
+  onBack: () => void;
+  onOpenHistory: (userId: string) => void;
+}) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +135,8 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                 ? block.paidTrainings - block.used
                 : 0;
 
+            const blockEnded = !block || (block.used >= block.paidTrainings);
+
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
@@ -137,7 +146,7 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
 
                 {block ? (
                   <Group spacing="xs" mb="xs">
-                    <Badge color="green">
+                    <Badge color={blockEnded ? 'red' : 'green'}>
                       Осталось: {remaining}
                     </Badge>
                     <Badge color="teal">
@@ -145,7 +154,14 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                     </Badge>
                   </Group>
                 ) : (
-                  <Text size="sm" color="dimmed">Нет активной оплаты</Text>
+                  <Text size="sm" color="dimmed" mb="xs">Нет активной оплаты</Text>
+                )}
+
+                {blockEnded && (
+                  <Text color="red" fw={600} mb="xs">
+                    <IconAlertTriangle size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+                    Требуется новый блок
+                  </Text>
                 )}
 
                 <Stack mt="xs" spacing="xs">
@@ -158,8 +174,12 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                     </Button>
                   </Group>
                   <Group grow>
-                    <Button color="gray" disabled>
-                      💬 Комм
+                    <Button
+                      color="yellow"
+                      variant="outline"
+                      onClick={() => onOpenHistory(client.id)}
+                    >
+                      📊 История оплат
                     </Button>
                     <Button color="red" onClick={() => deleteClient(client.id)}>
                       Удалить
