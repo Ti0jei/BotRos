@@ -1,3 +1,5 @@
+// frontend/src/pages/AdminClients.tsx
+
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -11,12 +13,7 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import {
-  IconAlertTriangle,
-  IconCurrencyDollar,
-  IconCheck,
-  IconX,
-} from '@tabler/icons-react';
+import { IconAlertTriangle, IconCurrencyDollar } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -80,19 +77,15 @@ export default function AdminClients({
       const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setBlockMap((prev) => ({ ...prev, [userId]: data }));
-      } else {
-        setBlockMap((prev) => ({ ...prev, [userId]: null }));
-      }
+      const data = res.ok ? await res.json() : null;
+      setBlockMap((prev) => ({ ...prev, [userId]: data }));
     } catch (err) {
       console.error(`Ошибка загрузки блока оплаты для ${userId}:`, err);
     }
   };
 
   const deleteClient = async (id: string) => {
-    if (!window.confirm('Вы точно хотите удалить клиента? Это действие необратимо.')) return;
+    if (!window.confirm('Вы точно хотите удалить клиента?')) return;
     const token = localStorage.getItem('token');
     await fetch(`${API}/api/clients/${id}`, {
       method: 'DELETE',
@@ -112,10 +105,6 @@ export default function AdminClients({
   };
 
   const saveInternalTag = async (id: string) => {
-    if (internalTagValue.trim().length > 50) {
-      alert('Доп. имя не должно превышать 50 символов');
-      return;
-    }
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API}/api/clients/${id}`, {
@@ -133,79 +122,72 @@ export default function AdminClients({
         alert('Ошибка при сохранении');
       }
     } catch (err) {
-      console.error('Ошибка сохранения internalTag:', err);
-      alert('Ошибка при сохранении');
+      console.error('Ошибка при PATCH /clients/:id', err);
     }
   };
 
-  const viewClient = (client: Client) => {
-    alert(`Раздел "Питание клиента ${client.name}" в разработке`);
-  };
-
-  const openPayments = (client: Client) => {
-    setSelectedClient(client);
-  };
+  const openPayments = (client: Client) => setSelectedClient(client);
 
   useEffect(() => {
     loadClients();
   }, []);
 
   if (selectedClient) {
-    return (
-      <ClientPayments
-        client={selectedClient}
-        onBack={() => setSelectedClient(null)}
-      />
-    );
+    return <ClientPayments client={selectedClient} onBack={() => setSelectedClient(null)} />;
   }
 
   return (
     <Container>
       <Title order={2} mb="md">Клиенты</Title>
+
       {loading ? (
         <Loader />
       ) : error ? (
-        <Text color="red" size="md">{error}</Text>
+        <Text color="red">{error}</Text>
       ) : (
         <Stack>
           {clients.map((client) => {
             const block = blockMap[client.id];
             const remaining = block ? block.paidTrainings - block.used : 0;
             const isEditing = editingId === client.id;
-            const blockEnded = block && block.used >= block.paidTrainings;
 
             return (
-              <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
+              <Card key={client.id} withBorder radius="md" p="md">
                 <Group position="apart" mb="xs">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Group spacing="xs">
                     <Text fw={500}>{client.name}</Text>
                     {isEditing ? (
                       <TextInput
                         value={internalTagValue}
                         onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                        placeholder="Доп. имя"
                         size="xs"
                         style={{ width: 120 }}
-                        placeholder="Доп. имя"
                       />
                     ) : (
                       client.internalTag && <Text size="sm" color="dimmed">({client.internalTag})</Text>
                     )}
-                  </div>
+                  </Group>
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 
                 {!isEditing && block && (
-                  <Group spacing="xs" mb="xs">
-                    <Badge color={blockEnded ? 'red' : 'green'}>Осталось: {remaining}</Badge>
-                    <Badge color="teal">Цена: {block.pricePerTraining} ₽</Badge>
-                  </Group>
-                )}
-
-                {!isEditing && blockEnded && (
-                  <Text color="red" fw={600} mb="xs">
-                    <IconAlertTriangle size={16} style={{ marginRight: 6 }} />
-                    Требуется новый блок
-                  </Text>
+                  <>
+                    <Group spacing="xs" mb="xs">
+                      <Badge color={remaining === 0 ? 'red' : 'green'}>
+                        Осталось: {remaining}
+                      </Badge>
+                      <Badge color="teal">
+                        Цена: {block.pricePerTraining} ₽
+                      </Badge>
+                    </Group>
+                    {remaining === 0 && (
+                      <Text color="red" fw={600}>
+                        <IconAlertTriangle size={16} style={{ marginRight: 6 }} />
+                        Требуется новый блок
+                      </Text>
+                    )}
+                  </>
                 )}
 
                 <Stack mt="xs" spacing="xs">
@@ -221,8 +203,12 @@ export default function AdminClients({
                       </>
                     ) : (
                       <>
-                        <Button color="blue" onClick={() => viewClient(client)}>Питание</Button>
-                        <Button color="teal" onClick={() => openPayments(client)}>💸 Оплата</Button>
+                        <Button color="blue" onClick={() => openPayments(client)}>
+                          Питание
+                        </Button>
+                        <Button color="teal" onClick={() => openPayments(client)}>
+                          💸 Оплата
+                        </Button>
                       </>
                     )}
                   </Group>
@@ -232,14 +218,7 @@ export default function AdminClients({
                         color="yellow"
                         variant="outline"
                         size="sm"
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
+                        style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}
                         onClick={() => onOpenHistory(client.id)}
                       >
                         📊 История оплат <IconCurrencyDollar size={18} />
