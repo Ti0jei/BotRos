@@ -24,6 +24,18 @@ router.get('/user/:userId/active', authMiddleware, async (req, res) => {
   res.json(block);
 });
 
+// 🔹 Получить все блоки оплаты по userId (для истории)
+router.get('/user/:userId', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
+
+  const blocks = await prisma.paymentBlock.findMany({
+    where: { userId },
+    orderBy: { paidAt: 'desc' },
+  });
+
+  res.json(blocks);
+});
+
 // 🔹 Получить активный блок оплаты по telegramId
 router.get('/telegram/:telegramId/active', authMiddleware, async (req, res) => {
   const { telegramId } = req.params;
@@ -83,15 +95,17 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     paidTrainings,
     pricePerTraining,
     used, // 👈 теперь поддерживается обновление
+    active, // 👈 поддержка изменения статуса активности
   } = req.body;
 
   const updated = await prisma.paymentBlock.update({
     where: { id },
     data: {
-      paidAt: new Date(paidAt),
-      paidTrainings: Number(paidTrainings),
-      pricePerTraining: Number(pricePerTraining),
+      paidAt: paidAt ? new Date(paidAt) : undefined,
+      paidTrainings: paidTrainings !== undefined ? Number(paidTrainings) : undefined,
+      pricePerTraining: pricePerTraining !== undefined ? Number(pricePerTraining) : undefined,
       used: typeof used === 'number' ? used : undefined,
+      active: typeof active === 'boolean' ? active : undefined,
     },
   });
 

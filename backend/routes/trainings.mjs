@@ -1,6 +1,3 @@
-// ВСТАВЬ ВМЕСТО СТАРОГО trainings.mjs
-// путь: backend/routes/trainings.mjs
-
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../utils/telegram.mjs';
@@ -193,6 +190,24 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
     attended: all.filter(t => t.attended === true).length,
     missed: all.filter(t => t.attended === false).length,
   });
+});
+
+// Получить разовые тренировки (isSinglePaid = true)
+router.get('/single/:userId', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
+
+  const trainings = await prisma.training.findMany({
+    where: {
+      userId,
+      isSinglePaid: true,
+    },
+    orderBy: {
+      date: 'desc',
+      hour: 'desc',
+    },
+  });
+
+  res.json(trainings);
 });
 
 export default router;
