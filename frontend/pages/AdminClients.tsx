@@ -16,6 +16,7 @@ import ClientPayments from './ClientPayments';
 interface Client {
   id: string;
   name: string;
+  extraName?: string; // Новое поле — доп. имя, опционально
   age: number;
 }
 
@@ -143,7 +144,9 @@ export default function AdminClients({
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
-                  <Text fw={500}>{client.name}</Text>
+                  <Text fw={500}>
+                    {client.name} {client.extraName ? `(${client.extraName})` : ''}
+                  </Text>
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 

@@ -8,18 +8,19 @@ datasource db {
 }
 
 model User {
-  id         String         @id @default(cuid())
-  email      String         @unique
-  password   String
-  name       String
-  age        Int
-  role       String         @default("USER")
-  createdAt  DateTime?      @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
-  telegramId String?        @unique
+  id           String         @id @default(cuid())
+  email        String         @unique
+  password     String
+  name         String
+  internalTag  String?        // ← новое поле, необязательное
+  age          Int
+  role         String         @default("USER")
+  createdAt    DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
+  telegramId   String?        @unique
 
-  payments   PaymentBlock[]
-  trainings  Training[]
+  payments     PaymentBlock[]
+  trainings    Training[]
 }
 
 model Training {
