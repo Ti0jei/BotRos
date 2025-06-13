@@ -10,7 +10,7 @@ import {
   Loader,
   Badge,
 } from '@mantine/core';
-import { IconAlertTriangle } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCurrencyRub } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -181,10 +181,20 @@ export default function AdminClients({
                       color="yellow"
                       variant="outline"
                       size="sm"
-                      style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', minWidth: 120 }}
+                      style={{
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        minWidth: 120,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontWeight: 500,
+                      }}
                       onClick={() => onOpenHistory(client.id)}
                     >
-                      📊 История оплат
+                      <IconCurrencyRub size={18} />
+                      История оплат
                     </Button>
                     <Button color="red" onClick={() => deleteClient(client.id)}>
                       Удалить
