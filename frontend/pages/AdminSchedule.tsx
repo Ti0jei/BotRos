@@ -49,6 +49,10 @@ export default function AdminSchedule() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+  const [confirmMessage, setConfirmMessage] = useState('');
+
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -115,21 +119,22 @@ export default function AdminSchedule() {
     await loadTrainings();
   };
 
-  const markAttendance = async (
-    id: string,
-    attended: boolean,
-    current: boolean | null
-  ) => {
-    if (current !== null) return;
-
-    await fetch(`${API}/api/trainings/${id}/attended`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ attended }),
+  const handleAttendance = (id: string, attended: boolean, current: boolean | null) => {
+    setConfirmAction(() => async () => {
+      await fetch(`${API}/api/trainings/${id}/attended`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ attended }),
+      });
+      setConfirmModal(false);
+      await loadTrainings();
     });
 
-    await loadTrainings();
+    setConfirmMessage(attended ? 'Отметить "Был"?' : 'Отметить "Прогул"?');
+    setConfirmModal(true);
   };
 
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
@@ -161,7 +166,10 @@ export default function AdminSchedule() {
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
             popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
-            styles={{ dropdown: { maxWidth: 280 }, calendarHeaderControl: { fontSize: 14 } }}
+            styles={{
+              dropdown: { maxWidth: 280 },
+              calendarHeaderControl: { fontSize: 14 },
+            }}
           />
         </div>
 
@@ -209,8 +217,7 @@ export default function AdminSchedule() {
                             size="xs"
                             color="green"
                             variant={training.attended === true ? 'filled' : 'light'}
-                            onClick={() => markAttendance(training.id, true, training.attended)}
-                            disabled={training.attended !== null}
+                            onClick={() => handleAttendance(training.id, true, training.attended)}
                             style={{ minWidth: 80 }}
                           >
                             Был
@@ -220,8 +227,7 @@ export default function AdminSchedule() {
                             size="xs"
                             color="red"
                             variant={training.attended === false ? 'filled' : 'light'}
-                            onClick={() => markAttendance(training.id, false, training.attended)}
-                            disabled={training.attended !== null}
+                            onClick={() => handleAttendance(training.id, false, training.attended)}
                             style={{ minWidth: 80 }}
                           >
                             Прогул
@@ -262,6 +268,22 @@ export default function AdminSchedule() {
         <Button mt="md" fullWidth onClick={assignTraining}>
           Назначить
         </Button>
+      </Modal>
+
+      <Modal
+        opened={confirmModal}
+        onClose={() => setConfirmModal(false)}
+        title="Подтверждение"
+      >
+        <Text mb="md">{confirmMessage}</Text>
+        <Group grow>
+          <Button color="gray" variant="light" onClick={() => setConfirmModal(false)}>
+            Нет
+          </Button>
+          <Button color="green" onClick={() => confirmAction()}>
+            Да
+          </Button>
+        </Group>
       </Modal>
     </Container>
   );
