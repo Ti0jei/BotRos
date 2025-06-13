@@ -201,10 +201,10 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
       userId,
       isSinglePaid: true,
     },
-    orderBy: {
-      date: 'desc',
-      hour: 'desc',
-    },
+    orderBy: [
+      { date: 'desc' },
+      { hour: 'desc' },
+    ],
   });
 
   res.json(trainings);
