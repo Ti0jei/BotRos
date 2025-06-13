@@ -19,6 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
         name: 'Главный тренер',
         age: 30,
         role: 'ADMIN',
+        internalTag: 'Тренер', // Добавлен internalTag для нового поля
       }
     });
     console.log('✅ Админ создан: admin@fit.com / admin123');
