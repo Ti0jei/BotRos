@@ -17,6 +17,7 @@ import ClientPayments from './ClientPayments';
 interface Client {
   id: string;
   name: string;
+  lastName?: string | null;
   internalTag?: string | null;
   age: number;
 }
@@ -157,17 +158,21 @@ export default function AdminClients({
               <Card key={client.id} withBorder radius="md" p="md">
                 <Group position="apart" mb="xs">
                   <Group spacing="xs">
-                    <Text fw={500}>{client.name}</Text>
                     {isEditing ? (
-                      <TextInput
-                        value={internalTagValue}
-                        onChange={(e) => setInternalTagValue(e.currentTarget.value)}
-                        placeholder="Доп. имя"
-                        size="xs"
-                        style={{ width: 120 }}
-                      />
+                      <>
+                        <Text>{client.name} {client.lastName ?? ''}</Text>
+                        <TextInput
+                          value={internalTagValue}
+                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                          placeholder="Доп. имя"
+                          size="xs"
+                          style={{ width: 120 }}
+                        />
+                      </>
                     ) : (
-                      client.internalTag && <Text size="sm" color="dimmed">({client.internalTag})</Text>
+                      <Text fw={500}>
+                        {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
+                      </Text>
                     )}
                   </Group>
                   <Text size="sm" color="dimmed">{client.age} лет</Text>

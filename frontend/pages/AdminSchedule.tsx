@@ -30,6 +30,8 @@ import {
 interface User {
   id: string;
   name: string;
+  lastName?: string | null;
+  internalTag?: string | null;
 }
 
 interface Training {
@@ -40,7 +42,11 @@ interface Training {
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
   attended: boolean | null;
   isSinglePaid: boolean;
-  user: { name: string };
+  user: {
+    name: string;
+    lastName?: string | null;
+    internalTag?: string | null;
+  };
 }
 
 export default function AdminSchedule() {
@@ -203,8 +209,8 @@ export default function AdminSchedule() {
                   <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
-                        {training.user.name}{' '}
-                        {training.isSinglePaid && <span title="Разовая оплата">💸</span>}
+                        {training.user.name} {training.user.lastName ?? ''} {training.user.internalTag ? `(${training.user.internalTag})` : ''}
+                        {training.isSinglePaid && <span title="Разовая оплата"> 💸</span>}
                       </Text>
                       <Badge color={
                         training.status === 'CONFIRMED'
@@ -269,7 +275,10 @@ export default function AdminSchedule() {
         <Select
           label="Клиент"
           placeholder="Выберите клиента"
-          data={clients.map((c) => ({ value: c.id, label: c.name }))}
+          data={clients.map((c) => ({
+            value: c.id,
+            label: `${c.name} ${c.lastName ?? ''}${c.internalTag ? ` (${c.internalTag})` : ''}`,
+          }))}
           value={selectedUser}
           onChange={setSelectedUser}
         />

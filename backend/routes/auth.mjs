@@ -9,12 +9,12 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 // УБРАЛИ ВРЕМЕННОЕ СОЗДАНИЕ АДМИНА ИЗ КОДА!
-// Админов теперь нужно создавать вручную через базу данных с role = 'ADMIN' и internalTag = 'Тренер'
 
 // Регистрация
 router.post('/register', async (req, res) => {
-  const { email, password, name, age, telegramId } = req.body;
-  if (!email || !password || !name || !age) {
+  const { email, password, name, lastName, age, telegramId } = req.body;
+
+  if (!email || !password || !name || !lastName || !age) {
     return res.status(400).json({ error: 'Missing fields' });
   }
 
@@ -39,10 +39,11 @@ router.post('/register', async (req, res) => {
       email,
       password: hashed,
       name,
+      lastName,
       age: parseInt(age),
       role: 'USER',
       telegramId: telegramId ? String(telegramId) : null,
-      internalTag: null, // Можно добавить пустое поле, если хотите
+      internalTag: null,
     }
   });
 
@@ -98,7 +99,7 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
   }
 });
 
-// 📩 Telegram ID через бота (один раз, только если Telegram ID нигде не записан)
+// 📩 Telegram ID через бота
 router.post('/telegram-direct', async (req, res) => {
   const { telegramId, username } = req.body;
 
@@ -116,7 +117,6 @@ router.post('/telegram-direct', async (req, res) => {
       return res.json({ status: 'already linked' });
     }
 
-    // Здесь теперь просто НЕ ЖЁСТКО ищем админа по internalTag, а по роли
     const admin = await prisma.user.findFirst({
       where: { role: 'ADMIN', telegramId: null },
     });

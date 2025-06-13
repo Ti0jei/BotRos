@@ -10,12 +10,10 @@ import {
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { getToken } from '../utils/auth';
-import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { getToken } from '../utils/auth';
+
 dayjs.extend(isSameOrBefore);
-
-
 
 interface Training {
   id: string;
@@ -45,7 +43,7 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
 
     const sorted = data
       .filter((t: Training) => dayjs(t.date).isAfter(dayjs().subtract(1, 'day')))
-      .sort((a: Training, b: Training) => {
+      .sort((a, b) => {
         const d1 = dayjs(a.date).add(a.hour, 'hour');
         const d2 = dayjs(b.date).add(b.hour, 'hour');
         return d1.diff(d2);

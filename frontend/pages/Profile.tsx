@@ -4,6 +4,7 @@ import ClientSchedule from './ClientSchedule';
 
 interface User {
   name: string;
+  lastName?: string | null;
   email: string;
   age: number;
   role: 'USER' | 'ADMIN';
@@ -42,7 +43,9 @@ export default function Profile({
     <Container size="xs" py="xl">
       {section === 'main' && (
         <Stack spacing="sm">
-          <Title order={2} mb="lg">Привет, {user.name} 👋</Title>
+          <Title order={2} mb="lg">
+            Привет, {user.name} {user.lastName ?? ''} 👋
+          </Title>
 
           <Button fullWidth color="blue" onClick={() => setSection('trainings')}>
             Мои тренировки

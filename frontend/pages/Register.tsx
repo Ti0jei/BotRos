@@ -12,6 +12,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
   const [telegramId, setTelegramId] = useState<string | null>(null);
 
@@ -28,8 +29,9 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       email,
       password,
       name,
+      lastName,
       age: Number(age),
-      telegramId, // может быть null
+      telegramId,
     };
 
     const res = await fetch(`${API}/api/auth/register`, {
@@ -52,6 +54,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
         <TextInput label="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <PasswordInput label="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
         <TextInput label="Имя" value={name} onChange={e => setName(e.target.value)} />
+        <TextInput label="Фамилия" value={lastName} onChange={e => setLastName(e.target.value)} />
         <TextInput label="Возраст" value={age} onChange={e => setAge(e.target.value)} />
         <Button fullWidth onClick={handleSubmit}>Зарегистрироваться</Button>
       </Stack>
