@@ -83,10 +83,13 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
   await prisma.training.delete({ where: { id } });
 
-  if (training.user?.telegramId) {
+  const now = new Date();
+  const trainingDate = new Date(training.date);
+
+  if (training.user?.telegramId && trainingDate >= new Date(now.toDateString())) {
     await notifyTelegram(
       training.user.telegramId,
-      `❌ Ваша тренировка на ${new Date(training.date).toLocaleDateString()} в ${training.hour}:00 была отменена`
+      `❌ Ваша тренировка на ${trainingDate.toLocaleDateString()} в ${training.hour}:00 была отменена`
     );
   }
 
@@ -163,12 +166,15 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     data: { attended },
   });
 
+  const trainingDate = new Date(training.date);
+  const today = new Date();
+
   if (attended === true) {
     const activeBlock = await prisma.paymentBlock.findFirst({
       where: { userId: training.userId, active: true },
     });
 
-    if (activeBlock) {
+    if (activeBlock && trainingDate >= activeBlock.paidAt) {
       const currentUsed = typeof activeBlock.used === 'number' ? activeBlock.used : 0;
       const nextUsed = currentUsed + 1;
 
@@ -183,15 +189,17 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
           data: { active: false },
         });
 
-        const trainer = await prisma.user.findFirst({
-          where: { role: 'ADMIN' },
-        });
+        if (trainingDate >= new Date(today.toDateString())) {
+          const trainer = await prisma.user.findFirst({
+            where: { role: 'ADMIN' },
+          });
 
-        if (trainer?.telegramId) {
-          await notifyTelegram(
-            trainer.telegramId,
-            `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему о необходимости оплаты.`
-          );
+          if (trainer?.telegramId) {
+            await notifyTelegram(
+              trainer.telegramId,
+              `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему о необходимости оплаты.`
+            );
+          }
         }
       }
     }
