@@ -11,7 +11,6 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCurrencyDollar } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -175,7 +174,18 @@ export default function AdminClients({
                       </Text>
                     )}
                   </Group>
-                  <Text size="sm" color="dimmed">{client.age} лет</Text>
+
+                  <Group spacing="xs">
+                    <Text size="sm" color="dimmed">{client.age} лет</Text>
+                    <Button
+                      size="xs"
+                      variant="filled"
+                      color={block ? 'green' : 'red'}
+                      style={{ pointerEvents: 'none', cursor: 'default' }}
+                    >
+                      {block ? '✔ Оплачен' : '✖ Не оплачен'}
+                    </Button>
+                  </Group>
                 </Group>
 
                 {!isEditing && block && (
@@ -188,12 +198,6 @@ export default function AdminClients({
                         Цена: {block.pricePerTraining} ₽
                       </Badge>
                     </Group>
-                    {remaining === 0 && (
-                      <Text color="red" fw={600}>
-                        <IconAlertTriangle size={16} style={{ marginRight: 6 }} />
-                        Требуется новый блок
-                      </Text>
-                    )}
                   </>
                 )}
 
@@ -219,19 +223,22 @@ export default function AdminClients({
                       </>
                     )}
                   </Group>
+
                   {!isEditing && (
                     <Stack spacing={8}>
                       <Group grow>
                         <Button
-                          color="yellow"
-                          variant="outline"
+                          variant="light"
+                          color="indigo"
                           size="sm"
-                          style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}
                           onClick={() => onOpenHistory(client.id)}
+                          leftIcon={<span style={{ fontSize: 16 }}>📊</span>}
+                          style={{ fontWeight: 500 }}
                         >
-                          📊 История оплат <IconCurrencyDollar size={18} />
+                          История оплат
                         </Button>
                       </Group>
+
                       <Group grow>
                         <Button color="orange" onClick={() => startEditing(client)}>
                           Псевдоним

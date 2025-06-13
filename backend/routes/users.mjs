@@ -19,6 +19,8 @@ router.get('/', async (req, res) => {
       select: {
         id: true,
         name: true,
+        lastName: true,       // ← добавлено
+        internalTag: true,    // ← добавлено
       },
       orderBy: { name: 'asc' },
     });
