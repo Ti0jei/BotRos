@@ -174,7 +174,10 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
       where: { userId: training.userId, active: true },
     });
 
-    if (activeBlock && trainingDate >= activeBlock.paidAt) {
+    // ✅ сравнение по дате без учёта времени
+    const dateOnly = (d) => d.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
+    if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
       const currentUsed = typeof activeBlock.used === 'number' ? activeBlock.used : 0;
       const nextUsed = currentUsed + 1;
 

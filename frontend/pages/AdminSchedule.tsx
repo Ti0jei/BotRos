@@ -10,8 +10,6 @@ import {
   ScrollArea,
   Badge,
   Text,
-  Stack,
-  Divider,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -21,7 +19,12 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 
 import { getToken } from '../utils/auth';
-import { IconCheck, IconTrash, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconTrash,
+  IconChevronLeft,
+  IconChevronRight,
+} from '@tabler/icons-react';
 
 interface User {
   id: string;
@@ -126,9 +129,7 @@ export default function AdminSchedule() {
   };
 
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
-
-  const getTrainingsAt = (hour: number) =>
-    trainings.filter((t) => t.hour === hour);
+  const getTrainingsAt = (hour: number) => trainings.filter((t) => t.hour === hour);
 
   useEffect(() => {
     loadClients();
@@ -154,15 +155,8 @@ export default function AdminSchedule() {
             dropdownType="popover"
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
-            popoverProps={{
-              withinPortal: true,
-              shadow: 'md',
-              radius: 'md',
-            }}
-            styles={{
-              dropdown: { maxWidth: 280 },
-              calendarHeaderControl: { fontSize: 14 },
-            }}
+            popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
+            styles={{ dropdown: { maxWidth: 280 }, calendarHeaderControl: { fontSize: 14 } }}
           />
         </div>
 
@@ -187,28 +181,50 @@ export default function AdminSchedule() {
                   </Button>
                 </Group>
 
-                {hourTrainings.map((training, index) => (
+                {hourTrainings.map((training) => (
                   <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
                     <Group position="apart" mb="xs">
                       <Text fw={500}>{training.user.name}</Text>
-                      {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
-                      {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
-                      {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+                      <Badge color={
+                        training.status === 'CONFIRMED'
+                          ? 'green'
+                          : training.status === 'DECLINED'
+                          ? 'red'
+                          : 'gray'
+                      }>
+                        {training.status === 'CONFIRMED' ? 'Придёт' :
+                         training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
+                      </Badge>
                     </Group>
 
-                    {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
-                      <Group grow>
-                        <Button size="xs" color="green" onClick={() => markAttendance(training.id, true)}>
-                          Был
-                        </Button>
-                        <Button size="xs" color="red" onClick={() => markAttendance(training.id, true)}>
-                          Прогул
-                        </Button>
-                        <Button size="xs" color="gray" variant="light" onClick={() => deleteTraining(training.id)}>
-                          Отмена
-                        </Button>
-                      </Group>
-                    )}
+                    <Group grow>
+                      {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
+                        <>
+                          <Button
+                            size="xs"
+                            color="green"
+                            onClick={() => markAttendance(training.id, true)}
+                          >
+                            Был
+                          </Button>
+                          <Button
+                            size="xs"
+                            color="red"
+                            onClick={() => markAttendance(training.id, true)}
+                          >
+                            Прогул
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        size="xs"
+                        color="gray"
+                        variant="light"
+                        onClick={() => deleteTraining(training.id)}
+                      >
+                        Отмена
+                      </Button>
+                    </Group>
                   </Paper>
                 ))}
               </Grid.Col>
@@ -229,7 +245,6 @@ export default function AdminSchedule() {
           value={selectedUser}
           onChange={setSelectedUser}
         />
-
         <Button mt="md" fullWidth onClick={assignTraining}>
           Назначить
         </Button>
