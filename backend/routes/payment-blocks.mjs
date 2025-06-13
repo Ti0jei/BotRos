@@ -75,10 +75,15 @@ router.post('/', authMiddleware, async (req, res) => {
   res.json(newBlock);
 });
 
-// 🔹 Обновить существующий блок оплаты
+// 🔹 Обновить существующий блок оплаты (включая used)
 router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { paidAt, paidTrainings, pricePerTraining } = req.body;
+  const {
+    paidAt,
+    paidTrainings,
+    pricePerTraining,
+    used, // 👈 теперь поддерживается обновление
+  } = req.body;
 
   const updated = await prisma.paymentBlock.update({
     where: { id },
@@ -86,6 +91,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
       paidAt: new Date(paidAt),
       paidTrainings: Number(paidTrainings),
       pricePerTraining: Number(pricePerTraining),
+      used: typeof used === 'number' ? used : undefined,
     },
   });
 

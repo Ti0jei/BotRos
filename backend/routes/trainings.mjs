@@ -1,3 +1,6 @@
+// ВСТАВЬ ВМЕСТО СТАРОГО trainings.mjs
+// путь: backend/routes/trainings.mjs
+
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../utils/telegram.mjs';
@@ -31,7 +34,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // Назначить тренировку
 router.post('/', authMiddleware, async (req, res) => {
-  const { userId, date, hour } = req.body;
+  const { userId, date, hour, isSinglePaid = false } = req.body;
   if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can assign trainings' });
 
   const training = await prisma.training.create({
@@ -39,6 +42,7 @@ router.post('/', authMiddleware, async (req, res) => {
       userId,
       date: new Date(`${date}T00:00:00`),
       hour: parseInt(hour),
+      isSinglePaid,
     },
   });
 
@@ -119,7 +123,16 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.status(200).json(training); // 🔒 уже установлен этот статус
   }
 
-  // Обновить attended и проверить, нужно ли списывать
+  // Разовая оплата — не списываем из блока
+  if (training.isSinglePaid) {
+    const updated = await prisma.training.update({
+      where: { id },
+      data: { attended, wasCounted: true },
+    });
+    return res.json(updated);
+  }
+
+  // Обновить attended и списать из блока
   const updated = await prisma.training.update({
     where: { id },
     data: { attended },

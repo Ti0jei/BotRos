@@ -10,6 +10,7 @@ import {
   ScrollArea,
   Badge,
   Text,
+  Checkbox,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -38,6 +39,7 @@ interface Training {
   hour: number;
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
   attended: boolean | null;
+  isSinglePaid: boolean;
   user: { name: string };
 }
 
@@ -47,6 +49,7 @@ export default function AdminSchedule() {
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [isSinglePaid, setIsSinglePaid] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [confirmModal, setConfirmModal] = useState(false);
@@ -87,6 +90,7 @@ export default function AdminSchedule() {
         userId: selectedUser,
         date: trainingDate,
         hour: selectedHour,
+        isSinglePaid,
       }),
     });
 
@@ -100,6 +104,7 @@ export default function AdminSchedule() {
     setModalOpen(false);
     setSelectedUser(null);
     setSelectedHour(null);
+    setIsSinglePaid(false);
     await loadTrainings();
   };
 
@@ -197,7 +202,10 @@ export default function AdminSchedule() {
                 {hourTrainings.map((training) => (
                   <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
                     <Group position="apart" mb="xs">
-                      <Text fw={500}>{training.user.name}</Text>
+                      <Text fw={500}>
+                        {training.user.name}{' '}
+                        {training.isSinglePaid && <span title="Разовая оплата">💸</span>}
+                      </Text>
                       <Badge color={
                         training.status === 'CONFIRMED'
                           ? 'green'
@@ -264,6 +272,12 @@ export default function AdminSchedule() {
           data={clients.map((c) => ({ value: c.id, label: c.name }))}
           value={selectedUser}
           onChange={setSelectedUser}
+        />
+        <Checkbox
+          mt="md"
+          label="Разовая оплата"
+          checked={isSinglePaid}
+          onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
         />
         <Button mt="md" fullWidth onClick={assignTraining}>
           Назначить

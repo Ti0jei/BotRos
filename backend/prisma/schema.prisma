@@ -23,16 +23,17 @@ model User {
 }
 
 model Training {
-  id         String   @id @default(cuid())
-  date       DateTime @db.Timestamp(6)
-  hour       Int
-  userId     String
-  status     Status   @default(PENDING)
-  attended   Boolean? // может быть null
-  wasCounted Boolean  @default(false) // 🔒 новее поле
-  createdAt  DateTime? @default(now()) @db.Timestamp(6)
+  id           String   @id @default(cuid())
+  date         DateTime @db.Timestamp(6)
+  hour         Int
+  userId       String
+  status       Status   @default(PENDING)
+  attended     Boolean? // может быть null
+  wasCounted   Boolean  @default(false) // 🔒 защита от повторного списания
+  isSinglePaid Boolean  @default(false) // ✅ разовая оплата
+  createdAt    DateTime? @default(now()) @db.Timestamp(6)
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 

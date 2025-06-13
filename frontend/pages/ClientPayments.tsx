@@ -198,6 +198,10 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         </Paper>
       ) : (
         <>
+          <Text color="red" fw={600} mt="sm">
+            🔴 Блок не оплачен
+          </Text>
+
           <Divider my="sm" />
           <Title order={4} mb="xs">➕ Добавить блок</Title>
 
