@@ -11,7 +11,13 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCurrencyDollar, IconEdit, IconCheck, IconX } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCurrencyDollar,
+  IconEdit,
+  IconCheck,
+  IconX,
+} from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -159,12 +165,16 @@ export default function AdminClients({
 
   return (
     <Container>
-      <Title order={2} mb="md">Клиенты</Title>
+      <Title order={2} mb="md">
+        Клиенты
+      </Title>
 
       {loading ? (
         <Loader />
       ) : error ? (
-        <Text color="red" size="md">{error}</Text>
+        <Text color="red" size="md">
+          {error}
+        </Text>
       ) : (
         <Stack>
           {clients.map((client) => {
@@ -173,7 +183,7 @@ export default function AdminClients({
               typeof block?.used === 'number' && typeof block?.paidTrainings === 'number'
                 ? block.paidTrainings - block.used
                 : 0;
-            const blockEnded = !block || (block.used >= block.paidTrainings);
+            const blockEnded = !block || block.used >= block.paidTrainings;
             const isEditing = editingId === client.id;
 
             return (
@@ -190,12 +200,16 @@ export default function AdminClients({
                           style={{ display: 'inline-block', width: 120 }}
                           placeholder="Доп. имя"
                         />
+                      ) : client.internalTag ? (
+                        `(${client.internalTag})`
                       ) : (
-                        client.internalTag ? `(${client.internalTag})` : ''
+                        ''
                       )}
                     </Text>
                   </div>
-                  <Text size="sm" color="dimmed">{client.age} лет</Text>
+                  <Text size="sm" color="dimmed">
+                    {client.age} лет
+                  </Text>
                 </Group>
 
                 {block ? (
@@ -203,17 +217,20 @@ export default function AdminClients({
                     <Badge color={blockEnded ? 'red' : 'green'}>
                       Осталось: {remaining}
                     </Badge>
-                    <Badge color="teal">
-                      Цена: {block.pricePerTraining ?? 0} ₽
-                    </Badge>
+                    <Badge color="teal">Цена: {block.pricePerTraining ?? 0} ₽</Badge>
                   </Group>
                 ) : (
-                  <Text size="sm" color="dimmed" mb="xs">Нет активной оплаты</Text>
+                  <Text size="sm" color="dimmed" mb="xs">
+                    Нет активной оплаты
+                  </Text>
                 )}
 
                 {blockEnded && (
                   <Text color="red" fw={600} mb="xs">
-                    <IconAlertTriangle size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+                    <IconAlertTriangle
+                      size={16}
+                      style={{ verticalAlign: 'middle', marginRight: 6 }}
+                    />
                     Требуется новый блок
                   </Text>
                 )}
@@ -251,7 +268,14 @@ export default function AdminClients({
                           color="yellow"
                           variant="outline"
                           size="sm"
-                          style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
                           onClick={() => onOpenHistory(client.id)}
                         >
                           📊 История оплат 💸
