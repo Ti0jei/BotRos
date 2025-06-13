@@ -17,15 +17,16 @@ import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-dayjs.extend(isSameOrBefore);
-
-import { getToken } from '../utils/auth';
 import {
   IconCheck,
   IconTrash,
   IconChevronLeft,
   IconChevronRight,
+  IconArrowLeft,
 } from '@tabler/icons-react';
+
+import { getToken } from '../utils/auth';
+dayjs.extend(isSameOrBefore);
 
 interface User {
   id: string;
@@ -49,10 +50,17 @@ interface Training {
   };
 }
 
-export default function AdminSchedule() {
+interface PaymentBlock {
+  id: string;
+  paidTrainings: number;
+  used: number;
+}
+
+export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   const [date, setDate] = useState(() => dayjs().startOf('day'));
   const [clients, setClients] = useState<User[]>([]);
   const [trainings, setTrainings] = useState<Training[]>([]);
+  const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
@@ -71,6 +79,14 @@ export default function AdminSchedule() {
     });
     const data = await res.json();
     setClients(data);
+
+    for (const client of data) {
+      const bRes = await fetch(`${API}/api/payment-blocks/user/${client.id}/active`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const bData = bRes.ok ? await bRes.json() : null;
+      setBlocks(prev => ({ ...prev, [client.id]: bData }));
+    }
   };
 
   const loadTrainings = async () => {
@@ -84,19 +100,17 @@ export default function AdminSchedule() {
   const assignTraining = async () => {
     if (!selectedUser || selectedHour === null) return;
 
-    // 🔒 Проверка: если не выбрана "Разовая оплата", то у пользователя должен быть активный блок
-    if (!isSinglePaid) {
-      const res = await fetch(`${API}/api/payment-blocks/user/${selectedUser}/active`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const block = res.ok ? await res.json() : null;
-      if (!block) {
-        alert('У клиента нет активного блока. Включите "Разовая оплата", чтобы назначить тренировку.');
-        return;
-      }
-    }
-
     const trainingDate = date.format('YYYY-MM-DD');
+    const hasBlock = !!blocks[selectedUser];
+
+    if (!hasBlock && !isSinglePaid) {
+      showNotification({
+        title: 'Нет активного блока',
+        message: 'У клиента нет активного блока. Отметьте "Разовая оплата"',
+        color: 'red',
+      });
+      return;
+    }
 
     await fetch(`${API}/api/trainings`, {
       method: 'POST',
@@ -142,7 +156,7 @@ export default function AdminSchedule() {
     await loadTrainings();
   };
 
-  const handleAttendance = (id: string, attended: boolean, current: boolean | null) => {
+  const handleAttendance = (id: string, attended: boolean) => {
     setConfirmAction(() => async () => {
       await fetch(`${API}/api/trainings/${id}/attended`, {
         method: 'PATCH',
@@ -171,9 +185,12 @@ export default function AdminSchedule() {
 
   return (
     <Container>
-      <Title order={2} mb="md">
-        Расписание на {date.format('DD.MM.YYYY')}
-      </Title>
+      <Group position="apart" mt="sm" mb="md">
+        <Title order={2}>Расписание на {date.format('DD.MM.YYYY')}</Title>
+        <Button variant="subtle" leftIcon={<IconArrowLeft size={16} />} onClick={onBack}>
+          Назад к профилю
+        </Button>
+      </Group>
 
       <Group mb="md">
         <Button variant="default" onClick={() => setDate(date.subtract(1, 'day'))}>
@@ -243,8 +260,7 @@ export default function AdminSchedule() {
                             size="xs"
                             color="green"
                             variant={training.attended === true ? 'filled' : 'light'}
-                            onClick={() => handleAttendance(training.id, true, training.attended)}
-                            style={{ minWidth: 80 }}
+                            onClick={() => handleAttendance(training.id, true)}
                           >
                             Был
                           </Button>
@@ -253,8 +269,7 @@ export default function AdminSchedule() {
                             size="xs"
                             color="red"
                             variant={training.attended === false ? 'filled' : 'light'}
-                            onClick={() => handleAttendance(training.id, false, training.attended)}
-                            style={{ minWidth: 80 }}
+                            onClick={() => handleAttendance(training.id, false)}
                           >
                             Прогул
                           </Button>
@@ -266,7 +281,6 @@ export default function AdminSchedule() {
                         color="gray"
                         variant="light"
                         onClick={() => deleteTraining(training.id)}
-                        style={{ minWidth: 80 }}
                       >
                         Отмена
                       </Button>
@@ -320,6 +334,10 @@ export default function AdminSchedule() {
           </Button>
         </Group>
       </Modal>
+
+      <Button mt="lg" variant="subtle" leftIcon={<IconArrowLeft size={16} />} onClick={onBack}>
+        ← Назад к профилю
+      </Button>
     </Container>
   );
 }
