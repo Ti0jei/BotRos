@@ -161,9 +161,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       await fetch(`${API}/api/trainings/${id}/attended`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+          Authorization: `Bearer ${token}` },
         body: JSON.stringify({ attended }),
       });
       setConfirmModal(false);
@@ -175,8 +173,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   };
 
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
-  const getTrainingsAt = (hour: number) =>
-    trainings.filter((t) => t.hour === hour);
+  const getTrainingsAt = (hour: number) => trainings.filter((t) => t.hour === hour);
 
   useEffect(() => {
     loadClients();
@@ -205,11 +202,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
             dropdownType="popover"
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
-            popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
-            styles={{
-              dropdown: { maxWidth: 280 },
-              calendarHeaderControl: { fontSize: 14 },
-            }}
           />
         </div>
 
@@ -275,7 +267,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                           </Button>
                         </>
                       )}
-
                       <Button
                         size="xs"
                         color="gray"
