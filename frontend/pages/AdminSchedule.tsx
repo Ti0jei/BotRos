@@ -11,6 +11,7 @@ import {
   Badge,
   Text,
   Stack,
+  Divider,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -176,58 +177,40 @@ export default function AdminSchedule() {
             const hourTrainings = getTrainingsAt(hour);
             return (
               <Grid.Col span={12} key={hour}>
-                <Paper withBorder p="sm" shadow="xs">
-                  <Group position="apart">
-                    <Text weight={500}>{hour}:00</Text>
-                    <Button
-                      size="xs"
-                      onClick={() => {
-                        setSelectedHour(hour);
-                        setModalOpen(true);
-                      }}
-                    >
-                      Назначить
-                    </Button>
-                  </Group>
+                <Group position="apart" mb="xs">
+                  <Title order={4}>{hour}:00</Title>
+                  <Button size="xs" onClick={() => {
+                    setSelectedHour(hour);
+                    setModalOpen(true);
+                  }}>
+                    Назначить
+                  </Button>
+                </Group>
 
-                  {hourTrainings.map((training) => (
-                    <Stack key={training.id} spacing="xs" mt="xs">
-                      <Group justify="space-between">
-                        <Text>{training.user.name}</Text>
-                        {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
-                        {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
-                        {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+                {hourTrainings.map((training, index) => (
+                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
+                    <Group position="apart" mb="xs">
+                      <Text fw={500}>{training.user.name}</Text>
+                      {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
+                      {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
+                      {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+                    </Group>
+
+                    {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
+                      <Group grow>
+                        <Button size="xs" color="green" onClick={() => markAttendance(training.id, true)}>
+                          Был
+                        </Button>
+                        <Button size="xs" color="red" onClick={() => markAttendance(training.id, true)}>
+                          Прогул
+                        </Button>
+                        <Button size="xs" color="gray" variant="light" onClick={() => deleteTraining(training.id)}>
+                          Отмена
+                        </Button>
                       </Group>
-
-                      {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
-                        <Group grow>
-                          <Button
-                            size="xs"
-                            color="green"
-                            onClick={() => markAttendance(training.id, true)}
-                          >
-                            ✅ Был
-                          </Button>
-                          <Button
-                            size="xs"
-                            color="red"
-                            onClick={() => markAttendance(training.id, true)}
-                          >
-                            🚫 Прогул
-                          </Button>
-                          <Button
-                            size="xs"
-                            color="gray"
-                            variant="light"
-                            onClick={() => deleteTraining(training.id)}
-                          >
-                            ❌ Отмена
-                          </Button>
-                        </Group>
-                      )}
-                    </Stack>
-                  ))}
-                </Paper>
+                    )}
+                  </Paper>
+                ))}
               </Grid.Col>
             );
           })}
