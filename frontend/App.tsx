@@ -6,7 +6,7 @@ import CoachProfile from './pages/CoachProfile';
 import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
-import PaymentHistory from './pages/PaymentHistory'; // ⬅️ Новый импорт
+import PaymentHistory from './pages/PaymentHistory';
 import { Container, Button } from '@mantine/core';
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
     'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar' | 'history'
   >('login');
   const [profile, setProfile] = useState<any>(null);
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null); // ⬅️ Новый стейт
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -114,12 +114,7 @@ function App() {
       )}
 
       {view === 'schedule' && profile?.role === 'ADMIN' && (
-        <>
-          <AdminSchedule />
-          <Button fullWidth mt="sm" variant="subtle" onClick={() => setView('profile')}>
-            ← Назад к профилю
-          </Button>
-        </>
+        <AdminSchedule onBack={() => setView('profile')} />
       )}
 
       {view === 'clients' && profile?.role === 'ADMIN' && (
