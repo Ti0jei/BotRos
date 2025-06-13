@@ -11,7 +11,12 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCurrencyDollar, IconCheck, IconX } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCurrencyDollar,
+  IconCheck,
+  IconX,
+} from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -46,24 +51,19 @@ export default function AdminClients({
 
   const loadClients = async () => {
     const token = localStorage.getItem('token');
-
     try {
       const res = await fetch(`${API}/api/clients`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
-
       if (!Array.isArray(data)) {
         setError('Ошибка доступа или авторизации');
         setClients([]);
         setLoading(false);
         return;
       }
-
       setClients(data);
       setLoading(false);
-
       for (const client of data) {
         loadBlock(client.id);
       }
@@ -92,9 +92,7 @@ export default function AdminClients({
   };
 
   const deleteClient = async (id: string) => {
-    if (!window.confirm('Вы точно хотите удалить клиента? Это действие необратимо.')) {
-      return;
-    }
+    if (!window.confirm('Вы точно хотите удалить клиента? Это действие необратимо.')) return;
     const token = localStorage.getItem('token');
     await fetch(`${API}/api/clients/${id}`, {
       method: 'DELETE',
@@ -115,7 +113,7 @@ export default function AdminClients({
 
   const saveInternalTag = async (id: string) => {
     if (internalTagValue.trim().length > 50) {
-      alert('Дополнительное имя не должно превышать 50 символов.');
+      alert('Доп. имя не должно превышать 50 символов');
       return;
     }
     const token = localStorage.getItem('token');
@@ -164,7 +162,6 @@ export default function AdminClients({
   return (
     <Container>
       <Title order={2} mb="md">Клиенты</Title>
-
       {loading ? (
         <Loader />
       ) : error ? (
@@ -173,113 +170,88 @@ export default function AdminClients({
         <Stack>
           {clients.map((client) => {
             const block = blockMap[client.id];
-            const remaining =
-              typeof block?.used === 'number' && typeof block?.paidTrainings === 'number'
-                ? block.paidTrainings - block.used
-                : 0;
-            const blockEnded = !block || (block.used >= block.paidTrainings);
+            const remaining = block ? block.paidTrainings - block.used : 0;
             const isEditing = editingId === client.id;
+            const blockEnded = block && block.used >= block.paidTrainings;
 
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
-                  <div>
-                    <Text fw={500} component="span">
-                      {client.name}{' '}
-                      {isEditing ? (
-                        <TextInput
-                          value={internalTagValue}
-                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
-                          size="xs"
-                          style={{ display: 'inline-block', width: 120 }}
-                          placeholder="Доп. имя"
-                          maxLength={50}
-                        />
-                      ) : (
-                        client.internalTag ? `(${client.internalTag})` : ''
-                      )}
-                    </Text>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Text fw={500}>{client.name}</Text>
+                    {isEditing ? (
+                      <TextInput
+                        value={internalTagValue}
+                        onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                        size="xs"
+                        style={{ width: 120 }}
+                        placeholder="Доп. имя"
+                      />
+                    ) : (
+                      client.internalTag && <Text size="sm" color="dimmed">({client.internalTag})</Text>
+                    )}
                   </div>
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 
-                {!isEditing && (
-                  <>
-                    {block ? (
-                      <Group spacing="xs" mb="xs">
-                        <Badge color={blockEnded ? 'red' : 'green'}>
-                          Осталось: {remaining}
-                        </Badge>
-                        <Badge color="teal">
-                          Цена: {block.pricePerTraining ?? 0} ₽
-                        </Badge>
-                      </Group>
-                    ) : (
-                      <Text size="sm" color="dimmed" mb="xs">Нет активной оплаты</Text>
-                    )}
+                {!isEditing && block && (
+                  <Group spacing="xs" mb="xs">
+                    <Badge color={blockEnded ? 'red' : 'green'}>Осталось: {remaining}</Badge>
+                    <Badge color="teal">Цена: {block.pricePerTraining} ₽</Badge>
+                  </Group>
+                )}
 
-                    {blockEnded && (
-                      <Text color="red" fw={600} mb="xs">
-                        <IconAlertTriangle size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-                        Требуется новый блок
-                      </Text>
-                    )}
-                  </>
+                {!isEditing && blockEnded && (
+                  <Text color="red" fw={600} mb="xs">
+                    <IconAlertTriangle size={16} style={{ marginRight: 6 }} />
+                    Требуется новый блок
+                  </Text>
                 )}
 
                 <Stack mt="xs" spacing="xs">
                   <Group grow>
-                    {!isEditing && (
+                    {isEditing ? (
                       <>
-                        <Button color="blue" onClick={() => viewClient(client)}>
-                          Питание
-                        </Button>
-                        <Button color="teal" onClick={() => openPayments(client)}>
-                          💸 Оплата
-                        </Button>
-                      </>
-                    )}
-                    {isEditing && (
-                      <>
-                        <Button
-                          color="green"
-                          onClick={() => saveInternalTag(client.id)}
-                        >
+                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
                           Сохранить
                         </Button>
-                        <Button
-                          color="gray"
-                          onClick={cancelEditing}
-                        >
+                        <Button color="gray" onClick={cancelEditing}>
                           Отмена
                         </Button>
                       </>
-                    )}
-                  </Group>
-                  <Group grow>
-                    {!isEditing && (
+                    ) : (
                       <>
-                        <Button
-                          color="yellow"
-                          variant="outline"
-                          size="sm"
-                          style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
-                          onClick={() => onOpenHistory(client.id)}
-                        >
-                          📊 История оплат 💸
-                        </Button>
-                        <Button
-                          color="orange"
-                          onClick={() => startEditing(client)}
-                        >
-                          Псевдоним
-                        </Button>
-                        <Button color="red" onClick={() => deleteClient(client.id)}>
-                          Удалить
-                        </Button>
+                        <Button color="blue" onClick={() => viewClient(client)}>Питание</Button>
+                        <Button color="teal" onClick={() => openPayments(client)}>💸 Оплата</Button>
                       </>
                     )}
                   </Group>
+                  {!isEditing && (
+                    <Group grow>
+                      <Button
+                        color="yellow"
+                        variant="outline"
+                        size="sm"
+                        style={{
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                        onClick={() => onOpenHistory(client.id)}
+                      >
+                        📊 История оплат <IconCurrencyDollar size={18} />
+                      </Button>
+                      <Button color="orange" onClick={() => startEditing(client)}>
+                        Псевдоним
+                      </Button>
+                      <Button color="red" onClick={() => deleteClient(client.id)}>
+                        Удалить
+                      </Button>
+                    </Group>
+                  )}
                 </Stack>
               </Card>
             );
