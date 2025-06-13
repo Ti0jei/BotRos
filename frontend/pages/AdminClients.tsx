@@ -11,14 +11,7 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import {
-  IconAlertTriangle,
-  IconCurrencyDollar,
-  IconEdit,
-  IconTrash,
-  IconCheck,
-  IconX,
-} from '@tabler/icons-react';
+import { IconAlertTriangle, IconCurrencyDollar } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -179,8 +172,12 @@ export default function AdminClients({
                 {!isEditing && block && (
                   <>
                     <Group spacing="xs" mb="xs">
-                      <Badge color={remaining === 0 ? 'red' : 'green'}>Осталось: {remaining}</Badge>
-                      <Badge color="teal">Цена: {block.pricePerTraining} ₽</Badge>
+                      <Badge color={remaining === 0 ? 'red' : 'green'}>
+                        Осталось: {remaining}
+                      </Badge>
+                      <Badge color="teal">
+                        Цена: {block.pricePerTraining} ₽
+                      </Badge>
                     </Group>
                     {remaining === 0 && (
                       <Text color="red" fw={600}>
@@ -195,24 +192,16 @@ export default function AdminClients({
                   <Group grow>
                     {isEditing ? (
                       <>
-                        <Button
-                          color="green"
-                          leftIcon={<IconCheck size={16} />}
-                          onClick={() => saveInternalTag(client.id)}
-                        >
+                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
                           Сохранить
                         </Button>
-                        <Button
-                          color="gray"
-                          leftIcon={<IconX size={16} />}
-                          onClick={cancelEditing}
-                        >
+                        <Button color="gray" onClick={cancelEditing}>
                           Отмена
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button color="blue" onClick={() => openPayments(client)}>
+                        <Button color="blue" onClick={() => viewClient(client)}>
                           Питание
                         </Button>
                         <Button color="teal" onClick={() => openPayments(client)}>
@@ -222,31 +211,27 @@ export default function AdminClients({
                     )}
                   </Group>
                   {!isEditing && (
-                    <Group grow>
-                      <Button
-                        color="yellow"
-                        variant="outline"
-                        size="sm"
-                        style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}
-                        onClick={() => onOpenHistory(client.id)}
-                      >
-                        📊 История оплат <IconCurrencyDollar size={18} />
-                      </Button>
-                      <Button
-                        color="orange"
-                        leftIcon={<IconEdit size={16} />}
-                        onClick={() => startEditing(client)}
-                      >
-                        Псевдоним
-                      </Button>
-                      <Button
-                        color="red"
-                        leftIcon={<IconTrash size={16} />}
-                        onClick={() => deleteClient(client.id)}
-                      >
-                        Удалить
-                      </Button>
-                    </Group>
+                    <Stack spacing={8}>
+                      <Group grow>
+                        <Button
+                          color="yellow"
+                          variant="outline"
+                          size="sm"
+                          style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 4 }}
+                          onClick={() => onOpenHistory(client.id)}
+                        >
+                          📊 История оплат <IconCurrencyDollar size={18} />
+                        </Button>
+                      </Group>
+                      <Group grow>
+                        <Button color="orange" onClick={() => startEditing(client)}>
+                          Псевдоним
+                        </Button>
+                        <Button color="red" onClick={() => deleteClient(client.id)}>
+                          Удалить
+                        </Button>
+                      </Group>
+                    </Stack>
                   )}
                 </Stack>
               </Card>
