@@ -11,7 +11,6 @@ import {
   Badge,
   Text,
   Checkbox,
-  Divider,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -185,45 +184,36 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   }, [date]);
 
   return (
-    <Container>
-      <Group position="apart" mt="md" mb="xs">
+    <Container size="sm">
+      <Group position="apart" mt="sm" mb="md">
         <Title order={2}>Расписание на {date.format('DD.MM.YYYY')}</Title>
-        <Button variant="light" onClick={onBack} leftIcon={<IconArrowLeft size={18} />}>
-          Назад к профилю
-        </Button>
+        <Button variant="light" onClick={onBack}>Назад к профилю</Button>
       </Group>
 
-      <Group mb="md" position="center">
+      <Group mb="md" spacing="xs" position="center">
         <Button variant="light" onClick={() => setDate(date.subtract(1, 'day'))}>
           ← Назад
         </Button>
-
         <DatePickerInput
           value={date.toDate()}
           onChange={(val) => val && setDate(dayjs(val))}
           clearable={false}
           dropdownType="popover"
-          nextIcon={<IconChevronRight size={16} />}
-          previousIcon={<IconChevronLeft size={16} />}
-          popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
         />
-
         <Button variant="light" onClick={() => setDate(date.add(1, 'day'))}>
           Вперёд →
         </Button>
       </Group>
 
-      <Divider my="sm" />
-
       <ScrollArea>
-        <Grid>
+        <Grid gutter="xs">
           {hours.map((hour) => {
             const hourTrainings = getTrainingsAt(hour);
             return (
               <Grid.Col span={12} key={hour}>
                 <Group position="apart" mb="xs">
-                  <Text fw={600} size="lg">{hour}:00</Text>
-                  <Button size="xs" onClick={() => {
+                  <Text fw={600}>{hour}:00</Text>
+                  <Button variant="filled" color="blue" size="xs" onClick={() => {
                     setSelectedHour(hour);
                     setModalOpen(true);
                   }}>
@@ -245,8 +235,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                           ? 'red'
                           : 'gray'
                       }>
-                        {training.status === 'CONFIRMED' ? 'Придёт' :
-                         training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
+                        {training.status === 'CONFIRMED' ? 'Придёт' : training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
                       </Badge>
                     </Group>
 
@@ -261,7 +250,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                           >
                             Был
                           </Button>
-
                           <Button
                             size="xs"
                             color="red"
@@ -272,7 +260,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                           </Button>
                         </>
                       )}
-
                       <Button
                         size="xs"
                         color="gray"
@@ -331,6 +318,10 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
           </Button>
         </Group>
       </Modal>
+
+      <Button mt="lg" variant="light" leftIcon={<IconArrowLeft size={16} />} onClick={onBack} fullWidth>
+        Назад к профилю
+      </Button>
     </Container>
   );
 }
