@@ -14,7 +14,6 @@ import {
   Checkbox,
   Divider,
   Stack,
-  Box,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -188,20 +187,22 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   }, [date]);
 
   return (
-    <Container size="sm" p="md">
-      <Group position="apart" mt="sm" mb="md">
-        <Title order={2}>Расписание на {date.format('DD.MM.YYYY')}</Title>
+    <Container size="xs" py="md">
+      <Group position="center" mb="xs">
         <Button
+          variant="subtle"
+          color="blue"
+          size="sm"
           onClick={onBack}
-          variant="light"
           leftIcon={<IconArrowLeft size={16} />}
         >
           Назад к профилю
         </Button>
       </Group>
 
-      <Group mb="md" position="center" spacing="xs">
+      <Group position="center" spacing="xs" mb="md">
         <Button
+          size="xs"
           variant="default"
           onClick={() => setDate(date.subtract(1, 'day'))}
           leftIcon={<IconChevronLeft size={14} />}
@@ -214,11 +215,15 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
           onChange={(val) => val && setDate(dayjs(val))}
           clearable={false}
           dropdownType="popover"
-          size="sm"
+          size="xs"
+          nextIcon={<IconChevronRight size={16} />}
+          previousIcon={<IconChevronLeft size={16} />}
+          popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
           styles={{ input: { textAlign: 'center', minWidth: 120 } }}
         />
 
         <Button
+          size="xs"
           variant="default"
           onClick={() => setDate(date.add(1, 'day'))}
           rightIcon={<IconChevronRight size={14} />}
@@ -229,18 +234,17 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
 
       <Divider my="sm" />
 
-      <ScrollArea h="65vh" offsetScrollbars>
+      <ScrollArea h="65vh">
         <Stack spacing="sm">
           {hours.map((hour) => {
             const hourTrainings = getTrainingsAt(hour);
             return (
-              <Box key={hour}>
+              <div key={hour}>
                 <Group position="apart" mb={4}>
                   <Text fw={600}>{hour}:00</Text>
                   <Button
                     size="xs"
                     variant="filled"
-                    color="blue"
                     onClick={() => {
                       setSelectedHour(hour);
                       setModalOpen(true);
@@ -261,15 +265,13 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                   >
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
-                        {training.user.name} {training.user.lastName ?? ''}{' '}
+                        {training.user.name} {training.user.lastName ?? ''}
                         {training.user.internalTag && (
                           <Text span color="dimmed">
-                            ({training.user.internalTag})
+                            {' '}({training.user.internalTag})
                           </Text>
                         )}
-                        {training.isSinglePaid && (
-                          <span title="Разовая оплата"> 💸</span>
-                        )}
+                        {training.isSinglePaid && <span title="Разовая оплата"> 💸</span>}
                       </Text>
                       <Badge color={
                         training.status === 'CONFIRMED'
@@ -315,7 +317,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                     </Group>
                   </Paper>
                 ))}
-              </Box>
+              </div>
             );
           })}
         </Stack>
