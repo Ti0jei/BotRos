@@ -103,7 +103,8 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     if (!selectedUser || selectedHour === null) return;
 
     const trainingDate = date.format('YYYY-MM-DD');
-    const hasBlock = !!blocks[selectedUser];
+    const block = blocks[selectedUser];
+    const hasBlock = block && block.paidTrainings > block.used;
 
     if (!hasBlock && !isSinglePaid) {
       showNotification({
