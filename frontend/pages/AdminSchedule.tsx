@@ -120,14 +120,12 @@ export default function AdminSchedule() {
     attended: boolean,
     current: boolean | null
   ) => {
-    if (current === attended) return; // 🔒 защита от повторного нажатия
+    if (current !== null) return;
 
     await fetch(`${API}/api/trainings/${id}/attended`, {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+        Authorization: `Bearer ${token}` },
       body: JSON.stringify({ attended }),
     });
 
@@ -163,10 +161,7 @@ export default function AdminSchedule() {
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
             popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
-            styles={{
-              dropdown: { maxWidth: 280 },
-              calendarHeaderControl: { fontSize: 14 },
-            }}
+            styles={{ dropdown: { maxWidth: 280 }, calendarHeaderControl: { fontSize: 14 } }}
           />
         </div>
 
@@ -183,43 +178,27 @@ export default function AdminSchedule() {
               <Grid.Col span={12} key={hour}>
                 <Group position="apart" mb="xs">
                   <Title order={4}>{hour}:00</Title>
-                  <Button
-                    size="xs"
-                    onClick={() => {
-                      setSelectedHour(hour);
-                      setModalOpen(true);
-                    }}
-                  >
+                  <Button size="xs" onClick={() => {
+                    setSelectedHour(hour);
+                    setModalOpen(true);
+                  }}>
                     Назначить
                   </Button>
                 </Group>
 
                 {hourTrainings.map((training) => (
-                  <Paper
-                    key={training.id}
-                    withBorder
-                    shadow="xs"
-                    p="sm"
-                    mb="xs"
-                    radius="md"
-                    bg="gray.1"
-                  >
+                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
                     <Group position="apart" mb="xs">
                       <Text fw={500}>{training.user.name}</Text>
-                      <Badge
-                        color={
-                          training.status === 'CONFIRMED'
-                            ? 'green'
-                            : training.status === 'DECLINED'
-                            ? 'red'
-                            : 'gray'
-                        }
-                      >
-                        {training.status === 'CONFIRMED'
-                          ? 'Придёт'
+                      <Badge color={
+                        training.status === 'CONFIRMED'
+                          ? 'green'
                           : training.status === 'DECLINED'
-                          ? 'Не придёт'
-                          : 'Ожидается'}
+                          ? 'red'
+                          : 'gray'
+                      }>
+                        {training.status === 'CONFIRMED' ? 'Придёт' :
+                         training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
                       </Badge>
                     </Group>
 
@@ -229,16 +208,9 @@ export default function AdminSchedule() {
                           <Button
                             size="xs"
                             color="green"
-                            variant={
-                              training.attended === true ? 'filled' : 'light'
-                            }
-                            onClick={() =>
-                              markAttendance(
-                                training.id,
-                                true,
-                                training.attended
-                              )
-                            }
+                            variant={training.attended === true ? 'filled' : 'light'}
+                            onClick={() => markAttendance(training.id, true, training.attended)}
+                            disabled={training.attended !== null}
                             style={{ minWidth: 80 }}
                           >
                             Был
@@ -247,16 +219,9 @@ export default function AdminSchedule() {
                           <Button
                             size="xs"
                             color="red"
-                            variant={
-                              training.attended === false ? 'filled' : 'light'
-                            }
-                            onClick={() =>
-                              markAttendance(
-                                training.id,
-                                false,
-                                training.attended
-                              )
-                            }
+                            variant={training.attended === false ? 'filled' : 'light'}
+                            onClick={() => markAttendance(training.id, false, training.attended)}
+                            disabled={training.attended !== null}
                             style={{ minWidth: 80 }}
                           >
                             Прогул
