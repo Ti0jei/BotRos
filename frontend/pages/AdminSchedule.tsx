@@ -68,7 +68,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
   const [confirmModal, setConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [confirmMessage, setConfirmMessage] = useState('');
@@ -181,11 +180,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   const getTrainingsAt = (hour: number) =>
     trainings.filter((t) => t.hour === hour);
 
-  useEffect(() => {
-    loadClients();
-    loadTrainings();
-  }, [date]);
-
   const getCardColor = (status: string) => {
     if (status === 'CONFIRMED') return '#e6ffec';
     if (status === 'DECLINED') return '#ffe6e6';
@@ -198,8 +192,13 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     return '🧍';
   };
 
+  useEffect(() => {
+    loadClients();
+    loadTrainings();
+  }, [date]);
+
   return (
-    <Container size="sm" py="md">
+    <Container size="sm" py="md" style={{ paddingBottom: 70 }}>
       <Group position="center" spacing="xs" mb="md">
         <Button
           size="xs"
@@ -337,7 +336,17 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         </Stack>
       </ScrollArea>
 
-      <Group position="center" mt="md">
+      <div style={{
+        position: 'fixed',
+        bottom: 10,
+        left: 0,
+        width: '100%',
+        background: 'white',
+        padding: '8px 0',
+        textAlign: 'center',
+        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+        zIndex: 1000,
+      }}>
         <Button
           variant="subtle"
           color="blue"
@@ -347,7 +356,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         >
           Назад к профилю
         </Button>
-      </Group>
+      </div>
 
       <Modal
         opened={modalOpen}
