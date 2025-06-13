@@ -148,20 +148,24 @@ export default function AdminClients({ onBack }: { onBack: () => void }) {
                   <Text size="sm" color="dimmed">Нет активной оплаты</Text>
                 )}
 
-                <Group grow>
-                  <Button variant="light" color="blue" onClick={() => viewClient(client)}>
-                    Посещения
-                  </Button>
-                  <Button variant="light" color="teal" onClick={() => openPayments(client)}>
-                    💸 Оплата
-                  </Button>
-                  <Button variant="light" color="gray" disabled>
-                    💬 Комм
-                  </Button>
-                  <Button variant="light" color="red" onClick={() => deleteClient(client.id)}>
-                    Удалить
-                  </Button>
-                </Group>
+                <Stack mt="xs" spacing="xs">
+                  <Group grow>
+                    <Button color="blue" onClick={() => viewClient(client)}>
+                      Посещения
+                    </Button>
+                    <Button color="teal" onClick={() => openPayments(client)}>
+                      💸 Оплата
+                    </Button>
+                  </Group>
+                  <Group grow>
+                    <Button color="gray" disabled>
+                      💬 Комм
+                    </Button>
+                    <Button color="red" onClick={() => deleteClient(client.id)}>
+                      Удалить
+                    </Button>
+                  </Group>
+                </Stack>
               </Card>
             );
           })}

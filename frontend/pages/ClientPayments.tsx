@@ -113,7 +113,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       setEditMode(false);
       await loadBlock();
     } else {
-      showNotification({ title: 'Ошибка', message: 'Не удалось обновить', color: 'red' });
+      showNotification({ title: 'Ошибка', message: 'Не удалось обновить блок', color: 'red' });
     }
   };
 
@@ -155,10 +155,6 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                   radius: 'md',
                   position: 'bottom-start',
                 }}
-                styles={{
-                  dropdown: { maxWidth: 280 },
-                  calendarHeaderControl: { fontSize: 14 },
-                }}
               />
 
               <NumberInput
@@ -191,6 +187,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
               <Text size="sm" color="dimmed">Цена: {block.price}₽</Text>
               <Text size="sm" color="dimmed">Всего тренировок: {block.sessions}</Text>
               <Text size="sm" color="dimmed">Использовано: {block.used}</Text>
+              <Text size="sm" fw={600}>Осталось: {block.sessions - block.used}</Text>
               <Button mt="sm" variant="light" onClick={() => setEditMode(true)}>
                 ✏️ Редактировать
               </Button>
@@ -198,52 +195,49 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
           )}
         </Paper>
       ) : (
-        <Text color="dimmed">Нет активного блока.</Text>
+        <>
+          <Divider my="sm" />
+          <Title order={4} mb="xs">➕ Добавить блок</Title>
+
+          <DatePickerInput
+            label="Дата оплаты"
+            value={date}
+            onChange={setDate}
+            locale="ru"
+            dropdownType="popover"
+            clearable={false}
+            radius="md"
+            size="md"
+            nextIcon={<IconChevronRight size={16} />}
+            previousIcon={<IconChevronLeft size={16} />}
+            popoverProps={{
+              withinPortal: true,
+              shadow: 'md',
+              radius: 'md',
+              position: 'bottom-start',
+            }}
+          />
+
+          <NumberInput
+            label="Кол-во тренировок"
+            value={sessions}
+            onChange={(v) => setSessions(Number(v))}
+            min={1}
+            mt="sm"
+          />
+
+          <NumberInput
+            label="Цена за тренировку, ₽"
+            value={price}
+            onChange={(v) => setPrice(Number(v))}
+            min={1}
+            mt="sm"
+          />
+
+          <Button fullWidth mt="md" onClick={createBlock}>Сохранить</Button>
+        </>
       )}
 
-      <Divider my="sm" />
-      <Title order={4} mb="xs">➕ Добавить блок</Title>
-
-      <DatePickerInput
-        label="Дата оплаты"
-        value={date}
-        onChange={setDate}
-        locale="ru"
-        dropdownType="popover"
-        clearable={false}
-        radius="md"
-        size="md"
-        nextIcon={<IconChevronRight size={16} />}
-        previousIcon={<IconChevronLeft size={16} />}
-        popoverProps={{
-          withinPortal: true,
-          shadow: 'md',
-          radius: 'md',
-          position: 'bottom-start',
-        }}
-        styles={{
-          dropdown: { maxWidth: 280 },
-          calendarHeaderControl: { fontSize: 14 },
-        }}
-      />
-
-      <NumberInput
-        label="Кол-во тренировок"
-        value={sessions}
-        onChange={(v) => setSessions(Number(v))}
-        min={1}
-        mt="sm"
-      />
-
-      <NumberInput
-        label="Цена за тренировку, ₽"
-        value={price}
-        onChange={(v) => setPrice(Number(v))}
-        min={1}
-        mt="sm"
-      />
-
-      <Button fullWidth mt="md" onClick={createBlock}>Сохранить</Button>
       <Button fullWidth mt="lg" variant="subtle" onClick={onBack}>← Назад</Button>
     </Container>
   );
