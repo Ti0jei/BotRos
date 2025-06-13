@@ -9,14 +9,15 @@ import {
   Group,
   Loader,
   Badge,
+  TextInput,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCurrencyDollar } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCurrencyDollar, IconEdit, IconCheck, IconX } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
   id: string;
   name: string;
-  internalTag?: string | null; // изменил с extraName на internalTag
+  internalTag?: string | null;
   age: number;
 }
 
@@ -39,6 +40,8 @@ export default function AdminClients({
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [internalTagValue, setInternalTagValue] = useState<string>('');
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const loadClients = async () => {
@@ -100,6 +103,39 @@ export default function AdminClients({
     loadClients();
   };
 
+  const startEditing = (client: Client) => {
+    setEditingId(client.id);
+    setInternalTagValue(client.internalTag ?? '');
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setInternalTagValue('');
+  };
+
+  const saveInternalTag = async (id: string) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${API}/api/clients/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ internalTag: internalTagValue }),
+      });
+      if (res.ok) {
+        loadClients();
+        cancelEditing();
+      } else {
+        alert('Ошибка при сохранении');
+      }
+    } catch (err) {
+      console.error('Ошибка сохранения internalTag:', err);
+      alert('Ошибка при сохранении');
+    }
+  };
+
   const viewClient = (client: Client) => {
     alert(`Раздел "Питание клиента ${client.name}" в разработке`);
   };
@@ -133,20 +169,32 @@ export default function AdminClients({
         <Stack>
           {clients.map((client) => {
             const block = blockMap[client.id];
-
             const remaining =
               typeof block?.used === 'number' && typeof block?.paidTrainings === 'number'
                 ? block.paidTrainings - block.used
                 : 0;
-
             const blockEnded = !block || (block.used >= block.paidTrainings);
+            const isEditing = editingId === client.id;
 
             return (
               <Card key={client.id} withBorder shadow="xs" radius="md" p="md">
                 <Group position="apart" mb="xs">
-                  <Text fw={500}>
-                    {client.name} {client.internalTag ? `(${client.internalTag})` : ''}
-                  </Text>
+                  <div>
+                    <Text fw={500} component="span">
+                      {client.name}{' '}
+                      {isEditing ? (
+                        <TextInput
+                          value={internalTagValue}
+                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                          size="xs"
+                          style={{ display: 'inline-block', width: 120 }}
+                          placeholder="Доп. имя"
+                        />
+                      ) : (
+                        client.internalTag ? `(${client.internalTag})` : ''
+                      )}
+                    </Text>
+                  </div>
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 
@@ -180,18 +228,46 @@ export default function AdminClients({
                     </Button>
                   </Group>
                   <Group grow>
-                    <Button
-                      color="yellow"
-                      variant="outline"
-                      size="sm"
-                      style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
-                      onClick={() => onOpenHistory(client.id)}
-                    >
-                      📊 История 💸<IconCurrencyDollar size={18} />
-                    </Button>
-                    <Button color="red" onClick={() => deleteClient(client.id)}>
-                      Удалить
-                    </Button>
+                    {isEditing ? (
+                      <>
+                        <Button
+                          color="green"
+                          leftIcon={<IconCheck size={16} />}
+                          onClick={() => saveInternalTag(client.id)}
+                        >
+                          Сохранить
+                        </Button>
+                        <Button
+                          color="gray"
+                          leftIcon={<IconX size={16} />}
+                          onClick={cancelEditing}
+                        >
+                          Отмена
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          color="yellow"
+                          variant="outline"
+                          size="sm"
+                          style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
+                          onClick={() => onOpenHistory(client.id)}
+                        >
+                          📊 История 💸<IconCurrencyDollar size={18} />
+                        </Button>
+                        <Button
+                          color="orange"
+                          leftIcon={<IconEdit size={16} />}
+                          onClick={() => startEditing(client)}
+                        >
+                          Редактировать
+                        </Button>
+                        <Button color="red" onClick={() => deleteClient(client.id)}>
+                          Удалить
+                        </Button>
+                      </>
+                    )}
                   </Group>
                 </Stack>
               </Card>
