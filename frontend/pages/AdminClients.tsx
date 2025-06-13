@@ -124,6 +124,10 @@ export default function AdminClients({
     }
   };
 
+  const viewClient = (client: Client) => {
+    alert(`Раздел "Питание клиента ${client.name}" в разработке`);
+  };
+
   const openPayments = (client: Client) => setSelectedClient(client);
 
   useEffect(() => {
