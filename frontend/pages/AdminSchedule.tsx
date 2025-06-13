@@ -192,47 +192,37 @@ export default function AdminSchedule() {
                   {hourTrainings.map((training) => (
                     <Group key={training.id} spacing="xs" mt="xs">
                       <Text>{training.user.name}</Text>
-                      <Badge
-                        color={
-                          training.status === 'CONFIRMED'
-                            ? 'green'
-                            : training.status === 'DECLINED'
-                            ? 'red'
-                            : 'gray'
-                        }
-                      >
-                        {training.status}
-                      </Badge>
 
-                      {dayjs(training.date).isSameOrBefore(dayjs(), 'day') ? (
+                      {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
+                      {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
+                      {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+
+                      {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
                         <>
                           <Button
                             size="xs"
-                            variant={training.attended === true ? 'filled' : 'light'}
                             color="green"
                             onClick={() => markAttendance(training.id, true)}
                           >
-                            Был
+                            ✅ Был
                           </Button>
                           <Button
                             size="xs"
-                            variant={training.attended === false ? 'filled' : 'light'}
                             color="red"
-                            onClick={() => markAttendance(training.id, false)}
+                            onClick={() => markAttendance(training.id, true)}
                           >
-                            Не был
+                            🚫 Прогул
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="subtle"
+                            color="gray"
+                            onClick={() => deleteTraining(training.id)}
+                          >
+                            ❌ Отмена
                           </Button>
                         </>
-                      ) : null}
-
-                      <Button
-                        variant="subtle"
-                        color="red"
-                        size="xs"
-                        onClick={() => deleteTraining(training.id)}
-                      >
-                        Отменить
-                      </Button>
+                      )}
                     </Group>
                   ))}
                 </Paper>
