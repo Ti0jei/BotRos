@@ -14,6 +14,7 @@ import {
   Checkbox,
   Divider,
   Stack,
+  Box,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -109,7 +110,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     if (!hasBlock && !isSinglePaid) {
       showNotification({
         title: 'Нет активного блока',
-        message: 'У клиента нет активного блока. Отметьте "Разовая оплата"',
+        message: 'У клиента нет активного блока. Поставьте галочку "Разовая оплата"',
         color: 'red',
       });
       return;
@@ -187,19 +188,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   }, [date]);
 
   return (
-    <Container size="xs" py="md">
-      <Group position="center" mb="xs">
-        <Button
-          variant="subtle"
-          color="blue"
-          size="sm"
-          onClick={onBack}
-          leftIcon={<IconArrowLeft size={16} />}
-        >
-          Назад к профилю
-        </Button>
-      </Group>
-
+    <Container size="sm" py="md" style={{ backgroundColor: '#f9fafc', borderRadius: 12 }}>
       <Group position="center" spacing="xs" mb="md">
         <Button
           size="xs"
@@ -239,19 +228,24 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
           {hours.map((hour) => {
             const hourTrainings = getTrainingsAt(hour);
             return (
-              <div key={hour}>
-                <Group position="apart" mb={4}>
-                  <Text fw={600}>{hour}:00</Text>
-                  <Button
-                    size="xs"
-                    variant="filled"
-                    onClick={() => {
-                      setSelectedHour(hour);
-                      setModalOpen(true);
-                    }}
-                  >
-                    Назначить
-                  </Button>
+              <Box key={hour}>
+                <Group position="apart" mb={4} align="center">
+                  <Text fw={600} size="md" style={{ minWidth: 60 }}>
+                    {hour}:00
+                  </Text>
+                  <Group grow spacing="xs">
+                    <Button
+                      size="xs"
+                      color="blue"
+                      variant="light"
+                      onClick={() => {
+                        setSelectedHour(hour);
+                        setModalOpen(true);
+                      }}
+                    >
+                      Назначить
+                    </Button>
+                  </Group>
                 </Group>
 
                 {hourTrainings.map((training) => (
@@ -262,16 +256,19 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                     radius="md"
                     p="sm"
                     mb="xs"
+                    style={{ backgroundColor: '#ffffff' }}
                   >
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
-                        {training.user.name} {training.user.lastName ?? ''}
+                        {training.user.name} {training.user.lastName ?? ''}{' '}
                         {training.user.internalTag && (
                           <Text span color="dimmed">
-                            {' '}({training.user.internalTag})
+                            ({training.user.internalTag})
                           </Text>
                         )}
-                        {training.isSinglePaid && <span title="Разовая оплата"> 💸</span>}
+                        {training.isSinglePaid && (
+                          <span title="Разовая оплата"> 💸</span>
+                        )}
                       </Text>
                       <Badge color={
                         training.status === 'CONFIRMED'
@@ -317,13 +314,24 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                     </Group>
                   </Paper>
                 ))}
-              </div>
+              </Box>
             );
           })}
         </Stack>
       </ScrollArea>
 
-      {/* Модалка назначения */}
+      <Group position="center" mt="md">
+        <Button
+          variant="subtle"
+          color="blue"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<IconArrowLeft size={16} />}
+        >
+          Назад к профилю
+        </Button>
+      </Group>
+
       <Modal
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -350,7 +358,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         </Button>
       </Modal>
 
-      {/* Модалка подтверждения */}
       <Modal
         opened={confirmModal}
         onClose={() => setConfirmModal(false)}
