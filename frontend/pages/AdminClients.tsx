@@ -11,13 +11,7 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import {
-  IconAlertTriangle,
-  IconCurrencyDollar,
-  IconEdit,
-  IconCheck,
-  IconX,
-} from '@tabler/icons-react';
+import { IconAlertTriangle, IconCurrencyDollar, IconCheck, IconX } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -120,6 +114,10 @@ export default function AdminClients({
   };
 
   const saveInternalTag = async (id: string) => {
+    if (internalTagValue.trim().length > 50) {
+      alert('Дополнительное имя не должно превышать 50 символов.');
+      return;
+    }
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API}/api/clients/${id}`, {
@@ -165,16 +163,12 @@ export default function AdminClients({
 
   return (
     <Container>
-      <Title order={2} mb="md">
-        Клиенты
-      </Title>
+      <Title order={2} mb="md">Клиенты</Title>
 
       {loading ? (
         <Loader />
       ) : error ? (
-        <Text color="red" size="md">
-          {error}
-        </Text>
+        <Text color="red" size="md">{error}</Text>
       ) : (
         <Stack>
           {clients.map((client) => {
@@ -183,7 +177,7 @@ export default function AdminClients({
               typeof block?.used === 'number' && typeof block?.paidTrainings === 'number'
                 ? block.paidTrainings - block.used
                 : 0;
-            const blockEnded = !block || block.used >= block.paidTrainings;
+            const blockEnded = !block || (block.used >= block.paidTrainings);
             const isEditing = editingId === client.id;
 
             return (
@@ -199,90 +193,83 @@ export default function AdminClients({
                           size="xs"
                           style={{ display: 'inline-block', width: 120 }}
                           placeholder="Доп. имя"
+                          maxLength={50}
                         />
-                      ) : client.internalTag ? (
-                        `(${client.internalTag})`
                       ) : (
-                        ''
+                        client.internalTag ? `(${client.internalTag})` : ''
                       )}
                     </Text>
                   </div>
-                  <Text size="sm" color="dimmed">
-                    {client.age} лет
-                  </Text>
+                  <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Group>
 
-                {block ? (
-                  <Group spacing="xs" mb="xs">
-                    <Badge color={blockEnded ? 'red' : 'green'}>
-                      Осталось: {remaining}
-                    </Badge>
-                    <Badge color="teal">Цена: {block.pricePerTraining ?? 0} ₽</Badge>
-                  </Group>
-                ) : (
-                  <Text size="sm" color="dimmed" mb="xs">
-                    Нет активной оплаты
-                  </Text>
-                )}
+                {!isEditing && (
+                  <>
+                    {block ? (
+                      <Group spacing="xs" mb="xs">
+                        <Badge color={blockEnded ? 'red' : 'green'}>
+                          Осталось: {remaining}
+                        </Badge>
+                        <Badge color="teal">
+                          Цена: {block.pricePerTraining ?? 0} ₽
+                        </Badge>
+                      </Group>
+                    ) : (
+                      <Text size="sm" color="dimmed" mb="xs">Нет активной оплаты</Text>
+                    )}
 
-                {blockEnded && (
-                  <Text color="red" fw={600} mb="xs">
-                    <IconAlertTriangle
-                      size={16}
-                      style={{ verticalAlign: 'middle', marginRight: 6 }}
-                    />
-                    Требуется новый блок
-                  </Text>
+                    {blockEnded && (
+                      <Text color="red" fw={600} mb="xs">
+                        <IconAlertTriangle size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+                        Требуется новый блок
+                      </Text>
+                    )}
+                  </>
                 )}
 
                 <Stack mt="xs" spacing="xs">
                   <Group grow>
-                    <Button color="blue" onClick={() => viewClient(client)}>
-                      Питание
-                    </Button>
-                    <Button color="teal" onClick={() => openPayments(client)}>
-                      💸 Оплата
-                    </Button>
-                  </Group>
-                  <Group grow>
-                    {isEditing ? (
+                    {!isEditing && (
+                      <>
+                        <Button color="blue" onClick={() => viewClient(client)}>
+                          Питание
+                        </Button>
+                        <Button color="teal" onClick={() => openPayments(client)}>
+                          💸 Оплата
+                        </Button>
+                      </>
+                    )}
+                    {isEditing && (
                       <>
                         <Button
                           color="green"
-                          leftIcon={<IconCheck size={16} />}
                           onClick={() => saveInternalTag(client.id)}
                         >
                           Сохранить
                         </Button>
                         <Button
                           color="gray"
-                          leftIcon={<IconX size={16} />}
                           onClick={cancelEditing}
                         >
                           Отмена
                         </Button>
                       </>
-                    ) : (
+                    )}
+                  </Group>
+                  <Group grow>
+                    {!isEditing && (
                       <>
                         <Button
                           color="yellow"
                           variant="outline"
                           size="sm"
-                          style={{
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            overflow: 'hidden',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
+                          style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
                           onClick={() => onOpenHistory(client.id)}
                         >
                           📊 История оплат 💸
                         </Button>
                         <Button
                           color="orange"
-                          leftIcon={<IconEdit size={16} />}
                           onClick={() => startEditing(client)}
                         >
                           Псевдоним
