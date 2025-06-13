@@ -13,22 +13,13 @@ router.get('/', authMiddleware, async (req, res) => {
   const { date } = req.query;
 
   let dateFilter = {};
-
   if (date) {
-    const startDate = new Date(`${date}T00:00:00`);
-    const endDate = new Date(`${date}T23:59:59`);
-    dateFilter = {
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
-    };
+    const start = new Date(`${date}T00:00:00`);
+    const end = new Date(`${date}T23:59:59`);
+    dateFilter = { date: { gte: start, lte: end } };
   }
 
-  const where = role === 'ADMIN'
-    ? dateFilter
-    : { userId, ...dateFilter };
-
+  const where = role === 'ADMIN' ? dateFilter : { userId, ...dateFilter };
   const trainings = await prisma.training.findMany({
     where,
     include: role === 'ADMIN' ? { user: true } : undefined,
@@ -41,10 +32,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // Назначить тренировку
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, hour } = req.body;
-
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can assign trainings' });
-  }
+  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can assign trainings' });
 
   const training = await prisma.training.create({
     data: {
@@ -55,7 +43,6 @@ router.post('/', authMiddleware, async (req, res) => {
   });
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-
   if (user?.telegramId) {
     await notifyTelegram(
       user.telegramId,
@@ -69,24 +56,16 @@ router.post('/', authMiddleware, async (req, res) => {
 // Удалить тренировку
 router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can delete trainings' });
 
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can delete trainings' });
-  }
-
-  const training = await prisma.training.findUnique({
-    where: { id },
-    include: { user: true },
-  });
-
+  const training = await prisma.training.findUnique({ where: { id }, include: { user: true } });
   if (!training) return res.status(404).json({ error: 'Not found' });
 
   await prisma.training.delete({ where: { id } });
 
-  const now = new Date();
+  const today = new Date();
   const trainingDate = new Date(training.date);
-
-  if (training.user?.telegramId && trainingDate >= new Date(now.toDateString())) {
+  if (training.user?.telegramId && trainingDate >= new Date(today.toDateString())) {
     await notifyTelegram(
       training.user.telegramId,
       `❌ Ваша тренировка на ${trainingDate.toLocaleDateString()} в ${training.hour}:00 была отменена`
@@ -96,69 +75,48 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   res.json({ success: true });
 });
 
-// Подтвердить/отменить тренировку
+// Подтвердить / отказаться
 router.patch('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const userId = req.user.userId;
 
-  const training = await prisma.training.findUnique({
-    where: { id },
-    include: { user: true },
-  });
+  const training = await prisma.training.findUnique({ where: { id }, include: { user: true } });
+  if (!training || training.userId !== userId) return res.status(404).json({ error: 'Not found' });
 
-  if (!training || training.userId !== userId) {
-    return res.status(404).json({ error: 'Not found' });
+  const updated = await prisma.training.update({ where: { id }, data: { status } });
+
+  if (training.user?.telegramId) {
+    const msg = status === 'CONFIRMED' ? '✅ вы подтвердили участие' : '🚫 вы отказались от тренировки';
+    await notifyTelegram(training.user.telegramId, `📌 Вы обновили статус тренировки: ${msg}`);
   }
 
-  const updated = await prisma.training.update({
-    where: { id },
-    data: { status },
-  });
-
-  const user = training.user;
-
-  if (user?.telegramId) {
-    const text =
-      status === 'CONFIRMED'
-        ? '✅ вы подтвердили участие'
-        : '🚫 вы отказались от тренировки';
-    await notifyTelegram(user.telegramId, `📌 Вы обновили статус тренировки: ${text}`);
-  }
-
-  const trainer = await prisma.user.findFirst({
-    where: { role: 'ADMIN' },
-  });
-
+  const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
   if (trainer?.telegramId) {
-    const formattedDate = new Date(training.date).toLocaleDateString();
-    const trainerText =
-      status === 'CONFIRMED'
-        ? `👤 ${user.name} подтвердил участие на тренировке ${formattedDate} в ${training.hour}:00`
-        : `👤 ${user.name} не подтвердил участие на тренировке ${formattedDate} в ${training.hour}:00`;
-
-    await notifyTelegram(trainer.telegramId, trainerText);
+    const dateStr = new Date(training.date).toLocaleDateString();
+    const msg = status === 'CONFIRMED'
+      ? `👤 ${training.user.name} подтвердил участие ${dateStr} в ${training.hour}:00`
+      : `👤 ${training.user.name} не подтвердил участие ${dateStr} в ${training.hour}:00`;
+    await notifyTelegram(trainer.telegramId, msg);
   }
 
   res.json(updated);
 });
 
-// ✅ Отметить присутствие тренером и учесть в оплате
+// Отметить посещение
 router.patch('/:id/attended', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { attended } = req.body;
-
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can mark attendance' });
-  }
+  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can mark attendance' });
 
   const training = await prisma.training.findUnique({
     where: { id },
     include: { user: true },
   });
+  if (!training) return res.status(404).json({ error: 'Training not found' });
 
-  if (!training) {
-    return res.status(404).json({ error: 'Training not found' });
+  if (training.attended === attended) {
+    return res.status(200).json(training); // 🔒 повторное нажатие, не списывать
   }
 
   const updated = await prisma.training.update({
@@ -166,19 +124,16 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     data: { attended },
   });
 
-  const trainingDate = new Date(training.date);
-  const today = new Date();
-
   if (attended === true) {
     const activeBlock = await prisma.paymentBlock.findFirst({
       where: { userId: training.userId, active: true },
     });
 
-    // ✅ сравнение по дате без учёта времени
-    const dateOnly = (d) => d.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const dateOnly = (d) => d.toISOString().slice(0, 10);
+    const trainingDate = new Date(training.date);
 
     if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
-      const currentUsed = typeof activeBlock.used === 'number' ? activeBlock.used : 0;
+      const currentUsed = activeBlock.used || 0;
       const nextUsed = currentUsed + 1;
 
       await prisma.paymentBlock.update({
@@ -192,17 +147,12 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
           data: { active: false },
         });
 
-        if (trainingDate >= new Date(today.toDateString())) {
-          const trainer = await prisma.user.findFirst({
-            where: { role: 'ADMIN' },
-          });
-
-          if (trainer?.telegramId) {
-            await notifyTelegram(
-              trainer.telegramId,
-              `❗ У клиента ${training.user.name} закончился блок тренировок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему о необходимости оплаты.`
-            );
-          }
+        const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+        if (trainer?.telegramId) {
+          await notifyTelegram(
+            trainer.telegramId,
+            `❗ У клиента ${training.user.name} закончился блок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему об оплате.`
+          );
         }
       }
     }
@@ -211,24 +161,19 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
   res.json(updated);
 });
 
-// 📊 Получить статистику по клиенту
+// Статистика
 router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can view stats' });
-  }
+  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can view stats' });
 
   const { userId } = req.params;
-
   const all = await prisma.training.findMany({ where: { userId } });
 
-  const stats = {
+  res.json({
     total: all.length,
     confirmed: all.filter(t => t.status === 'CONFIRMED').length,
     attended: all.filter(t => t.attended === true).length,
     missed: all.filter(t => t.attended === false).length,
-  };
-
-  res.json(stats);
+  });
 });
 
 export default router;

@@ -28,7 +28,7 @@ model Training {
   hour      Int
   userId    String
   status    Status   @default(PENDING)
-  attended  Boolean? @default(false) // ✅ поле для отметки посещения
+  attended  Boolean? // Убрали @default(false), теперь по умолчанию null
   createdAt DateTime? @default(now()) @db.Timestamp(6)
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -38,7 +38,7 @@ model PaymentBlock {
   id               String   @id @default(cuid())
   userId           String
   paidTrainings    Int
-  used             Int      @default(0) // ✅ считаем, сколько уже было использовано
+  used             Int      @default(0)
   pricePerTraining Int
   paidAt           DateTime @default(now()) @db.Timestamp(6)
   active           Boolean  @default(true)
