@@ -104,7 +104,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   res.json(updated);
 });
 
-// Отметить посещение
+// Отметить посещение (списание при был и прогул)
 router.patch('/:id/attended', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { attended } = req.body;
@@ -117,22 +117,22 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
   if (!training) return res.status(404).json({ error: 'Training not found' });
 
   if (training.attended === attended) {
-    return res.status(200).json(training); // 🔒 уже установлен этот статус
+    return res.status(200).json(training);
   }
 
-  // Разовая оплата — не списываем из блока
+  // Разовая тренировка — не списываем
   if (training.isSinglePaid) {
     const updated = await prisma.training.update({
       where: { id },
-      data: { attended, wasCounted: true },
+      data: { attended },
     });
     return res.json(updated);
   }
 
-  // Обновить attended и списать из блока (включая прогул)
-  let updated = await prisma.training.update({
+  // По блоку — списываем при "был" и "прогул"
+  const updated = await prisma.training.update({
     where: { id },
-    data: { attended },
+    data: { attended, wasCounted: true },
   });
 
   if ((attended === true || attended === false) && training.wasCounted !== true) {
@@ -150,11 +150,6 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
       await prisma.paymentBlock.update({
         where: { id: activeBlock.id },
         data: { used: nextUsed },
-      });
-
-      updated = await prisma.training.update({
-        where: { id },
-        data: { wasCounted: true },
       });
 
       if (nextUsed >= activeBlock.paidTrainings) {
