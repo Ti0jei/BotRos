@@ -10,6 +10,7 @@ import {
   ScrollArea,
   Badge,
   Text,
+  Stack,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -190,15 +191,16 @@ export default function AdminSchedule() {
                   </Group>
 
                   {hourTrainings.map((training) => (
-                    <Group key={training.id} spacing="xs" mt="xs">
-                      <Text>{training.user.name}</Text>
-
-                      {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
-                      {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
-                      {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+                    <Stack key={training.id} spacing="xs" mt="xs">
+                      <Group justify="space-between">
+                        <Text>{training.user.name}</Text>
+                        {training.status === 'CONFIRMED' && <Badge color="green">Придёт</Badge>}
+                        {training.status === 'DECLINED' && <Badge color="red">Не придёт</Badge>}
+                        {training.status === 'PENDING' && <Badge color="gray">Ожидается</Badge>}
+                      </Group>
 
                       {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
-                        <>
+                        <Group grow>
                           <Button
                             size="xs"
                             color="green"
@@ -215,15 +217,15 @@ export default function AdminSchedule() {
                           </Button>
                           <Button
                             size="xs"
-                            variant="subtle"
                             color="gray"
+                            variant="light"
                             onClick={() => deleteTraining(training.id)}
                           >
                             ❌ Отмена
                           </Button>
-                        </>
+                        </Group>
                       )}
-                    </Group>
+                    </Stack>
                   ))}
                 </Paper>
               </Grid.Col>
