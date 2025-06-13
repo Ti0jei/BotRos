@@ -154,38 +154,39 @@ export default function AdminClients({
             const isEditing = editingId === client.id;
 
             return (
-              <Card key={client.id} withBorder radius="md" p="md">
+              <Card key={client.id} withBorder radius="md" p="md" style={{ position: 'relative' }}>
+                {/* Индикатор оплаты — кружок */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    backgroundColor: block ? 'green' : 'red',
+                  }}
+                />
+
                 <Stack spacing="xs" mb="xs">
-                  <Group position="apart">
-                    <Group spacing="xs">
-                      {isEditing ? (
-                        <>
-                          <Text>{client.name} {client.lastName ?? ''}</Text>
-                          <TextInput
-                            value={internalTagValue}
-                            onChange={(e) => setInternalTagValue(e.currentTarget.value)}
-                            placeholder="Доп. имя"
-                            size="xs"
-                            style={{ width: 120 }}
-                          />
-                        </>
-                      ) : (
-                        <Text fw={500}>
-                          {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
-                        </Text>
-                      )}
-                    </Group>
-
-                    <Button
-                      size="xs"
-                      variant="filled"
-                      color={block ? 'green' : 'red'}
-                      style={{ pointerEvents: 'none', cursor: 'default' }}
-                    >
-                      {block ? '✔ Оплачен' : '✖ Не оплачен'}
-                    </Button>
+                  <Group spacing="xs">
+                    {isEditing ? (
+                      <>
+                        <Text>{client.name} {client.lastName ?? ''}</Text>
+                        <TextInput
+                          value={internalTagValue}
+                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                          placeholder="Доп. имя"
+                          size="xs"
+                          style={{ width: 120 }}
+                        />
+                      </>
+                    ) : (
+                      <Text fw={500}>
+                        {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
+                      </Text>
+                    )}
                   </Group>
-
                   <Text size="sm" color="dimmed">{client.age} лет</Text>
                 </Stack>
 
