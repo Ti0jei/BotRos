@@ -254,14 +254,14 @@ export default function AdminClients({
                           style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: 4 }}
                           onClick={() => onOpenHistory(client.id)}
                         >
-                          📊 История 💸<IconCurrencyDollar size={18} />
+                          📊 История оплат 💸
                         </Button>
                         <Button
                           color="orange"
                           leftIcon={<IconEdit size={16} />}
                           onClick={() => startEditing(client)}
                         >
-                          Редактировать
+                          Псевдоним
                         </Button>
                         <Button color="red" onClick={() => deleteClient(client.id)}>
                           Удалить
