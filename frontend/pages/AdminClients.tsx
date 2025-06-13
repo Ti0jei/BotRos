@@ -155,28 +155,27 @@ export default function AdminClients({
 
             return (
               <Card key={client.id} withBorder radius="md" p="md">
-                <Group position="apart" mb="xs">
-                  <Group spacing="xs">
-                    {isEditing ? (
-                      <>
-                        <Text>{client.name} {client.lastName ?? ''}</Text>
-                        <TextInput
-                          value={internalTagValue}
-                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
-                          placeholder="Доп. имя"
-                          size="xs"
-                          style={{ width: 120 }}
-                        />
-                      </>
-                    ) : (
-                      <Text fw={500}>
-                        {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
-                      </Text>
-                    )}
-                  </Group>
+                <Stack spacing="xs" mb="xs">
+                  <Group position="apart">
+                    <Group spacing="xs">
+                      {isEditing ? (
+                        <>
+                          <Text>{client.name} {client.lastName ?? ''}</Text>
+                          <TextInput
+                            value={internalTagValue}
+                            onChange={(e) => setInternalTagValue(e.currentTarget.value)}
+                            placeholder="Доп. имя"
+                            size="xs"
+                            style={{ width: 120 }}
+                          />
+                        </>
+                      ) : (
+                        <Text fw={500}>
+                          {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
+                        </Text>
+                      )}
+                    </Group>
 
-                  <Group spacing="xs">
-                    <Text size="sm" color="dimmed">{client.age} лет</Text>
                     <Button
                       size="xs"
                       variant="filled"
@@ -186,7 +185,9 @@ export default function AdminClients({
                       {block ? '✔ Оплачен' : '✖ Не оплачен'}
                     </Button>
                   </Group>
-                </Group>
+
+                  <Text size="sm" color="dimmed">{client.age} лет</Text>
+                </Stack>
 
                 {!isEditing && block && (
                   <>
