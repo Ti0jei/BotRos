@@ -122,7 +122,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   }, []);
 
   return (
-    <Container>
+    <Container style={{ paddingBottom: 70 }}>
       <Title order={2} mb="md">💸 Оплаты — {client.name}</Title>
 
       {loading ? (
@@ -244,7 +244,28 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         </>
       )}
 
-      <Button fullWidth mt="lg" variant="subtle" onClick={onBack}>← Назад</Button>
+      {/* Закреплённая кнопка */}
+      <div style={{
+        position: 'fixed',
+        bottom: 10,
+        left: 0,
+        width: '100%',
+        background: 'white',
+        padding: '8px 0',
+        textAlign: 'center',
+        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+        zIndex: 1000,
+      }}>
+        <Button
+          variant="subtle"
+          color="blue"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+        >
+          Назад к профилю
+        </Button>
+      </div>
     </Container>
   );
 }

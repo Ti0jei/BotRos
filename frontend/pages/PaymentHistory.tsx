@@ -78,8 +78,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}` },
         body: JSON.stringify({ active: false }),
       });
       await loadData();
@@ -89,7 +88,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Container>
+    <Container style={{ paddingBottom: 70 }}>
       <Title order={3} mb="md">История оплат</Title>
 
       {loading ? (
@@ -156,9 +155,28 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         </Stack>
       )}
 
-      <Button fullWidth mt="lg" variant="subtle" onClick={onBack}>
-        ← Назад
-      </Button>
+      {/* Закреплённая кнопка "Назад к профилю" */}
+      <div style={{
+        position: 'fixed',
+        bottom: 10,
+        left: 0,
+        width: '100%',
+        background: 'white',
+        padding: '8px 0',
+        textAlign: 'center',
+        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+        zIndex: 1000,
+      }}>
+        <Button
+          variant="subtle"
+          color="blue"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+        >
+          Назад к профилю
+        </Button>
+      </div>
     </Container>
   );
 }
