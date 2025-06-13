@@ -1,10 +1,7 @@
-// frontend/src/pages/AdminSchedule.tsx
 import {
   Container,
-  Title,
   Select,
   Paper,
-  Grid,
   Group,
   Button,
   Modal,
@@ -21,6 +18,7 @@ import { showNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isToday from 'dayjs/plugin/isToday';
 import {
   IconCheck,
   IconTrash,
@@ -28,9 +26,10 @@ import {
   IconChevronRight,
   IconArrowLeft,
 } from '@tabler/icons-react';
-
 import { getToken } from '../utils/auth';
+
 dayjs.extend(isSameOrBefore);
+dayjs.extend(isToday);
 
 interface User {
   id: string;
@@ -187,8 +186,20 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, [date]);
 
+  const getCardColor = (status: string) => {
+    if (status === 'CONFIRMED') return '#e6ffec';
+    if (status === 'DECLINED') return '#ffe6e6';
+    return '#f1f3f5';
+  };
+
+  const getUserIcon = (training: Training) => {
+    if (training.isSinglePaid) return '💸';
+    if (!blocks[training.userId]) return '📛';
+    return '🧍';
+  };
+
   return (
-    <Container size="sm" py="md" style={{ backgroundColor: '#f9fafc', borderRadius: 12 }}>
+    <Container size="sm" py="md">
       <Group position="center" spacing="xs" mb="md">
         <Button
           size="xs"
@@ -221,14 +232,23 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         </Button>
       </Group>
 
+      <Group position="center" mb="sm">
+        <Text fw={700} size="lg">
+          Расписание на {date.format('DD.MM.YYYY')}
+          {date.isToday() && <Text span color="green"> (сегодня)</Text>}
+        </Text>
+      </Group>
+
       <Divider my="sm" />
 
       <ScrollArea h="65vh">
         <Stack spacing="sm">
           {hours.map((hour) => {
             const hourTrainings = getTrainingsAt(hour);
+            const highlightHour = date.isToday() && hour === dayjs().hour();
+
             return (
-              <Box key={hour}>
+              <Box key={hour} style={{ backgroundColor: highlightHour ? '#fffbe6' : 'transparent', borderRadius: 8, padding: 4 }}>
                 <Group position="apart" mb={4} align="center">
                   <Text fw={600} size="md" style={{ minWidth: 60 }}>
                     {hour}:00
@@ -256,18 +276,15 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                     radius="md"
                     p="sm"
                     mb="xs"
-                    style={{ backgroundColor: '#ffffff' }}
+                    style={{ backgroundColor: getCardColor(training.status) }}
                   >
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
-                        {training.user.name} {training.user.lastName ?? ''}{' '}
+                        {getUserIcon(training)} {training.user.name} {training.user.lastName ?? ''}{' '}
                         {training.user.internalTag && (
                           <Text span color="dimmed">
                             ({training.user.internalTag})
                           </Text>
-                        )}
-                        {training.isSinglePaid && (
-                          <span title="Разовая оплата"> 💸</span>
                         )}
                       </Text>
                       <Badge color={
