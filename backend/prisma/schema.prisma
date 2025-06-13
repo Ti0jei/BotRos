@@ -23,16 +23,18 @@ model User {
 }
 
 model Training {
-  id        String   @id @default(cuid())
-  date      DateTime @db.Timestamp(6)
-  hour      Int
-  userId    String
-  status    Status   @default(PENDING)
-  attended  Boolean? // Убрали @default(false), теперь по умолчанию null
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  id         String   @id @default(cuid())
+  date       DateTime @db.Timestamp(6)
+  hour       Int
+  userId     String
+  status     Status   @default(PENDING)
+  attended   Boolean? // может быть null
+  wasCounted Boolean  @default(false) // 🔒 новее поле
+  createdAt  DateTime? @default(now()) @db.Timestamp(6)
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 
 model PaymentBlock {
   id               String   @id @default(cuid())

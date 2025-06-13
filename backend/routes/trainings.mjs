@@ -116,21 +116,22 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
   if (!training) return res.status(404).json({ error: 'Training not found' });
 
   if (training.attended === attended) {
-    return res.status(200).json(training); // 🔒 повторное нажатие, не списывать
+    return res.status(200).json(training); // 🔒 уже установлен этот статус
   }
 
+  // Обновить attended и проверить, нужно ли списывать
   const updated = await prisma.training.update({
     where: { id },
     data: { attended },
   });
 
-  if (attended === true) {
+  if (attended === true && training.wasCounted !== true) {
+    const trainingDate = new Date(training.date);
     const activeBlock = await prisma.paymentBlock.findFirst({
       where: { userId: training.userId, active: true },
     });
 
     const dateOnly = (d) => d.toISOString().slice(0, 10);
-    const trainingDate = new Date(training.date);
 
     if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
       const currentUsed = activeBlock.used || 0;
@@ -139,6 +140,11 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
       await prisma.paymentBlock.update({
         where: { id: activeBlock.id },
         data: { used: nextUsed },
+      });
+
+      await prisma.training.update({
+        where: { id },
+        data: { wasCounted: true },
       });
 
       if (nextUsed >= activeBlock.paidTrainings) {
