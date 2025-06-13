@@ -25,9 +25,9 @@ interface Client {
 interface PaymentBlock {
   id: string;
   date: string;
-  sessions: number;
+  paidTrainings: number;
   used: number;
-  price: number;
+  pricePerTraining: number;
   active: boolean;
 }
 
@@ -39,8 +39,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   const [loading, setLoading] = useState(true);
 
   const [date, setDate] = useState<Date | null>(new Date());
-  const [sessions, setSessions] = useState<number>(8);
-  const [price, setPrice] = useState<number>(600);
+  const [paidTrainings, setPaidTrainings] = useState<number>(8);
+  const [pricePerTraining, setPricePerTraining] = useState<number>(600);
   const [used, setUsed] = useState<number>(0);
 
   const [editMode, setEditMode] = useState(false);
@@ -55,8 +55,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       const data = await res.json();
       setBlock(data);
       setDate(new Date(data.date));
-      setSessions(data.sessions);
-      setPrice(data.price);
+      setPaidTrainings(data.paidTrainings);
+      setPricePerTraining(data.pricePerTraining);
       setUsed(data.used);
     } else {
       setBlock(null);
@@ -75,16 +75,16 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       body: JSON.stringify({
         userId: client.id,
         paidAt: date,
-        paidTrainings: sessions,
-        pricePerTraining: price,
+        paidTrainings,
+        pricePerTraining,
       }),
     });
 
     if (res.ok) {
       showNotification({ title: 'Блок создан', message: 'Новая оплата успешно добавлена', color: 'green' });
       setDate(new Date());
-      setSessions(8);
-      setPrice(600);
+      setPaidTrainings(8);
+      setPricePerTraining(600);
       await loadBlock();
     } else {
       showNotification({ title: 'Ошибка', message: 'Не удалось добавить блок оплаты', color: 'red' });
@@ -102,8 +102,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       },
       body: JSON.stringify({
         paidAt: date,
-        paidTrainings: sessions,
-        pricePerTraining: price,
+        paidTrainings,
+        pricePerTraining,
         used,
       }),
     });
@@ -131,8 +131,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         <Paper withBorder p="md" mb="md" shadow="xs">
           <Group position="apart" mb="xs">
             <Text fw={500}>Активный блок</Text>
-            <Badge color={block.used >= block.sessions ? 'red' : 'green'}>
-              {block.used} / {block.sessions}
+            <Badge color={block.used >= block.paidTrainings ? 'red' : 'green'}>
+              {block.used} / {block.paidTrainings}
             </Badge>
           </Group>
 
@@ -159,15 +159,15 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
 
               <NumberInput
                 label="Кол-во тренировок"
-                value={sessions}
-                onChange={(v) => setSessions(Number(v))}
+                value={paidTrainings}
+                onChange={(v) => setPaidTrainings(Number(v))}
                 min={1}
               />
 
               <NumberInput
                 label="Цена за тренировку, ₽"
-                value={price}
-                onChange={(v) => setPrice(Number(v))}
+                value={pricePerTraining}
+                onChange={(v) => setPricePerTraining(Number(v))}
                 min={1}
               />
 
@@ -176,7 +176,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 value={used}
                 onChange={(v) => setUsed(Number(v))}
                 min={0}
-                max={sessions}
+                max={paidTrainings}
               />
 
               <Button onClick={updateBlock} color="blue">💾 Сохранить изменения</Button>
@@ -184,10 +184,12 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
           ) : (
             <>
               <Text size="sm" color="dimmed">Дата оплаты: {dayjs(block.date).format('DD.MM.YYYY')}</Text>
-              <Text size="sm" color="dimmed">Цена: {block.price}₽</Text>
-              <Text size="sm" color="dimmed">Всего тренировок: {block.sessions}</Text>
+              <Text size="sm" color="dimmed">Цена: {block.pricePerTraining}₽</Text>
+              <Text size="sm" color="dimmed">Всего тренировок: {block.paidTrainings}</Text>
               <Text size="sm" color="dimmed">Использовано: {block.used}</Text>
-              <Text size="sm" fw={600}>Осталось: {block.sessions - block.used}</Text>
+              <Text size="sm" fw={600}>
+                Осталось: {block.paidTrainings - block.used}
+              </Text>
               <Button mt="sm" variant="light" onClick={() => setEditMode(true)}>
                 ✏️ Редактировать
               </Button>
@@ -220,16 +222,16 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
 
           <NumberInput
             label="Кол-во тренировок"
-            value={sessions}
-            onChange={(v) => setSessions(Number(v))}
+            value={paidTrainings}
+            onChange={(v) => setPaidTrainings(Number(v))}
             min={1}
             mt="sm"
           />
 
           <NumberInput
             label="Цена за тренировку, ₽"
-            value={price}
-            onChange={(v) => setPrice(Number(v))}
+            value={pricePerTraining}
+            onChange={(v) => setPricePerTraining(Number(v))}
             min={1}
             mt="sm"
           />
