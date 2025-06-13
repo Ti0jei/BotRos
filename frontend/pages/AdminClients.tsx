@@ -139,7 +139,7 @@ export default function AdminClients({
   }
 
   return (
-    <Container>
+    <Container style={{ paddingBottom: 70 }}>
       <Title order={2} mb="md">Клиенты</Title>
 
       {loading ? (
@@ -155,7 +155,6 @@ export default function AdminClients({
 
             return (
               <Card key={client.id} withBorder radius="md" p="md" style={{ position: 'relative' }}>
-                {/* Индикатор оплаты — кружок */}
                 <div
                   style={{
                     position: 'absolute',
@@ -191,16 +190,14 @@ export default function AdminClients({
                 </Stack>
 
                 {!isEditing && block && (
-                  <>
-                    <Group spacing="xs" mb="xs">
-                      <Badge color={remaining === 0 ? 'red' : 'green'}>
-                        Осталось: {remaining}
-                      </Badge>
-                      <Badge color="teal">
-                        Цена: {block.pricePerTraining} ₽
-                      </Badge>
-                    </Group>
-                  </>
+                  <Group spacing="xs" mb="xs">
+                    <Badge color={remaining === 0 ? 'red' : 'green'}>
+                      Осталось: {remaining}
+                    </Badge>
+                    <Badge color="teal">
+                      Цена: {block.pricePerTraining} ₽
+                    </Badge>
+                  </Group>
                 )}
 
                 <Stack mt="xs" spacing="xs">
@@ -258,9 +255,28 @@ export default function AdminClients({
         </Stack>
       )}
 
-      <Button fullWidth mt="lg" variant="subtle" onClick={onBack}>
-        ← Назад
-      </Button>
+      {/* Закреплённая кнопка "Назад к профилю" */}
+      <div style={{
+        position: 'fixed',
+        bottom: 10,
+        left: 0,
+        width: '100%',
+        background: 'white',
+        padding: '8px 0',
+        textAlign: 'center',
+        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+        zIndex: 1000,
+      }}>
+        <Button
+          variant="subtle"
+          color="blue"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+        >
+          Назад к профилю
+        </Button>
+      </div>
     </Container>
   );
 }
