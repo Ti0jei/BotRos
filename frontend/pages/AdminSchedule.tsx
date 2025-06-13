@@ -115,7 +115,13 @@ export default function AdminSchedule() {
     await loadTrainings();
   };
 
-  const markAttendance = async (id: string, attended: boolean) => {
+  const markAttendance = async (
+    id: string,
+    attended: boolean,
+    current: boolean | null
+  ) => {
+    if (current === attended) return; // 🔒 защита от повторного нажатия
+
     await fetch(`${API}/api/trainings/${id}/attended`, {
       method: 'PATCH',
       headers: {
@@ -129,7 +135,8 @@ export default function AdminSchedule() {
   };
 
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
-  const getTrainingsAt = (hour: number) => trainings.filter((t) => t.hour === hour);
+  const getTrainingsAt = (hour: number) =>
+    trainings.filter((t) => t.hour === hour);
 
   useEffect(() => {
     loadClients();
@@ -156,7 +163,10 @@ export default function AdminSchedule() {
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
             popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
-            styles={{ dropdown: { maxWidth: 280 }, calendarHeaderControl: { fontSize: 14 } }}
+            styles={{
+              dropdown: { maxWidth: 280 },
+              calendarHeaderControl: { fontSize: 14 },
+            }}
           />
         </div>
 
@@ -173,54 +183,93 @@ export default function AdminSchedule() {
               <Grid.Col span={12} key={hour}>
                 <Group position="apart" mb="xs">
                   <Title order={4}>{hour}:00</Title>
-                  <Button size="xs" onClick={() => {
-                    setSelectedHour(hour);
-                    setModalOpen(true);
-                  }}>
+                  <Button
+                    size="xs"
+                    onClick={() => {
+                      setSelectedHour(hour);
+                      setModalOpen(true);
+                    }}
+                  >
                     Назначить
                   </Button>
                 </Group>
 
                 {hourTrainings.map((training) => (
-                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
+                  <Paper
+                    key={training.id}
+                    withBorder
+                    shadow="xs"
+                    p="sm"
+                    mb="xs"
+                    radius="md"
+                    bg="gray.1"
+                  >
                     <Group position="apart" mb="xs">
                       <Text fw={500}>{training.user.name}</Text>
-                      <Badge color={
-                        training.status === 'CONFIRMED'
-                          ? 'green'
+                      <Badge
+                        color={
+                          training.status === 'CONFIRMED'
+                            ? 'green'
+                            : training.status === 'DECLINED'
+                            ? 'red'
+                            : 'gray'
+                        }
+                      >
+                        {training.status === 'CONFIRMED'
+                          ? 'Придёт'
                           : training.status === 'DECLINED'
-                          ? 'red'
-                          : 'gray'
-                      }>
-                        {training.status === 'CONFIRMED' ? 'Придёт' :
-                         training.status === 'DECLINED' ? 'Не придёт' : 'Ожидается'}
+                          ? 'Не придёт'
+                          : 'Ожидается'}
                       </Badge>
                     </Group>
 
-                    <Group grow>
+                    <Group grow spacing="xs">
                       {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
                         <>
                           <Button
                             size="xs"
                             color="green"
-                            onClick={() => markAttendance(training.id, true)}
+                            variant={
+                              training.attended === true ? 'filled' : 'light'
+                            }
+                            onClick={() =>
+                              markAttendance(
+                                training.id,
+                                true,
+                                training.attended
+                              )
+                            }
+                            style={{ minWidth: 80 }}
                           >
                             Был
                           </Button>
+
                           <Button
                             size="xs"
                             color="red"
-                            onClick={() => markAttendance(training.id, true)}
+                            variant={
+                              training.attended === false ? 'filled' : 'light'
+                            }
+                            onClick={() =>
+                              markAttendance(
+                                training.id,
+                                false,
+                                training.attended
+                              )
+                            }
+                            style={{ minWidth: 80 }}
                           >
                             Прогул
                           </Button>
                         </>
                       )}
+
                       <Button
                         size="xs"
                         color="gray"
                         variant="light"
                         onClick={() => deleteTraining(training.id)}
+                        style={{ minWidth: 80 }}
                       >
                         Отмена
                       </Button>
