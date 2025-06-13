@@ -1,5 +1,3 @@
-// frontend/src/pages/AdminClients.tsx
-
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -13,7 +11,14 @@ import {
   Badge,
   TextInput,
 } from '@mantine/core';
-import { IconAlertTriangle, IconCurrencyDollar } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCurrencyDollar,
+  IconEdit,
+  IconTrash,
+  IconCheck,
+  IconX,
+} from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 
 interface Client {
@@ -174,12 +179,8 @@ export default function AdminClients({
                 {!isEditing && block && (
                   <>
                     <Group spacing="xs" mb="xs">
-                      <Badge color={remaining === 0 ? 'red' : 'green'}>
-                        Осталось: {remaining}
-                      </Badge>
-                      <Badge color="teal">
-                        Цена: {block.pricePerTraining} ₽
-                      </Badge>
+                      <Badge color={remaining === 0 ? 'red' : 'green'}>Осталось: {remaining}</Badge>
+                      <Badge color="teal">Цена: {block.pricePerTraining} ₽</Badge>
                     </Group>
                     {remaining === 0 && (
                       <Text color="red" fw={600}>
@@ -194,10 +195,18 @@ export default function AdminClients({
                   <Group grow>
                     {isEditing ? (
                       <>
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
+                        <Button
+                          color="green"
+                          leftIcon={<IconCheck size={16} />}
+                          onClick={() => saveInternalTag(client.id)}
+                        >
                           Сохранить
                         </Button>
-                        <Button color="gray" onClick={cancelEditing}>
+                        <Button
+                          color="gray"
+                          leftIcon={<IconX size={16} />}
+                          onClick={cancelEditing}
+                        >
                           Отмена
                         </Button>
                       </>
@@ -223,10 +232,18 @@ export default function AdminClients({
                       >
                         📊 История оплат <IconCurrencyDollar size={18} />
                       </Button>
-                      <Button color="orange" onClick={() => startEditing(client)}>
+                      <Button
+                        color="orange"
+                        leftIcon={<IconEdit size={16} />}
+                        onClick={() => startEditing(client)}
+                      >
                         Псевдоним
                       </Button>
-                      <Button color="red" onClick={() => deleteClient(client.id)}>
+                      <Button
+                        color="red"
+                        leftIcon={<IconTrash size={16} />}
+                        onClick={() => deleteClient(client.id)}
+                      >
                         Удалить
                       </Button>
                     </Group>
