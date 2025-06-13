@@ -11,6 +11,7 @@ import {
   Badge,
   Text,
   Checkbox,
+  Divider,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
@@ -161,7 +162,9 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       await fetch(`${API}/api/trainings/${id}/attended`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ attended }),
       });
       setConfirmModal(false);
@@ -173,7 +176,8 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   };
 
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
-  const getTrainingsAt = (hour: number) => trainings.filter((t) => t.hour === hour);
+  const getTrainingsAt = (hour: number) =>
+    trainings.filter((t) => t.hour === hour);
 
   useEffect(() => {
     loadClients();
@@ -182,33 +186,34 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
 
   return (
     <Container>
-      <Group position="apart" mt="sm" mb="md">
+      <Group position="apart" mt="md" mb="xs">
         <Title order={2}>Расписание на {date.format('DD.MM.YYYY')}</Title>
-        <Button variant="subtle" leftIcon={<IconArrowLeft size={16} />} onClick={onBack}>
+        <Button variant="light" onClick={onBack} leftIcon={<IconArrowLeft size={18} />}>
           Назад к профилю
         </Button>
       </Group>
 
-      <Group mb="md">
-        <Button variant="default" onClick={() => setDate(date.subtract(1, 'day'))}>
+      <Group mb="md" position="center">
+        <Button variant="light" onClick={() => setDate(date.subtract(1, 'day'))}>
           ← Назад
         </Button>
 
-        <div style={{ maxWidth: 220 }}>
-          <DatePickerInput
-            value={date.toDate()}
-            onChange={(val) => val && setDate(dayjs(val))}
-            clearable={false}
-            dropdownType="popover"
-            nextIcon={<IconChevronRight size={16} />}
-            previousIcon={<IconChevronLeft size={16} />}
-          />
-        </div>
+        <DatePickerInput
+          value={date.toDate()}
+          onChange={(val) => val && setDate(dayjs(val))}
+          clearable={false}
+          dropdownType="popover"
+          nextIcon={<IconChevronRight size={16} />}
+          previousIcon={<IconChevronLeft size={16} />}
+          popoverProps={{ withinPortal: true, shadow: 'md', radius: 'md' }}
+        />
 
-        <Button variant="default" onClick={() => setDate(date.add(1, 'day'))}>
+        <Button variant="light" onClick={() => setDate(date.add(1, 'day'))}>
           Вперёд →
         </Button>
       </Group>
+
+      <Divider my="sm" />
 
       <ScrollArea>
         <Grid>
@@ -217,7 +222,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
             return (
               <Grid.Col span={12} key={hour}>
                 <Group position="apart" mb="xs">
-                  <Title order={4}>{hour}:00</Title>
+                  <Text fw={600} size="lg">{hour}:00</Text>
                   <Button size="xs" onClick={() => {
                     setSelectedHour(hour);
                     setModalOpen(true);
@@ -227,7 +232,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                 </Group>
 
                 {hourTrainings.map((training) => (
-                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md" bg="gray.1">
+                  <Paper key={training.id} withBorder shadow="xs" p="sm" mb="xs" radius="md">
                     <Group position="apart" mb="xs">
                       <Text fw={500}>
                         {training.user.name} {training.user.lastName ?? ''} {training.user.internalTag ? `(${training.user.internalTag})` : ''}
@@ -267,6 +272,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                           </Button>
                         </>
                       )}
+
                       <Button
                         size="xs"
                         color="gray"
@@ -325,10 +331,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
           </Button>
         </Group>
       </Modal>
-
-      <Button mt="lg" variant="subtle" leftIcon={<IconArrowLeft size={16} />} onClick={onBack}>
-        ← Назад к профилю
-      </Button>
     </Container>
   );
 }
