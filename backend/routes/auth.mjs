@@ -10,7 +10,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const BASE_URL = process.env.WEB_APP_URL || 'http://localhost:3000';
-const EMAIL_FROM = process.env.EMAIL_FROM;
+const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@fittelega.com';
 
 // 🚀 Регистрация
 router.post('/register', async (req, res) => {
@@ -48,7 +48,7 @@ router.post('/register', async (req, res) => {
 
   const hashed = await bcrypt.hash(password, 10);
   const emailToken = crypto.randomBytes(32).toString('hex');
-  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 часа
 
   const user = await prisma.user.create({
     data: {
@@ -74,8 +74,7 @@ router.post('/register', async (req, res) => {
     html: `<p>Здравствуйте, ${name}!</p><p>Перейдите по ссылке для подтверждения email:</p><p><a href="${BASE_URL}/api/auth/verify?token=${emailToken}">Подтвердить почту</a></p>`
   });
 
-  const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
-  res.json({ token, user });
+  res.json({ message: 'Письмо с подтверждением отправлено. Подтвердите email для входа.' });
 });
 
 // 🔐 Подтверждение email
@@ -112,9 +111,17 @@ router.get('/verify', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
+
   if (!user) return res.status(400).json({ error: 'Пользователь не найден' });
+
+  // ❗ Требуем подтверждение email
+  if (!user.emailVerified) {
+    return res.status(400).json({ error: 'Подтвердите email перед входом' });
+  }
+
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(400).json({ error: 'Неверный пароль' });
+
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
   res.json({ token, user });
 });
