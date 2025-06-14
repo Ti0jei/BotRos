@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom'; // ✅ добавлено
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -21,8 +22,7 @@ function App() {
   const [params] = useSearchParams();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tid = params.get('tid');
+    const tid = new URLSearchParams(window.location.search).get('tid');
     if (tid) {
       console.log('[TG] Сохраняем telegramId из URL:', tid);
       localStorage.setItem('telegramId', tid);

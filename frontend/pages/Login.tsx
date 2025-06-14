@@ -8,7 +8,7 @@ import {
   Title,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-
+import { useSearchParams } from 'react-router-dom';
 
 export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   const [email, setEmail] = useState('');
