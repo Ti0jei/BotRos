@@ -8,14 +8,25 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
-// УБРАЛИ ВРЕМЕННОЕ СОЗДАНИЕ АДМИНА ИЗ КОДА!
-
 // Регистрация
 router.post('/register', async (req, res) => {
-  const { email, password, name, lastName, age, telegramId } = req.body;
+  const { email, password, name, lastName, age, telegramId, inviteCode } = req.body;
 
-  if (!email || !password || !name || !lastName || !age) {
+  if (!email || !password || !name || !lastName || !age || !inviteCode) {
     return res.status(400).json({ error: 'Missing fields' });
+  }
+
+  // Проверка инвайт-кода
+  const now = new Date();
+  const validCode = await prisma.inviteCode.findFirst({
+    where: {
+      code: inviteCode,
+      expiresAt: { gt: now },
+    },
+  });
+
+  if (!validCode) {
+    return res.status(400).json({ error: 'Неверный или просроченный инвайт-код' });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

@@ -51,6 +51,13 @@ model PaymentBlock {
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model InviteCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
 enum Status {
   PENDING
   CONFIRMED

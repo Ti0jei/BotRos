@@ -6,7 +6,9 @@ import {
   Stack,
   Paper,
   Title,
+  Notification,
 } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
 
 export default function Register({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState('');
@@ -14,7 +16,9 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,6 +29,13 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   }, []);
 
   const handleSubmit = async () => {
+    setError(null);
+
+    if (!inviteCode.trim()) {
+      setError('Введите код приглашения');
+      return;
+    }
+
     const body = {
       email,
       password,
@@ -32,18 +43,27 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       lastName,
       age: Number(age),
       telegramId,
+      inviteCode,
     };
 
-    const res = await fetch(`${API}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch(`${API}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      onRegistered();
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        onRegistered();
+      } else {
+        setError(data?.error || 'Ошибка при регистрации');
+      }
+    } catch (err) {
+      console.error('Ошибка регистрации:', err);
+      setError('Ошибка соединения с сервером');
     }
   };
 
@@ -51,11 +71,17 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
     <Paper shadow="md" p="xl" withBorder>
       <Stack>
         <Title order={3}>Регистрация</Title>
+        {error && (
+          <Notification color="red" icon={<IconAlertCircle size={18} />} withCloseButton onClose={() => setError(null)}>
+            {error}
+          </Notification>
+        )}
         <TextInput label="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <PasswordInput label="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
         <TextInput label="Имя" value={name} onChange={e => setName(e.target.value)} />
         <TextInput label="Фамилия" value={lastName} onChange={e => setLastName(e.target.value)} />
         <TextInput label="Возраст" value={age} onChange={e => setAge(e.target.value)} />
+        <TextInput label="Инвайт-код" value={inviteCode} onChange={e => setInviteCode(e.target.value)} />
         <Button fullWidth onClick={handleSubmit}>Зарегистрироваться</Button>
       </Stack>
     </Paper>

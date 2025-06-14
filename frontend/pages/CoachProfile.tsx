@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { IconAlarm, IconClock } from '@tabler/icons-react';
 import { getToken } from '../utils/auth';
+import InviteCodeViewer from '../components/InviteCodeViewer'; // ✅ добавлен импорт
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -99,6 +100,9 @@ export default function CoachProfile({
       <Button fullWidth mb="sm" disabled>
         Материалы (скоро)
       </Button>
+
+      {/* ✅ Блок показа инвайт-кода */}
+      <InviteCodeViewer />
 
       <Button fullWidth mt="lg" color="red" onClick={onLogout}>
         Выйти
