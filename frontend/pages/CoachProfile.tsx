@@ -10,7 +10,7 @@ import {
   Loader,
 } from '@mantine/core';
 import dayjs from 'dayjs';
-import { IconAlarm } from '@tabler/icons-react';
+import { IconAlarm, IconClock } from '@tabler/icons-react';
 import { getToken } from '../utils/auth';
 
 interface CoachProfileProps {
@@ -23,6 +23,7 @@ interface CoachProfileProps {
 interface Training {
   id: string;
   hour: number;
+  status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
   user: {
     name: string;
     lastName?: string | null;
@@ -36,7 +37,7 @@ export default function CoachProfile({
   onOpenSchedule,
   onOpenClients,
 }: CoachProfileProps) {
-  const [nextTraining, setNextTraining] = useState<Training | null>(null);
+  const [upcomingTrainings, setUpcomingTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
 
   const token = getToken();
@@ -49,11 +50,17 @@ export default function CoachProfile({
       const res = await fetch(`${API}/api/trainings?date=${today}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
+      const data: Training[] = await res.json();
       const sorted = data
-        .filter((t: any) => t.user)
-        .sort((a: any, b: any) => a.hour - b.hour);
-      setNextTraining(sorted[0] || null);
+        .filter((t) => t.status === 'PENDING')
+        .sort((a, b) => a.hour - b.hour);
+
+      const nextHour = sorted.length > 0 ? sorted[0].hour : null;
+      const filtered = nextHour !== null
+        ? sorted.filter((t) => t.hour === nextHour)
+        : [];
+
+      setUpcomingTrainings(filtered);
       setLoading(false);
     };
 
@@ -91,24 +98,27 @@ export default function CoachProfile({
           <Loader size="sm" />
         </Group>
       ) : (
-        nextTraining && (
+        upcomingTrainings.length > 0 && (
           <Paper mt="lg" p="md" withBorder radius="md" shadow="xs">
             <Group mb="xs">
-              <IconAlarm size={16} />
-              <Text fw={500}>Ближайшая тренировка сегодня</Text>
+              <IconAlarm size={18} />
+              <Text fw={600}>Ближайшая тренировка сегодня</Text>
             </Group>
-            <Text>
-              🕒 {nextTraining.hour}:00 — {nextTraining.user.name}{' '}
-              {nextTraining.user.lastName || ''}{' '}
-              {nextTraining.user.internalTag ? (
-                <Text span color="dimmed">
-                  ({nextTraining.user.internalTag})
-                </Text>
-              ) : null}
-            </Text>
-            <Badge mt="xs" color="yellow" size="sm">
-              Ожидается
-            </Badge>
+
+            {upcomingTrainings.map((t) => (
+              <Group key={t.id} position="apart" mb="xs">
+                <Group spacing="xs">
+                  <IconClock size={16} />
+                  <Text size="sm">
+                    {t.hour}:00 — {t.user.name} {t.user.lastName ?? ''}
+                    {t.user.internalTag && (
+                      <Text span color="dimmed"> ({t.user.internalTag})</Text>
+                    )}
+                  </Text>
+                </Group>
+                <Badge color="orange" size="sm">Ожидается</Badge>
+              </Group>
+            ))}
           </Paper>
         )
       )}
