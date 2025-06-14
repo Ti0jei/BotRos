@@ -27,14 +27,16 @@ export default function TrainingHourBlock({
   return (
     <Box
       style={{
-        backgroundColor: highlight ? '#fffbe6' : 'transparent',
+        backgroundColor: highlight ? '#fff3bf' : 'transparent', // более насыщенный желтый
+        border: highlight ? '2px solid #fab005' : undefined,    // оранжевая рамка
         borderRadius: 8,
-        padding: 4,
+        padding: 6,
+        boxShadow: highlight ? '0 0 8px rgba(255, 165, 0, 0.4)' : undefined,
       }}
     >
       <Group position="apart" mb={4}>
         <Text fw={600} size="md" style={{ minWidth: 60 }}>
-          {hour}:00
+          {hour}:00 {highlight && '⏰'}
         </Text>
         <Button size="xs" color="blue" variant="light" onClick={onOpenAssign}>
           Назначить
