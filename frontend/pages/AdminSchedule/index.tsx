@@ -3,8 +3,8 @@ import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isToday from 'dayjs/plugin/isToday';
 import { showNotification } from '@mantine/notifications';
-import { Container, Divider, Group, ScrollArea, Stack, Text, Button } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight, IconCheck } from '@tabler/icons-react';
+import { Container, Divider, Group, ScrollArea, Stack, Text } from '@mantine/core';
+import { IconCheck } from '@tabler/icons-react';
 
 import { getToken } from '../../utils/auth';
 import ScheduleHeader from './ScheduleHeader';
@@ -106,7 +106,6 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
-
     await loadTrainings();
   };
 
@@ -154,12 +153,12 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
               date={date}
               trainings={trainings.filter((t) => t.hour === hour)}
               blocks={blocks}
-              onAssignClick={() => {
+              onOpenAssign={() => {
                 setSelectedHour(hour);
                 setModalOpen(true);
               }}
               onDelete={deleteTraining}
-              onAttendance={handleAttendance}
+              onAttend={handleAttendance}
             />
           ))}
         </Stack>
