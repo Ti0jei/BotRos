@@ -20,6 +20,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const [inviteCode, setInviteCode] = useState('');
   const [telegramId, setTelegramId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -64,7 +65,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
           icon: <IconCheck size={18} />,
         });
 
-        onRegistered(); // можешь оставить или убрать
+        setSuccess(true);
       } else {
         setError(data?.error || 'Ошибка при регистрации');
       }
@@ -94,41 +95,53 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
           label="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          disabled={success}
         />
 
         <PasswordInput
           label="Пароль"
           value={password}
           onChange={e => setPassword(e.target.value)}
+          disabled={success}
         />
 
         <TextInput
           label="Имя"
           value={name}
           onChange={e => setName(e.target.value)}
+          disabled={success}
         />
 
         <TextInput
           label="Фамилия"
           value={lastName}
           onChange={e => setLastName(e.target.value)}
+          disabled={success}
         />
 
         <TextInput
           label="Возраст"
           value={age}
           onChange={e => setAge(e.target.value)}
+          disabled={success}
         />
 
         <TextInput
           label="Инвайт-код"
           value={inviteCode}
           onChange={e => setInviteCode(e.target.value)}
+          disabled={success}
         />
 
-        <Button fullWidth onClick={handleSubmit}>
-          Зарегистрироваться
-        </Button>
+        {!success ? (
+          <Button fullWidth onClick={handleSubmit}>
+            Зарегистрироваться
+          </Button>
+        ) : (
+          <Button fullWidth color="blue" onClick={onRegistered}>
+            Перейти ко входу
+          </Button>
+        )}
       </Stack>
     </Paper>
   );

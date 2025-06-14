@@ -9,24 +9,28 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useSearchParams } from 'react-router-dom';
+import { IconCheck } from '@tabler/icons-react';
 
 export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [params] = useSearchParams();
+  const [verifiedShown, setVerifiedShown] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    if (params.get('verified') === 'true') {
+    if (!verifiedShown && params.get('verified') === 'true') {
       showNotification({
         title: 'Почта подтверждена',
         message: 'Теперь вы можете войти',
         color: 'green',
+        icon: <IconCheck size={18} />,
       });
+      setVerifiedShown(true);
     }
-  }, [params]);
+  }, [params, verifiedShown]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -70,11 +74,13 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
           label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
         />
         <PasswordInput
           label="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
         />
         <Button fullWidth onClick={handleLogin} loading={loading}>
           Войти
