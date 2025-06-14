@@ -111,7 +111,8 @@ router.get('/verify', async (req, res) => {
     },
   });
 
-  res.redirect(`https://botros-qrra.onrender.com/login?verified=true`);
+  // ✅ редиректим на фронт
+  res.redirect(`https://bot-ros-frontend.vercel.app/login?verified=true`);
 });
 
 // 🔑 Вход
