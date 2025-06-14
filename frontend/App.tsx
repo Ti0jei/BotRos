@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom'; // ✅ добавлено
+import { useSearchParams } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -53,21 +53,25 @@ function App() {
           setView('profile');
 
           const telegramId = localStorage.getItem('telegramId');
-          if (telegramId) {
-            console.log('[TG] Привязываем Telegram ID:', telegramId);
+          const parsedTg = telegramId ? parseInt(telegramId, 10) : null;
+
+          if (parsedTg && !isNaN(parsedTg)) {
+            console.log('[TG] Привязываем Telegram ID:', parsedTg);
             fetch(`${API}/api/auth/telegram-connect`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify({ telegramId: parseInt(telegramId, 10) }),
+              body: JSON.stringify({ telegramId: parsedTg }),
             })
               .then(() => {
                 console.log('[TG] ✅ Telegram ID привязан');
                 localStorage.removeItem('telegramId');
               })
-              .catch((err) => console.error('[TG] ❌ Ошибка при привязке telegramId:', err));
+              .catch((err) =>
+                console.error('[TG] ❌ Ошибка при привязке telegramId:', err)
+              );
           }
         } else {
           localStorage.removeItem('token');
@@ -87,7 +91,12 @@ function App() {
       {view === 'login' && (
         <>
           <Login onLoggedIn={() => setView('profile')} />
-          <Button variant="subtle" mt="sm" fullWidth onClick={() => setView('register')}>
+          <Button
+            variant="subtle"
+            mt="sm"
+            fullWidth
+            onClick={() => setView('register')}
+          >
             Зарегистрироваться
           </Button>
         </>
@@ -96,7 +105,12 @@ function App() {
       {view === 'register' && (
         <>
           <Register onRegistered={() => setView('profile')} />
-          <Button variant="subtle" mt="sm" fullWidth onClick={() => setView('login')}>
+          <Button
+            variant="subtle"
+            mt="sm"
+            fullWidth
+            onClick={() => setView('login')}
+          >
             Назад ко входу
           </Button>
         </>
