@@ -5,6 +5,7 @@ import {
   Select,
   Text,
 } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import { PaymentBlock } from './types';
 
 interface AssignModalProps {
@@ -22,7 +23,7 @@ interface AssignModalProps {
   isSinglePaid: boolean;
   setIsSinglePaid: (v: boolean) => void;
   selectedHour: number | null;
-  blocks: Record<string, PaymentBlock | null>; // ⬅️ добавляем сюда блоки
+  blocks?: Record<string, PaymentBlock | null>; // blocks можно передавать опционально
 }
 
 export default function AssignModal({
@@ -35,11 +36,16 @@ export default function AssignModal({
   isSinglePaid,
   setIsSinglePaid,
   selectedHour,
-  blocks,
+  blocks = {}, // default to empty object
 }: AssignModalProps) {
-  const block = selectedUser ? blocks[selectedUser] : null;
-  const hasBlock = block && block.paidTrainings > block.used;
-  const shouldWarn = selectedUser && !hasBlock && !isSinglePaid;
+  const [needsPayment, setNeedsPayment] = useState(false);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+    const block = blocks[selectedUser];
+    const hasBlock = block && block.paidTrainings > block.used;
+    setNeedsPayment(!hasBlock);
+  }, [selectedUser, blocks]);
 
   return (
     <Modal
@@ -58,18 +64,18 @@ export default function AssignModal({
         onChange={setSelectedUser}
       />
 
+      {needsPayment && (
+        <Text color="red" size="sm" mt="xs">
+          У клиента нет активного блока. Поставьте галочку "Разовая оплата", чтобы назначить тренировку.
+        </Text>
+      )}
+
       <Checkbox
         mt="md"
         label="Разовая оплата"
         checked={isSinglePaid}
         onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
       />
-
-      {shouldWarn && (
-        <Text color="red" mt="sm" size="sm">
-          У клиента нет активного блока. Выберите "Разовая оплата", чтобы назначить тренировку.
-        </Text>
-      )}
 
       <Button mt="md" fullWidth onClick={onAssign}>
         Назначить
