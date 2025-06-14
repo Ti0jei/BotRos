@@ -42,7 +42,7 @@ export default function CoachProfile({
 }: CoachProfileProps) {
   const [upcomingTrainings, setUpcomingTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCode, setShowCode] = useState(false); // ✅ новое состояние
+  const [showCode, setShowCode] = useState(false);
 
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -103,28 +103,7 @@ export default function CoachProfile({
         Материалы (скоро)
       </Button>
 
-      {/* ✅ Кнопка для показа/скрытия инвайт-кода */}
-      <Button
-        fullWidth
-        variant="outline"
-        color="gray"
-        onClick={() => setShowCode((prev) => !prev)}
-        mb="md"
-      >
-        {showCode ? 'Скрыть код для регистрации' : 'Код для регистрации'}
-      </Button>
-
-      <Collapse in={showCode}>
-        <Paper p="md" withBorder radius="md" shadow="xs" mb="md">
-          <Title order={4} mb="sm">Код для регистрации клиентов</Title>
-          <InviteCodeViewer />
-        </Paper>
-      </Collapse>
-
-      <Button fullWidth mt="lg" color="red" onClick={onLogout}>
-        Выйти
-      </Button>
-
+      {/* 📅 Ближайшие тренировки */}
       {loading ? (
         <Group justify="center" mt="lg">
           <Loader size="sm" />
@@ -171,6 +150,29 @@ export default function CoachProfile({
           </Paper>
         )
       )}
+
+      {/* 🔻 Код для регистрации — внизу */}
+      <Button
+        fullWidth
+        variant="outline"
+        color="gray"
+        onClick={() => setShowCode((prev) => !prev)}
+        mt="lg"
+      >
+        {showCode ? 'Скрыть код для регистрации' : 'Код для регистрации'}
+      </Button>
+
+      <Collapse in={showCode}>
+        <Paper mt="sm" p="md" withBorder radius="md" shadow="xs">
+          <Title order={4} mb="sm">Код для регистрации клиентов</Title>
+          <InviteCodeViewer />
+        </Paper>
+      </Collapse>
+
+      {/* 🔴 ВЫХОД — в самом конце */}
+      <Button fullWidth mt="lg" color="red" onClick={onLogout}>
+        Выйти
+      </Button>
     </Container>
   );
 }
