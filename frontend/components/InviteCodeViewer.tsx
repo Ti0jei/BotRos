@@ -18,11 +18,12 @@ export default function InviteCodeViewer() {
   const [expires, setExpires] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchInviteCode = async () => {
+  const fetchInviteCode = async (force = false) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/api/invite-code?admin=true`);
+      const query = force ? '?admin=true&force=true' : '?admin=true';
+      const res = await fetch(`${API}/api/invite-code${query}`);
       const data = await res.json();
 
       if (res.ok) {
@@ -49,7 +50,7 @@ export default function InviteCodeViewer() {
         <Button
           variant="light"
           size="xs"
-          onClick={fetchInviteCode}
+          onClick={() => fetchInviteCode(true)} // 💡 вызываем с `force=true`
           leftIcon={<IconRefresh size={14} />}
         >
           Обновить

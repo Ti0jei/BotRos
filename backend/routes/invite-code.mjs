@@ -25,33 +25,52 @@ function generateInviteCode() {
   );
 }
 
-// 🔄 GET /api/invite-code — только для админа
+// 🔄 GET /api/invite-code?admin=true&force=true
 router.get('/', async (req, res) => {
   try {
-    // Временно: простой админ-доступ по query или можно authMiddleware.role === ADMIN
-    const isAdmin = req.query.admin === 'true'; // заменить на авторизацию!
+    const isAdmin = req.query.admin === 'true'; // 🔐 можно заменить на авторизацию
+    const forceNew = req.query.force === 'true';
     if (!isAdmin) return res.status(403).json({ error: 'Доступ запрещён' });
 
     const now = new Date();
 
-    let active = await prisma.inviteCode.findFirst({
-      where: {
-        expiresAt: { gt: now }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    let activeCode = null;
 
-    if (!active) {
-      const code = generateInviteCode();
-      active = await prisma.inviteCode.create({
+    if (forceNew) {
+      // Удалить все старые
+      await prisma.inviteCode.deleteMany({});
+      // Создать новый
+      activeCode = await prisma.inviteCode.create({
         data: {
-          code,
+          code: generateInviteCode(),
           expiresAt: dayjs(now).add(1, 'hour').toDate()
         }
       });
+    } else {
+      // Найти активный
+      activeCode = await prisma.inviteCode.findFirst({
+        where: {
+          expiresAt: { gt: now }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (!activeCode) {
+        // Если нет активного — создать новый
+        await prisma.inviteCode.deleteMany({});
+        activeCode = await prisma.inviteCode.create({
+          data: {
+            code: generateInviteCode(),
+            expiresAt: dayjs(now).add(1, 'hour').toDate()
+          }
+        });
+      }
     }
 
-    return res.json({ code: active.code, expiresAt: active.expiresAt });
+    return res.json({
+      code: activeCode.code,
+      expiresAt: activeCode.expiresAt
+    });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'Ошибка сервера' });

@@ -71,18 +71,57 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
     <Paper shadow="md" p="xl" withBorder>
       <Stack>
         <Title order={3}>Регистрация</Title>
+
         {error && (
-          <Notification color="red" icon={<IconAlertCircle size={18} />} withCloseButton onClose={() => setError(null)}>
+          <Notification
+            color="red"
+            icon={<IconAlertCircle size={18} />}
+            withCloseButton
+            onClose={() => setError(null)}
+          >
             {error}
           </Notification>
         )}
-        <TextInput label="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <PasswordInput label="Пароль" value={password} onChange={e => setPassword(e.target.value)} />
-        <TextInput label="Имя" value={name} onChange={e => setName(e.target.value)} />
-        <TextInput label="Фамилия" value={lastName} onChange={e => setLastName(e.target.value)} />
-        <TextInput label="Возраст" value={age} onChange={e => setAge(e.target.value)} />
-        <TextInput label="Инвайт-код" value={inviteCode} onChange={e => setInviteCode(e.target.value)} />
-        <Button fullWidth onClick={handleSubmit}>Зарегистрироваться</Button>
+
+        <TextInput
+          label="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+
+        <PasswordInput
+          label="Пароль"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+
+        <TextInput
+          label="Имя"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+
+        <TextInput
+          label="Фамилия"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+        />
+
+        <TextInput
+          label="Возраст"
+          value={age}
+          onChange={e => setAge(e.target.value)}
+        />
+
+        <TextInput
+          label="Инвайт-код"
+          value={inviteCode}
+          onChange={e => setInviteCode(e.target.value)}
+        />
+
+        <Button fullWidth onClick={handleSubmit}>
+          Зарегистрироваться
+        </Button>
       </Stack>
     </Paper>
   );
