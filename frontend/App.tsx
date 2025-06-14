@@ -38,7 +38,6 @@ function App() {
         color: 'green',
       });
 
-      // Удалить ?verified=true из URL
       navigate(window.location.pathname, { replace: true });
     }
   }, [params, navigate]);
@@ -81,6 +80,11 @@ function App() {
           localStorage.removeItem('token');
           setView('login');
         }
+      })
+      .catch((err) => {
+        console.error('Ошибка при загрузке профиля:', err);
+        localStorage.removeItem('token');
+        setView('login');
       });
   }, []);
 
@@ -111,12 +115,12 @@ function App() {
         <>
           <Register
             onRegistered={() => {
+              setView('login');
               showNotification({
                 title: 'Регистрация завершена',
                 message: 'Теперь подтвердите почту и войдите',
                 color: 'green',
               });
-              setView('login');
             }}
           />
           <Center>

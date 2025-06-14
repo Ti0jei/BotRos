@@ -25,7 +25,6 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    // Автоподставляем Telegram ID, если зашёл из WebApp
     if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
       setTelegramId(window.Telegram.WebApp.initDataUnsafe.user.id.toString());
     }
@@ -59,18 +58,19 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       const data = await res.json();
 
       if (res.ok) {
-        // сохраняем в sessionStorage для автозаполнения в login
+        // Сохраняем для автоподстановки при входе
         sessionStorage.setItem('lastEmail', email);
         sessionStorage.setItem('lastPassword', password);
 
+        setSuccess(true); // сначала меняем состояние...
+
+        // ...потом уведомляем
         showNotification({
           title: 'Проверьте почту',
           message: data.message || 'На email отправлено письмо для подтверждения.',
           color: 'green',
           icon: <IconCheck size={18} />,
         });
-
-        setSuccess(true);
       } else {
         setError(data?.error || 'Ошибка при регистрации');
       }
@@ -105,42 +105,42 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
         <TextInput
           label="Email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           disabled={success}
         />
 
         <PasswordInput
           label="Пароль"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           disabled={success}
         />
 
         <TextInput
           label="Имя"
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           disabled={success}
         />
 
         <TextInput
           label="Фамилия"
           value={lastName}
-          onChange={e => setLastName(e.target.value)}
+          onChange={(e) => setLastName(e.target.value)}
           disabled={success}
         />
 
         <TextInput
           label="Возраст"
           value={age}
-          onChange={e => setAge(e.target.value)}
+          onChange={(e) => setAge(e.target.value)}
           disabled={success}
         />
 
         <TextInput
           label="Инвайт-код"
           value={inviteCode}
-          onChange={e => setInviteCode(e.target.value)}
+          onChange={(e) => setInviteCode(e.target.value)}
           disabled={success}
         />
 
@@ -149,14 +149,9 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
             Зарегистрироваться
           </Button>
         ) : (
-          <>
-            <Button fullWidth color="blue" onClick={handleGoToLogin}>
-              Перейти ко входу
-            </Button>
-            <Button variant="subtle" onClick={handleGoToLogin}>
-              Назад ко входу
-            </Button>
-          </>
+          <Button fullWidth color="blue" onClick={handleGoToLogin}>
+            Перейти ко входу
+          </Button>
         )}
       </Stack>
     </Paper>
