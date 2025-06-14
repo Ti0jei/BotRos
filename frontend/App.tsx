@@ -73,11 +73,13 @@ function App() {
           }
         } else {
           localStorage.removeItem('token');
+          setProfile(null);
           setView('login');
         }
       })
       .catch(() => {
         localStorage.removeItem('token');
+        setProfile(null);
         setView('login');
       })
       .finally(() => setProfileLoading(false));
@@ -88,6 +90,14 @@ function App() {
     setProfile(null);
     setView('login');
   };
+
+  if (profileLoading && localStorage.getItem('token')) {
+    return (
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
+    );
+  }
 
   return (
     <Container size="xs" pt="xl">
@@ -124,13 +134,9 @@ function App() {
         </>
       )}
 
-      {view === 'profile' && (
+      {view === 'profile' && profile && (
         <>
-          {profileLoading || !profile ? (
-            <Center h="60vh">
-              <Loader size="lg" />
-            </Center>
-          ) : profile.role === 'ADMIN' ? (
+          {profile.role === 'ADMIN' ? (
             <CoachProfile
               profile={profile}
               onLogout={logout}
