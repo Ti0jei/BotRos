@@ -25,6 +25,7 @@ interface Training {
   hour: number;
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
   user: {
+    id: string;
     name: string;
     lastName?: string | null;
     internalTag?: string | null;
@@ -51,11 +52,14 @@ export default function CoachProfile({
         headers: { Authorization: `Bearer ${token}` },
       });
       const data: Training[] = await res.json();
-      const sorted = data
-        .filter((t) => t.status === 'PENDING')
-        .sort((a, b) => a.hour - b.hour);
 
+      const valid = data.filter(
+        (t) => t.status === 'PENDING' || t.status === 'CONFIRMED'
+      );
+
+      const sorted = valid.sort((a, b) => a.hour - b.hour);
       const nextHour = sorted.length > 0 ? sorted[0].hour : null;
+
       const filtered = nextHour !== null
         ? sorted.filter((t) => t.hour === nextHour)
         : [];
@@ -66,6 +70,13 @@ export default function CoachProfile({
 
     fetchTrainings();
   }, []);
+
+  const sendReminder = async (trainingId: string) => {
+    await fetch(`${API}/api/notifications/remind/${trainingId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  };
 
   return (
     <Container>
@@ -102,7 +113,7 @@ export default function CoachProfile({
           <Paper mt="lg" p="md" withBorder radius="md" shadow="xs">
             <Group mb="xs">
               <IconAlarm size={18} />
-              <Text fw={600}>Ближайшая тренировка сегодня</Text>
+              <Text fw={600}>Ближайшие тренировки сегодня</Text>
             </Group>
 
             {upcomingTrainings.map((t) => (
@@ -116,7 +127,24 @@ export default function CoachProfile({
                     )}
                   </Text>
                 </Group>
-                <Badge color="orange" size="sm">Ожидается</Badge>
+                <Group spacing="xs">
+                  <Badge
+                    color={t.status === 'CONFIRMED' ? 'green' : 'orange'}
+                    size="sm"
+                  >
+                    {t.status === 'CONFIRMED' ? 'Подтверждено' : 'Ожидается'}
+                  </Badge>
+                  {t.status === 'PENDING' && (
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      color="orange"
+                      onClick={() => sendReminder(t.id)}
+                    >
+                      Напомнить
+                    </Button>
+                  )}
+                </Group>
               </Group>
             ))}
           </Paper>
