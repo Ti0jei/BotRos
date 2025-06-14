@@ -9,7 +9,6 @@ import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
 import { Container, Button } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useSearchParams } from 'react-router-dom';
 
 function App() {
   const [view, setView] = useState<
