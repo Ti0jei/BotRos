@@ -1,11 +1,5 @@
-import {
-  Button,
-  Checkbox,
-  Modal,
-  Select,
-  Text,
-} from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { Button, Checkbox, Modal, Select, Text } from '@mantine/core';
 import { PaymentBlock } from './types';
 
 interface AssignModalProps {
@@ -23,7 +17,7 @@ interface AssignModalProps {
   isSinglePaid: boolean;
   setIsSinglePaid: (v: boolean) => void;
   selectedHour: number | null;
-  blocks?: Record<string, PaymentBlock | null>; // blocks можно передавать опционально
+  blocks: Record<string, PaymentBlock | null>;
 }
 
 export default function AssignModal({
@@ -36,16 +30,24 @@ export default function AssignModal({
   isSinglePaid,
   setIsSinglePaid,
   selectedHour,
-  blocks = {}, // default to empty object
+  blocks,
 }: AssignModalProps) {
-  const [needsPayment, setNeedsPayment] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
-    if (!selectedUser) return;
-    const block = blocks[selectedUser];
-    const hasBlock = block && block.paidTrainings > block.used;
-    setNeedsPayment(!hasBlock);
-  }, [selectedUser, blocks]);
+    // при изменении выбранного клиента или галочки — убираем ошибку
+    setShowError(false);
+  }, [selectedUser, isSinglePaid]);
+
+  const hasBlock = selectedUser && blocks[selectedUser]?.paidTrainings > blocks[selectedUser]?.used;
+
+  const handleAssign = () => {
+    if (!hasBlock && !isSinglePaid) {
+      setShowError(true);
+    } else {
+      onAssign();
+    }
+  };
 
   return (
     <Modal
@@ -64,7 +66,7 @@ export default function AssignModal({
         onChange={setSelectedUser}
       />
 
-      {needsPayment && (
+      {showError && (
         <Text color="red" size="sm" mt="xs">
           У клиента нет активного блока. Поставьте галочку "Разовая оплата", чтобы назначить тренировку.
         </Text>
@@ -77,7 +79,7 @@ export default function AssignModal({
         onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
       />
 
-      <Button mt="md" fullWidth onClick={onAssign}>
+      <Button mt="md" fullWidth onClick={handleAssign}>
         Назначить
       </Button>
     </Modal>
