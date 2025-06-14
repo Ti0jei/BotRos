@@ -117,14 +117,13 @@ function App() {
           <Register
             onRegistered={() => {
               setView('login');
-              // 🔔 уведомление показывается уже на login
               setTimeout(() => {
                 showNotification({
                   title: 'Регистрация завершена',
                   message: 'Теперь подтвердите почту и войдите',
                   color: 'green',
                 });
-              }, 100); // небольшой отложенный вызов, чтобы точно отрисовалось
+              }, 150);
             }}
           />
           <Center>
@@ -137,24 +136,22 @@ function App() {
 
       {view === 'profile' && (
         <>
-          {profileLoading ? (
-            <Center mt="lg"><Loader /></Center>
-          ) : profile ? (
-            profile.role === 'ADMIN' ? (
-              <CoachProfile
-                profile={profile}
-                onLogout={logout}
-                onOpenSchedule={() => setView('schedule')}
-                onOpenClients={() => setView('clients')}
-              />
-            ) : (
-              <Profile
-                profile={profile}
-                onLogout={logout}
-                onOpenTrainings={() => setView('client-calendar')}
-              />
-            )
-          ) : null}
+          {profileLoading || !profile ? (
+            <Center mt="lg"><Loader size="lg" color="blue" /></Center>
+          ) : profile.role === 'ADMIN' ? (
+            <CoachProfile
+              profile={profile}
+              onLogout={logout}
+              onOpenSchedule={() => setView('schedule')}
+              onOpenClients={() => setView('clients')}
+            />
+          ) : (
+            <Profile
+              profile={profile}
+              onLogout={logout}
+              onOpenTrainings={() => setView('client-calendar')}
+            />
+          )}
         </>
       )}
 
