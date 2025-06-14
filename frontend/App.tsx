@@ -54,6 +54,7 @@ function App() {
       .then((data) => {
         if (data) {
           setProfile(data);
+          setView('profile');
 
           const telegramId = localStorage.getItem('telegramId');
           const parsedTg = telegramId ? parseInt(telegramId, 10) : null;
@@ -66,14 +67,10 @@ function App() {
                 Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({ telegramId: parsedTg }),
-            })
-              .then(() => {
-                localStorage.removeItem('telegramId');
-              })
-              .catch(() => {});
+            }).finally(() => {
+              localStorage.removeItem('telegramId');
+            });
           }
-
-          setView('profile');
         } else {
           localStorage.removeItem('token');
           setView('login');
@@ -91,15 +88,6 @@ function App() {
     setProfile(null);
     setView('login');
   };
-
-  // 🧠 Показываем loader при загрузке профиля и наличии токена
-  if (profileLoading && localStorage.getItem('token')) {
-    return (
-      <Center h="100vh">
-        <Loader size="lg" />
-      </Center>
-    );
-  }
 
   return (
     <Container size="xs" pt="xl">
@@ -136,9 +124,13 @@ function App() {
         </>
       )}
 
-      {view === 'profile' && profile && (
+      {view === 'profile' && (
         <>
-          {profile.role === 'ADMIN' ? (
+          {profileLoading || !profile ? (
+            <Center h="60vh">
+              <Loader size="lg" />
+            </Center>
+          ) : profile.role === 'ADMIN' ? (
             <CoachProfile
               profile={profile}
               onLogout={logout}
