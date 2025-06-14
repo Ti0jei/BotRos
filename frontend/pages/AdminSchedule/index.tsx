@@ -176,6 +176,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         isSinglePaid={isSinglePaid}
         setIsSinglePaid={setIsSinglePaid}
         selectedHour={selectedHour}
+        blocks={blocks} // ✅ ДОБАВЛЕНО для показа предупреждения
       />
 
       <ConfirmModal

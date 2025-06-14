@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Modal, Select, Text } from '@mantine/core';
-import { PaymentBlock } from './types';
+import {
+  Button,
+  Checkbox,
+  Modal,
+  Select,
+  Text,
+  Stack,
+} from '@mantine/core';
+import { PaymentBlock, User } from './types';
 
 interface AssignModalProps {
   opened: boolean;
   onClose: () => void;
   onAssign: () => void;
-  clients: {
-    id: string;
-    name: string;
-    lastName?: string | null;
-    internalTag?: string | null;
-  }[];
+  clients: User[];
   selectedUser: string | null;
   setSelectedUser: (id: string | null) => void;
   isSinglePaid: boolean;
@@ -32,22 +34,16 @@ export default function AssignModal({
   selectedHour,
   blocks,
 }: AssignModalProps) {
-  const [showError, setShowError] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
-    // при изменении выбранного клиента или галочки — убираем ошибку
-    setShowError(false);
-  }, [selectedUser, isSinglePaid]);
+    if (!selectedUser) return;
 
-  const hasBlock = selectedUser && blocks[selectedUser]?.paidTrainings > blocks[selectedUser]?.used;
+    const block = blocks[selectedUser];
+    const hasBlock = block && block.paidTrainings > block.used;
 
-  const handleAssign = () => {
-    if (!hasBlock && !isSinglePaid) {
-      setShowError(true);
-    } else {
-      onAssign();
-    }
-  };
+    setShowWarning(!hasBlock && !isSinglePaid);
+  }, [selectedUser, blocks, isSinglePaid]);
 
   return (
     <Modal
@@ -55,33 +51,34 @@ export default function AssignModal({
       onClose={onClose}
       title={`Назначить тренировку на ${selectedHour}:00`}
     >
-      <Select
-        label="Клиент"
-        placeholder="Выберите клиента"
-        data={clients.map((c) => ({
-          value: c.id,
-          label: `${c.name} ${c.lastName ?? ''}${c.internalTag ? ` (${c.internalTag})` : ''}`,
-        }))}
-        value={selectedUser}
-        onChange={setSelectedUser}
-      />
+      <Stack>
+        <Select
+          label="Клиент"
+          placeholder="Выберите клиента"
+          data={clients.map((c) => ({
+            value: c.id,
+            label: `${c.name} ${c.lastName ?? ''}${c.internalTag ? ` (${c.internalTag})` : ''}`,
+          }))}
+          value={selectedUser}
+          onChange={setSelectedUser}
+        />
 
-      {showError && (
-        <Text color="red" size="sm" mt="xs">
-          У клиента нет активного блока. Поставьте галочку "Разовая оплата", чтобы назначить тренировку.
-        </Text>
-      )}
+        {showWarning && (
+          <Text color="red" size="sm">
+            У клиента нет активного блока. Поставьте галочку "Разовая оплата", чтобы назначить тренировку.
+          </Text>
+        )}
 
-      <Checkbox
-        mt="md"
-        label="Разовая оплата"
-        checked={isSinglePaid}
-        onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
-      />
+        <Checkbox
+          label="Разовая оплата"
+          checked={isSinglePaid}
+          onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
+        />
 
-      <Button mt="md" fullWidth onClick={handleAssign}>
-        Назначить
-      </Button>
+        <Button fullWidth mt="sm" onClick={onAssign}>
+          Назначить
+        </Button>
+      </Stack>
     </Modal>
   );
 }
