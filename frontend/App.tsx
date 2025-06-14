@@ -8,7 +8,7 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
-import { Container, Button } from '@mantine/core';
+import { Container, Button, Center } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -37,7 +37,9 @@ function App() {
         message: 'Теперь вы можете войти',
         color: 'green',
       });
-      navigate(window.location.pathname); // удаляем ?verified=true
+
+      // Удалить ?verified=true из URL
+      navigate(window.location.pathname, { replace: true });
     }
   }, [params, navigate]);
 
@@ -93,14 +95,15 @@ function App() {
       {view === 'login' && (
         <>
           <Login onLoggedIn={() => setView('profile')} />
-          <Button
-            variant="subtle"
-            mt="sm"
-            fullWidth
-            onClick={() => setView('register')}
-          >
-            Зарегистрироваться
-          </Button>
+          <Center>
+            <Button
+              variant="subtle"
+              mt="sm"
+              onClick={() => setView('register')}
+            >
+              Зарегистрироваться
+            </Button>
+          </Center>
         </>
       )}
 
@@ -116,14 +119,15 @@ function App() {
               setView('login');
             }}
           />
-          <Button
-            variant="subtle"
-            mt="sm"
-            fullWidth
-            onClick={() => setView('login')}
-          >
-            Назад ко входу
-          </Button>
+          <Center>
+            <Button
+              variant="subtle"
+              mt="sm"
+              onClick={() => setView('login')}
+            >
+              Назад ко входу
+            </Button>
+          </Center>
         </>
       )}
 

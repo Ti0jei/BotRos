@@ -6,175 +6,157 @@ import {
   Stack,
   Paper,
   Title,
+  Notification,
 } from '@mantine/core';
+import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import {
-  IconCheck,
-  IconAlertCircle,
-  IconMail,
-} from '@tabler/icons-react';
 
-export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
+export default function Register({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [params] = useSearchParams();
-  const [verifiedShown, setVerifiedShown] = useState(false);
-  const [showResend, setShowResend] = useState(false);
-  const [resending, setResending] = useState(false);
-  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [age, setAge] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const savedEmail = sessionStorage.getItem('lastEmail');
-    const savedPassword = sessionStorage.getItem('lastPassword');
-    if (savedEmail) setEmail(savedEmail);
-    if (savedPassword) setPassword(savedPassword);
-
-    if (!verifiedShown && params.get('verified') === 'true') {
-      showNotification({
-        title: 'Почта подтверждена',
-        message: 'Теперь вы можете войти',
-        color: 'green',
-        icon: <IconCheck size={18} />,
-      });
-      setVerifiedShown(true);
-      navigate(window.location.pathname); // убираем ?verified=true из URL
+    // Автоподставляем Telegram ID, если зашёл из WebApp
+    if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+      setTelegramId(window.Telegram.WebApp.initDataUnsafe.user.id.toString());
     }
-  }, [params, verifiedShown, navigate]);
+  }, []);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setShowResend(false);
+  const handleSubmit = async () => {
+    setError(null);
 
-    try {
-      const res = await fetch(`${API}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        sessionStorage.removeItem('lastEmail');
-        sessionStorage.removeItem('lastPassword');
-        onLoggedIn();
-      } else {
-        const errorMsg = data.error || 'Неверные данные';
-
-        showNotification({
-          title: 'Ошибка входа',
-          message:
-            errorMsg === 'Подтвердите email перед входом'
-              ? 'Пожалуйста, подтвердите почту по ссылке в письме'
-              : errorMsg,
-          color: 'red',
-          icon: <IconAlertCircle size={18} />,
-        });
-
-        if (errorMsg === 'Подтвердите email перед входом') {
-          setShowResend(true);
-        }
-      }
-    } catch (err) {
-      console.error('Ошибка запроса:', err);
-      showNotification({
-        title: 'Сервер недоступен',
-        message: 'Попробуйте позже',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResend = async () => {
-    if (!email) {
-      showNotification({
-        title: 'Email не указан',
-        message: 'Введите email, чтобы отправить письмо повторно',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
+    if (!inviteCode.trim()) {
+      setError('Введите код приглашения');
       return;
     }
 
-    setResending(true);
+    const body = {
+      email,
+      password,
+      name,
+      lastName,
+      age: Number(age),
+      telegramId,
+      inviteCode,
+    };
 
     try {
-      const res = await fetch(`${API}/api/auth/resend`, {
+      const res = await fetch(`${API}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
 
       if (res.ok) {
+        // сохраняем в sessionStorage для автозаполнения в login
+        sessionStorage.setItem('lastEmail', email);
+        sessionStorage.setItem('lastPassword', password);
+
         showNotification({
-          title: 'Письмо отправлено',
-          message: 'Проверьте почту и подтвердите email',
+          title: 'Проверьте почту',
+          message: data.message || 'На email отправлено письмо для подтверждения.',
           color: 'green',
-          icon: <IconMail size={18} />,
+          icon: <IconCheck size={18} />,
         });
+
+        setSuccess(true);
       } else {
-        showNotification({
-          title: 'Ошибка',
-          message: data?.error || 'Не удалось отправить письмо',
-          color: 'red',
-          icon: <IconAlertCircle size={18} />,
-        });
+        setError(data?.error || 'Ошибка при регистрации');
       }
     } catch (err) {
-      console.error('Ошибка повторной отправки:', err);
-      showNotification({
-        title: 'Ошибка',
-        message: 'Не удалось отправить письмо',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
-    } finally {
-      setResending(false);
+      console.error('Ошибка регистрации:', err);
+      setError('Ошибка соединения с сервером');
     }
+  };
+
+  const handleGoToLogin = () => {
+    sessionStorage.setItem('lastEmail', email);
+    sessionStorage.setItem('lastPassword', password);
+    onRegistered(); // переход во вход
   };
 
   return (
     <Paper shadow="md" p="xl" withBorder>
       <Stack>
-        <Title order={3}>Вход</Title>
+        <Title order={3}>Регистрация</Title>
+
+        {error && (
+          <Notification
+            color="red"
+            icon={<IconAlertCircle size={18} />}
+            withCloseButton
+            onClose={() => setError(null)}
+          >
+            {error}
+          </Notification>
+        )}
 
         <TextInput
           label="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
+          onChange={e => setEmail(e.target.value)}
+          disabled={success}
         />
+
         <PasswordInput
           label="Пароль"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
+          onChange={e => setPassword(e.target.value)}
+          disabled={success}
         />
-        <Button fullWidth onClick={handleLogin} loading={loading}>
-          Войти
-        </Button>
 
-        {showResend && (
-          <Button
-            variant="light"
-            color="blue"
-            mt="sm"
-            onClick={handleResend}
-            loading={resending}
-            leftIcon={<IconMail size={18} />}
-          >
-            Отправить письмо повторно
+        <TextInput
+          label="Имя"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          disabled={success}
+        />
+
+        <TextInput
+          label="Фамилия"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+          disabled={success}
+        />
+
+        <TextInput
+          label="Возраст"
+          value={age}
+          onChange={e => setAge(e.target.value)}
+          disabled={success}
+        />
+
+        <TextInput
+          label="Инвайт-код"
+          value={inviteCode}
+          onChange={e => setInviteCode(e.target.value)}
+          disabled={success}
+        />
+
+        {!success ? (
+          <Button fullWidth onClick={handleSubmit}>
+            Зарегистрироваться
           </Button>
+        ) : (
+          <>
+            <Button fullWidth color="blue" onClick={handleGoToLogin}>
+              Перейти ко входу
+            </Button>
+            <Button variant="subtle" onClick={handleGoToLogin}>
+              Назад ко входу
+            </Button>
+          </>
         )}
       </Stack>
     </Paper>
