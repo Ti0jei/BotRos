@@ -19,7 +19,7 @@ router.get('/', authMiddleware, async (req, res) => {
       select: {
         id: true,
         name: true,
-        lastName: true,        // ← добавлено!
+        lastName: true,
         internalTag: true,
         email: true,
         age: true,
@@ -55,6 +55,26 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Ошибка PATCH /clients/:id:', err);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// DELETE: Удаление клиента
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.user || req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+
+  try {
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Ошибка при удалении клиента:', err);
+    res.status(500).json({ error: 'Ошибка при удалении клиента' });
   }
 });
 
