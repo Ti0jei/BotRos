@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -20,6 +20,7 @@ function App() {
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const [params] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const tid = new URLSearchParams(window.location.search).get('tid');
@@ -36,8 +37,9 @@ function App() {
         message: 'Теперь вы можете войти',
         color: 'green',
       });
+      navigate(window.location.pathname); // удаляем ?verified=true
     }
-  }, [params]);
+  }, [params, navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -104,7 +106,16 @@ function App() {
 
       {view === 'register' && (
         <>
-          <Register onRegistered={() => setView('profile')} />
+          <Register
+            onRegistered={() => {
+              showNotification({
+                title: 'Регистрация завершена',
+                message: 'Теперь подтвердите почту и войдите',
+                color: 'green',
+              });
+              setView('login');
+            }}
+          />
           <Button
             variant="subtle"
             mt="sm"

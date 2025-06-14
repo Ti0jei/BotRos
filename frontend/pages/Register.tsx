@@ -8,7 +8,7 @@ import {
   Title,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   IconCheck,
   IconAlertCircle,
@@ -23,6 +23,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   const [verifiedShown, setVerifiedShown] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [resending, setResending] = useState(false);
+  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -40,8 +41,9 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         icon: <IconCheck size={18} />,
       });
       setVerifiedShown(true);
+      navigate(window.location.pathname); // убираем ?verified=true из URL
     }
-  }, [params, verifiedShown]);
+  }, [params, verifiedShown, navigate]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -92,7 +94,15 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   };
 
   const handleResend = async () => {
-    if (!email) return;
+    if (!email) {
+      showNotification({
+        title: 'Email не указан',
+        message: 'Введите email, чтобы отправить письмо повторно',
+        color: 'red',
+        icon: <IconAlertCircle size={18} />,
+      });
+      return;
+    }
 
     setResending(true);
 
