@@ -8,7 +8,8 @@ import {
   Title,
   Notification,
 } from '@mantine/core';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
+import { showNotification } from '@mantine/notifications';
 
 export default function Register({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState('');
@@ -55,9 +56,15 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        onRegistered();
+      if (res.ok) {
+        showNotification({
+          title: 'Регистрация прошла успешно',
+          message: data.message || 'Проверьте почту и подтвердите email',
+          color: 'green',
+          icon: <IconCheck size={18} />,
+        });
+
+        onRegistered(); // можешь оставить или убрать
       } else {
         setError(data?.error || 'Ошибка при регистрации');
       }
