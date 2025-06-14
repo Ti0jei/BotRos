@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { IconAlarm, IconClock } from '@tabler/icons-react';
 import { getToken } from '../utils/auth';
-import InviteCodeViewer from '../components/InviteCodeViewer'; // ✅ добавлен импорт
+import InviteCodeViewer from '../components/InviteCodeViewer';
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -101,8 +101,11 @@ export default function CoachProfile({
         Материалы (скоро)
       </Button>
 
-      {/* ✅ Блок показа инвайт-кода */}
-      <InviteCodeViewer />
+      {/* ✅ Инвайт-код для регистрации клиентов */}
+      <Paper mt="md" p="md" withBorder radius="md" shadow="xs">
+        <Title order={4} mb="sm">Код для регистрации клиентов</Title>
+        <InviteCodeViewer />
+      </Paper>
 
       <Button fullWidth mt="lg" color="red" onClick={onLogout}>
         Выйти
