@@ -3,7 +3,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import CoachProfile from './pages/CoachProfile';
-import AdminSchedule from './pages/AdminSchedule';
+import AdminSchedule from './pages/AdminSchedule/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
