@@ -58,9 +58,13 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       const data = await res.json();
 
       if (res.ok) {
+        // 💾 сохраняем email и пароль
+        sessionStorage.setItem('lastEmail', email);
+        sessionStorage.setItem('lastPassword', password);
+
         showNotification({
-          title: 'Регистрация прошла успешно',
-          message: data.message || 'Проверьте почту и подтвердите email',
+          title: 'Проверьте почту',
+          message: data.message || 'На ваш email отправлено письмо для подтверждения.',
           color: 'green',
           icon: <IconCheck size={18} />,
         });
