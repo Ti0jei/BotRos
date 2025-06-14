@@ -9,7 +9,6 @@ import { resend } from '../utils/resend.mjs';
 const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
-const BASE_URL = process.env.WEB_APP_URL || 'http://localhost:3000';
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@fittelega.com';
 
 // 🚀 Регистрация
@@ -67,11 +66,19 @@ router.post('/register', async (req, res) => {
 
   await prisma.inviteCode.deleteMany({ where: { id: validCode.id } });
 
+  const verifyUrl = `https://botros-qrra.onrender.com/api/auth/verify?token=${emailToken}`;
+
   await resend.emails.send({
     from: EMAIL_FROM,
     to: email,
     subject: 'Подтвердите вашу почту',
-    html: `<p>Здравствуйте, ${name}!</p><p>Перейдите по ссылке для подтверждения email:</p><p><a href="${BASE_URL}/api/auth/verify?token=${emailToken}">Подтвердить почту</a></p>`
+    html: `
+      <p>Здравствуйте, ${name}!</p>
+      <p>Перейдите по ссылке для подтверждения email:</p>
+      <p><a href="${verifyUrl}">Подтвердить почту</a></p>
+      <p>Если кнопка не работает — скопируйте ссылку в браузер:</p>
+      <p>${verifyUrl}</p>
+    `,
   });
 
   res.json({ message: 'Письмо с подтверждением отправлено. Подтвердите email для входа.' });
@@ -104,7 +111,7 @@ router.get('/verify', async (req, res) => {
     },
   });
 
-  res.redirect(`${BASE_URL}/login?verified=true`);
+  res.redirect(`https://botros-qrra.onrender.com/login?verified=true`);
 });
 
 // 🔑 Вход
@@ -114,7 +121,6 @@ router.post('/login', async (req, res) => {
 
   if (!user) return res.status(400).json({ error: 'Пользователь не найден' });
 
-  // ❗ Требуем подтверждение email
   if (!user.emailVerified) {
     return res.status(400).json({ error: 'Подтвердите email перед входом' });
   }
