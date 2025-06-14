@@ -8,6 +8,7 @@ import {
   Group,
   Badge,
   Loader,
+  Collapse,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import { IconAlarm, IconClock } from '@tabler/icons-react';
@@ -41,6 +42,7 @@ export default function CoachProfile({
 }: CoachProfileProps) {
   const [upcomingTrainings, setUpcomingTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCode, setShowCode] = useState(false); // ✅ новое состояние
 
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -101,11 +103,23 @@ export default function CoachProfile({
         Материалы (скоро)
       </Button>
 
-      {/* ✅ Инвайт-код для регистрации клиентов */}
-      <Paper mt="md" p="md" withBorder radius="md" shadow="xs">
-        <Title order={4} mb="sm">Код для регистрации клиентов</Title>
-        <InviteCodeViewer />
-      </Paper>
+      {/* ✅ Кнопка для показа/скрытия инвайт-кода */}
+      <Button
+        fullWidth
+        variant="outline"
+        color="gray"
+        onClick={() => setShowCode((prev) => !prev)}
+        mb="md"
+      >
+        {showCode ? 'Скрыть код для регистрации' : 'Код для регистрации'}
+      </Button>
+
+      <Collapse in={showCode}>
+        <Paper p="md" withBorder radius="md" shadow="xs" mb="md">
+          <Title order={4} mb="sm">Код для регистрации клиентов</Title>
+          <InviteCodeViewer />
+        </Paper>
+      </Collapse>
 
       <Button fullWidth mt="lg" color="red" onClick={onLogout}>
         Выйти
