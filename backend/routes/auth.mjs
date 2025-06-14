@@ -105,7 +105,7 @@ router.get('/verify', async (req, res) => {
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      emailVerified: new Date(),
+      emailVerified: true, // ✅ БУЛЕВО
       emailToken: null,
       emailTokenExpires: null,
     },
