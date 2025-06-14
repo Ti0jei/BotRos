@@ -26,7 +26,6 @@ function App() {
   useEffect(() => {
     const tid = new URLSearchParams(window.location.search).get('tid');
     if (tid) {
-      console.log('[TG] Сохраняем telegramId из URL:', tid);
       localStorage.setItem('telegramId', tid);
     }
   }, []);
@@ -38,7 +37,6 @@ function App() {
         message: 'Теперь вы можете войти',
         color: 'green',
       });
-
       navigate(window.location.pathname, { replace: true });
     }
   }, [params, navigate]);
@@ -61,7 +59,6 @@ function App() {
           const parsedTg = telegramId ? parseInt(telegramId, 10) : null;
 
           if (parsedTg && !isNaN(parsedTg)) {
-            console.log('[TG] Привязываем Telegram ID:', parsedTg);
             fetch(`${API}/api/auth/telegram-connect`, {
               method: 'POST',
               headers: {
@@ -71,12 +68,9 @@ function App() {
               body: JSON.stringify({ telegramId: parsedTg }),
             })
               .then(() => {
-                console.log('[TG] ✅ Telegram ID привязан');
                 localStorage.removeItem('telegramId');
               })
-              .catch((err) =>
-                console.error('[TG] ❌ Ошибка при привязке telegramId:', err)
-              );
+              .catch(() => {});
           }
 
           setView('profile');
@@ -85,8 +79,7 @@ function App() {
           setView('login');
         }
       })
-      .catch((err) => {
-        console.error('Ошибка при загрузке профиля:', err);
+      .catch(() => {
         localStorage.removeItem('token');
         setView('login');
       })
@@ -98,6 +91,15 @@ function App() {
     setProfile(null);
     setView('login');
   };
+
+  // 🧠 Показываем loader при загрузке профиля и наличии токена
+  if (profileLoading && localStorage.getItem('token')) {
+    return (
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
+    );
+  }
 
   return (
     <Container size="xs" pt="xl">
@@ -123,7 +125,7 @@ function App() {
                   message: 'Теперь подтвердите почту и войдите',
                   color: 'green',
                 });
-              }, 150);
+              }, 100);
             }}
           />
           <Center>
@@ -134,11 +136,9 @@ function App() {
         </>
       )}
 
-      {view === 'profile' && (
+      {view === 'profile' && profile && (
         <>
-          {profileLoading || !profile ? (
-            <Center mt="lg"><Loader size="lg" color="blue" /></Center>
-          ) : profile.role === 'ADMIN' ? (
+          {profile.role === 'ADMIN' ? (
             <CoachProfile
               profile={profile}
               onLogout={logout}
