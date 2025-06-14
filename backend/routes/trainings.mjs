@@ -187,7 +187,7 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   });
 });
 
-// Получить разовые тренировки (isSinglePaid = true)
+// Получить разовые тренировки
 router.get('/single/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
@@ -203,6 +203,28 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
   });
 
   res.json(trainings);
+});
+
+// Получить ближайшую тренировку для тренера
+router.get('/next', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can view next training' });
+  }
+
+  const now = new Date();
+
+  const training = await prisma.training.findFirst({
+    where: {
+      date: { gte: now },
+    },
+    include: { user: true },
+    orderBy: [
+      { date: 'asc' },
+      { hour: 'asc' },
+    ],
+  });
+
+  res.json(training || null);
 });
 
 export default router;
