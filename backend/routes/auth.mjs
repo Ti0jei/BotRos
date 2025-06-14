@@ -105,13 +105,12 @@ router.get('/verify', async (req, res) => {
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      emailVerified: true, // ✅ БУЛЕВО
+      emailVerified: true,
       emailToken: null,
       emailTokenExpires: null,
     },
   });
 
-  // ✅ редиректим на фронт
   res.redirect(`https://bot-ros-frontend.vercel.app/login?verified=true`);
 });
 
@@ -131,6 +130,50 @@ router.post('/login', async (req, res) => {
 
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
   res.json({ token, user });
+});
+
+// 📬 Повторная отправка письма подтверждения
+router.post('/resend', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email обязателен' });
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    return res.status(400).json({ error: 'Пользователь не найден' });
+  }
+
+  if (user.emailVerified) {
+    return res.status(400).json({ error: 'Email уже подтверждён' });
+  }
+
+  const emailToken = crypto.randomBytes(32).toString('hex');
+  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 часа
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { emailToken, emailTokenExpires },
+  });
+
+  const verifyUrl = `https://botros-qrra.onrender.com/api/auth/verify?token=${emailToken}`;
+
+  await resend.emails.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: 'Подтвердите вашу почту (повторно)',
+    html: `
+      <p>Здравствуйте, ${user.name}!</p>
+      <p>Перейдите по ссылке для подтверждения email:</p>
+      <p><a href="${verifyUrl}">Подтвердить почту</a></p>
+      <p>Если кнопка не работает — скопируйте ссылку в браузер:</p>
+      <p>${verifyUrl}</p>
+    `,
+  });
+
+  res.json({ message: 'Письмо отправлено повторно' });
 });
 
 // 📲 Привязка Telegram ID из WebApp
