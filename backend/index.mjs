@@ -8,6 +8,7 @@ import clientsRoutes from './routes/clients.mjs';
 import trainingsRoutes from './routes/trainings.mjs';
 import usersRoute from './routes/users.mjs';
 import paymentBlocksRoutes from './routes/payment-blocks.mjs';
+import notificationRoutes from './routes/notifications.mjs'; // ✅ добавлено
 
 import { authMiddleware } from './middleware/auth.mjs';
 
@@ -32,6 +33,7 @@ app.use('/api/clients', authMiddleware, clientsRoutes);
 app.use('/api/trainings', authMiddleware, trainingsRoutes);
 app.use('/api/users', usersRoute);
 app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
+app.use('/api/notifications', notificationRoutes); // ✅ подключено
 
 // ✅ Запуск сервера
 app.listen(PORT, () => {
