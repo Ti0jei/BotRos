@@ -3,6 +3,16 @@ import { Training, PaymentBlock } from './types';
 import TrainingCard from './TrainingCard';
 import dayjs from 'dayjs';
 
+interface Props {
+  hour: number;
+  date: dayjs.Dayjs;
+  trainings: Training[];
+  blocks: Record<string, PaymentBlock | null>;
+  onOpenAssign: () => void;
+  onDelete: (id: string) => void;
+  onAttend: (id: string, value: boolean) => void;
+}
+
 export default function TrainingHourBlock({
   hour,
   date,
@@ -11,15 +21,7 @@ export default function TrainingHourBlock({
   onOpenAssign,
   onDelete,
   onAttend,
-}: {
-  hour: number;
-  date: dayjs.Dayjs;
-  trainings: Training[];
-  blocks: Record<string, PaymentBlock | null>;
-  onOpenAssign: () => void;
-  onDelete: (id: string) => void;
-  onAttend: (id: string, value: boolean) => void;
-}) {
+}: Props) {
   const highlight = date.isToday() && hour === dayjs().hour();
 
   return (
