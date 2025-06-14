@@ -8,6 +8,8 @@ import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
 import { Container, Button } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
+import { useSearchParams } from 'react-router-dom';
 
 function App() {
   const [view, setView] = useState<
@@ -17,6 +19,7 @@ function App() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
+  const [params] = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -26,6 +29,16 @@ function App() {
       localStorage.setItem('telegramId', tid);
     }
   }, []);
+
+  useEffect(() => {
+    if (params.get('verified') === 'true') {
+      showNotification({
+        title: 'Почта подтверждена',
+        message: 'Теперь вы можете войти',
+        color: 'green',
+      });
+    }
+  }, [params]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');

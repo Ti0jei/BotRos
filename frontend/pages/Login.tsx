@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   TextInput,
   PasswordInput,
@@ -7,13 +7,26 @@ import {
   Paper,
   Title,
 } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [params] = useSearchParams();
 
   const API = import.meta.env.VITE_API_BASE_URL;
+
+  useEffect(() => {
+    if (params.get('verified') === 'true') {
+      showNotification({
+        title: 'Почта подтверждена',
+        message: 'Теперь вы можете войти',
+        color: 'green',
+      });
+    }
+  }, [params]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -31,11 +44,19 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         localStorage.setItem('token', data.token);
         onLoggedIn();
       } else {
-        alert(data.error || 'Ошибка входа');
+        showNotification({
+          title: 'Ошибка входа',
+          message: data.error || 'Неверные данные',
+          color: 'red',
+        });
       }
     } catch (err) {
       console.error('Ошибка запроса:', err);
-      alert('Сервер недоступен');
+      showNotification({
+        title: 'Сервер недоступен',
+        message: 'Попробуйте позже',
+        color: 'red',
+      });
     } finally {
       setLoading(false);
     }
