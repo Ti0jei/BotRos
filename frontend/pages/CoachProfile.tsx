@@ -1,5 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Title, Paper, Text, Group, Badge } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Title,
+  Paper,
+  Text,
+  Group,
+  Badge,
+  Loader,
+} from '@mantine/core';
+import dayjs from 'dayjs';
+import { IconAlarm } from '@tabler/icons-react';
+import { getToken } from '../utils/auth';
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -10,39 +22,49 @@ interface CoachProfileProps {
 
 interface Training {
   id: string;
-  date: string;
   hour: number;
   user: {
     name: string;
-    lastName?: string;
-    internalTag?: string;
+    lastName?: string | null;
+    internalTag?: string | null;
   };
-  isSinglePaid: boolean;
-  status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
 }
 
-export default function CoachProfile({ profile, onLogout, onOpenSchedule, onOpenClients }: CoachProfileProps) {
+export default function CoachProfile({
+  profile,
+  onLogout,
+  onOpenSchedule,
+  onOpenClients,
+}: CoachProfileProps) {
   const [nextTraining, setNextTraining] = useState<Training | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const loadNext = async () => {
-      const res = await fetch(`${API}/api/trainings/next`, {
+    const fetchTrainings = async () => {
+      setLoading(true);
+      const today = dayjs().format('YYYY-MM-DD');
+      const res = await fetch(`${API}/api/trainings?date=${today}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setNextTraining(data);
-      }
+      const data = await res.json();
+      const sorted = data
+        .filter((t: any) => t.user)
+        .sort((a: any, b: any) => a.hour - b.hour);
+      setNextTraining(sorted[0] || null);
+      setLoading(false);
     };
 
-    loadNext();
+    fetchTrainings();
   }, []);
 
   return (
     <Container>
-      <Title order={2} mb="lg">Привет, Кристиночка 👋</Title>
+      <Title order={2} mb="lg">
+        Привет, {profile.name} 👋
+      </Title>
 
       <Button fullWidth mb="sm" color="blue" onClick={onOpenClients}>
         Клиенты
@@ -60,26 +82,36 @@ export default function CoachProfile({ profile, onLogout, onOpenSchedule, onOpen
         Материалы (скоро)
       </Button>
 
-      {nextTraining && (
-        <Paper withBorder shadow="xs" radius="md" p="md" mt="lg" mb="sm">
-          <Group position="apart" mb="xs">
-            <Text fw={600}>Ближайшая тренировка</Text>
-            <Badge color="blue">
-              {new Date(nextTraining.date).toLocaleDateString()} в {nextTraining.hour}:00
-            </Badge>
-          </Group>
-          <Text>
-            {nextTraining.user.name} {nextTraining.user.lastName ?? ''}{' '}
-            {nextTraining.user.internalTag && (
-              <Text span color="dimmed">({nextTraining.user.internalTag})</Text>
-            )}
-          </Text>
-        </Paper>
-      )}
-
       <Button fullWidth mt="lg" color="red" onClick={onLogout}>
         Выйти
       </Button>
+
+      {loading ? (
+        <Group justify="center" mt="lg">
+          <Loader size="sm" />
+        </Group>
+      ) : (
+        nextTraining && (
+          <Paper mt="lg" p="md" withBorder radius="md" shadow="xs">
+            <Group mb="xs">
+              <IconAlarm size={16} />
+              <Text fw={500}>Ближайшая тренировка сегодня</Text>
+            </Group>
+            <Text>
+              🕒 {nextTraining.hour}:00 — {nextTraining.user.name}{' '}
+              {nextTraining.user.lastName || ''}{' '}
+              {nextTraining.user.internalTag ? (
+                <Text span color="dimmed">
+                  ({nextTraining.user.internalTag})
+                </Text>
+              ) : null}
+            </Text>
+            <Badge mt="xs" color="yellow" size="sm">
+              Ожидается
+            </Badge>
+          </Paper>
+        )
+      )}
     </Container>
   );
 }
