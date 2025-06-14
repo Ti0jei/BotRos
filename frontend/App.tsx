@@ -8,7 +8,7 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
-import { Container, Button, Center } from '@mantine/core';
+import { Container, Button, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
   >('login');
   const [profile, setProfile] = useState<any>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const [params] = useSearchParams();
@@ -46,6 +47,8 @@ function App() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
+    setProfileLoading(true);
+
     fetch(`${API}/api/profile`, {
       headers: { Authorization: 'Bearer ' + token },
     })
@@ -53,7 +56,6 @@ function App() {
       .then((data) => {
         if (data) {
           setProfile(data);
-          setView('profile');
 
           const telegramId = localStorage.getItem('telegramId');
           const parsedTg = telegramId ? parseInt(telegramId, 10) : null;
@@ -76,6 +78,8 @@ function App() {
                 console.error('[TG] ❌ Ошибка при привязке telegramId:', err)
               );
           }
+
+          setView('profile');
         } else {
           localStorage.removeItem('token');
           setView('login');
@@ -85,7 +89,8 @@ function App() {
         console.error('Ошибка при загрузке профиля:', err);
         localStorage.removeItem('token');
         setView('login');
-      });
+      })
+      .finally(() => setProfileLoading(false));
   }, []);
 
   const logout = () => {
@@ -100,11 +105,7 @@ function App() {
         <>
           <Login onLoggedIn={() => setView('profile')} />
           <Center>
-            <Button
-              variant="subtle"
-              mt="sm"
-              onClick={() => setView('register')}
-            >
+            <Button variant="subtle" mt="sm" onClick={() => setView('register')}>
               Зарегистрироваться
             </Button>
           </Center>
@@ -116,41 +117,44 @@ function App() {
           <Register
             onRegistered={() => {
               setView('login');
-              showNotification({
-                title: 'Регистрация завершена',
-                message: 'Теперь подтвердите почту и войдите',
-                color: 'green',
-              });
+              // 🔔 уведомление показывается уже на login
+              setTimeout(() => {
+                showNotification({
+                  title: 'Регистрация завершена',
+                  message: 'Теперь подтвердите почту и войдите',
+                  color: 'green',
+                });
+              }, 100); // небольшой отложенный вызов, чтобы точно отрисовалось
             }}
           />
           <Center>
-            <Button
-              variant="subtle"
-              mt="sm"
-              onClick={() => setView('login')}
-            >
+            <Button variant="subtle" mt="sm" onClick={() => setView('login')}>
               Назад ко входу
             </Button>
           </Center>
         </>
       )}
 
-      {view === 'profile' && profile && (
+      {view === 'profile' && (
         <>
-          {profile.role === 'ADMIN' ? (
-            <CoachProfile
-              profile={profile}
-              onLogout={logout}
-              onOpenSchedule={() => setView('schedule')}
-              onOpenClients={() => setView('clients')}
-            />
-          ) : (
-            <Profile
-              profile={profile}
-              onLogout={logout}
-              onOpenTrainings={() => setView('client-calendar')}
-            />
-          )}
+          {profileLoading ? (
+            <Center mt="lg"><Loader /></Center>
+          ) : profile ? (
+            profile.role === 'ADMIN' ? (
+              <CoachProfile
+                profile={profile}
+                onLogout={logout}
+                onOpenSchedule={() => setView('schedule')}
+                onOpenClients={() => setView('clients')}
+              />
+            ) : (
+              <Profile
+                profile={profile}
+                onLogout={logout}
+                onOpenTrainings={() => setView('client-calendar')}
+              />
+            )
+          ) : null}
         </>
       )}
 

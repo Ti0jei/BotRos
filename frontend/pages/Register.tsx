@@ -38,12 +38,18 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       return;
     }
 
+    const parsedAge = parseInt(age.trim(), 10);
+    if (isNaN(parsedAge) || parsedAge <= 0) {
+      setError('Укажите корректный возраст');
+      return;
+    }
+
     const body = {
       email,
       password,
       name,
       lastName,
-      age: Number(age),
+      age: parsedAge,
       telegramId,
       inviteCode,
     };
@@ -83,7 +89,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const handleGoToLogin = () => {
     sessionStorage.setItem('lastEmail', email);
     sessionStorage.setItem('lastPassword', password);
-    onRegistered(); // переход во вход
+    onRegistered(); // переход ко входу
   };
 
   return (

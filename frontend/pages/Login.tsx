@@ -41,7 +41,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         icon: <IconCheck size={18} />,
       });
       setVerifiedShown(true);
-      navigate(window.location.pathname); // убираем ?verified=true из URL
+      navigate(window.location.pathname); // убираем ?verified=true
     }
   }, [params, verifiedShown, navigate]);
 
