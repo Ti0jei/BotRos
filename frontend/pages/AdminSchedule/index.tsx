@@ -3,7 +3,14 @@ import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isToday from 'dayjs/plugin/isToday';
 import { showNotification } from '@mantine/notifications';
-import { Container, Divider, Group, ScrollArea, Stack, Text } from '@mantine/core';
+import {
+  Container,
+  Divider,
+  Group,
+  ScrollArea,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 
 import { getToken } from '../../utils/auth';
@@ -45,7 +52,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       const bData = bRes.ok ? await bRes.json() : null;
-      setBlocks(prev => ({ ...prev, [client.id]: bData }));
+      setBlocks((prev) => ({ ...prev, [client.id]: bData }));
     }
   };
 
@@ -106,6 +113,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
+
     await loadTrainings();
   };
 
@@ -137,13 +145,16 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   return (
     <Container size="sm" py="md" style={{ paddingBottom: 70 }}>
       <ScheduleHeader date={date} setDate={setDate} />
+
       <Group position="center" mb="sm">
         <Text fw={700} size="lg">
           Расписание на {date.format('DD.MM.YYYY')}
           {date.isToday() && <Text span color="green"> (сегодня)</Text>}
         </Text>
       </Group>
+
       <Divider my="sm" />
+
       <ScrollArea h="65vh">
         <Stack spacing="sm">
           {hours.map((hour) => (
@@ -153,12 +164,12 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
               date={date}
               trainings={trainings.filter((t) => t.hour === hour)}
               blocks={blocks}
-              onOpenAssign={() => {
+              onAssignClick={() => {
                 setSelectedHour(hour);
                 setModalOpen(true);
               }}
               onDelete={deleteTraining}
-              onAttend={handleAttendance}
+              onAttendance={handleAttendance}
             />
           ))}
         </Stack>
@@ -176,6 +187,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         isSinglePaid={isSinglePaid}
         setIsSinglePaid={setIsSinglePaid}
         selectedHour={selectedHour}
+        blocks={blocks} // ⬅️ ВАЖНО: передаём сюда!
       />
 
       <ConfirmModal
