@@ -24,21 +24,21 @@ const API_BASE = 'https://platform.fatsecret.com/rest/server.api';
 // 🔹 1. ПУБЛИЧНЫЕ РОУТЫ
 //
 
-// Авторизация — теперь возвращает ссылку, а не редирект
+// 🔁 Авторизация — редирект
 publicFatSecretRoutes.get('/authorize', async (req, res) => {
   try {
     const { userId } = req.query;
     if (!userId) return res.status(400).send('Missing userId');
 
     const url = `${AUTHORIZE_URL}?response_type=code&client_id=${FATSECRET_CLIENT_ID}&redirect_uri=${encodeURIComponent(FATSECRET_REDIRECT_URI)}&state=${userId}`;
-    res.json({ url }); // 🔁 отдаём ссылку, чтобы фронт открыл её в новой вкладке
+    res.redirect(url);
   } catch (err) {
     console.error('Ошибка авторизации FatSecret:', err);
     res.status(500).send('Ошибка авторизации');
   }
 });
 
-// Callback после авторизации
+// 📥 Callback после авторизации
 publicFatSecretRoutes.get('/callback', async (req, res) => {
   const { code, state: userId } = req.query;
   if (!code || !userId) return res.status(400).send('Недопустимые параметры');
@@ -83,7 +83,7 @@ publicFatSecretRoutes.get('/callback', async (req, res) => {
 // 🔹 2. ЗАЩИЩЁННЫЕ РОУТЫ
 //
 
-// Проверка подключения
+// ✅ Проверка подключения
 protectedFatSecretRoutes.get('/status', async (req, res) => {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
@@ -98,7 +98,7 @@ protectedFatSecretRoutes.get('/status', async (req, res) => {
   }
 });
 
-// Получение дневных данных
+// 📊 Получение дневных данных
 protectedFatSecretRoutes.get('/nutrition/:userId', async (req, res) => {
   const { userId } = req.params;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
@@ -131,7 +131,7 @@ protectedFatSecretRoutes.get('/nutrition/:userId', async (req, res) => {
   res.json(entries.reverse());
 });
 
-// Суммарные данные (неделя/месяц)
+// 📈 Суммарные данные
 protectedFatSecretRoutes.get('/summary/:userId', async (req, res) => {
   const { userId } = req.params;
   const { period = 'week' } = req.query;
@@ -165,7 +165,7 @@ protectedFatSecretRoutes.get('/summary/:userId', async (req, res) => {
   res.json({ period, ...total });
 });
 
-// Сброс токена
+// ❌ Сброс подключения
 protectedFatSecretRoutes.delete('/token/:userId', async (req, res) => {
   const { userId } = req.params;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
@@ -179,7 +179,4 @@ protectedFatSecretRoutes.delete('/token/:userId', async (req, res) => {
   }
 });
 
-//
-// 🔚 Экспорт роутеров
-//
 export { publicFatSecretRoutes, protectedFatSecretRoutes };
