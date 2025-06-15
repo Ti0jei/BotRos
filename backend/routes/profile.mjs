@@ -6,8 +6,13 @@ const router = express.Router();
 
 // 🔐 Получить профиль
 router.get('/', async (req, res) => {
+  const userId = req.user?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: 'Неавторизован' });
+  }
+
   const user = await prisma.user.findUnique({
-    where: { id: req.user.id }, // ✅ ← исправлено
+    where: { id: userId },
     select: {
       id: true,
       email: true,
