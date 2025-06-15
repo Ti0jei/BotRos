@@ -17,7 +17,7 @@ const {
 } = process.env;
 
 const TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
-const AUTHORIZE_URL = 'https://www.fatsecret.com/oauth/authorize';
+const AUTHORIZE_URL = 'https://www.fatsecret.com/connect/default.aspx';
 const API_BASE = 'https://platform.fatsecret.com/rest/server.api';
 
 //
