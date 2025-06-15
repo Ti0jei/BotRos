@@ -12,7 +12,7 @@ model User {
   email              String         @unique
   password           String
   name               String
-  lastName           String?        // ← добавлено: фамилия клиента
+  lastName           String?        // ← фамилия клиента
   internalTag        String?        // ← псевдоним, для тренера
   age                Int
   role               String         @default("USER")
@@ -20,12 +20,13 @@ model User {
   createdAt          DateTime?      @default(now()) @db.Timestamp(6)
   updatedAt          DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
 
-  emailVerified      Boolean        @default(false)          // ← подтверждена ли почта
-  emailToken         String?        @unique                  // ← токен для подтверждения
-  emailTokenExpires  DateTime?                                // ← срок действия токена
+  emailVerified      Boolean        @default(false)
+  emailToken         String?        @unique
+  emailTokenExpires  DateTime?
 
   payments           PaymentBlock[]
   trainings          Training[]
+  fatSecretToken     FatSecretToken?
 }
 
 model Training {
@@ -34,14 +35,13 @@ model Training {
   hour         Int
   userId       String
   status       Status   @default(PENDING)
-  attended     Boolean? // может быть null
-  wasCounted   Boolean  @default(false) // 🔒 защита от повторного списания
-  isSinglePaid Boolean  @default(false) // ✅ разовая оплата
+  attended     Boolean?
+  wasCounted   Boolean  @default(false)
+  isSinglePaid Boolean  @default(false)
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
 
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
 
 model PaymentBlock {
   id               String   @id @default(cuid())
@@ -60,6 +60,17 @@ model InviteCode {
   code      String   @unique
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model FatSecretToken {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 enum Status {

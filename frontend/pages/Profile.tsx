@@ -7,6 +7,8 @@ import {
   Text,
   Center,
   Loader,
+  Group,
+  Badge,
 } from '@mantine/core';
 import ClientSchedule from './ClientSchedule';
 
@@ -16,6 +18,7 @@ interface User {
   email: string;
   age: number;
   role: 'USER' | 'ADMIN';
+  id: string; // ✅ нужен для FatSecret подключения
 }
 
 export default function Profile({
@@ -27,6 +30,7 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fatConnected, setFatConnected] = useState(false); // ✅ новое состояние
   const [section, setSection] = useState<
     'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
   >('main');
@@ -47,13 +51,20 @@ export default function Profile({
       .then((data) => {
         if (data) {
           setUser(data);
+          // ✅ Проверка подключения FatSecret
+          return fetch(`${API}/api/fatsecret/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
         } else {
-          localStorage.removeItem('token');
-          onLogout();
+          throw new Error('Profile not found');
         }
       })
+      .then((res) => res?.ok ? res.json() : { connected: false })
+      .then((data) => {
+        if (data?.connected) setFatConnected(true);
+      })
       .catch((err) => {
-        console.error('Ошибка при получении профиля:', err);
+        console.error('Ошибка:', err);
         localStorage.removeItem('token');
         onLogout();
       })
@@ -63,6 +74,10 @@ export default function Profile({
   const handleLogout = () => {
     localStorage.removeItem('token');
     onLogout();
+  };
+
+  const handleConnectFatSecret = () => {
+    window.location.href = `${API}/api/fatsecret/authorize`;
   };
 
   if (loading) {
@@ -93,9 +108,22 @@ export default function Profile({
             Мои тренировки
           </Button>
 
-          <Button fullWidth color="blue" disabled>
-            Питание (скоро)
-          </Button>
+          <Stack spacing={4}>
+            <Button
+              fullWidth
+              color={fatConnected ? 'green' : 'blue'}
+              onClick={handleConnectFatSecret}
+              disabled={fatConnected}
+            >
+              {fatConnected ? 'FatSecret подключён ✅' : 'Подключить FatSecret'}
+            </Button>
+            {fatConnected && (
+              <Text size="xs" color="dimmed">
+                Ваш аккаунт FatSecret уже подключён.
+              </Text>
+            )}
+          </Stack>
+
           <Button fullWidth color="blue" disabled>
             Замеры (скоро)
           </Button>
