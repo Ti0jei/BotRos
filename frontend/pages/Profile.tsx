@@ -9,6 +9,7 @@ import {
   Loader,
 } from '@mantine/core';
 import ClientSchedule from './ClientSchedule';
+import ClientNutrition from './ClientNutrition';
 
 interface User {
   name: string;
@@ -16,7 +17,7 @@ interface User {
   email: string;
   age: number;
   role: 'USER' | 'ADMIN';
-  id: string; // ✅ нужен для FatSecret подключения
+  id: string;
 }
 
 export default function Profile({
@@ -75,7 +76,7 @@ export default function Profile({
 
   const handleConnectFatSecret = () => {
     if (user?.id) {
-      window.location.href = `${API}/api/fatsecret/authorize?userId=${user.id}`;
+      window.open(`${API}/api/fatsecret/authorize?userId=${user.id}`, '_blank');
     }
   };
 
@@ -117,9 +118,14 @@ export default function Profile({
               {fatConnected ? 'FatSecret подключён ✅' : 'Подключить FatSecret'}
             </Button>
             {fatConnected && (
-              <Text size="xs" color="dimmed">
-                Ваш аккаунт FatSecret уже подключён.
-              </Text>
+              <>
+                <Button fullWidth color="blue" onClick={() => setSection('nutrition')}>
+                  Питание
+                </Button>
+                <Text size="xs" color="dimmed">
+                  Ваш аккаунт FatSecret уже подключён.
+                </Text>
+              </>
             )}
           </Stack>
 
@@ -149,14 +155,14 @@ export default function Profile({
         <ClientSchedule onBack={() => setSection('main')} />
       )}
 
-      {section !== 'main' && section !== 'trainings' && (
+      {section === 'nutrition' && (
+        <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
+      )}
+
+      {['measurements', 'photos'].includes(section) && (
         <Stack spacing="md">
           <Title order={3}>
-            {{
-              nutrition: 'Питание',
-              measurements: 'Замеры',
-              photos: 'Фото',
-            }[section]}
+            {section === 'measurements' ? 'Замеры' : 'Фото'}
           </Title>
           <Text size="sm" color="dimmed">
             [Раздел в разработке]

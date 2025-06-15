@@ -1,3 +1,4 @@
+// frontend/src/components/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -12,7 +13,7 @@ import {
   Divider,
   Alert,
 } from '@mantine/core';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { IconAlertCircle, IconPlugConnected } from '@tabler/icons-react';
 
 interface NutritionDay {
   date: string;
@@ -84,14 +85,28 @@ export default function ClientNutrition({
     setResetting(false);
   };
 
+  const handleConnect = () => {
+    window.open(`${API}/api/fatsecret/authorize?userId=${userId}`, '_blank');
+  };
+
   return (
     <Container py="xl" style={{ paddingBottom: 70 }}>
       <Title order={2} mb="md">Питание клиента</Title>
 
       {connected === false && (
-        <Alert icon={<IconAlertCircle />} title="Не подключено" color="red" mb="md">
-          Клиент не авторизовался в FatSecret.
-        </Alert>
+        <>
+          <Alert icon={<IconAlertCircle />} title="Не подключено" color="red" mb="md">
+            Клиент не авторизовался в FatSecret.
+          </Alert>
+          <Button
+            leftIcon={<IconPlugConnected />}
+            color="green"
+            onClick={handleConnect}
+            mb="md"
+          >
+            Подключить FatSecret
+          </Button>
+        </>
       )}
 
       {connected && (

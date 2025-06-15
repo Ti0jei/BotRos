@@ -24,14 +24,14 @@ const API_BASE = 'https://platform.fatsecret.com/rest/server.api';
 // 🔹 1. ПУБЛИЧНЫЕ РОУТЫ
 //
 
-// Авторизация
+// Авторизация — теперь возвращает ссылку, а не редирект
 publicFatSecretRoutes.get('/authorize', async (req, res) => {
   try {
     const { userId } = req.query;
     if (!userId) return res.status(400).send('Missing userId');
 
     const url = `${AUTHORIZE_URL}?response_type=code&client_id=${FATSECRET_CLIENT_ID}&redirect_uri=${encodeURIComponent(FATSECRET_REDIRECT_URI)}&state=${userId}`;
-    res.redirect(url);
+    res.json({ url }); // 🔁 отдаём ссылку, чтобы фронт открыл её в новой вкладке
   } catch (err) {
     console.error('Ошибка авторизации FatSecret:', err);
     res.status(500).send('Ошибка авторизации');
