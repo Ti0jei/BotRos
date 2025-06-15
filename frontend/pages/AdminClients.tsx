@@ -12,6 +12,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import ClientPayments from './ClientPayments';
+import ClientNutrition from './ClientNutrition';
 
 interface Client {
   id: string;
@@ -39,6 +40,7 @@ export default function AdminClients({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [view, setView] = useState<'payments' | 'nutrition' | null>(null);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [internalTagValue, setInternalTagValue] = useState<string>('');
@@ -124,18 +126,22 @@ export default function AdminClients({
     }
   };
 
-  const viewClient = (client: Client) => {
-    alert(`Раздел "Питание клиента ${client.name}" в разработке`);
-  };
-
-  const openPayments = (client: Client) => setSelectedClient(client);
-
   useEffect(() => {
     loadClients();
   }, []);
 
-  if (selectedClient) {
-    return <ClientPayments client={selectedClient} onBack={() => setSelectedClient(null)} />;
+  if (selectedClient && view === 'payments') {
+    return <ClientPayments client={selectedClient} onBack={() => {
+      setSelectedClient(null);
+      setView(null);
+    }} />;
+  }
+
+  if (selectedClient && view === 'nutrition') {
+    return <ClientNutrition userId={selectedClient.id} onBack={() => {
+      setSelectedClient(null);
+      setView(null);
+    }} />;
   }
 
   return (
@@ -213,10 +219,16 @@ export default function AdminClients({
                       </>
                     ) : (
                       <>
-                        <Button color="blue" onClick={() => viewClient(client)}>
+                        <Button color="blue" onClick={() => {
+                          setSelectedClient(client);
+                          setView('nutrition');
+                        }}>
                           Питание
                         </Button>
-                        <Button color="teal" onClick={() => openPayments(client)}>
+                        <Button color="teal" onClick={() => {
+                          setSelectedClient(client);
+                          setView('payments');
+                        }}>
                           💸 Оплата
                         </Button>
                       </>
@@ -255,7 +267,6 @@ export default function AdminClients({
         </Stack>
       )}
 
-      {/* Закреплённая кнопка "Назад к профилю" */}
       <div style={{
         position: 'fixed',
         bottom: 10,
