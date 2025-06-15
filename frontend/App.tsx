@@ -8,7 +8,7 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
-import { Container, Button, Center, Loader } from '@mantine/core';
+import { Container, Button, Center, Loader, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -72,12 +72,14 @@ function App() {
             });
           }
         } else {
+          console.warn('❌ Сервер не вернул профиль, токен удалён');
           localStorage.removeItem('token');
           setProfile(null);
           setView('login');
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Ошибка при загрузке профиля:', err);
         localStorage.removeItem('token');
         setProfile(null);
         setView('login');
@@ -91,12 +93,20 @@ function App() {
     setView('login');
   };
 
+  // Показываем loader при загрузке профиля
   if (profileLoading && localStorage.getItem('token')) {
     return (
       <Center h="100vh">
         <Loader size="lg" />
       </Center>
     );
+  }
+
+  // Защита от "белого экрана"
+  if (!profile && view === 'profile') {
+    console.warn('❌ Профиль пустой, возврат на login');
+    setView('login');
+    return null;
   }
 
   return (
