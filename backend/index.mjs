@@ -68,4 +68,12 @@ app.get('/api/test-email', async (req, res) => {
     console.log('📤 Email отправлен:', result);
     res.json({ success: true, result });
   } catch (err) {
-    console.error('❌ Ошибка при отправк
+    console.error('❌ Ошибка при отправке email:', err);
+    res.status(500).json({ error: 'Ошибка при отправке письма', details: err });
+  }
+});
+
+// ✅ Запуск сервера
+app.listen(PORT, () => {
+  console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
+});
