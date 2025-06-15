@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import fetch from 'node-fetch'; // ⬅️ нужно для /ip
+import fetch from 'node-fetch';
 
 import authRoutes from './routes/auth.mjs';
 import profileRoutes from './routes/profile.mjs';
@@ -11,7 +11,11 @@ import usersRoute from './routes/users.mjs';
 import paymentBlocksRoutes from './routes/payment-blocks.mjs';
 import notificationRoutes from './routes/notifications.mjs';
 import inviteCodeRoutes from './routes/invite-code.mjs';
-import fatSecretRoutes from './routes/fatsecret.mjs';
+
+import {
+  publicFatSecretRoutes,
+  protectedFatSecretRoutes,
+} from './routes/fatsecret.mjs';
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
@@ -39,7 +43,10 @@ app.use('/api/users', usersRoute);
 app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/invite-code', inviteCodeRoutes);
-app.use('/api/fatsecret', authMiddleware, fatSecretRoutes); // FatSecret
+
+// ✅ FatSecret: сначала публичные, потом защищённые
+app.use('/api/fatsecret', publicFatSecretRoutes);
+app.use('/api/fatsecret', authMiddleware, protectedFatSecretRoutes);
 
 // ✅ ВРЕМЕННЫЙ РОУТ — узнать IP сервера для FatSecret
 app.get('/ip', async (req, res) => {
@@ -55,7 +62,7 @@ app.get('/ip', async (req, res) => {
 // ✅ Тест email-уведомления через Resend
 app.get('/api/test-email', async (req, res) => {
   try {
-    const to = 'zoty2104@gmail.com'; // Замени на нужный email
+    const to = 'zoty2104@gmail.com';
     const from = process.env.EMAIL_FROM;
 
     const result = await resend.emails.send({

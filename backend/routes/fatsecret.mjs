@@ -2,11 +2,12 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import fetch from 'node-fetch';
-import { authMiddleware } from '../middleware/auth.mjs';
 import dayjs from 'dayjs';
 
 dotenv.config();
-const router = express.Router();
+
+const publicFatSecretRoutes = express.Router();
+const protectedFatSecretRoutes = express.Router();
 const prisma = new PrismaClient();
 
 const {
@@ -19,8 +20,12 @@ const TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
 const AUTHORIZE_URL = 'https://www.fatsecret.com/oauth/authorize';
 const API_BASE = 'https://platform.fatsecret.com/rest/server.api';
 
-// 🔹 1. ПУБЛИЧНЫЙ маршрут — авторизация без authMiddleware
-router.get('/authorize', async (req, res) => {
+//
+// 🔹 1. ПУБЛИЧНЫЕ РОУТЫ
+//
+
+// Авторизация
+publicFatSecretRoutes.get('/authorize', async (req, res) => {
   try {
     const { userId } = req.query;
     if (!userId) return res.status(400).send('Missing userId');
@@ -33,8 +38,8 @@ router.get('/authorize', async (req, res) => {
   }
 });
 
-// 🔹 2. Callback — сохраняем токен
-router.get('/callback', async (req, res) => {
+// Callback после авторизации
+publicFatSecretRoutes.get('/callback', async (req, res) => {
   const { code, state: userId } = req.query;
   if (!code || !userId) return res.status(400).send('Недопустимые параметры');
 
@@ -74,8 +79,12 @@ router.get('/callback', async (req, res) => {
   }
 });
 
-// 🔹 3. Проверка подключения
-router.get('/status', authMiddleware, async (req, res) => {
+//
+// 🔹 2. ЗАЩИЩЁННЫЕ РОУТЫ
+//
+
+// Проверка подключения
+protectedFatSecretRoutes.get('/status', async (req, res) => {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -89,8 +98,8 @@ router.get('/status', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔹 4. Получение дневных данных по питанию
-router.get('/nutrition/:userId', authMiddleware, async (req, res) => {
+// Получение дневных данных
+protectedFatSecretRoutes.get('/nutrition/:userId', async (req, res) => {
   const { userId } = req.params;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
@@ -122,8 +131,8 @@ router.get('/nutrition/:userId', authMiddleware, async (req, res) => {
   res.json(entries.reverse());
 });
 
-// 🔹 5. Суммарные данные (неделя или месяц)
-router.get('/summary/:userId', authMiddleware, async (req, res) => {
+// Суммарные данные (неделя/месяц)
+protectedFatSecretRoutes.get('/summary/:userId', async (req, res) => {
   const { userId } = req.params;
   const { period = 'week' } = req.query;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
@@ -156,8 +165,8 @@ router.get('/summary/:userId', authMiddleware, async (req, res) => {
   res.json({ period, ...total });
 });
 
-// 🔹 6. Сброс подключения
-router.delete('/token/:userId', authMiddleware, async (req, res) => {
+// Сброс токена
+protectedFatSecretRoutes.delete('/token/:userId', async (req, res) => {
   const { userId } = req.params;
   if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
@@ -170,4 +179,7 @@ router.delete('/token/:userId', authMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+//
+// 🔚 Экспорт роутеров
+//
+export { publicFatSecretRoutes, protectedFatSecretRoutes };
