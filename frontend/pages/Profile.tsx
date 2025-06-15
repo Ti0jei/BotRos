@@ -7,8 +7,6 @@ import {
   Text,
   Center,
   Loader,
-  Group,
-  Badge,
 } from '@mantine/core';
 import ClientSchedule from './ClientSchedule';
 
@@ -30,7 +28,7 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fatConnected, setFatConnected] = useState(false); // ✅ новое состояние
+  const [fatConnected, setFatConnected] = useState(false);
   const [section, setSection] = useState<
     'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
   >('main');
@@ -51,7 +49,6 @@ export default function Profile({
       .then((data) => {
         if (data) {
           setUser(data);
-          // ✅ Проверка подключения FatSecret
           return fetch(`${API}/api/fatsecret/status`, {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -59,7 +56,7 @@ export default function Profile({
           throw new Error('Profile not found');
         }
       })
-      .then((res) => res?.ok ? res.json() : { connected: false })
+      .then((res) => (res?.ok ? res.json() : { connected: false }))
       .then((data) => {
         if (data?.connected) setFatConnected(true);
       })
@@ -77,7 +74,9 @@ export default function Profile({
   };
 
   const handleConnectFatSecret = () => {
-    window.location.href = `${API}/api/fatsecret/authorize`;
+    if (user?.id) {
+      window.location.href = `${API}/api/fatsecret/authorize?userId=${user.id}`;
+    }
   };
 
   if (loading) {
