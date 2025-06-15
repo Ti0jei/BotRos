@@ -4,23 +4,26 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// Получить профиль
+// 🔐 Получить профиль
 router.get('/', async (req, res) => {
   const user = await prisma.user.findUnique({
-    where: { id: req.user.userId },
+    where: { id: req.user.id }, // ✅ ← исправлено
     select: {
       id: true,
       email: true,
       name: true,
+      lastName: true,
+      internalTag: true,
       age: true,
-      role: true
-    }
+      role: true,
+    },
   });
 
+  if (!user) return res.status(404).json({ error: 'User not found' });
   res.json(user);
 });
 
-// Получить всех клиентов (только для ADMIN)
+// 👥 Получить всех клиентов (только для ADMIN)
 router.get('/all', async (req, res) => {
   if (req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Access denied' });
@@ -31,9 +34,11 @@ router.get('/all', async (req, res) => {
     select: {
       id: true,
       name: true,
+      lastName: true,
       email: true,
-      age: true
-    }
+      internalTag: true,
+      age: true,
+    },
   });
 
   res.json(users);
