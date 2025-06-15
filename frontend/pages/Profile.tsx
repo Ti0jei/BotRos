@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Button, Container, Stack, Title, Text } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Stack,
+  Title,
+  Text,
+  Center,
+  Loader,
+} from '@mantine/core';
 import ClientSchedule from './ClientSchedule';
 
 interface User {
@@ -18,18 +26,38 @@ export default function Profile({
   onOpenAdmin: () => void;
 }) {
   const [user, setUser] = useState<User | null>(null);
-  const [section, setSection] = useState<'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'>('main');
+  const [loading, setLoading] = useState(true);
+  const [section, setSection] = useState<
+    'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
+  >('main');
+
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      onLogout();
+      return;
+    }
 
     fetch(`${API}/api/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.json())
-      .then(data => setUser(data));
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          setUser(data);
+        } else {
+          localStorage.removeItem('token');
+          onLogout();
+        }
+      })
+      .catch((err) => {
+        console.error('Ошибка при получении профиля:', err);
+        localStorage.removeItem('token');
+        onLogout();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = () => {
@@ -37,7 +65,21 @@ export default function Profile({
     onLogout();
   };
 
-  if (!user) return null;
+  if (loading) {
+    return (
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Center h="100vh">
+        <Text color="red">Не удалось загрузить профиль</Text>
+      </Center>
+    );
+  }
 
   return (
     <Container size="xs" py="xl">
@@ -51,10 +93,18 @@ export default function Profile({
             Мои тренировки
           </Button>
 
-          <Button fullWidth color="blue" disabled>Питание (скоро)</Button>
-          <Button fullWidth color="blue" disabled>Замеры (скоро)</Button>
-          <Button fullWidth color="blue" disabled>Фото (скоро)</Button>
-          <Button fullWidth variant="light" color="gray" disabled>Материал для изучения</Button>
+          <Button fullWidth color="blue" disabled>
+            Питание (скоро)
+          </Button>
+          <Button fullWidth color="blue" disabled>
+            Замеры (скоро)
+          </Button>
+          <Button fullWidth color="blue" disabled>
+            Фото (скоро)
+          </Button>
+          <Button fullWidth variant="light" color="gray" disabled>
+            Материал для изучения
+          </Button>
 
           {user.role === 'ADMIN' && (
             <Button fullWidth mt="sm" onClick={onOpenAdmin}>
@@ -81,8 +131,12 @@ export default function Profile({
               photos: 'Фото',
             }[section]}
           </Title>
-          <Text size="sm" color="dimmed">[Раздел в разработке]</Text>
-          <Button variant="light" onClick={() => setSection('main')}>← Назад</Button>
+          <Text size="sm" color="dimmed">
+            [Раздел в разработке]
+          </Text>
+          <Button variant="light" onClick={() => setSection('main')}>
+            ← Назад
+          </Button>
         </Stack>
       )}
     </Container>
