@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// 🔐 Получить профиль
+// 🔐 Получить профиль текущего пользователя
 router.get('/', async (req, res) => {
   const userId = req.user?.userId;
   if (!userId) {
