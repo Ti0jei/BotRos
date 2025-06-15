@@ -76,8 +76,11 @@ router.get('/callback', async (req, res) => {
 
 // 🔹 3. Проверка подключения
 router.get('/status', authMiddleware, async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
   try {
-    const token = await prisma.fatSecretToken.findUnique({ where: { userId: req.user.id } });
+    const token = await prisma.fatSecretToken.findUnique({ where: { userId } });
     const isConnected = !!token && !!token.accessToken && token.expiresAt > new Date();
     res.json({ connected: isConnected });
   } catch (err) {
@@ -89,6 +92,8 @@ router.get('/status', authMiddleware, async (req, res) => {
 // 🔹 4. Получение дневных данных по питанию
 router.get('/nutrition/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
   const token = await prisma.fatSecretToken.findUnique({ where: { userId } });
   if (!token || !token.accessToken) return res.status(404).json([]);
 
@@ -121,6 +126,7 @@ router.get('/nutrition/:userId', authMiddleware, async (req, res) => {
 router.get('/summary/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
   const { period = 'week' } = req.query;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
   const token = await prisma.fatSecretToken.findUnique({ where: { userId } });
   if (!token || !token.accessToken) return res.status(404).json({});
@@ -153,6 +159,8 @@ router.get('/summary/:userId', authMiddleware, async (req, res) => {
 // 🔹 6. Сброс подключения
 router.delete('/token/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+
   try {
     await prisma.fatSecretToken.delete({ where: { userId } });
     res.json({ success: true });
