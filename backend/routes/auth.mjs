@@ -21,10 +21,7 @@ router.post('/register', async (req, res) => {
 
   const now = new Date();
   const validCode = await prisma.inviteCode.findFirst({
-    where: {
-      code: inviteCode,
-      expiresAt: { gt: now },
-    },
+    where: { code: inviteCode, expiresAt: { gt: now } },
   });
 
   if (!validCode) {
@@ -47,7 +44,7 @@ router.post('/register', async (req, res) => {
 
   const hashed = await bcrypt.hash(password, 10);
   const emailToken = crypto.randomBytes(32).toString('hex');
-  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 часа
+  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 ч
 
   const user = await prisma.user.create({
     data: {
@@ -117,8 +114,8 @@ router.get('/verify', async (req, res) => {
 // 🔑 Вход
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
 
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(400).json({ error: 'Пользователь не найден' });
 
   if (!user.emailVerified) {
@@ -129,29 +126,31 @@ router.post('/login', async (req, res) => {
   if (!valid) return res.status(400).json({ error: 'Неверный пароль' });
 
   const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
-  res.json({ token, user });
+
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      lastName: user.lastName,
+      email: user.email,
+      age: user.age,
+      role: user.role,
+    },
+  });
 });
 
 // 📬 Повторная отправка письма подтверждения
 router.post('/resend', async (req, res) => {
   const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email обязателен' });
-  }
+  if (!email) return res.status(400).json({ error: 'Email обязателен' });
 
   const user = await prisma.user.findUnique({ where: { email } });
-
-  if (!user) {
-    return res.status(400).json({ error: 'Пользователь не найден' });
-  }
-
-  if (user.emailVerified) {
-    return res.status(400).json({ error: 'Email уже подтверждён' });
-  }
+  if (!user) return res.status(400).json({ error: 'Пользователь не найден' });
+  if (user.emailVerified) return res.status(400).json({ error: 'Email уже подтверждён' });
 
   const emailToken = crypto.randomBytes(32).toString('hex');
-  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 часа
+  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
   await prisma.user.update({
     where: { id: user.id },
@@ -166,9 +165,7 @@ router.post('/resend', async (req, res) => {
     subject: 'Подтвердите вашу почту (повторно)',
     html: `
       <p>Здравствуйте, ${user.name}!</p>
-      <p>Перейдите по ссылке для подтверждения email:</p>
       <p><a href="${verifyUrl}">Подтвердить почту</a></p>
-      <p>Если кнопка не работает — скопируйте ссылку в браузер:</p>
       <p>${verifyUrl}</p>
     `,
   });
@@ -176,25 +173,22 @@ router.post('/resend', async (req, res) => {
   res.json({ message: 'Письмо отправлено повторно' });
 });
 
-// 📲 Привязка Telegram ID из WebApp
+// 📲 Привязка Telegram ID (из WebApp)
 router.post('/telegram-connect', authMiddleware, async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
   const { telegramId } = req.body;
 
-  if (!telegramId || typeof telegramId !== 'number') {
-    return res.status(400).json({ error: 'Некорректный telegramId' });
+  if (!userId || !telegramId || typeof telegramId !== 'number') {
+    return res.status(400).json({ error: 'Некорректные параметры' });
   }
 
   try {
     const existing = await prisma.user.findFirst({
-      where: {
-        telegramId: String(telegramId),
-        NOT: { id: userId },
-      },
+      where: { telegramId: String(telegramId), NOT: { id: userId } },
     });
 
     if (existing) {
-      return res.status(400).json({ error: 'Этот Telegram уже привязан к другому аккаунту' });
+      return res.status(400).json({ error: 'Этот Telegram уже привязан' });
     }
 
     await prisma.user.update({
@@ -209,18 +203,21 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
   }
 });
 
-// 🤖 Telegram ID напрямую через бота
+// 🤖 Прямая привязка Telegram ID из бота
 router.post('/telegram-direct', async (req, res) => {
   const { telegramId } = req.body;
-  if (!telegramId) {
-    return res.status(400).json({ error: 'Не указан telegramId' });
-  }
+  if (!telegramId) return res.status(400).json({ error: 'Не указан telegramId' });
 
   try {
-    const existing = await prisma.user.findFirst({ where: { telegramId: String(telegramId) } });
+    const existing = await prisma.user.findFirst({
+      where: { telegramId: String(telegramId) },
+    });
     if (existing) return res.json({ status: 'already linked' });
 
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN', telegramId: null } });
+    const admin = await prisma.user.findFirst({
+      where: { role: 'ADMIN', telegramId: null },
+    });
+
     if (!admin) return res.status(404).json({ error: 'Нет свободного администратора' });
 
     await prisma.user.update({
