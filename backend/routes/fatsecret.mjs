@@ -19,11 +19,13 @@ const TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
 const AUTHORIZE_URL = 'https://www.fatsecret.com/oauth/authorize';
 const API_BASE = 'https://platform.fatsecret.com/rest/server.api';
 
-// 🔹 1. Авторизация — редирект на FatSecret
-router.get('/authorize', authMiddleware, async (req, res) => {
+// 🔹 1. ПУБЛИЧНЫЙ маршрут — авторизация без authMiddleware
+router.get('/authorize', async (req, res) => {
   try {
-    const state = req.user.id;
-    const url = `${AUTHORIZE_URL}?response_type=code&client_id=${FATSECRET_CLIENT_ID}&redirect_uri=${encodeURIComponent(FATSECRET_REDIRECT_URI)}&state=${state}`;
+    const { userId } = req.query;
+    if (!userId) return res.status(400).send('Missing userId');
+
+    const url = `${AUTHORIZE_URL}?response_type=code&client_id=${FATSECRET_CLIENT_ID}&redirect_uri=${encodeURIComponent(FATSECRET_REDIRECT_URI)}&state=${userId}`;
     res.redirect(url);
   } catch (err) {
     console.error('Ошибка авторизации FatSecret:', err);
