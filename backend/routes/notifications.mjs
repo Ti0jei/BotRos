@@ -101,4 +101,29 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
+// Удаление записи питания по дате
+router.delete('/:userId/:date', authMiddleware, async (req, res) => {
+  const { userId, date } = req.params;
+
+  if (!userId || !date) {
+    return res.status(400).json({ error: 'Недостаточно данных' });
+  }
+
+  try {
+    await prisma.nutritionEntry.delete({
+      where: {
+        userId_date: {
+          userId,
+          date: new Date(date),
+        },
+      },
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Ошибка удаления записи питания:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 export default router;
