@@ -11,7 +11,6 @@ import {
   Divider,
   Center,
   Stack,
-  rem,
   Loader,
   Grid,
 } from '@mantine/core';
@@ -191,22 +190,17 @@ export default function ClientNutrition({
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm">
-          Нет данных за выбранный день
-        </Text>
+        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
       )}
 
       {!isAdmin && !formVisible && (
-        <Button
-          fullWidth
-          onClick={() => {
-            setCalories('');
-            setProtein('');
-            setFat('');
-            setCarbs('');
-            setFormVisible(true);
-          }}
-        >
+        <Button fullWidth onClick={() => {
+          setCalories('');
+          setProtein('');
+          setFat('');
+          setCarbs('');
+          setFormVisible(true);
+        }}>
           ➕ Внести КБЖУ
         </Button>
       )}
@@ -222,7 +216,7 @@ export default function ClientNutrition({
                 min={0}
                 hideControls
                 inputWrapperOrder={['label', 'input']}
-                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
+                w="100%"
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -233,7 +227,7 @@ export default function ClientNutrition({
                 min={0}
                 hideControls
                 inputWrapperOrder={['label', 'input']}
-                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
+                w="100%"
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -244,7 +238,7 @@ export default function ClientNutrition({
                 min={0}
                 hideControls
                 inputWrapperOrder={['label', 'input']}
-                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
+                w="100%"
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -255,7 +249,7 @@ export default function ClientNutrition({
                 min={0}
                 hideControls
                 inputWrapperOrder={['label', 'input']}
-                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
+                w="100%"
               />
             </Grid.Col>
           </Grid>
