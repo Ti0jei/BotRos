@@ -13,6 +13,7 @@ import {
   Stack,
   rem,
   Loader,
+  Grid,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
@@ -194,12 +195,20 @@ export default function ClientNutrition({
 
       {formVisible && (
         <Paper withBorder p="md" radius="md" mt="md">
-          <Group grow wrap="wrap">
-            <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
-            <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} hideControls />
-            <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} hideControls />
-            <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
-          </Group>
+          <Grid gutter="md">
+            <Grid.Col span={6}>
+              <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} hideControls />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} hideControls />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
+            </Grid.Col>
+          </Grid>
           <Button mt="md" fullWidth onClick={handleSave}>💾 Сохранить</Button>
         </Paper>
       )}
