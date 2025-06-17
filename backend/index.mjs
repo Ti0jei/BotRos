@@ -15,6 +15,7 @@ import nutritionRoutes from './routes/nutrition.mjs'; // ✅ ручное пит
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
+import './cron/nutritionReminder.mjs';
 
 dotenv.config();
 
