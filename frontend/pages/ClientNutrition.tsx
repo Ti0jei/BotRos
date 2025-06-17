@@ -54,7 +54,7 @@ export default function ClientNutrition({
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [formVisible, setFormVisible] = useState(false);
 
-  const [calories, setCalories] = useState<number | ''>(''); 
+  const [calories, setCalories] = useState<number | ''>('');
   const [protein, setProtein] = useState<number | ''>('');
   const [fat, setFat] = useState<number | ''>('');
   const [carbs, setCarbs] = useState<number | ''>('');
@@ -72,16 +72,16 @@ export default function ClientNutrition({
   const loadData = () => {
     setLoading(true);
     Promise.all([
-      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then(res => res.json()),
     ])
       .then(([nutrition, week, month]) => {
         setData(Array.isArray(nutrition) ? nutrition : []);
         setWeekly(week);
         setMonthly(month);
       })
-      .catch((err) => console.error(err))
+      .catch(err => console.error(err))
       .finally(() => setLoading(false));
   };
 
@@ -144,7 +144,7 @@ export default function ClientNutrition({
         value={selectedDate}
         onChange={(val) => {
           setSelectedDate(val);
-          setFormVisible(false);
+          setFormVisible(false); // скрывать форму при смене даты
         }}
         maxDate={new Date()}
         leftSection={<IconCalendar size={16} />}
@@ -192,9 +192,7 @@ export default function ClientNutrition({
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm">
-          Нет данных за выбранный день
-        </Text>
+        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
       )}
 
       {!isAdmin && !formVisible && (
@@ -260,25 +258,19 @@ export default function ClientNutrition({
               />
             </Grid.Col>
           </Grid>
-          <Button mt="md" fullWidth onClick={handleSave}>
-            💾 Сохранить
-          </Button>
+          <Button mt="md" fullWidth onClick={handleSave}>💾 Сохранить</Button>
         </Paper>
       )}
 
       <Divider my="md" label="Сводка" />
 
       {loading ? (
-        <Center>
-          <Loader />
-        </Center>
+        <Center><Loader /></Center>
       ) : (
         <Stack>
           {weekly && (
             <Paper withBorder p="md" radius="md">
-              <Text fw={600} mb={4}>
-                Итого за неделю
-              </Text>
+              <Text fw={600} mb={4}>Итого за неделю</Text>
               <Group gap="xs">
                 <Badge color="blue">Ккал: {weekly.calories}</Badge>
                 <Badge color="green">Б: {weekly.protein}</Badge>
@@ -289,9 +281,7 @@ export default function ClientNutrition({
           )}
           {monthly && (
             <Paper withBorder p="md" radius="md">
-              <Text fw={600} mb={4}>
-                Итого за месяц
-              </Text>
+              <Text fw={600} mb={4}>Итого за месяц</Text>
               <Group gap="xs">
                 <Badge color="blue">Ккал: {monthly.calories}</Badge>
                 <Badge color="green">Б: {monthly.protein}</Badge>

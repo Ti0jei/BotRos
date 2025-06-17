@@ -5,7 +5,7 @@ import { authMiddleware } from '../middleware/auth.mjs';
 
 const router = express.Router();
 
-// Middleware авторизации
+// Авторизация
 router.use(authMiddleware);
 
 // Получить всё питание пользователя
@@ -17,38 +17,32 @@ router.get('/:userId', async (req, res) => {
     });
     res.json(nutrition);
   } catch (error) {
-    console.error('Ошибка при получении питания:', error);
+    console.error('❌ Ошибка при получении питания:', error);
     res.status(500).json({ error: 'Ошибка при получении питания' });
   }
 });
 
-// Получить суммарные значения по периоду
+// Получить суммарные значения (неделя / месяц)
 router.get('/summary/:userId', async (req, res) => {
   const { userId } = req.params;
   const { period } = req.query;
 
   try {
-    let startDate;
-    if (period === 'week') {
-      startDate = dayjs().startOf('week').toDate();
-    } else if (period === 'month') {
-      startDate = dayjs().startOf('month').toDate();
-    } else {
+    const startDate = period === 'week'
+      ? dayjs().startOf('week').toDate()
+      : period === 'month'
+      ? dayjs().startOf('month').toDate()
+      : null;
+
+    if (!startDate) {
       return res.status(400).json({ error: 'Некорректный период' });
     }
 
     const result = await prisma.nutrition.aggregate({
-      _sum: {
-        calories: true,
-        protein: true,
-        fat: true,
-        carbs: true,
-      },
+      _sum: { calories: true, protein: true, fat: true, carbs: true },
       where: {
         userId,
-        date: {
-          gte: startDate,
-        },
+        date: { gte: startDate },
       },
     });
 
@@ -60,18 +54,18 @@ router.get('/summary/:userId', async (req, res) => {
       carbs: result._sum.carbs || 0,
     });
   } catch (error) {
-    console.error('Ошибка при подсчёте суммы:', error);
+    console.error('❌ Ошибка при подсчёте суммы:', error);
     res.status(500).json({ error: 'Ошибка при подсчёте суммы' });
   }
 });
 
-// Добавить или обновить запись за день
+// Добавить или обновить запись
 router.post('/', async (req, res) => {
-  const { userId, date, calories, protein, fat, carbs } = req.body;
-
   if (req.user?.role === 'ADMIN') {
-    return res.status(403).json({ error: 'Администраторы не могут изменять питание' });
+    return res.status(403).json({ error: 'Администраторам запрещено редактировать питание' });
   }
+
+  const { userId, date, calories, protein, fat, carbs } = req.body;
 
   if (!userId || !date) {
     return res.status(400).json({ error: 'Необходимы userId и дата' });
@@ -95,12 +89,7 @@ router.post('/', async (req, res) => {
             date: new Date(date),
           },
         },
-        data: {
-          calories,
-          protein,
-          fat,
-          carbs,
-        },
+        data: { calories, protein, fat, carbs },
       });
     } else {
       await prisma.nutrition.create({
@@ -117,15 +106,15 @@ router.post('/', async (req, res) => {
 
     res.json({ ok: true });
   } catch (error) {
-    console.error('Ошибка при сохранении питания:', error);
+    console.error('❌ Ошибка при сохранении питания:', error);
     res.status(500).json({ error: 'Ошибка при сохранении питания' });
   }
 });
 
-// Удалить запись за конкретную дату
+// Удалить запись
 router.delete('/:userId/:date', async (req, res) => {
   if (req.user?.role === 'ADMIN') {
-    return res.status(403).json({ error: 'Администраторы не могут удалять питание' });
+    return res.status(403).json({ error: 'Администраторам запрещено удалять питание' });
   }
 
   const { userId, date } = req.params;
@@ -141,8 +130,8 @@ router.delete('/:userId/:date', async (req, res) => {
     });
     res.json({ ok: true });
   } catch (error) {
-    console.error('Ошибка при удалении записи питания:', error);
-    res.status(500).json({ error: 'Ошибка при удалении записи питания' });
+    console.error('❌ Ошибка при удалении питания:', error);
+    res.status(500).json({ error: 'Ошибка при удалении питания' });
   }
 });
 
