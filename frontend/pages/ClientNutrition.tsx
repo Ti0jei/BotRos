@@ -203,7 +203,8 @@ export default function ClientNutrition({
                 onChange={setCalories}
                 min={0}
                 hideControls
-                style={{ minWidth: rem(120) }}
+                inputWrapperOrder={['label', 'input']}
+                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -213,7 +214,8 @@ export default function ClientNutrition({
                 onChange={setProtein}
                 min={0}
                 hideControls
-                style={{ minWidth: rem(120) }}
+                inputWrapperOrder={['label', 'input']}
+                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -223,7 +225,8 @@ export default function ClientNutrition({
                 onChange={setFat}
                 min={0}
                 hideControls
-                style={{ minWidth: rem(120) }}
+                inputWrapperOrder={['label', 'input']}
+                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -233,7 +236,8 @@ export default function ClientNutrition({
                 onChange={setCarbs}
                 min={0}
                 hideControls
-                style={{ minWidth: rem(120) }}
+                inputWrapperOrder={['label', 'input']}
+                styles={{ input: { minWidth: rem(140), textAlign: 'center' } }}
               />
             </Grid.Col>
           </Grid>
