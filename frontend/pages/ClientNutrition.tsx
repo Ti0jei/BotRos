@@ -11,7 +11,8 @@ import {
   Badge,
   Divider,
   NumberInput,
-  Center, // 👈 вот он — импорт добавлен
+  Center,
+  rem,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
@@ -113,26 +114,54 @@ export default function ClientNutrition({
   };
 
   return (
-    <Container size="sm" py="md" style={{ paddingBottom: 80 }}>
+    <Container size="sm" pt="md" pb={80}>
       <Title order={2} mb="md">Питание</Title>
 
       <Paper withBorder radius="md" p="md" mb="lg">
-        <Group grow>
+        <Group grow wrap="wrap">
           <DatePickerInput
             label="Дата"
-            icon={<IconCalendar size={16} />}
             value={date}
             onChange={setDate}
             maxDate={new Date()}
-            leftSectionPointerEvents="none"
             leftSection={<IconCalendar size={16} />}
+            leftSectionPointerEvents="none"
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
+            style={{ minWidth: rem(120) }}
           />
-          <NumberInput label="Калории" value={calories} onChange={setCalories} hideControls />
-          <NumberInput label="Белки" value={protein} onChange={setProtein} hideControls />
-          <NumberInput label="Жиры" value={fat} onChange={setFat} hideControls />
-          <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} hideControls />
+          <NumberInput
+            label="Калории"
+            value={calories}
+            onChange={setCalories}
+            hideControls
+            min={0}
+            parser={(value) => value?.replace(/\D/g, '')}
+          />
+          <NumberInput
+            label="Белки"
+            value={protein}
+            onChange={setProtein}
+            hideControls
+            min={0}
+            parser={(value) => value?.replace(/\D/g, '')}
+          />
+          <NumberInput
+            label="Жиры"
+            value={fat}
+            onChange={setFat}
+            hideControls
+            min={0}
+            parser={(value) => value?.replace(/\D/g, '')}
+          />
+          <NumberInput
+            label="Углеводы"
+            value={carbs}
+            onChange={setCarbs}
+            hideControls
+            min={0}
+            parser={(value) => value?.replace(/\D/g, '')}
+          />
         </Group>
         <Button fullWidth mt="md" onClick={handleSave}>
           Сохранить
@@ -165,19 +194,21 @@ export default function ClientNutrition({
             {data.length === 0 ? (
               <Text size="sm" color="dimmed">Нет данных</Text>
             ) : (
-              data.map(entry => (
-                <Paper key={entry.date} withBorder radius="md" p="md">
-                  <Group justify="space-between" mb="xs">
-                    <Text fw={500}>{entry.date}</Text>
-                    <Badge color="blue">{entry.calories} ккал</Badge>
-                  </Group>
-                  <Group gap="xs">
-                    <Badge color="green">Б: {entry.protein} г</Badge>
-                    <Badge color="yellow">Ж: {entry.fat} г</Badge>
-                    <Badge color="cyan">У: {entry.carbs} г</Badge>
-                  </Group>
-                </Paper>
-              ))
+              data
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(entry => (
+                  <Paper key={entry.date} withBorder radius="md" p="md">
+                    <Group justify="space-between" mb="xs">
+                      <Text fw={500}>{dayjs(entry.date).format('DD MMM YYYY')}</Text>
+                      <Badge color="blue">{entry.calories} ккал</Badge>
+                    </Group>
+                    <Group gap="xs">
+                      <Badge color="green">Б: {entry.protein} г</Badge>
+                      <Badge color="yellow">Ж: {entry.fat} г</Badge>
+                      <Badge color="cyan">У: {entry.carbs} г</Badge>
+                    </Group>
+                  </Paper>
+                ))
             )}
           </Stack>
         </>

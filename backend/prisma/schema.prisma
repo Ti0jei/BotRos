@@ -12,8 +12,8 @@ model User {
   email              String         @unique
   password           String
   name               String
-  lastName           String?        // ← фамилия клиента
-  internalTag        String?        // ← псевдоним, для тренера
+  lastName           String?        // фамилия клиента
+  internalTag        String?        // псевдоним, для тренера
   age                Int
   role               String         @default("USER")
   telegramId         String?        @unique
@@ -26,7 +26,7 @@ model User {
 
   payments           PaymentBlock[]
   trainings          Training[]
-  fatSecretToken     FatSecretToken?
+  nutrition          Nutrition[]    // ← связь с питанием
 }
 
 model Training {
@@ -62,15 +62,20 @@ model InviteCode {
   expiresAt DateTime
 }
 
-model FatSecretToken {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken  String
-  refreshToken String
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+
+
+model Nutrition {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  calories  Int
+  protein   Int
+  fat       Int
+  carbs     Int
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
 }
 
 enum Status {

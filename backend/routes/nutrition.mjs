@@ -1,4 +1,3 @@
-// src/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -14,12 +13,14 @@ import {
   NumberInput,
   Center,
   SimpleGrid,
+  ActionIcon,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
   IconChevronLeft,
   IconChevronRight,
   IconCalendar,
+  IconEdit,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
@@ -93,12 +94,16 @@ export default function ClientNutrition({
       return;
     }
 
+    const formattedDate = dayjs(date).format('YYYY-MM-DD');
+    const existingEntry = data.find((d) => d.date === formattedDate);
+    const method = existingEntry ? 'PATCH' : 'POST';
+
     const res = await fetch(`${API}/api/nutrition`, {
-      method: 'POST',
+      method,
       headers,
       body: JSON.stringify({
         userId,
-        date: dayjs(date).format('YYYY-MM-DD'),
+        date: formattedDate,
         calories,
         protein,
         fat,
@@ -108,10 +113,18 @@ export default function ClientNutrition({
 
     if (res.ok) {
       loadData();
-      alert('Сохранено');
+      alert(existingEntry ? 'Обновлено' : 'Сохранено');
     } else {
       alert('Ошибка при сохранении');
     }
+  };
+
+  const handleEdit = (entry: NutritionDay) => {
+    setDate(new Date(entry.date));
+    setCalories(entry.calories);
+    setProtein(entry.protein);
+    setFat(entry.fat);
+    setCarbs(entry.carbs);
   };
 
   return (
@@ -130,13 +143,41 @@ export default function ClientNutrition({
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
           />
-          <NumberInput label="Калории" value={calories} onChange={setCalories} hideControls />
-          <NumberInput label="Белки" value={protein} onChange={setProtein} hideControls />
-          <NumberInput label="Жиры" value={fat} onChange={setFat} hideControls />
-          <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} hideControls />
+          <NumberInput
+            label="Калории"
+            value={calories}
+            onChange={setCalories}
+            hideControls
+            parser={(value) => value?.replace(/\D/g, '')}
+            min={0}
+          />
+          <NumberInput
+            label="Белки"
+            value={protein}
+            onChange={setProtein}
+            hideControls
+            parser={(value) => value?.replace(/\D/g, '')}
+            min={0}
+          />
+          <NumberInput
+            label="Жиры"
+            value={fat}
+            onChange={setFat}
+            hideControls
+            parser={(value) => value?.replace(/\D/g, '')}
+            min={0}
+          />
+          <NumberInput
+            label="Углеводы"
+            value={carbs}
+            onChange={setCarbs}
+            hideControls
+            parser={(value) => value?.replace(/\D/g, '')}
+            min={0}
+          />
         </SimpleGrid>
         <Button fullWidth mt="md" onClick={handleSave}>
-          Сохранить
+          {data.find(d => d.date === dayjs(date).format('YYYY-MM-DD')) ? 'Обновить' : 'Сохранить'}
         </Button>
       </Paper>
 
@@ -174,19 +215,26 @@ export default function ClientNutrition({
             {data.length === 0 ? (
               <Text size="sm" color="dimmed">Нет данных</Text>
             ) : (
-              data.map(entry => (
-                <Paper key={entry.date} withBorder radius="md" p="md">
-                  <Group justify="space-between" mb="xs">
-                    <Text fw={500}>{entry.date}</Text>
-                    <Badge color="blue">{entry.calories} ккал</Badge>
-                  </Group>
-                  <Group gap="xs">
-                    <Badge color="green">Б: {entry.protein} г</Badge>
-                    <Badge color="yellow">Ж: {entry.fat} г</Badge>
-                    <Badge color="cyan">У: {entry.carbs} г</Badge>
-                  </Group>
-                </Paper>
-              ))
+              data
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map(entry => (
+                  <Paper key={entry.date} withBorder radius="md" p="md">
+                    <Group justify="space-between" mb="xs">
+                      <Text fw={500}>{dayjs(entry.date).format('DD MMM YYYY')}</Text>
+                      <Group gap={4}>
+                        <Badge color="blue">{entry.calories} ккал</Badge>
+                        <ActionIcon variant="light" color="blue" onClick={() => handleEdit(entry)}>
+                          <IconEdit size={16} />
+                        </ActionIcon>
+                      </Group>
+                    </Group>
+                    <Group gap="xs">
+                      <Badge color="green">Б: {entry.protein} г</Badge>
+                      <Badge color="yellow">Ж: {entry.fat} г</Badge>
+                      <Badge color="cyan">У: {entry.carbs} г</Badge>
+                    </Group>
+                  </Paper>
+                ))
             )}
           </Stack>
         </>
