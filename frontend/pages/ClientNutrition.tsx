@@ -1,4 +1,3 @@
-// src/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -12,6 +11,7 @@ import {
   Badge,
   Divider,
   NumberInput,
+  Center, // 👈 вот он — импорт добавлен
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
