@@ -54,7 +54,7 @@ export default function ClientNutrition({
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [formVisible, setFormVisible] = useState(false);
 
-  const [calories, setCalories] = useState<number | ''>('');
+  const [calories, setCalories] = useState<number | ''>(''); 
   const [protein, setProtein] = useState<number | ''>('');
   const [fat, setFat] = useState<number | ''>('');
   const [carbs, setCarbs] = useState<number | ''>('');
@@ -72,16 +72,16 @@ export default function ClientNutrition({
   const loadData = () => {
     setLoading(true);
     Promise.all([
-      fetch(`${API}/api/nutrition/${userId}`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
     ])
       .then(([nutrition, week, month]) => {
         setData(Array.isArray(nutrition) ? nutrition : []);
         setWeekly(week);
         setMonthly(month);
       })
-      .catch(err => console.error(err))
+      .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   };
 
@@ -165,35 +165,49 @@ export default function ClientNutrition({
             <Badge color="yellow">Ж: {selectedRecord.fat} Г</Badge>
             <Badge color="cyan">У: {selectedRecord.carbs} Г</Badge>
           </Group>
+
           {!isAdmin && (
             <Group mt="md">
-              <Button size="xs" onClick={() => {
-                setFormVisible(true);
-                setCalories(selectedRecord.calories);
-                setProtein(selectedRecord.protein);
-                setFat(selectedRecord.fat);
-                setCarbs(selectedRecord.carbs);
-              }}>
+              <Button
+                size="xs"
+                onClick={() => {
+                  setFormVisible(true);
+                  setCalories(selectedRecord.calories);
+                  setProtein(selectedRecord.protein);
+                  setFat(selectedRecord.fat);
+                  setCarbs(selectedRecord.carbs);
+                }}
+              >
                 ✏️ Редактировать
               </Button>
-              <Button size="xs" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
+              <Button
+                size="xs"
+                color="red"
+                onClick={handleDelete}
+                leftIcon={<IconTrash size={14} />}
+              >
                 Удалить
               </Button>
             </Group>
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
+        <Text size="sm" color="dimmed" mb="sm">
+          Нет данных за выбранный день
+        </Text>
       )}
 
       {!isAdmin && !formVisible && (
-        <Button fullWidth onClick={() => {
-          setCalories('');
-          setProtein('');
-          setFat('');
-          setCarbs('');
-          setFormVisible(true);
-        }}>
+        <Button
+          fullWidth
+          onClick={() => {
+            setCalories('');
+            setProtein('');
+            setFat('');
+            setCarbs('');
+            setFormVisible(true);
+          }}
+        >
           ➕ Внести КБЖУ
         </Button>
       )}
@@ -246,17 +260,25 @@ export default function ClientNutrition({
               />
             </Grid.Col>
           </Grid>
-          <Button mt="md" fullWidth onClick={handleSave}>💾 Сохранить</Button>
+          <Button mt="md" fullWidth onClick={handleSave}>
+            💾 Сохранить
+          </Button>
         </Paper>
       )}
 
       <Divider my="md" label="Сводка" />
 
-      {loading ? <Center><Loader /></Center> : (
+      {loading ? (
+        <Center>
+          <Loader />
+        </Center>
+      ) : (
         <Stack>
           {weekly && (
             <Paper withBorder p="md" radius="md">
-              <Text fw={600} mb={4}>Итого за неделю</Text>
+              <Text fw={600} mb={4}>
+                Итого за неделю
+              </Text>
               <Group gap="xs">
                 <Badge color="blue">Ккал: {weekly.calories}</Badge>
                 <Badge color="green">Б: {weekly.protein}</Badge>
@@ -267,7 +289,9 @@ export default function ClientNutrition({
           )}
           {monthly && (
             <Paper withBorder p="md" radius="md">
-              <Text fw={600} mb={4}>Итого за месяц</Text>
+              <Text fw={600} mb={4}>
+                Итого за месяц
+              </Text>
               <Group gap="xs">
                 <Badge color="blue">Ккал: {monthly.calories}</Badge>
                 <Badge color="green">Б: {monthly.protein}</Badge>
@@ -279,17 +303,19 @@ export default function ClientNutrition({
         </Stack>
       )}
 
-      <div style={{
-        position: 'fixed',
-        bottom: 10,
-        left: 0,
-        width: '100%',
-        background: 'white',
-        padding: '10px 0',
-        textAlign: 'center',
-        boxShadow: '0 -2px 8px rgba(0,0,0,0.05)',
-        zIndex: 1000,
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 10,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 8px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
         <Button variant="light" color="blue" size="sm" onClick={onBack}>
           ← Назад к профилю
         </Button>
