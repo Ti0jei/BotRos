@@ -12,6 +12,7 @@ import {
   Center,
   Stack,
   rem,
+  Loader,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
@@ -94,9 +95,8 @@ export default function ClientNutrition({
       return;
     }
 
-    const method = selectedRecord ? 'POST' : 'POST'; // POST используется и на update, бэкенд сам решает
     const res = await fetch(`${API}/api/nutrition`, {
-      method,
+      method: 'POST',
       headers,
       body: JSON.stringify({
         userId,
