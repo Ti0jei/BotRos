@@ -1,41 +1,104 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth.mjs';
-import { notifyTelegram } from '../utils/telegram.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// POST /api/notifications/remind/:trainingId
-router.post('/remind/:trainingId', authMiddleware, async (req, res) => {
-  const { trainingId } = req.params;
+// Получение данных по дням (14 последних)
+router.get('/:userId', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
 
-  // Только админ может отправлять напоминания
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can send reminders' });
+  try {
+    const entries = await prisma.nutritionEntry.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      take: 14,
+    });
+
+    res.json(entries);
+  } catch (err) {
+    console.error('Ошибка получения питания:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// Получение сумм за неделю/месяц
+router.get('/summary/:userId', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
+  const { period = 'week' } = req.query;
+
+  const days = period === 'month' ? 30 : 7;
+  const dateFrom = new Date();
+  dateFrom.setDate(dateFrom.getDate() - days + 1);
+
+  try {
+    const entries = await prisma.nutritionEntry.findMany({
+      where: {
+        userId,
+        date: { gte: dateFrom },
+      },
+    });
+
+    const total = {
+      period,
+      calories: 0,
+      protein: 0,
+      fat: 0,
+      carbs: 0,
+    };
+
+    for (const entry of entries) {
+      total.calories += entry.calories;
+      total.protein += entry.protein;
+      total.fat += entry.fat;
+      total.carbs += entry.carbs;
+    }
+
+    res.json(total);
+  } catch (err) {
+    console.error('Ошибка расчёта summary:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// Добавление или обновление записи
+router.post('/', authMiddleware, async (req, res) => {
+  const { userId, date, calories, protein, fat, carbs } = req.body;
+
+  if (!userId || !date) {
+    return res.status(400).json({ error: 'Недостаточно данных' });
   }
 
-  const training = await prisma.training.findUnique({
-    where: { id: trainingId },
-    include: { user: true },
-  });
+  try {
+    const entry = await prisma.nutritionEntry.upsert({
+      where: {
+        userId_date: {
+          userId,
+          date: new Date(date),
+        },
+      },
+      update: {
+        calories,
+        protein,
+        fat,
+        carbs,
+      },
+      create: {
+        userId,
+        date: new Date(date),
+        calories,
+        protein,
+        fat,
+        carbs,
+      },
+    });
 
-  if (!training || training.status !== 'PENDING') {
-    return res.status(404).json({ error: 'Training not found or already confirmed/declined' });
+    res.json(entry);
+  } catch (err) {
+    console.error('Ошибка сохранения питания:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
   }
-
-  if (!training.user?.telegramId) {
-    return res.status(400).json({ error: 'User has no Telegram ID' });
-  }
-
-  const dateStr = new Date(training.date).toLocaleDateString('ru-RU');
-  const timeStr = `${training.hour}:00`;
-
-  const message = `⏰ Напоминание!\nВам назначена тренировка на ${dateStr} в ${timeStr}.\nПожалуйста, подтвердите участие в приложении ✅❌`;
-
-  await notifyTelegram(training.user.telegramId, message);
-
-  return res.json({ success: true });
 });
 
 export default router;

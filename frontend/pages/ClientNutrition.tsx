@@ -1,4 +1,3 @@
-// frontend/src/components/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -11,9 +10,10 @@ import {
   Group,
   Badge,
   Divider,
-  Alert,
+  NumberInput,
 } from '@mantine/core';
-import { IconAlertCircle, IconPlugConnected } from '@tabler/icons-react';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 
 interface NutritionDay {
   date: string;
@@ -41,79 +41,92 @@ export default function ClientNutrition({
   const [data, setData] = useState<NutritionDay[]>([]);
   const [weekly, setWeekly] = useState<Summary | null>(null);
   const [monthly, setMonthly] = useState<Summary | null>(null);
-  const [connected, setConnected] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
-  const [resetting, setResetting] = useState(false);
+
+  const [date, setDate] = useState<Date | null>(new Date());
+  const [calories, setCalories] = useState<number | ''>('');
+  const [protein, setProtein] = useState<number | ''>('');
+  const [fat, setFat] = useState<number | ''>('');
+  const [carbs, setCarbs] = useState<number | ''>('');
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const headers = { Authorization: `Bearer ${token}` };
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 
+  const loadData = () => {
+    setLoading(true);
     Promise.all([
-      fetch(`${API}/api/fatsecret/nutrition/${userId}`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/fatsecret/summary/${userId}?period=week`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/fatsecret/summary/${userId}?period=month`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/fatsecret/status`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then(res => res.json()),
     ])
-      .then(([nutrition, week, month, status]) => {
+      .then(([nutrition, week, month]) => {
         setData(Array.isArray(nutrition) ? nutrition : []);
         setWeekly(week);
         setMonthly(month);
-        setConnected(status.connected);
       })
       .catch((err) => {
         console.error('Ошибка загрузки питания:', err);
       })
       .finally(() => setLoading(false));
-  }, [userId]);
-
-  const handleReset = async () => {
-    if (!window.confirm('Отключить FatSecret у клиента?')) return;
-    setResetting(true);
-    const res = await fetch(`${API}/api/fatsecret/token/${userId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      alert('FatSecret отключён');
-      setConnected(false);
-    } else {
-      alert('Ошибка при сбросе');
-    }
-    setResetting(false);
   };
 
-  const handleConnect = () => {
-    window.open(`${API}/api/fatsecret/authorize?userId=${userId}`, '_blank');
+  useEffect(() => {
+    loadData();
+  }, [userId]);
+
+  const handleSave = async () => {
+    if (!date || calories === '' || protein === '' || fat === '' || carbs === '') {
+      alert('Заполните все поля');
+      return;
+    }
+
+    const res = await fetch(`${API}/api/nutrition`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        userId,
+        date: dayjs(date).format('YYYY-MM-DD'),
+        calories,
+        protein,
+        fat,
+        carbs,
+      }),
+    });
+
+    if (res.ok) {
+      loadData();
+      alert('Сохранено');
+    } else {
+      alert('Ошибка при сохранении');
+    }
   };
 
   return (
     <Container py="xl" style={{ paddingBottom: 70 }}>
       <Title order={2} mb="md">Питание клиента</Title>
 
-      {connected === false && (
-        <>
-          <Alert icon={<IconAlertCircle />} title="Не подключено" color="red" mb="md">
-            Клиент не авторизовался в FatSecret.
-          </Alert>
-          <Button
-            leftIcon={<IconPlugConnected />}
-            color="green"
-            onClick={handleConnect}
-            mb="md"
-          >
-            Подключить FatSecret
-          </Button>
-        </>
-      )}
-
-      {connected && (
-        <Button color="red" variant="outline" size="xs" mb="md" onClick={handleReset} loading={resetting}>
-          ⛔ Сбросить подключение FatSecret
+      <Paper withBorder p="md" radius="md" mb="lg">
+        <Group grow>
+          <DatePickerInput
+            label="Дата"
+            value={date}
+            onChange={setDate}
+            maxDate={new Date()}
+          />
+          <NumberInput label="Калории" value={calories} onChange={setCalories} />
+          <NumberInput label="Белки" value={protein} onChange={setProtein} />
+          <NumberInput label="Жиры" value={fat} onChange={setFat} />
+          <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} />
+        </Group>
+        <Button mt="md" onClick={handleSave}>
+          Сохранить
         </Button>
-      )}
+      </Paper>
 
       {loading ? (
         <Loader />
@@ -146,9 +159,7 @@ export default function ClientNutrition({
           <Divider mb="md" label="История по дням" />
 
           {data.length === 0 ? (
-            <Text size="sm" color="dimmed">
-              Нет данных по питанию
-            </Text>
+            <Text size="sm" color="dimmed">Нет данных по питанию</Text>
           ) : (
             <Stack spacing="sm">
               {data.map((entry) => (

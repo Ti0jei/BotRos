@@ -11,11 +11,7 @@ import usersRoute from './routes/users.mjs';
 import paymentBlocksRoutes from './routes/payment-blocks.mjs';
 import notificationRoutes from './routes/notifications.mjs';
 import inviteCodeRoutes from './routes/invite-code.mjs';
-
-import {
-  publicFatSecretRoutes,
-  protectedFatSecretRoutes,
-} from './routes/fatsecret.mjs';
+import nutritionRoutes from './routes/nutrition.mjs'; // ✅ ручное питание
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
@@ -25,7 +21,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Разрешаем запросы только с твоего фронтенда
 app.use(cors({
   origin: 'https://bot-ros-frontend.vercel.app',
   credentials: true,
@@ -43,12 +38,9 @@ app.use('/api/users', usersRoute);
 app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/invite-code', inviteCodeRoutes);
+app.use('/api/nutrition', authMiddleware, nutritionRoutes);
 
-// ✅ FatSecret: сначала публичные, потом защищённые
-app.use('/api/fatsecret', publicFatSecretRoutes);
-app.use('/api/fatsecret', authMiddleware, protectedFatSecretRoutes);
-
-// ✅ ВРЕМЕННЫЙ РОУТ — узнать IP сервера для FatSecret
+// 🌐 Узнать IP сервера
 app.get('/ip', async (req, res) => {
   try {
     const response = await fetch('https://api.ipify.org?format=json');
@@ -59,7 +51,7 @@ app.get('/ip', async (req, res) => {
   }
 });
 
-// ✅ Тест email-уведомления через Resend
+// 📤 Проверка email-отправки
 app.get('/api/test-email', async (req, res) => {
   try {
     const to = 'zoty2104@gmail.com';
@@ -80,7 +72,6 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
-// ✅ Запуск сервера
 app.listen(PORT, () => {
   console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
 });
