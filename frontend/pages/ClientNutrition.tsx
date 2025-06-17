@@ -2,23 +2,23 @@ import { useEffect, useState } from 'react';
 import {
   Container,
   Title,
-  Stack,
-  Text,
-  Loader,
-  Button,
   Paper,
   Group,
   Badge,
-  Divider,
+  Text,
+  Button,
   NumberInput,
+  Divider,
   Center,
+  Stack,
   rem,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
+  IconCalendar,
   IconChevronLeft,
   IconChevronRight,
-  IconCalendar,
+  IconTrash,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
@@ -49,8 +49,9 @@ export default function ClientNutrition({
   const [weekly, setWeekly] = useState<Summary | null>(null);
   const [monthly, setMonthly] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [formVisible, setFormVisible] = useState(false);
 
-  const [date, setDate] = useState<Date | null>(new Date());
   const [calories, setCalories] = useState<number | ''>('');
   const [protein, setProtein] = useState<number | ''>('');
   const [fat, setFat] = useState<number | ''>('');
@@ -58,7 +59,6 @@ export default function ClientNutrition({
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
-
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -76,9 +76,7 @@ export default function ClientNutrition({
         setWeekly(week);
         setMonthly(month);
       })
-      .catch((err) => {
-        console.error('Ошибка загрузки питания:', err);
-      })
+      .catch(err => console.error(err))
       .finally(() => setLoading(false));
   };
 
@@ -86,18 +84,23 @@ export default function ClientNutrition({
     loadData();
   }, [userId]);
 
+  const selectedRecord = data.find(
+    (d) => dayjs(d.date).format('YYYY-MM-DD') === dayjs(selectedDate).format('YYYY-MM-DD')
+  );
+
   const handleSave = async () => {
-    if (!date || calories === '' || protein === '' || fat === '' || carbs === '') {
+    if (!selectedDate || calories === '' || protein === '' || fat === '' || carbs === '') {
       alert('Заполните все поля');
       return;
     }
 
+    const method = selectedRecord ? 'POST' : 'POST'; // POST используется и на update, бэкенд сам решает
     const res = await fetch(`${API}/api/nutrition`, {
-      method: 'POST',
+      method,
       headers,
       body: JSON.stringify({
         userId,
-        date: dayjs(date).format('YYYY-MM-DD'),
+        date: dayjs(selectedDate).format('YYYY-MM-DD'),
         calories,
         protein,
         fat,
@@ -107,9 +110,24 @@ export default function ClientNutrition({
 
     if (res.ok) {
       loadData();
+      setFormVisible(false);
       alert('Сохранено');
     } else {
       alert('Ошибка при сохранении');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedDate) return;
+    const res = await fetch(
+      `${API}/api/nutrition/${userId}/${dayjs(selectedDate).format('YYYY-MM-DD')}`,
+      { method: 'DELETE', headers }
+    );
+    if (res.ok) {
+      loadData();
+      alert('Удалено');
+    } else {
+      alert('Ошибка при удалении');
     }
   };
 
@@ -117,101 +135,102 @@ export default function ClientNutrition({
     <Container size="sm" pt="md" pb={80}>
       <Title order={2} mb="md">Питание</Title>
 
-      <Paper withBorder radius="md" p="md" mb="lg">
-        <Group grow wrap="wrap">
-          <DatePickerInput
-            label="Дата"
-            value={date}
-            onChange={setDate}
-            maxDate={new Date()}
-            leftSection={<IconCalendar size={16} />}
-            leftSectionPointerEvents="none"
-            nextIcon={<IconChevronRight size={16} />}
-            previousIcon={<IconChevronLeft size={16} />}
-            style={{ minWidth: rem(120) }}
-          />
-          <NumberInput
-            label="Калории"
-            value={calories}
-            onChange={setCalories}
-            hideControls
-            min={0}
-            parser={(value) => value?.replace(/\D/g, '')}
-          />
-          <NumberInput
-            label="Белки"
-            value={protein}
-            onChange={setProtein}
-            hideControls
-            min={0}
-            parser={(value) => value?.replace(/\D/g, '')}
-          />
-          <NumberInput
-            label="Жиры"
-            value={fat}
-            onChange={setFat}
-            hideControls
-            min={0}
-            parser={(value) => value?.replace(/\D/g, '')}
-          />
-          <NumberInput
-            label="Углеводы"
-            value={carbs}
-            onChange={setCarbs}
-            hideControls
-            min={0}
-            parser={(value) => value?.replace(/\D/g, '')}
-          />
-        </Group>
-        <Button fullWidth mt="md" onClick={handleSave}>
-          Сохранить
-        </Button>
-      </Paper>
+      <DatePickerInput
+        label="Выберите дату"
+        value={selectedDate}
+        onChange={(val) => {
+          setSelectedDate(val);
+          setFormVisible(false);
+        }}
+        maxDate={new Date()}
+        leftSection={<IconCalendar size={16} />}
+        leftSectionPointerEvents="none"
+        nextIcon={<IconChevronRight size={16} />}
+        previousIcon={<IconChevronLeft size={16} />}
+        mb="md"
+      />
 
-      {loading ? (
-        <Center><Loader /></Center>
+      {selectedRecord ? (
+        <Paper withBorder p="md" radius="md" mb="md">
+          <Group justify="space-between" mb="xs">
+            <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
+            <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
+          </Group>
+          <Group gap="xs">
+            <Badge color="green">Б: {selectedRecord.protein} Г</Badge>
+            <Badge color="yellow">Ж: {selectedRecord.fat} Г</Badge>
+            <Badge color="cyan">У: {selectedRecord.carbs} Г</Badge>
+          </Group>
+          <Group mt="md">
+            <Button size="xs" onClick={() => {
+              setFormVisible(true);
+              setCalories(selectedRecord.calories);
+              setProtein(selectedRecord.protein);
+              setFat(selectedRecord.fat);
+              setCarbs(selectedRecord.carbs);
+            }}>
+              ✏️ Редактировать
+            </Button>
+            <Button size="xs" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
+              Удалить
+            </Button>
+          </Group>
+        </Paper>
       ) : (
-        <>
-          {[weekly, monthly].map((sum, idx) =>
-            sum && (
-              <Paper withBorder radius="md" p="md" mb="sm" key={idx}>
-                <Text fw={600} mb={4}>
-                  Итого за {sum.period === 'week' ? 'неделю' : 'месяц'}
-                </Text>
-                <Group gap="xs">
-                  <Badge color="blue">Ккал: {sum.calories}</Badge>
-                  <Badge color="green">Б: {sum.protein}</Badge>
-                  <Badge color="yellow">Ж: {sum.fat}</Badge>
-                  <Badge color="cyan">У: {sum.carbs}</Badge>
-                </Group>
-              </Paper>
-            )
+        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
+      )}
+
+      {!formVisible && (
+        <Button fullWidth onClick={() => {
+          setCalories('');
+          setProtein('');
+          setFat('');
+          setCarbs('');
+          setFormVisible(true);
+        }}>
+          ➕ Внести КБЖУ
+        </Button>
+      )}
+
+      {formVisible && (
+        <Paper withBorder p="md" radius="md" mt="md">
+          <Group grow wrap="wrap">
+            <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
+            <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} hideControls />
+            <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} hideControls />
+            <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
+          </Group>
+          <Button mt="md" fullWidth onClick={handleSave}>💾 Сохранить</Button>
+        </Paper>
+      )}
+
+      <Divider my="md" label="Сводка" />
+
+      {loading ? <Center><Loader /></Center> : (
+        <Stack>
+          {weekly && (
+            <Paper withBorder p="md" radius="md">
+              <Text fw={600} mb={4}>Итого за неделю</Text>
+              <Group gap="xs">
+                <Badge color="blue">Ккал: {weekly.calories}</Badge>
+                <Badge color="green">Б: {weekly.protein}</Badge>
+                <Badge color="yellow">Ж: {weekly.fat}</Badge>
+                <Badge color="cyan">У: {weekly.carbs}</Badge>
+              </Group>
+            </Paper>
           )}
-
-          <Divider my="md" label="История по дням" />
-
-          <Stack>
-            {data.length === 0 ? (
-              <Text size="sm" color="dimmed">Нет данных</Text>
-            ) : (
-              data
-                .sort((a, b) => b.date.localeCompare(a.date))
-                .map(entry => (
-                  <Paper key={entry.date} withBorder radius="md" p="md">
-                    <Group justify="space-between" mb="xs">
-                      <Text fw={500}>{dayjs(entry.date).format('DD MMM YYYY')}</Text>
-                      <Badge color="blue">{entry.calories} ккал</Badge>
-                    </Group>
-                    <Group gap="xs">
-                      <Badge color="green">Б: {entry.protein} г</Badge>
-                      <Badge color="yellow">Ж: {entry.fat} г</Badge>
-                      <Badge color="cyan">У: {entry.carbs} г</Badge>
-                    </Group>
-                  </Paper>
-                ))
-            )}
-          </Stack>
-        </>
+          {monthly && (
+            <Paper withBorder p="md" radius="md">
+              <Text fw={600} mb={4}>Итого за месяц</Text>
+              <Group gap="xs">
+                <Badge color="blue">Ккал: {monthly.calories}</Badge>
+                <Badge color="green">Б: {monthly.protein}</Badge>
+                <Badge color="yellow">Ж: {monthly.fat}</Badge>
+                <Badge color="cyan">У: {monthly.carbs}</Badge>
+              </Group>
+            </Paper>
+          )}
+        </Stack>
       )}
 
       <div style={{
@@ -225,14 +244,8 @@ export default function ClientNutrition({
         boxShadow: '0 -2px 8px rgba(0,0,0,0.05)',
         zIndex: 1000,
       }}>
-        <Button
-          variant="light"
-          color="blue"
-          size="sm"
-          onClick={onBack}
-          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
-        >
-          Назад к профилю
+        <Button variant="light" color="blue" size="sm" onClick={onBack}>
+          ← Назад к профилю
         </Button>
       </div>
     </Container>
