@@ -1,266 +1,143 @@
-import { useEffect, useState } from 'react';
-import {
-  Container,
-  Title,
-  Stack,
-  Text,
-  Loader,
-  Button,
-  Paper,
-  Group,
-  Badge,
-  Divider,
-  NumberInput,
-  Center,
-  SimpleGrid,
-  ActionIcon,
-} from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconCalendar,
-  IconEdit,
-} from '@tabler/icons-react';
+import express from 'express';
+import prisma from '../lib/prisma.mjs';
 import dayjs from 'dayjs';
+import { authMiddleware } from '../middleware/auth.mjs';
 
-interface NutritionDay {
-  date: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-}
+const router = express.Router();
 
-interface Summary {
-  period: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-}
+// Middleware авторизации
+router.use(authMiddleware);
 
-export default function ClientNutrition({
-  userId,
-  onBack,
-}: {
-  userId: string;
-  onBack: () => void;
-}) {
-  const [data, setData] = useState<NutritionDay[]>([]);
-  const [weekly, setWeekly] = useState<Summary | null>(null);
-  const [monthly, setMonthly] = useState<Summary | null>(null);
-  const [loading, setLoading] = useState(true);
+// Получить всё питание пользователя
+router.get('/:userId', async (req, res) => {
+  try {
+    const nutrition = await prisma.nutrition.findMany({
+      where: { userId: req.params.userId },
+      orderBy: { date: 'desc' },
+    });
+    res.json(nutrition);
+  } catch (error) {
+    console.error('Ошибка при получении питания:', error);
+    res.status(500).json({ error: 'Ошибка при получении питания' });
+  }
+});
 
-  const [date, setDate] = useState<Date | null>(new Date());
-  const [calories, setCalories] = useState<number | ''>('');
-  const [protein, setProtein] = useState<number | ''>('');
-  const [fat, setFat] = useState<number | ''>('');
-  const [carbs, setCarbs] = useState<number | ''>('');
+// Получить суммарные значения по периоду
+router.get('/summary/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { period } = req.query;
 
-  const API = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('token');
-
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-
-  const loadData = () => {
-    setLoading(true);
-    Promise.all([
-      fetch(`${API}/api/nutrition/${userId}`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then(res => res.json()),
-    ])
-      .then(([nutrition, week, month]) => {
-        setData(Array.isArray(nutrition) ? nutrition : []);
-        setWeekly(week);
-        setMonthly(month);
-      })
-      .catch((err) => {
-        console.error('Ошибка загрузки питания:', err);
-      })
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [userId]);
-
-  const handleSave = async () => {
-    if (!date || calories === '' || protein === '' || fat === '' || carbs === '') {
-      alert('Заполните все поля');
-      return;
+  try {
+    let startDate;
+    if (period === 'week') {
+      startDate = dayjs().startOf('week').toDate();
+    } else if (period === 'month') {
+      startDate = dayjs().startOf('month').toDate();
+    } else {
+      return res.status(400).json({ error: 'Некорректный период' });
     }
 
-    const formattedDate = dayjs(date).format('YYYY-MM-DD');
-    const existingEntry = data.find((d) => d.date === formattedDate);
-    const method = existingEntry ? 'PATCH' : 'POST';
-
-    const res = await fetch(`${API}/api/nutrition`, {
-      method,
-      headers,
-      body: JSON.stringify({
+    const result = await prisma.nutrition.aggregate({
+      _sum: {
+        calories: true,
+        protein: true,
+        fat: true,
+        carbs: true,
+      },
+      where: {
         userId,
-        date: formattedDate,
-        calories,
-        protein,
-        fat,
-        carbs,
-      }),
+        date: {
+          gte: startDate,
+        },
+      },
     });
 
-    if (res.ok) {
-      loadData();
-      alert(existingEntry ? 'Обновлено' : 'Сохранено');
+    res.json({
+      period,
+      calories: result._sum.calories || 0,
+      protein: result._sum.protein || 0,
+      fat: result._sum.fat || 0,
+      carbs: result._sum.carbs || 0,
+    });
+  } catch (error) {
+    console.error('Ошибка при подсчёте суммы:', error);
+    res.status(500).json({ error: 'Ошибка при подсчёте суммы' });
+  }
+});
+
+// Добавить или обновить запись за день
+router.post('/', async (req, res) => {
+  const { userId, date, calories, protein, fat, carbs } = req.body;
+
+  if (!userId || !date) {
+    return res.status(400).json({ error: 'Необходимы userId и дата' });
+  }
+
+  try {
+    const existing = await prisma.nutrition.findUnique({
+      where: {
+        userId_date: {
+          userId,
+          date: new Date(date),
+        },
+      },
+    });
+
+    if (existing) {
+      // Обновление
+      await prisma.nutrition.update({
+        where: {
+          userId_date: {
+            userId,
+            date: new Date(date),
+          },
+        },
+        data: {
+          calories,
+          protein,
+          fat,
+          carbs,
+        },
+      });
     } else {
-      alert('Ошибка при сохранении');
+      // Создание новой записи
+      await prisma.nutrition.create({
+        data: {
+          userId,
+          date: new Date(date),
+          calories,
+          protein,
+          fat,
+          carbs,
+        },
+      });
     }
-  };
 
-  const handleEdit = (entry: NutritionDay) => {
-    setDate(new Date(entry.date));
-    setCalories(entry.calories);
-    setProtein(entry.protein);
-    setFat(entry.fat);
-    setCarbs(entry.carbs);
-  };
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Ошибка при сохранении питания:', error);
+    res.status(500).json({ error: 'Ошибка при сохранении питания' });
+  }
+});
 
-  return (
-    <Container size="sm" py="md" style={{ paddingBottom: 80 }}>
-      <Title order={2} mb="lg">Питание</Title>
+// Удалить запись за конкретную дату
+router.delete('/:userId/:date', async (req, res) => {
+  const { userId, date } = req.params;
 
-      <Paper withBorder radius="md" p="md" mb="lg">
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-          <DatePickerInput
-            label="Дата"
-            value={date}
-            onChange={setDate}
-            maxDate={new Date()}
-            leftSection={<IconCalendar size={16} />}
-            leftSectionPointerEvents="none"
-            nextIcon={<IconChevronRight size={16} />}
-            previousIcon={<IconChevronLeft size={16} />}
-          />
-          <NumberInput
-            label="Калории"
-            value={calories}
-            onChange={setCalories}
-            hideControls
-            parser={(value) => value?.replace(/\D/g, '')}
-            min={0}
-          />
-          <NumberInput
-            label="Белки"
-            value={protein}
-            onChange={setProtein}
-            hideControls
-            parser={(value) => value?.replace(/\D/g, '')}
-            min={0}
-          />
-          <NumberInput
-            label="Жиры"
-            value={fat}
-            onChange={setFat}
-            hideControls
-            parser={(value) => value?.replace(/\D/g, '')}
-            min={0}
-          />
-          <NumberInput
-            label="Углеводы"
-            value={carbs}
-            onChange={setCarbs}
-            hideControls
-            parser={(value) => value?.replace(/\D/g, '')}
-            min={0}
-          />
-        </SimpleGrid>
-        <Button fullWidth mt="md" onClick={handleSave}>
-          {data.find(d => d.date === dayjs(date).format('YYYY-MM-DD')) ? 'Обновить' : 'Сохранить'}
-        </Button>
-      </Paper>
+  try {
+    await prisma.nutrition.delete({
+      where: {
+        userId_date: {
+          userId,
+          date: new Date(date),
+        },
+      },
+    });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Ошибка при удалении записи питания:', error);
+    res.status(500).json({ error: 'Ошибка при удалении записи питания' });
+  }
+});
 
-      {loading ? (
-        <Center><Loader /></Center>
-      ) : (
-        <>
-          {weekly && (
-            <Paper withBorder radius="md" p="md" mb="sm">
-              <Text fw={600} mb={4}>Итого за неделю</Text>
-              <Group gap="xs">
-                <Badge color="blue">Ккал: {weekly.calories}</Badge>
-                <Badge color="green">Б: {weekly.protein}</Badge>
-                <Badge color="yellow">Ж: {weekly.fat}</Badge>
-                <Badge color="cyan">У: {weekly.carbs}</Badge>
-              </Group>
-            </Paper>
-          )}
-
-          {monthly && (
-            <Paper withBorder radius="md" p="md" mb="sm">
-              <Text fw={600} mb={4}>Итого за месяц</Text>
-              <Group gap="xs">
-                <Badge color="blue">Ккал: {monthly.calories}</Badge>
-                <Badge color="green">Б: {monthly.protein}</Badge>
-                <Badge color="yellow">Ж: {monthly.fat}</Badge>
-                <Badge color="cyan">У: {monthly.carbs}</Badge>
-              </Group>
-            </Paper>
-          )}
-
-          <Divider my="md" label="История по дням" />
-
-          <Stack>
-            {data.length === 0 ? (
-              <Text size="sm" color="dimmed">Нет данных</Text>
-            ) : (
-              data
-                .sort((a, b) => b.date.localeCompare(a.date))
-                .map(entry => (
-                  <Paper key={entry.date} withBorder radius="md" p="md">
-                    <Group justify="space-between" mb="xs">
-                      <Text fw={500}>{dayjs(entry.date).format('DD MMM YYYY')}</Text>
-                      <Group gap={4}>
-                        <Badge color="blue">{entry.calories} ккал</Badge>
-                        <ActionIcon variant="light" color="blue" onClick={() => handleEdit(entry)}>
-                          <IconEdit size={16} />
-                        </ActionIcon>
-                      </Group>
-                    </Group>
-                    <Group gap="xs">
-                      <Badge color="green">Б: {entry.protein} г</Badge>
-                      <Badge color="yellow">Ж: {entry.fat} г</Badge>
-                      <Badge color="cyan">У: {entry.carbs} г</Badge>
-                    </Group>
-                  </Paper>
-                ))
-            )}
-          </Stack>
-        </>
-      )}
-
-      <div style={{
-        position: 'fixed',
-        bottom: 10,
-        left: 0,
-        width: '100%',
-        background: 'white',
-        padding: '10px 0',
-        textAlign: 'center',
-        boxShadow: '0 -2px 8px rgba(0,0,0,0.05)',
-        zIndex: 1000,
-      }}>
-        <Button
-          variant="light"
-          color="blue"
-          size="sm"
-          onClick={onBack}
-          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
-        >
-          Назад к профилю
-        </Button>
-      </div>
-    </Container>
-  );
-}
+export default router;
