@@ -69,6 +69,10 @@ router.get('/summary/:userId', async (req, res) => {
 router.post('/', async (req, res) => {
   const { userId, date, calories, protein, fat, carbs } = req.body;
 
+  if (req.user?.role === 'ADMIN') {
+    return res.status(403).json({ error: 'Администраторы не могут изменять питание' });
+  }
+
   if (!userId || !date) {
     return res.status(400).json({ error: 'Необходимы userId и дата' });
   }
@@ -84,7 +88,6 @@ router.post('/', async (req, res) => {
     });
 
     if (existing) {
-      // Обновление
       await prisma.nutrition.update({
         where: {
           userId_date: {
@@ -100,7 +103,6 @@ router.post('/', async (req, res) => {
         },
       });
     } else {
-      // Создание новой записи
       await prisma.nutrition.create({
         data: {
           userId,
@@ -122,6 +124,10 @@ router.post('/', async (req, res) => {
 
 // Удалить запись за конкретную дату
 router.delete('/:userId/:date', async (req, res) => {
+  if (req.user?.role === 'ADMIN') {
+    return res.status(403).json({ error: 'Администраторы не могут удалять питание' });
+  }
+
   const { userId, date } = req.params;
 
   try {
