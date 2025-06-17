@@ -1,3 +1,4 @@
+// src/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -13,6 +14,11 @@ import {
   NumberInput,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconCalendar,
+} from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
 interface NutritionDay {
@@ -107,63 +113,60 @@ export default function ClientNutrition({
   };
 
   return (
-    <Container py="xl" style={{ paddingBottom: 70 }}>
-      <Title order={2} mb="md">Питание клиента</Title>
+    <Container size="sm" py="md" style={{ paddingBottom: 80 }}>
+      <Title order={2} mb="md">Питание</Title>
 
-      <Paper withBorder p="md" radius="md" mb="lg">
+      <Paper withBorder radius="md" p="md" mb="lg">
         <Group grow>
           <DatePickerInput
             label="Дата"
+            icon={<IconCalendar size={16} />}
             value={date}
             onChange={setDate}
             maxDate={new Date()}
+            leftSectionPointerEvents="none"
+            leftSection={<IconCalendar size={16} />}
+            nextIcon={<IconChevronRight size={16} />}
+            previousIcon={<IconChevronLeft size={16} />}
           />
-          <NumberInput label="Калории" value={calories} onChange={setCalories} />
-          <NumberInput label="Белки" value={protein} onChange={setProtein} />
-          <NumberInput label="Жиры" value={fat} onChange={setFat} />
-          <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} />
+          <NumberInput label="Калории" value={calories} onChange={setCalories} hideControls />
+          <NumberInput label="Белки" value={protein} onChange={setProtein} hideControls />
+          <NumberInput label="Жиры" value={fat} onChange={setFat} hideControls />
+          <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} hideControls />
         </Group>
-        <Button mt="md" onClick={handleSave}>
+        <Button fullWidth mt="md" onClick={handleSave}>
           Сохранить
         </Button>
       </Paper>
 
       {loading ? (
-        <Loader />
+        <Center><Loader /></Center>
       ) : (
         <>
-          {weekly && (
-            <Paper withBorder p="md" radius="md" mb="sm">
-              <Text fw={600} mb={6}>Итого за неделю</Text>
-              <Group gap="xs">
-                <Badge color="blue">Ккал: {weekly.calories}</Badge>
-                <Badge color="green">Б: {weekly.protein}</Badge>
-                <Badge color="yellow">Ж: {weekly.fat}</Badge>
-                <Badge color="cyan">У: {weekly.carbs}</Badge>
-              </Group>
-            </Paper>
+          {[weekly, monthly].map((sum, idx) =>
+            sum && (
+              <Paper withBorder radius="md" p="md" mb="sm" key={idx}>
+                <Text fw={600} mb={4}>
+                  Итого за {sum.period === 'week' ? 'неделю' : 'месяц'}
+                </Text>
+                <Group gap="xs">
+                  <Badge color="blue">Ккал: {sum.calories}</Badge>
+                  <Badge color="green">Б: {sum.protein}</Badge>
+                  <Badge color="yellow">Ж: {sum.fat}</Badge>
+                  <Badge color="cyan">У: {sum.carbs}</Badge>
+                </Group>
+              </Paper>
+            )
           )}
 
-          {monthly && (
-            <Paper withBorder p="md" radius="md" mb="lg">
-              <Text fw={600} mb={6}>Итого за месяц</Text>
-              <Group gap="xs">
-                <Badge color="blue">Ккал: {monthly.calories}</Badge>
-                <Badge color="green">Б: {monthly.protein}</Badge>
-                <Badge color="yellow">Ж: {monthly.fat}</Badge>
-                <Badge color="cyan">У: {monthly.carbs}</Badge>
-              </Group>
-            </Paper>
-          )}
+          <Divider my="md" label="История по дням" />
 
-          <Divider mb="md" label="История по дням" />
-
-          {data.length === 0 ? (
-            <Text size="sm" color="dimmed">Нет данных по питанию</Text>
-          ) : (
-            <Stack spacing="sm">
-              {data.map((entry) => (
-                <Paper key={entry.date} withBorder p="md" radius="md">
+          <Stack>
+            {data.length === 0 ? (
+              <Text size="sm" color="dimmed">Нет данных</Text>
+            ) : (
+              data.map(entry => (
+                <Paper key={entry.date} withBorder radius="md" p="md">
                   <Group justify="space-between" mb="xs">
                     <Text fw={500}>{entry.date}</Text>
                     <Badge color="blue">{entry.calories} ккал</Badge>
@@ -174,26 +177,25 @@ export default function ClientNutrition({
                     <Badge color="cyan">У: {entry.carbs} г</Badge>
                   </Group>
                 </Paper>
-              ))}
-            </Stack>
-          )}
+              ))
+            )}
+          </Stack>
         </>
       )}
 
-      {/* Кнопка назад */}
       <div style={{
         position: 'fixed',
         bottom: 10,
         left: 0,
         width: '100%',
         background: 'white',
-        padding: '8px 0',
+        padding: '10px 0',
         textAlign: 'center',
-        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+        boxShadow: '0 -2px 8px rgba(0,0,0,0.05)',
         zIndex: 1000,
       }}>
         <Button
-          variant="subtle"
+          variant="light"
           color="blue"
           size="sm"
           onClick={onBack}
