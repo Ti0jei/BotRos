@@ -138,7 +138,7 @@ export default function AdminClients({
   }
 
   if (selectedClient && view === 'nutrition') {
-    return <ClientNutrition userId={selectedClient.id} onBack={() => {
+    return <ClientNutrition userId={selectedClient.id} isAdmin={true} onBack={() => {
       setSelectedClient(null);
       setView(null);
     }} />;

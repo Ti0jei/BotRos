@@ -43,9 +43,11 @@ interface Summary {
 export default function ClientNutrition({
   userId,
   onBack,
+  isAdmin = false,
 }: {
   userId: string;
   onBack: () => void;
+  isAdmin?: boolean;
 }) {
   const [data, setData] = useState<NutritionDay[]>([]);
   const [weekly, setWeekly] = useState<Summary | null>(null);
@@ -61,9 +63,6 @@ export default function ClientNutrition({
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
-  const role = localStorage.getItem('role');
-  const isAdmin = role === 'ADMIN';
-
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -144,7 +143,7 @@ export default function ClientNutrition({
         value={selectedDate}
         onChange={(val) => {
           setSelectedDate(val);
-          setFormVisible(false); // скрывать форму при смене даты
+          setFormVisible(false);
         }}
         maxDate={new Date()}
         leftSection={<IconCalendar size={16} />}
@@ -192,7 +191,9 @@ export default function ClientNutrition({
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
+        <Text size="sm" color="dimmed" mb="sm">
+          Нет данных за выбранный день
+        </Text>
       )}
 
       {!isAdmin && !formVisible && (
@@ -258,7 +259,9 @@ export default function ClientNutrition({
               />
             </Grid.Col>
           </Grid>
-          <Button mt="md" fullWidth onClick={handleSave}>💾 Сохранить</Button>
+          <Button mt="md" fullWidth onClick={handleSave}>
+            💾 Сохранить
+          </Button>
         </Paper>
       )}
 
