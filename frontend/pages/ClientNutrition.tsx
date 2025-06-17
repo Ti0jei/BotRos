@@ -61,6 +61,9 @@ export default function ClientNutrition({
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'ADMIN';
+
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -162,26 +165,28 @@ export default function ClientNutrition({
             <Badge color="yellow">Ж: {selectedRecord.fat} Г</Badge>
             <Badge color="cyan">У: {selectedRecord.carbs} Г</Badge>
           </Group>
-          <Group mt="md">
-            <Button size="xs" onClick={() => {
-              setFormVisible(true);
-              setCalories(selectedRecord.calories);
-              setProtein(selectedRecord.protein);
-              setFat(selectedRecord.fat);
-              setCarbs(selectedRecord.carbs);
-            }}>
-              ✏️ Редактировать
-            </Button>
-            <Button size="xs" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
-              Удалить
-            </Button>
-          </Group>
+          {!isAdmin && (
+            <Group mt="md">
+              <Button size="xs" onClick={() => {
+                setFormVisible(true);
+                setCalories(selectedRecord.calories);
+                setProtein(selectedRecord.protein);
+                setFat(selectedRecord.fat);
+                setCarbs(selectedRecord.carbs);
+              }}>
+                ✏️ Редактировать
+              </Button>
+              <Button size="xs" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
+                Удалить
+              </Button>
+            </Group>
+          )}
         </Paper>
       ) : (
         <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
       )}
 
-      {!formVisible && (
+      {!isAdmin && !formVisible && (
         <Button fullWidth onClick={() => {
           setCalories('');
           setProtein('');
@@ -193,7 +198,7 @@ export default function ClientNutrition({
         </Button>
       )}
 
-      {formVisible && (
+      {!isAdmin && formVisible && (
         <Paper withBorder p="md" radius="md" mt="md">
           <Grid gutter="md">
             <Grid.Col span={6}>
