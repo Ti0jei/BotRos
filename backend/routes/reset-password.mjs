@@ -11,17 +11,17 @@ router.post('/request', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email обязателен' });
 
-  console.log('📩 Запрос сброса пароля для:', email);
+  console.log('📩 [reset-request] Запрос на email:', email);
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       console.log('⛔ Email не найден в базе:', email);
-      return res.status(200).json({ ok: true }); // не раскрываем наличие
+      return res.status(200).json({ ok: true }); // не раскрываем
     }
 
     const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 час
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -31,29 +31,38 @@ router.post('/request', async (req, res) => {
       },
     });
 
-    const resetUrl = `https://fittelega-frontend.vercel.app/reset-password?token=${token}`;
-    console.log('🔗 Ссылка сброса:', resetUrl);
+    const resetUrl = `https://bot-ros-frontend.vercel.app/reset-password?token=${token}`;
+    console.log('🔗 Ссылка на сброс:', resetUrl);
 
-    const emailResult = await resend.emails.send({
-      from: 'Fittelega <support@fittelega.com>',
+    const result = await resend.emails.send({
+      from: 'Krissfit Support <support@fittelega.com>',
       to: email,
-      subject: 'Сброс пароля',
+      subject: '🔐 Восстановление доступа к Krissfit',
       html: `
-        <p>Вы запросили сброс пароля в системе Fittelega.</p>
-        <p><a href="${resetUrl}">Нажмите здесь, чтобы сбросить пароль</a></p>
-        <p>Если вы не запрашивали, просто проигнорируйте это письмо.</p>
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2>Сброс пароля</h2>
+          <p>Вы запросили сброс пароля на Krissfit.</p>
+          <p>
+            <a href="${resetUrl}" 
+               style="background: #f06595; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none;"
+               target="_blank">
+              Сбросить пароль
+            </a>
+          </p>
+          <p>Если это были не вы — просто игнорируйте письмо.</p>
+        </div>
       `,
     });
 
-    console.log('📨 Результат отправки:', emailResult);
+    console.log('📨 [Resend] результат:', result);
     res.json({ ok: true });
   } catch (err) {
-    console.error('❌ Ошибка при сбросе пароля:', err);
+    console.error('❌ Ошибка при сбросе:', err);
     res.status(500).json({ error: 'Ошибка при сбросе пароля' });
   }
 });
 
-// 🔹 Шаг 2: Подтверждение сброса (установка нового пароля)
+// 🔹 Шаг 2: Подтверждение сброса
 router.post('/confirm', async (req, res) => {
   const { token, password } = req.body;
   if (!token || !password) return res.status(400).json({ error: 'Все поля обязательны' });
@@ -82,11 +91,11 @@ router.post('/confirm', async (req, res) => {
       },
     });
 
-    console.log('✅ Пароль обновлён для пользователя:', user.email);
+    console.log('✅ Пароль обновлён для:', user.email);
     res.json({ ok: true });
   } catch (err) {
-    console.error('❌ Ошибка при подтверждении сброса:', err);
-    res.status(500).json({ error: 'Ошибка при установке пароля' });
+    console.error('❌ Ошибка при установке нового пароля:', err);
+    res.status(500).json({ error: 'Ошибка при сбросе' });
   }
 });
 
