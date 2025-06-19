@@ -135,19 +135,16 @@ export default function ClientNutrition({
   };
 
   const cardStyle = {
-    background: 'rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(5px)',
-    WebkitBackdropFilter: 'blur(5px)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
+    background: '#fff',
+    borderRadius: 12,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
   };
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundImage: 'url(/images/client-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundColor: '#e8b3a6',
         padding: 16,
         display: 'flex',
         justifyContent: 'center',
@@ -156,16 +153,11 @@ export default function ClientNutrition({
     >
       <Box
         sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          borderRadius: 20,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-          padding: 16,
           width: '100%',
           maxWidth: 420,
         }}
       >
-        <Title order={2} ta="center" mb="md">
+        <Title order={2} ta="center" mb="md" color="#222">
           Моё питание
         </Title>
 
@@ -184,7 +176,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper radius="md" p="md" mb="md" style={cardStyle}>
+          <Paper p="md" mb="md" style={cardStyle}>
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -264,7 +256,7 @@ export default function ClientNutrition({
         ) : (
           <Stack>
             {weekly && (
-              <Paper radius="md" p="md" style={cardStyle}>
+              <Paper p="md" style={cardStyle}>
                 <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -275,7 +267,7 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper radius="md" p="md" style={cardStyle}>
+              <Paper p="md" style={cardStyle}>
                 <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
