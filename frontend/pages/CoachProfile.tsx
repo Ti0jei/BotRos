@@ -121,17 +121,13 @@ export default function CoachProfile({
   };
 
   return (
-    <Box
-      style={{
-        backgroundColor: '#e8b3a6',
-        minHeight: '100vh',
-        padding: '24px 16px',
-      }}
-    >
-      <Container size="xs">
+    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+      <Container size="xs" py="md">
         <Paper p="md" radius="md" shadow="md" withBorder>
           <Stack spacing="sm">
-            <Title order={3}>Привет, {profile.name} 👋</Title>
+            <Title order={3} ta="center">
+              Привет, {profile.name} 👋
+            </Title>
 
             <Button fullWidth onClick={onOpenClients} color="pink" variant="light">
               Клиенты
@@ -186,7 +182,7 @@ export default function CoachProfile({
                       {t.status === 'PENDING' && (
                         <Button
                           size="xs"
-                          variant="outline"
+                          variant="subtle"
                           color="orange"
                           onClick={() => sendReminder(t.id)}
                         >
@@ -219,23 +215,34 @@ export default function CoachProfile({
 
         <Collapse in={showCode}>
           <Paper mt="sm" p="md" radius="md" withBorder>
-            <Title order={4} mb="xs">
-              Код для регистрации
-            </Title>
+            <Title order={4} mb="xs">Код для регистрации</Title>
             <InviteCodeViewer />
           </Paper>
         </Collapse>
 
-        <Button
-          fullWidth
-          mt="lg"
-          variant="outline"
-          color="red"
-          leftIcon={<IconLogout size={16} />}
-          onClick={onLogout}
+        <Box
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            background: 'white',
+            padding: '10px 0',
+            textAlign: 'center',
+            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+            zIndex: 1000,
+          }}
         >
-          Выйти
-        </Button>
+          <Button
+            variant="subtle"
+            color="red"
+            size="sm"
+            onClick={onLogout}
+            leftIcon={<IconLogout size={16} />}
+          >
+            Выйти
+          </Button>
+        </Box>
       </Container>
     </Box>
   );
