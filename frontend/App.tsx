@@ -11,7 +11,7 @@ import PaymentHistory from './pages/PaymentHistory';
 import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 
-import { Container, Button, Center, Loader, Text } from '@mantine/core';
+import { Container, Button, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -27,13 +27,11 @@ function App() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  // ✅ Запоминаем Telegram ID из URL
   useEffect(() => {
     const tid = params.get('tid');
     if (tid) localStorage.setItem('telegramId', tid);
   }, [params]);
 
-  // ✅ Обрабатываем подтверждение почты и переход на сброс пароля
   useEffect(() => {
     if (params.get('verified') === 'true') {
       showNotification({
@@ -49,7 +47,6 @@ function App() {
     }
   }, [params, navigate]);
 
-  // ✅ Загружаем профиль, если есть токен
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -123,11 +120,6 @@ function App() {
           <Center>
             <Button variant="subtle" mt="sm" onClick={() => setView('register')}>
               Зарегистрироваться
-            </Button>
-          </Center>
-          <Center>
-            <Button variant="subtle" mt="xs" color="blue" onClick={() => setView('reset-request')}>
-              Забыли пароль?
             </Button>
           </Center>
         </>
