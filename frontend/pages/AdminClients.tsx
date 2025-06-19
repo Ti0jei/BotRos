@@ -1,3 +1,4 @@
+// frontend/pages/AdminClients.tsx
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -11,6 +12,7 @@ import {
   Badge,
   TextInput,
   Box,
+  Divider,
 } from '@mantine/core';
 import ClientPayments from './ClientPayments';
 import ClientNutrition from './ClientNutrition';
@@ -62,9 +64,7 @@ export default function AdminClients({
       }
       setClients(data);
       setLoading(false);
-      for (const client of data) {
-        loadBlock(client.id);
-      }
+      for (const client of data) loadBlock(client.id);
     } catch (err) {
       console.error('Ошибка запроса:', err);
       setError('Сервер недоступен');
@@ -146,7 +146,7 @@ export default function AdminClients({
   }
 
   return (
-    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
         <Title order={2} mb="md" style={{ color: '#222' }}>Клиенты</Title>
 
