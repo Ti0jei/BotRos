@@ -10,9 +10,18 @@ import {
   Loader,
   Collapse,
   Center,
+  Stack,
+  Box,
 } from '@mantine/core';
 import dayjs from 'dayjs';
-import { IconAlarm, IconClock } from '@tabler/icons-react';
+import {
+  IconAlarm,
+  IconClock,
+  IconUserPlus,
+  IconChevronDown,
+  IconChevronUp,
+  IconLogout,
+} from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import { getToken } from '../utils/auth';
 import InviteCodeViewer from '../components/InviteCodeViewer';
@@ -61,26 +70,18 @@ export default function CoachProfile({
         if (!res.ok) throw new Error('Ошибка загрузки тренировок');
 
         const data: Training[] = await res.json();
-
         const now = new Date();
-        const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
         const filtered = data
           .filter((t) => {
-            const trainingTimeMinutes = t.hour * 60;
-            return (
-              (t.status === 'PENDING' || t.status === 'CONFIRMED') &&
-              trainingTimeMinutes > currentTimeMinutes
-            );
+            const timeMin = t.hour * 60;
+            return (t.status === 'PENDING' || t.status === 'CONFIRMED') && timeMin > currentMinutes;
           })
           .sort((a, b) => a.hour - b.hour);
 
         const nextHour = filtered.length > 0 ? filtered[0].hour : null;
-        const upcoming = nextHour !== null
-          ? filtered.filter((t) => t.hour === nextHour)
-          : [];
-
-        setUpcomingTrainings(upcoming);
+        setUpcomingTrainings(nextHour !== null ? filtered.filter((t) => t.hour === nextHour) : []);
       } catch (err) {
         console.error('Ошибка при получении тренировок:', err);
         showNotification({
@@ -120,98 +121,122 @@ export default function CoachProfile({
   };
 
   return (
-    <Container>
-      <Title order={2} mb="lg">
-        Привет, {profile.name} 👋
-      </Title>
+    <Box
+      style={{
+        backgroundColor: '#e8b3a6',
+        minHeight: '100vh',
+        padding: '24px 16px',
+      }}
+    >
+      <Container size="xs">
+        <Paper p="md" radius="md" shadow="md" withBorder>
+          <Stack spacing="sm">
+            <Title order={3}>Привет, {profile.name} 👋</Title>
 
-      <Button fullWidth mb="sm" color="blue" onClick={onOpenClients}>
-        Клиенты
-      </Button>
+            <Button fullWidth onClick={onOpenClients} color="pink" variant="light">
+              Клиенты
+            </Button>
 
-      <Button fullWidth mb="sm" color="blue" onClick={onOpenSchedule}>
-        Назначить тренировку
-      </Button>
+            <Button fullWidth onClick={onOpenSchedule} color="pink" variant="light">
+              Назначить тренировку
+            </Button>
 
-      <Button fullWidth mb="sm" disabled>
-        Питание клиентов (скоро)
-      </Button>
+            <Button fullWidth disabled variant="light" color="gray">
+              Питание клиентов (скоро)
+            </Button>
 
-      <Button fullWidth mb="sm" disabled>
-        Материалы (скоро)
-      </Button>
+            <Button fullWidth disabled variant="light" color="gray">
+              Материалы (скоро)
+            </Button>
+          </Stack>
+        </Paper>
 
-      {/* 📅 Ближайшие тренировки */}
-      {loading ? (
-        <Center mt="lg">
-          <Loader size="sm" />
-        </Center>
-      ) : upcomingTrainings.length > 0 ? (
-        <Paper mt="lg" p="md" withBorder radius="md" shadow="xs">
-          <Group mb="xs">
-            <IconAlarm size={18} />
-            <Text fw={600}>Ближайшие тренировки сегодня</Text>
-          </Group>
-
-          {upcomingTrainings.map((t) => (
-            <Group key={t.id} position="apart" mb="xs">
-              <Group spacing="xs">
-                <IconClock size={16} />
-                <Text size="sm">
-                  {t.hour}:00 — {t.user.name} {t.user.lastName ?? ''}
-                  {t.user.internalTag && (
-                    <Text span color="dimmed"> ({t.user.internalTag})</Text>
-                  )}
-                </Text>
-              </Group>
-              <Group spacing="xs">
-                <Badge
-                  color={t.status === 'CONFIRMED' ? 'green' : 'orange'}
-                  size="sm"
-                >
-                  {t.status === 'CONFIRMED' ? 'Подтверждено' : 'Ожидается'}
-                </Badge>
-                {t.status === 'PENDING' && (
-                  <Button
-                    size="xs"
-                    variant="outline"
-                    color="orange"
-                    onClick={() => sendReminder(t.id)}
-                  >
-                    Напомнить
-                  </Button>
-                )}
-              </Group>
+        {/* Тренировки */}
+        {loading ? (
+          <Center mt="lg">
+            <Loader size="sm" />
+          </Center>
+        ) : upcomingTrainings.length > 0 ? (
+          <Paper mt="lg" p="md" radius="md" shadow="sm" withBorder>
+            <Group mb="xs">
+              <IconAlarm size={18} />
+              <Text fw={600}>Ближайшие тренировки сегодня</Text>
             </Group>
-          ))}
-        </Paper>
-      ) : (
-        <Text mt="lg" ta="center" color="dimmed">
-          Сегодня пока нет запланированных тренировок
-        </Text>
-      )}
 
-      {/* 🔻 Код для регистрации */}
-      <Button
-        fullWidth
-        variant="outline"
-        color="gray"
-        onClick={() => setShowCode((prev) => !prev)}
-        mt="lg"
-      >
-        {showCode ? 'Скрыть код для регистрации' : 'Код для регистрации'}
-      </Button>
+            <Stack spacing="sm">
+              {upcomingTrainings.map((t) => (
+                <Paper key={t.id} p="sm" radius="md" withBorder>
+                  <Group position="apart">
+                    <Group spacing="xs">
+                      <IconClock size={16} />
+                      <Text size="sm">
+                        {t.hour}:00 — {t.user.name} {t.user.lastName ?? ''}
+                        {t.user.internalTag && (
+                          <Text span color="dimmed"> ({t.user.internalTag})</Text>
+                        )}
+                      </Text>
+                    </Group>
+                    <Group spacing="xs">
+                      <Badge
+                        color={t.status === 'CONFIRMED' ? 'green' : 'orange'}
+                        size="sm"
+                      >
+                        {t.status === 'CONFIRMED' ? 'Подтверждено' : 'Ожидается'}
+                      </Badge>
+                      {t.status === 'PENDING' && (
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          color="orange"
+                          onClick={() => sendReminder(t.id)}
+                        >
+                          Напомнить
+                        </Button>
+                      )}
+                    </Group>
+                  </Group>
+                </Paper>
+              ))}
+            </Stack>
+          </Paper>
+        ) : (
+          <Text mt="lg" ta="center" color="dimmed">
+            Сегодня пока нет запланированных тренировок
+          </Text>
+        )}
 
-      <Collapse in={showCode}>
-        <Paper mt="sm" p="md" withBorder radius="md" shadow="xs">
-          <Title order={4} mb="sm">Код для регистрации клиентов</Title>
-          <InviteCodeViewer />
-        </Paper>
-      </Collapse>
+        {/* Код приглашения */}
+        <Button
+          fullWidth
+          variant="subtle"
+          color="pink"
+          mt="lg"
+          onClick={() => setShowCode((p) => !p)}
+          rightIcon={showCode ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
+        >
+          {showCode ? 'Скрыть код для регистрации' : 'Показать код для регистрации'}
+        </Button>
 
-      <Button fullWidth mt="lg" color="red" onClick={onLogout}>
-        Выйти
-      </Button>
-    </Container>
+        <Collapse in={showCode}>
+          <Paper mt="sm" p="md" radius="md" withBorder>
+            <Title order={4} mb="xs">
+              Код для регистрации
+            </Title>
+            <InviteCodeViewer />
+          </Paper>
+        </Collapse>
+
+        <Button
+          fullWidth
+          mt="lg"
+          variant="outline"
+          color="red"
+          leftIcon={<IconLogout size={16} />}
+          onClick={onLogout}
+        >
+          Выйти
+        </Button>
+      </Container>
+    </Box>
   );
 }

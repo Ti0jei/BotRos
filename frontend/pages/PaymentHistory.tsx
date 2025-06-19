@@ -10,6 +10,7 @@ import {
   Button,
   Loader,
   Divider,
+  Box,
 } from '@mantine/core';
 
 interface Props {
@@ -88,84 +89,87 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Container size="xs" style={{ paddingBottom: 80 }}>
-      <Title order={3} mb="md">
-        История оплат
-      </Title>
+    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+      <Container size="xs" py="md">
+        <Title order={3} mb="md" style={{ color: '#222' }}>
+          История оплат
+        </Title>
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <Stack spacing="md">
-          {blocks.map((block) => (
-            <Paper key={block.id} withBorder radius="md" p="md" shadow="xs">
-              <Group position="apart" mb="xs">
-                <Text fw={600} size="sm">
-                  Оплата от {new Date(block.paidAt).toLocaleDateString()}
+        {loading ? (
+          <Loader />
+        ) : (
+          <Stack spacing="md">
+            {blocks.map((block) => (
+              <Paper key={block.id} withBorder radius="md" p="md" shadow="sm">
+                <Group position="apart" mb="xs">
+                  <Text fw={600} size="sm">
+                    Оплата от {new Date(block.paidAt).toLocaleDateString()}
+                  </Text>
+                  <Badge color={block.active ? 'green' : 'gray'}>
+                    {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
+                  </Badge>
+                </Group>
+
+                <Text size="sm" color="dimmed">
+                  {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
                 </Text>
-                <Badge color={block.active ? 'green' : 'gray'}>
-                  {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
-                </Badge>
-              </Group>
-              <Text size="sm" color="dimmed">
-                {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
-              </Text>
-              {block.active && (
-                <Button
-                  size="xs"
-                  color="red"
-                  fullWidth
-                  mt="sm"
-                  onClick={() => markInactive(block.id)}
-                >
-                  Завершить
-                </Button>
-              )}
-            </Paper>
-          ))}
 
-          {singleTrainings.length > 0 && (
-            <>
-              <Divider label="Разовые тренировки" labelPosition="center" />
-              <Stack spacing="xs">
-                {singleTrainings.map((t) => (
-                  <Paper key={t.id} withBorder radius="md" p="sm">
-                    <Group position="apart">
-                      <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
-                      <Text size="sm" color="dimmed">{t.hour}:00</Text>
-                    </Group>
-                  </Paper>
-                ))}
-              </Stack>
-            </>
-          )}
-        </Stack>
-      )}
+                {block.active && (
+                  <Button
+                    size="xs"
+                    color="red"
+                    fullWidth
+                    mt="sm"
+                    onClick={() => markInactive(block.id)}
+                  >
+                    Завершить блок
+                  </Button>
+                )}
+              </Paper>
+            ))}
 
-      {/* Закреплённая кнопка */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 10,
-          left: 0,
-          width: '100%',
-          background: 'white',
-          padding: '8px 0',
-          textAlign: 'center',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
-        }}
-      >
-        <Button
-          variant="subtle"
-          color="blue"
-          size="sm"
-          onClick={onBack}
-          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+            {singleTrainings.length > 0 && (
+              <>
+                <Divider label="Разовые тренировки" labelPosition="center" />
+                <Stack spacing="xs">
+                  {singleTrainings.map((t) => (
+                    <Paper key={t.id} withBorder radius="md" p="sm" shadow="xs">
+                      <Group position="apart">
+                        <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                        <Text size="sm" color="dimmed">{t.hour}:00</Text>
+                      </Group>
+                    </Paper>
+                  ))}
+                </Stack>
+              </>
+            )}
+          </Stack>
+        )}
+
+        <Box
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            background: 'white',
+            padding: '10px 0',
+            textAlign: 'center',
+            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+            zIndex: 1000,
+          }}
         >
-          Назад к профилю
-        </Button>
-      </div>
-    </Container>
+          <Button
+            variant="subtle"
+            color="pink"
+            size="sm"
+            onClick={onBack}
+            leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+          >
+            Назад к профилю
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 }

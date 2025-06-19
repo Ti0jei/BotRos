@@ -10,6 +10,7 @@ import {
   Loader,
   Badge,
   TextInput,
+  Box,
 } from '@mantine/core';
 import ClientPayments from './ClientPayments';
 import ClientNutrition from './ClientNutrition';
@@ -145,149 +146,129 @@ export default function AdminClients({
   }
 
   return (
-    <Container style={{ paddingBottom: 70 }}>
-      <Title order={2} mb="md">Клиенты</Title>
+    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+      <Container size="xs" py="md">
+        <Title order={2} mb="md" style={{ color: '#222' }}>Клиенты</Title>
 
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <Text color="red">{error}</Text>
-      ) : (
-        <Stack>
-          {clients.map((client) => {
-            const block = blockMap[client.id];
-            const remaining = block ? block.paidTrainings - block.used : 0;
-            const isEditing = editingId === client.id;
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <Text color="red">{error}</Text>
+        ) : (
+          <Stack>
+            {clients.map((client) => {
+              const block = blockMap[client.id];
+              const remaining = block ? block.paidTrainings - block.used : 0;
+              const isEditing = editingId === client.id;
 
-            return (
-              <Card key={client.id} withBorder radius="md" p="md" style={{ position: 'relative' }}>
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    backgroundColor: block ? 'green' : 'red',
-                  }}
-                />
+              return (
+                <Card key={client.id} withBorder radius="md" p="md" shadow="sm">
+                  <Stack spacing="xs">
+                    <Group position="apart">
+                      <Text fw={600}>
+                        {client.name} {client.lastName ?? ''}{' '}
+                        {client.internalTag && (
+                          <Text span color="dimmed">({client.internalTag})</Text>
+                        )}
+                      </Text>
+                      <div
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: '50%',
+                          backgroundColor: block ? 'green' : 'red',
+                        }}
+                      />
+                    </Group>
 
-                <Stack spacing="xs" mb="xs">
-                  <Group spacing="xs">
+                    <Text size="sm" color="dimmed">{client.age} лет</Text>
+
                     {isEditing ? (
-                      <>
-                        <Text>{client.name} {client.lastName ?? ''}</Text>
+                      <Group grow>
                         <TextInput
                           value={internalTagValue}
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
-                          size="xs"
-                          style={{ width: 120 }}
                         />
-                      </>
-                    ) : (
-                      <Text fw={500}>
-                        {client.name} {client.lastName ?? ''} {client.internalTag ? `(${client.internalTag})` : ''}
-                      </Text>
-                    )}
-                  </Group>
-                  <Text size="sm" color="dimmed">{client.age} лет</Text>
-                </Stack>
-
-                {!isEditing && block && (
-                  <Group spacing="xs" mb="xs">
-                    <Badge color={remaining === 0 ? 'red' : 'green'}>
-                      Осталось: {remaining}
-                    </Badge>
-                    <Badge color="teal">
-                      Цена: {block.pricePerTraining} ₽
-                    </Badge>
-                  </Group>
-                )}
-
-                <Stack mt="xs" spacing="xs">
-                  <Group grow>
-                    {isEditing ? (
-                      <>
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
-                          Сохранить
-                        </Button>
-                        <Button color="gray" onClick={cancelEditing}>
-                          Отмена
-                        </Button>
-                      </>
+                        <Button color="green" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
+                        <Button color="gray" onClick={cancelEditing}>Отмена</Button>
+                      </Group>
                     ) : (
                       <>
-                        <Button color="blue" onClick={() => {
-                          setSelectedClient(client);
-                          setView('nutrition');
-                        }}>
-                          Питание
-                        </Button>
-                        <Button color="teal" onClick={() => {
-                          setSelectedClient(client);
-                          setView('payments');
-                        }}>
-                          💸 Оплата
-                        </Button>
+                        {block && (
+                          <Group spacing="xs">
+                            <Badge color={remaining === 0 ? 'red' : 'green'}>
+                              Осталось: {remaining}
+                            </Badge>
+                            <Badge color="teal">
+                              Цена: {block.pricePerTraining} ₽
+                            </Badge>
+                          </Group>
+                        )}
+
+                        <Group grow mt="xs">
+                          <Button variant="subtle" color="pink" onClick={() => {
+                            setSelectedClient(client);
+                            setView('nutrition');
+                          }}>
+                            Питание
+                          </Button>
+
+                          <Button variant="subtle" color="pink" onClick={() => {
+                            setSelectedClient(client);
+                            setView('payments');
+                          }}>
+                            💸 Оплата
+                          </Button>
+                        </Group>
+
+                        <Group grow mt={6}>
+                          <Button
+                            variant="subtle"
+                            color="pink"
+                            onClick={() => onOpenHistory(client.id)}
+                          >
+                            📊 История оплат
+                          </Button>
+                        </Group>
+
+                        <Group grow mt={6}>
+                          <Button color="orange" onClick={() => startEditing(client)}>Псевдоним</Button>
+                          <Button color="red" onClick={() => deleteClient(client.id)}>Удалить</Button>
+                        </Group>
                       </>
                     )}
-                  </Group>
+                  </Stack>
+                </Card>
+              );
+            })}
+          </Stack>
+        )}
 
-                  {!isEditing && (
-                    <Stack spacing={8}>
-                      <Group grow>
-                        <Button
-                          variant="light"
-                          color="indigo"
-                          size="sm"
-                          onClick={() => onOpenHistory(client.id)}
-                          leftIcon={<span style={{ fontSize: 16 }}>📊</span>}
-                          style={{ fontWeight: 500 }}
-                        >
-                          История оплат
-                        </Button>
-                      </Group>
-
-                      <Group grow>
-                        <Button color="orange" onClick={() => startEditing(client)}>
-                          Псевдоним
-                        </Button>
-                        <Button color="red" onClick={() => deleteClient(client.id)}>
-                          Удалить
-                        </Button>
-                      </Group>
-                    </Stack>
-                  )}
-                </Stack>
-              </Card>
-            );
-          })}
-        </Stack>
-      )}
-
-      <div style={{
-        position: 'fixed',
-        bottom: 10,
-        left: 0,
-        width: '100%',
-        background: 'white',
-        padding: '8px 0',
-        textAlign: 'center',
-        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-        zIndex: 1000,
-      }}>
-        <Button
-          variant="subtle"
-          color="blue"
-          size="sm"
-          onClick={onBack}
-          leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+        <Box
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            background: 'white',
+            padding: '10px 0',
+            textAlign: 'center',
+            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+            zIndex: 1000,
+          }}
         >
-          Назад к профилю
-        </Button>
-      </div>
-    </Container>
+          <Button
+            variant="subtle"
+            color="pink"
+            size="sm"
+            onClick={onBack}
+            leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+          >
+            Назад к профилю
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 }
