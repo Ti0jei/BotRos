@@ -1,3 +1,4 @@
+// frontend/pages/ClientPayments.tsx
 import {
   Container,
   Title,
@@ -13,7 +14,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight, IconEdit, IconCheck } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -82,13 +83,22 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     });
 
     if (res.ok) {
-      showNotification({ title: 'Блок создан', message: 'Новая оплата успешно добавлена', color: 'green' });
+      showNotification({
+        title: 'Блок создан',
+        message: 'Новая оплата успешно добавлена',
+        color: 'green',
+        icon: <IconCheck size={18} />,
+      });
       setDate(new Date());
       setPaidTrainings(8);
       setPricePerTraining(600);
       await loadBlock();
     } else {
-      showNotification({ title: 'Ошибка', message: 'Не удалось добавить блок оплаты', color: 'red' });
+      showNotification({
+        title: 'Ошибка',
+        message: 'Не удалось добавить блок оплаты',
+        color: 'red',
+      });
     }
   };
 
@@ -110,11 +120,19 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     });
 
     if (res.ok) {
-      showNotification({ title: 'Обновлено', message: 'Блок оплаты обновлён', color: 'green' });
+      showNotification({
+        title: 'Обновлено',
+        message: 'Блок оплаты обновлён',
+        color: 'green',
+      });
       setEditMode(false);
       await loadBlock();
     } else {
-      showNotification({ title: 'Ошибка', message: 'Не удалось обновить блок', color: 'red' });
+      showNotification({
+        title: 'Ошибка',
+        message: 'Не удалось обновить блок',
+        color: 'red',
+      });
     }
   };
 
@@ -123,7 +141,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   }, []);
 
   return (
-    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
         <Title order={3} mb="md" style={{ color: '#222' }}>
           💸 Оплаты — {client.name}
@@ -132,7 +150,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         {loading ? (
           <Text>Загрузка...</Text>
         ) : block ? (
-          <Paper withBorder p="md" mb="md" shadow="sm">
+          <Paper withBorder p="md" mb="md" shadow="sm" style={{ border: '1px solid #ccc' }}>
             <Group position="apart" mb="xs">
               <Text fw={500}>Активный блок</Text>
               <Badge color={block.used >= block.paidTrainings ? 'red' : 'green'}>
@@ -183,23 +201,43 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
               </Stack>
             ) : (
               <Stack spacing="xs">
-                <Text size="sm" color="dimmed">Дата оплаты: {dayjs(block.date).format('DD.MM.YYYY')}</Text>
-                <Text size="sm" color="dimmed">Цена: {block.pricePerTraining}₽</Text>
-                <Text size="sm" color="dimmed">Всего тренировок: {block.paidTrainings}</Text>
-                <Text size="sm" color="dimmed">Использовано: {block.used}</Text>
-                <Text size="sm" fw={600}>Осталось: {block.paidTrainings - block.used}</Text>
+                <Text size="sm" color="dimmed">
+                  Дата оплаты: {dayjs(block.date).format('DD.MM.YYYY')}
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Цена: {block.pricePerTraining}₽
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Всего тренировок: {block.paidTrainings}
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Использовано: {block.used}
+                </Text>
+                <Text size="sm" fw={600}>
+                  Осталось: {block.paidTrainings - block.used}
+                </Text>
 
-                <Button mt="xs" variant="light" color="pink" onClick={() => setEditMode(true)}>
-                  ✏️ Редактировать
+                <Button
+                  mt="xs"
+                  variant="outline"
+                  color="pink"
+                  leftIcon={<IconEdit size={16} />}
+                  onClick={() => setEditMode(true)}
+                >
+                  Редактировать
                 </Button>
               </Stack>
             )}
           </Paper>
         ) : (
           <>
-            <Text color="red" fw={600} mt="sm">🔴 Блок не оплачен</Text>
+            <Text color="red" fw={600} mt="sm">
+              🔴 Блок не оплачен
+            </Text>
             <Divider my="sm" />
-            <Title order={4} mb="xs">➕ Добавить блок</Title>
+            <Title order={4} mb="xs">
+              ➕ Добавить блок
+            </Title>
 
             <DatePickerInput
               label="Дата оплаты"
