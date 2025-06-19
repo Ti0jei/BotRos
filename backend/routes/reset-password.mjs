@@ -35,7 +35,7 @@ router.post('/request', async (req, res) => {
     console.log('🔗 Ссылка на сброс:', resetUrl);
 
     const result = await resend.emails.send({
-      from: 'Krissfit Support <support@fittelega.com>',
+      from: 'Krissfit Support <support@krissfit.ru>',
       to: email,
       subject: '🔐 Восстановление доступа к Krissfit',
       html: `
