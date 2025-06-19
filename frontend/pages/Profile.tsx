@@ -124,9 +124,7 @@ export default function Profile({
   return (
     <div
       style={{
-        backgroundImage: 'url(/images/client-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -136,18 +134,16 @@ export default function Profile({
     >
       <Container
         size="xs"
-        p={32}
+        p={24}
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          backgroundColor: '#fff',
           borderRadius: 24,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
           position: 'relative',
           width: '100%',
           maxWidth: 420,
         }}
       >
-        {/* 🔔 Оповещения */}
         {section === 'main' && (
           <Tooltip
             label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}
@@ -162,7 +158,6 @@ export default function Profile({
                 position: 'absolute',
                 top: 12,
                 right: 12,
-                opacity: 0.7,
               }}
             >
               {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
@@ -170,7 +165,6 @@ export default function Profile({
           </Tooltip>
         )}
 
-        {/* Главная */}
         {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm">
@@ -227,7 +221,7 @@ export default function Profile({
               variant="light"
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
-              Материал для изучения
+              Материалы для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
@@ -257,7 +251,6 @@ export default function Profile({
           </Stack>
         )}
 
-        {/* Разделы */}
         {section === 'trainings' && (
           <ClientSchedule onBack={() => setSection('main')} />
         )}
