@@ -43,7 +43,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         icon: <IconCheck size={18} />,
       });
       setVerifiedShown(true);
-      navigate(window.location.pathname); // убираем ?verified=true
+      navigate(window.location.pathname);
     }
   }, [params, verifiedShown, navigate]);
 
@@ -151,21 +151,22 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
         backgroundImage: 'url("/images/krissfit-bg-pink.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '2rem',
       }}
     >
       <Paper
         shadow="xl"
-        radius="md"
+        radius="lg"
         p="xl"
         withBorder
         style={{
           backdropFilter: 'blur(10px)',
           backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
           width: '100%',
           maxWidth: 400,
         }}
