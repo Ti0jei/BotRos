@@ -157,22 +157,18 @@ export default function ClientNutrition({
       sx={{
         minHeight: '100vh',
         backgroundColor: isAdmin ? '#f5d4ca' : '#e8b3a6',
-        padding: 16,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'start',
         paddingBottom: 80,
+        position: 'relative',
       }}
     >
       <Box
         sx={{
-          width: '100%',
           maxWidth: 420,
+          margin: '0 auto',
+          padding: 16,
           backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(8px)',
           borderRadius: 24,
           boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-          padding: 20,
         }}
       >
         <Title order={2} ta="center" mb="md" color="#222">
@@ -299,7 +295,6 @@ export default function ClientNutrition({
         )}
       </Box>
 
-      {/* Кнопка назад — фиксированная снизу */}
       <Box
         style={{
           position: 'fixed',
@@ -314,12 +309,18 @@ export default function ClientNutrition({
         }}
       >
         <Button
-          variant="subtle"
-          color="pink"
-          size="sm"
           onClick={onBack}
           leftIcon={<IconArrowBack size={14} />}
-          sx={pinkButtonSx}
+          styles={{
+            root: {
+              color: '#d6336c',
+              border: '1px solid #d6336c',
+              borderRadius: 8,
+              fontWeight: 500,
+              backgroundColor: 'transparent',
+              '&:hover': { backgroundColor: '#ffe3ed' },
+            },
+          }}
         >
           Назад к профилю
         </Button>
