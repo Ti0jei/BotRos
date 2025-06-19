@@ -17,7 +17,7 @@ router.post('/request', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       console.log('⛔ Email не найден в базе:', email);
-      return res.status(200).json({ ok: true }); // не раскрываем
+      return res.status(200).json({ ok: true }); // не раскрываем наличие
     }
 
     const token = crypto.randomBytes(32).toString('hex');
@@ -55,7 +55,7 @@ router.post('/request', async (req, res) => {
           </p>
         </div>
       `,
-      reply_to: 'support@krissfit.ru', // 👈 если нужно
+      reply_to: 'support@krissfit.ru',
     });
 
     console.log('📨 [Resend] результат:', result);
@@ -84,7 +84,13 @@ router.post('/confirm', async (req, res) => {
       return res.status(400).json({ error: 'Неверный или истёкший токен' });
     }
 
-    const hashed = await Bun.password.hash(password);
+    let hashed;
+    try {
+      hashed = await Bun.password.hash(password);
+    } catch (err) {
+      console.error('❌ Ошибка хэширования пароля:', err);
+      return res.status(500).json({ error: 'Ошибка при шифровании пароля' });
+    }
 
     await prisma.user.update({
       where: { id: user.id },
