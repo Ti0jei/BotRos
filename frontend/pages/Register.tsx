@@ -104,14 +104,14 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       }}
     >
       <Paper
-        shadow="md"
         p="xl"
-        withBorder
         style={{
           maxWidth: 400,
           width: '100%',
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
           borderRadius: 16,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
         }}
       >
         <Stack>

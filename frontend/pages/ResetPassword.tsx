@@ -90,9 +90,10 @@ export default function ResetPassword({ onBack }: Props) {
         size="xs"
         p="xl"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
           borderRadius: 16,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
         }}
       >
         <Title order={2} mb="md" ta="center">
