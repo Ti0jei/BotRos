@@ -1,3 +1,4 @@
+// frontend/pages/RequestReset.tsx
 import { useState } from 'react';
 import {
   Button,
@@ -66,12 +67,20 @@ export default function RequestReset({ onBack }: Props) {
     }
   };
 
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
   return (
     <div
       style={{
-        backgroundImage: 'url(/images/reset-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -83,13 +92,16 @@ export default function RequestReset({ onBack }: Props) {
         size="xs"
         p="xl"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          borderRadius: 16,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderRadius: 24,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
         }}
       >
-        <Title order={2} mb="md" ta="center">Сброс пароля</Title>
+        <Title order={2} mb="md" ta="center">
+          Сброс пароля
+        </Title>
 
         {sent ? (
           <>
@@ -97,7 +109,7 @@ export default function RequestReset({ onBack }: Props) {
               Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
             </Text>
             <Center>
-              <Button variant="subtle" onClick={onBack} color="pink">
+              <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
                 На главную
               </Button>
             </Center>
@@ -116,13 +128,14 @@ export default function RequestReset({ onBack }: Props) {
                 loading={loading}
                 disabled={!email}
                 leftIcon={<IconMail size={16} />}
+                color="pink"
               >
                 Сбросить пароль
               </Button>
             </Stack>
 
             <Center mt="md">
-              <Button variant="subtle" onClick={onBack} color="pink">
+              <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
                 На главную
               </Button>
             </Center>

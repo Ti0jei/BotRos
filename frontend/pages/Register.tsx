@@ -1,3 +1,4 @@
+// frontend/pages/Register.tsx
 import { useState, useEffect } from 'react';
 import {
   TextInput,
@@ -93,9 +94,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   return (
     <div
       style={{
-        backgroundImage: 'url(/images/reg-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -108,14 +107,17 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
         style={{
           maxWidth: 400,
           width: '100%',
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          borderRadius: 16,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderRadius: 24,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
         }}
       >
         <Stack>
-          <Title order={3} ta="center">Регистрация</Title>
+          <Title order={3} ta="center">
+            Регистрация
+          </Title>
 
           {error && (
             <Notification

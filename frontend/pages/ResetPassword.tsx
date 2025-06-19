@@ -73,12 +73,20 @@ export default function ResetPassword({ onBack }: Props) {
     }
   };
 
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
   return (
     <div
       style={{
-        backgroundImage: 'url(/images/reset-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -90,10 +98,11 @@ export default function ResetPassword({ onBack }: Props) {
         size="xs"
         p="xl"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          borderRadius: 16,
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderRadius: 24,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
         }}
       >
         <Title order={2} mb="md" ta="center">
@@ -106,7 +115,7 @@ export default function ResetPassword({ onBack }: Props) {
               Пароль успешно обновлён. Теперь войдите с новым паролем.
             </Text>
             <Center>
-              <Button color="pink" onClick={onBack}>
+              <Button sx={pinkButtonSx} variant="subtle" onClick={onBack}>
                 Назад ко входу
               </Button>
             </Center>
@@ -122,7 +131,7 @@ export default function ResetPassword({ onBack }: Props) {
             <Button onClick={handleSubmit} loading={loading} color="pink">
               Сохранить пароль
             </Button>
-            <Button variant="subtle" onClick={onBack} color="gray">
+            <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
               Назад ко входу
             </Button>
           </Stack>
