@@ -1,3 +1,4 @@
+// frontend/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -135,6 +136,12 @@ export default function ClientNutrition({
     }
   };
 
+  const gradientStyle = {
+    background: 'linear-gradient(135deg, #fcdde9, #f6cdd2)',
+    border: 'none',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+  };
+
   return (
     <Box
       sx={{
@@ -150,7 +157,7 @@ export default function ClientNutrition({
     >
       <Box
         sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          ...gradientStyle,
           borderRadius: 20,
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
@@ -178,7 +185,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper withBorder radius="md" p="md" mb="md" shadow="sm">
+          <Paper radius="md" p="md" mb="md" style={gradientStyle}>
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -230,7 +237,7 @@ export default function ClientNutrition({
         )}
 
         {!isAdmin && formVisible && (
-          <Paper withBorder radius="md" p="md" mt="md" shadow="sm">
+          <Paper radius="md" p="md" mt="md" style={gradientStyle}>
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -258,7 +265,7 @@ export default function ClientNutrition({
         ) : (
           <Stack>
             {weekly && (
-              <Paper withBorder radius="md" p="md" shadow="sm">
+              <Paper radius="md" p="md" style={gradientStyle}>
                 <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -269,7 +276,7 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper withBorder radius="md" p="md" shadow="sm">
+              <Paper radius="md" p="md" style={gradientStyle}>
                 <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
