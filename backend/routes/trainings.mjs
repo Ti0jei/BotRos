@@ -43,8 +43,12 @@ router.post('/', authMiddleware, async (req, res) => {
     },
   });
 
+  // ❗ Блокируем уведомление, если тренировка в прошлом
+  const now = new Date();
+  const trainingDateTime = new Date(`${date}T${hour.toString().padStart(2, '0')}:00:00`);
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (user?.telegramId) {
+
+  if (user?.telegramId && trainingDateTime > now) {
     await notifyTelegram(
       user.telegramId,
       `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00\nПодтвердите участие в приложении ✅❌`
@@ -104,7 +108,7 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   res.json(updated);
 });
 
-// Отметить посещение (списание при был и прогул)
+// Отметить посещение
 router.patch('/:id/attended', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { attended } = req.body;
@@ -120,7 +124,6 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.status(200).json(training);
   }
 
-  // Разовая тренировка — не списываем
   if (training.isSinglePaid) {
     const updated = await prisma.training.update({
       where: { id },
@@ -129,7 +132,6 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.json(updated);
   }
 
-  // По блоку — списываем при "был" и "прогул"
   const updated = await prisma.training.update({
     where: { id },
     data: { attended, wasCounted: true },
@@ -205,7 +207,7 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
   res.json(trainings);
 });
 
-// Получить ближайшую тренировку для тренера
+// Получить ближайшую тренировку
 router.get('/next', authMiddleware, async (req, res) => {
   if (req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Only admin can view next training' });
