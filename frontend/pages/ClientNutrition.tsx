@@ -117,7 +117,6 @@ export default function ClientNutrition({
     if (res.ok) {
       loadData();
       setFormVisible(false);
-      alert('Сохранено');
     } else {
       alert('Ошибка при сохранении');
     }
@@ -131,16 +130,15 @@ export default function ClientNutrition({
     );
     if (res.ok) {
       loadData();
-      alert('Удалено');
     } else {
       alert('Ошибка при удалении');
     }
   };
 
   return (
-    <Container size="xs" pt="md" pb={90}>
+    <Container size="xs" py="md">
       <Title order={2} ta="center" mb="md">
-        Питание
+        Моё питание
       </Title>
 
       <DatePickerInput
@@ -158,20 +156,19 @@ export default function ClientNutrition({
       />
 
       {selectedRecord ? (
-        <Paper withBorder p="md" radius="md" mb="md" shadow="xs">
+        <Paper withBorder radius="md" p="md" mb="md" shadow="sm">
           <Group justify="space-between" mb="xs">
             <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
             <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
           </Group>
-          <Group gap="xs">
-            <Badge color="green">Б: {selectedRecord.protein} Г</Badge>
-            <Badge color="yellow">Ж: {selectedRecord.fat} Г</Badge>
-            <Badge color="cyan">У: {selectedRecord.carbs} Г</Badge>
+          <Group gap="xs" mb="xs">
+            <Badge color="green">Б: {selectedRecord.protein} г</Badge>
+            <Badge color="yellow">Ж: {selectedRecord.fat} г</Badge>
+            <Badge color="cyan">У: {selectedRecord.carbs} г</Badge>
           </Group>
-
           {!isAdmin && (
-            <Group mt="md" justify="space-between">
-              <Button size="xs" variant="light" leftIcon={<IconEdit size={16} />} onClick={() => {
+            <Group justify="space-between">
+              <Button size="xs" leftIcon={<IconEdit size={14} />} variant="light" onClick={() => {
                 setFormVisible(true);
                 setCalories(selectedRecord.calories);
                 setProtein(selectedRecord.protein);
@@ -180,14 +177,14 @@ export default function ClientNutrition({
               }}>
                 Редактировать
               </Button>
-              <Button size="xs" color="red" leftIcon={<IconTrash size={16} />} onClick={handleDelete}>
+              <Button size="xs" color="red" leftIcon={<IconTrash size={14} />} onClick={handleDelete}>
                 Удалить
               </Button>
             </Group>
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm" ta="center">
+        <Text size="sm" color="dimmed" ta="center" mb="md">
           Нет данных за выбранный день
         </Text>
       )}
@@ -195,8 +192,8 @@ export default function ClientNutrition({
       {!isAdmin && !formVisible && (
         <Button
           fullWidth
-          variant="filled"
           color="pink"
+          leftIcon={<IconPlus size={16} />}
           onClick={() => {
             setCalories('');
             setProtein('');
@@ -204,14 +201,13 @@ export default function ClientNutrition({
             setCarbs('');
             setFormVisible(true);
           }}
-          leftIcon={<IconPlus size={16} />}
         >
           Внести КБЖУ
         </Button>
       )}
 
       {!isAdmin && formVisible && (
-        <Paper withBorder p="md" radius="md" mt="md">
+        <Paper withBorder radius="md" p="md" mt="md" shadow="sm">
           <Grid gutter="md">
             <Grid.Col span={6}>
               <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -226,20 +222,22 @@ export default function ClientNutrition({
               <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
             </Grid.Col>
           </Grid>
-          <Button mt="md" fullWidth color="pink" onClick={handleSave}>
+          <Button fullWidth mt="md" color="pink" onClick={handleSave}>
             💾 Сохранить
           </Button>
         </Paper>
       )}
 
-      <Divider my="md" label="Сводка" />
+      <Divider my="md" label="Сводка" labelPosition="center" />
 
       {loading ? (
-        <Center><Loader /></Center>
+        <Center>
+          <Loader />
+        </Center>
       ) : (
         <Stack>
           {weekly && (
-            <Paper withBorder p="md" radius="md" shadow="xs">
+            <Paper withBorder radius="md" p="md" shadow="xs">
               <Text fw={600} mb={4}>Итого за неделю</Text>
               <Group gap="xs">
                 <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -250,7 +248,7 @@ export default function ClientNutrition({
             </Paper>
           )}
           {monthly && (
-            <Paper withBorder p="md" radius="md" shadow="xs">
+            <Paper withBorder radius="md" p="md" shadow="xs">
               <Text fw={600} mb={4}>Итого за месяц</Text>
               <Group gap="xs">
                 <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
@@ -276,7 +274,13 @@ export default function ClientNutrition({
           zIndex: 1000,
         }}
       >
-        <Button variant="light" color="blue" size="sm" onClick={onBack} leftIcon={<IconArrowBack size={16} />}>
+        <Button
+          variant="light"
+          color="blue"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<IconArrowBack size={14} />}
+        >
           Назад к профилю
         </Button>
       </Box>
