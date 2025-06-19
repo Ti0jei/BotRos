@@ -74,32 +74,59 @@ export default function ResetPassword({ onBack }: Props) {
   };
 
   return (
-    <Container size="xs" mt="xl">
-      <Title order={2} mb="md">Новый пароль</Title>
+    <div
+      style={{
+        backgroundImage: 'url(/images/reset-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <Container
+        size="xs"
+        p="xl"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          borderRadius: 16,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <Title order={2} mb="md" ta="center">
+          Новый пароль
+        </Title>
 
-      {done ? (
-        <>
-          <Text mb="md">Пароль успешно обновлён. Теперь войдите с новым паролем.</Text>
-          <Center>
-            <Button color="pink" onClick={onBack}>Назад ко входу</Button>
-          </Center>
-        </>
-      ) : (
-        <Stack>
-          <PasswordInput
-            label="Новый пароль"
-            placeholder="Введите новый пароль"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-          />
-          <Button onClick={handleSubmit} loading={loading} color="pink">
-            Сохранить пароль
-          </Button>
-          <Button variant="subtle" onClick={onBack} color="gray">
-            Назад ко входу
-          </Button>
-        </Stack>
-      )}
-    </Container>
+        {done ? (
+          <>
+            <Text mb="md" ta="center">
+              Пароль успешно обновлён. Теперь войдите с новым паролем.
+            </Text>
+            <Center>
+              <Button color="pink" onClick={onBack}>
+                Назад ко входу
+              </Button>
+            </Center>
+          </>
+        ) : (
+          <Stack>
+            <PasswordInput
+              label="Новый пароль"
+              placeholder="Введите новый пароль"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+            />
+            <Button onClick={handleSubmit} loading={loading} color="pink">
+              Сохранить пароль
+            </Button>
+            <Button variant="subtle" onClick={onBack} color="gray">
+              Назад ко входу
+            </Button>
+          </Stack>
+        )}
+      </Container>
+    </div>
   );
 }
