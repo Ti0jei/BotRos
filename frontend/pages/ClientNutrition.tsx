@@ -1,4 +1,3 @@
-// frontend/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -156,7 +155,7 @@ export default function ClientNutrition({
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#f5d4ca',
+        backgroundColor: isAdmin ? '#f5d4ca' : '#e8b3a6',
         padding: 16,
         display: 'flex',
         justifyContent: 'center',
@@ -167,7 +166,8 @@ export default function ClientNutrition({
         sx={{
           width: '100%',
           maxWidth: 420,
-          backgroundColor: '#fff',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(8px)',
           borderRadius: 24,
           boxShadow: '0 0 12px rgba(0,0,0,0.1)',
           padding: 20,

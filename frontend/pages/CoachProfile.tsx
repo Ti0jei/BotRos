@@ -18,7 +18,6 @@ import dayjs from 'dayjs';
 import {
   IconAlarm,
   IconClock,
-  IconUserPlus,
   IconChevronDown,
   IconChevronUp,
   IconLogout,
@@ -121,6 +120,14 @@ export default function CoachProfile({
     }
   };
 
+  const pinkButtonStyle = {
+    root: {
+      color: '#d6336c',
+      borderRadius: 8,
+      '&:hover': { backgroundColor: '#ffe3ed' },
+    },
+  };
+
   return (
     <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
@@ -140,11 +147,11 @@ export default function CoachProfile({
               Привет, {profile.name} 👋
             </Title>
 
-            <Button fullWidth onClick={onOpenClients} variant="subtle" color="pink">
+            <Button fullWidth onClick={onOpenClients} variant="subtle" styles={pinkButtonStyle}>
               Клиенты
             </Button>
 
-            <Button fullWidth onClick={onOpenSchedule} variant="subtle" color="pink">
+            <Button fullWidth onClick={onOpenSchedule} variant="subtle" styles={pinkButtonStyle}>
               Назначить тренировку
             </Button>
 
@@ -195,7 +202,7 @@ export default function CoachProfile({
                         <Button
                           size="xs"
                           variant="subtle"
-                          color="orange"
+                          styles={pinkButtonStyle}
                           onClick={() => sendReminder(t.id)}
                         >
                           Напомнить
@@ -218,9 +225,9 @@ export default function CoachProfile({
         <Button
           fullWidth
           variant="subtle"
-          color="pink"
           onClick={() => setShowCode((p) => !p)}
           rightIcon={showCode ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
+          styles={pinkButtonStyle}
         >
           {showCode ? 'Скрыть код для регистрации' : 'Показать код для регистрации'}
         </Button>
@@ -247,10 +254,10 @@ export default function CoachProfile({
         >
           <Button
             variant="subtle"
-            color="pink"
             size="sm"
             onClick={onLogout}
             leftIcon={<IconLogout size={16} />}
+            styles={pinkButtonStyle}
           >
             Выйти
           </Button>

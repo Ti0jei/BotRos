@@ -1,283 +1,325 @@
-// frontend/pages/AdminClients.tsx
 import { useEffect, useState } from 'react';
 import {
-  Container,
+  Box,
   Title,
-  Card,
+  Paper,
+  Group,
+  Badge,
   Text,
   Button,
+  NumberInput,
+  Divider,
+  Center,
   Stack,
-  Group,
   Loader,
-  Badge,
-  TextInput,
-  Box,
+  Grid,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import {
-  IconCash,
-  IconChefHat,
-  IconGift,
-  IconPencil,
+  IconCalendar,
+  IconChevronLeft,
+  IconChevronRight,
   IconTrash,
+  IconEdit,
+  IconPlus,
+  IconArrowBack,
 } from '@tabler/icons-react';
-import ClientPayments from './ClientPayments';
-import ClientNutrition from './ClientNutrition';
+import dayjs from 'dayjs';
 
-interface Client {
-  id: string;
-  name: string;
-  lastName?: string | null;
-  internalTag?: string | null;
-  age: number;
+interface NutritionDay {
+  date: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
 }
 
-interface PaymentBlock {
-  id: string;
-  paidTrainings: number;
-  pricePerTraining: number;
-  used: number;
+interface Summary {
+  period: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
 }
 
-export default function AdminClients({
+export default function ClientNutrition({
+  userId,
   onBack,
-  onOpenHistory,
+  isAdmin = false,
 }: {
+  userId: string;
   onBack: () => void;
-  onOpenHistory: (userId: string) => void;
+  isAdmin?: boolean;
 }) {
-  const [clients, setClients] = useState<Client[]>([]);
+  const [data, setData] = useState<NutritionDay[]>([]);
+  const [weekly, setWeekly] = useState<Summary | null>(null);
+  const [monthly, setMonthly] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [view, setView] = useState<'payments' | 'nutrition' | null>(null);
-  const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [internalTagValue, setInternalTagValue] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [formVisible, setFormVisible] = useState(false);
+
+  const [calories, setCalories] = useState<number | ''>('');
+  const [protein, setProtein] = useState<number | ''>('');
+  const [fat, setFat] = useState<number | ''>('');
+  const [carbs, setCarbs] = useState<number | ''>('');
+
   const API = import.meta.env.VITE_API_BASE_URL;
-
-  const loadClients = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`${API}/api/clients`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!Array.isArray(data)) {
-        setError('Ошибка доступа или авторизации');
-        setClients([]);
-        setLoading(false);
-        return;
-      }
-      setClients(data);
-      setLoading(false);
-      for (const client of data) loadBlock(client.id);
-    } catch (err) {
-      console.error('Ошибка запроса:', err);
-      setError('Сервер недоступен');
-      setLoading(false);
-    }
+  const token = localStorage.getItem('token');
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   };
 
-  const loadBlock = async (userId: string) => {
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = res.ok ? await res.json() : null;
-      setBlockMap((prev) => ({ ...prev, [userId]: data }));
-    } catch (err) {
-      console.error(`Ошибка загрузки блока оплаты для ${userId}:`, err);
-    }
-  };
-
-  const deleteClient = async (id: string) => {
-    if (!window.confirm('Вы точно хотите удалить клиента?')) return;
-    const token = localStorage.getItem('token');
-    await fetch(`${API}/api/clients/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    loadClients();
-  };
-
-  const startEditing = (client: Client) => {
-    setEditingId(client.id);
-    setInternalTagValue(client.internalTag ?? '');
-  };
-
-  const cancelEditing = () => {
-    setEditingId(null);
-    setInternalTagValue('');
-  };
-
-  const saveInternalTag = async (id: string) => {
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch(`${API}/api/clients/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ internalTag: internalTagValue }),
-      });
-      if (res.ok) {
-        loadClients();
-        cancelEditing();
-      } else {
-        alert('Ошибка при сохранении');
-      }
-    } catch (err) {
-      console.error('Ошибка при PATCH /clients/:id', err);
-    }
+  const loadData = () => {
+    setLoading(true);
+    Promise.all([
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
+    ])
+      .then(([nutrition, week, month]) => {
+        setData(Array.isArray(nutrition) ? nutrition : []);
+        setWeekly(week);
+        setMonthly(month);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    loadClients();
-  }, []);
+    loadData();
+  }, [userId]);
 
-  if (selectedClient && view === 'payments') {
-    return <ClientPayments client={selectedClient} onBack={() => {
-      setSelectedClient(null);
-      setView(null);
-    }} />;
-  }
+  const selectedRecord = data.find(
+    (d) => dayjs(d.date).format('YYYY-MM-DD') === dayjs(selectedDate).format('YYYY-MM-DD')
+  );
 
-  if (selectedClient && view === 'nutrition') {
-    return <ClientNutrition userId={selectedClient.id} isAdmin={true} onBack={() => {
-      setSelectedClient(null);
-      setView(null);
-    }} />;
-  }
+  const handleSave = async () => {
+    if (!selectedDate || calories === '' || protein === '' || fat === '' || carbs === '') {
+      alert('Заполните все поля');
+      return;
+    }
+
+    const res = await fetch(`${API}/api/nutrition`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        userId,
+        date: dayjs(selectedDate).format('YYYY-MM-DD'),
+        calories,
+        protein,
+        fat,
+        carbs,
+      }),
+    });
+
+    if (res.ok) {
+      loadData();
+      setFormVisible(false);
+    } else {
+      alert('Ошибка при сохранении');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedDate) return;
+    const res = await fetch(
+      `${API}/api/nutrition/${userId}/${dayjs(selectedDate).format('YYYY-MM-DD')}`,
+      { method: 'DELETE', headers }
+    );
+    if (res.ok) {
+      loadData();
+    } else {
+      alert('Ошибка при удалении');
+    }
+  };
+
+  const cardStyle = {
+    background: '#ffffff',
+    borderRadius: 12,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+  };
+
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    transition: 'background-color 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
 
   return (
-    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
-      <Container size="xs" py="md">
-        <Title order={2} mb="md" style={{ color: '#222' }}>Клиенты</Title>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: isAdmin ? '#f5d4ca' : '#e8b3a6',
+        padding: 16,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'start',
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: 420,
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: 24,
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
+          padding: 20,
+        }}
+      >
+        <Title order={2} ta="center" mb="md" color="#222">
+          {isAdmin ? 'Питание клиента' : 'Моё питание'}
+        </Title>
+
+        <DatePickerInput
+          value={selectedDate}
+          onChange={(val) => {
+            setSelectedDate(val);
+            setFormVisible(false);
+          }}
+          maxDate={new Date()}
+          leftSection={<IconCalendar size={16} />}
+          nextIcon={<IconChevronRight size={16} />}
+          previousIcon={<IconChevronLeft size={16} />}
+          mx="auto"
+          mb="md"
+        />
+
+        {selectedRecord ? (
+          <Paper p="md" mb="md" style={cardStyle}>
+            <Group justify="space-between" mb="xs">
+              <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
+              <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
+            </Group>
+            <Group gap="xs" mb="xs">
+              <Badge color="green">Б: {selectedRecord.protein} г</Badge>
+              <Badge color="yellow">Ж: {selectedRecord.fat} г</Badge>
+              <Badge color="cyan">У: {selectedRecord.carbs} г</Badge>
+            </Group>
+            {!isAdmin && (
+              <Group justify="space-between">
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  sx={pinkButtonSx}
+                  onClick={() => {
+                    setFormVisible(true);
+                    setCalories(selectedRecord.calories);
+                    setProtein(selectedRecord.protein);
+                    setFat(selectedRecord.fat);
+                    setCarbs(selectedRecord.carbs);
+                  }}
+                  leftIcon={<IconEdit size={14} />}
+                >
+                  Редактировать
+                </Button>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="red"
+                  onClick={handleDelete}
+                  leftIcon={<IconTrash size={14} />}
+                >
+                  Удалить
+                </Button>
+              </Group>
+            )}
+          </Paper>
+        ) : (
+          <Text size="sm" color="dimmed" ta="center" mb="md">
+            Нет данных за выбранный день
+          </Text>
+        )}
+
+        {!isAdmin && !formVisible && (
+          <Button
+            fullWidth
+            variant="subtle"
+            sx={pinkButtonSx}
+            leftIcon={<IconPlus size={16} />}
+            onClick={() => {
+              setCalories('');
+              setProtein('');
+              setFat('');
+              setCarbs('');
+              setFormVisible(true);
+            }}
+            mb="md"
+          >
+            Внести КБЖУ
+          </Button>
+        )}
+
+        {!isAdmin && formVisible && (
+          <Paper radius="md" p="md" mt="md" style={cardStyle}>
+            <Grid gutter="md">
+              <Grid.Col span={6}>
+                <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} hideControls />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} hideControls />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
+              </Grid.Col>
+            </Grid>
+            <Button fullWidth mt="md" color="pink" onClick={handleSave}>
+              💾 Сохранить
+            </Button>
+          </Paper>
+        )}
+
+        <Divider my="md" label="Сводка" labelPosition="center" />
 
         {loading ? (
-          <Loader />
-        ) : error ? (
-          <Text color="red">{error}</Text>
+          <Center><Loader /></Center>
         ) : (
           <Stack>
-            {clients.map((client) => {
-              const block = blockMap[client.id];
-              const remaining = block ? block.paidTrainings - block.used : 0;
-              const isEditing = editingId === client.id;
-
-              return (
-                <Card key={client.id} withBorder radius="md" p="md" shadow="sm">
-                  <Stack spacing="xs">
-                    <Group position="apart">
-                      <Text fw={600}>
-                        {client.name} {client.lastName ?? ''}{' '}
-                        {client.internalTag && (
-                          <Text span color="dimmed">({client.internalTag})</Text>
-                        )}
-                      </Text>
-                      <div
-                        style={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: '50%',
-                          backgroundColor: block ? 'green' : 'red',
-                        }}
-                      />
-                    </Group>
-
-                    <Text size="sm" color="dimmed">{client.age} лет</Text>
-
-                    {isEditing ? (
-                      <Stack spacing="xs">
-                        <TextInput
-                          value={internalTagValue}
-                          onChange={(e) => setInternalTagValue(e.currentTarget.value)}
-                          placeholder="Доп. имя"
-                        />
-                        <Button variant="outline" color="pink" fullWidth>
-                          Толстый
-                        </Button>
-                        <Button color="green" fullWidth onClick={() => saveInternalTag(client.id)}>
-                          💾 Сохранить
-                        </Button>
-                        <Button color="gray" fullWidth onClick={cancelEditing}>
-                          Отмена
-                        </Button>
-                      </Stack>
-                    ) : (
-                      <>
-                        {block && (
-                          <Group spacing="xs">
-                            <Badge color={remaining === 0 ? 'red' : 'green'}>
-                              Осталось: {remaining}
-                            </Badge>
-                            <Badge color="teal">
-                              Цена: {block.pricePerTraining} ₽
-                            </Badge>
-                          </Group>
-                        )}
-
-                        <Group grow mt="xs">
-                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconChefHat size={16} />} onClick={() => {
-                            setSelectedClient(client);
-                            setView('nutrition');
-                          }}>
-                            Питание
-                          </Button>
-
-                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconCash size={16} />} onClick={() => {
-                            setSelectedClient(client);
-                            setView('payments');
-                          }}>
-                            Оплата
-                          </Button>
-                        </Group>
-
-                        <Group grow mt={6}>
-                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconGift size={16} />} onClick={() => onOpenHistory(client.id)}>
-                            История оплат
-                          </Button>
-                        </Group>
-
-                        <Group grow mt={6}>
-                          <Button variant="outline" color="orange" fullWidth leftIcon={<IconPencil size={16} />} onClick={() => startEditing(client)}>Псевдоним</Button>
-                          <Button variant="outline" color="red" fullWidth leftIcon={<IconTrash size={16} />} onClick={() => deleteClient(client.id)}>Удалить</Button>
-                        </Group>
-                      </>
-                    )}
-                  </Stack>
-                </Card>
-              );
-            })}
+            {weekly && (
+              <Paper p="md" style={cardStyle}>
+                <Text fw={600} mb={4}>Итого за неделю</Text>
+                <Group gap="xs">
+                  <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
+                  <Badge color="green">Б: {weekly.protein}</Badge>
+                  <Badge color="yellow">Ж: {weekly.fat}</Badge>
+                  <Badge color="cyan">У: {weekly.carbs}</Badge>
+                </Group>
+              </Paper>
+            )}
+            {monthly && (
+              <Paper p="md" style={cardStyle}>
+                <Text fw={600} mb={4}>Итого за месяц</Text>
+                <Group gap="xs">
+                  <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
+                  <Badge color="green">Б: {monthly.protein}</Badge>
+                  <Badge color="yellow">Ж: {monthly.fat}</Badge>
+                  <Badge color="cyan">У: {monthly.carbs}</Badge>
+                </Group>
+              </Paper>
+            )}
           </Stack>
         )}
 
-        <Box
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-            zIndex: 1000,
-          }}
+        <Button
+          fullWidth
+          mt="lg"
+          variant="subtle"
+          sx={pinkButtonSx}
+          leftIcon={<IconArrowBack size={14} />}
+          onClick={onBack}
         >
-          <Button
-            variant="subtle"
-            color="pink"
-            size="sm"
-            onClick={onBack}
-            leftIcon={<span style={{ fontSize: 16 }}>←</span>}
-          >
-            Назад к профилю
-          </Button>
-        </Box>
-      </Container>
+          Назад к профилю
+        </Button>
+      </Box>
     </Box>
   );
 }
