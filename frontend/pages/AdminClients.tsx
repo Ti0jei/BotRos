@@ -14,7 +14,13 @@ import {
   Box,
   Divider,
 } from '@mantine/core';
-import { IconCash, IconKnifeFork, IconGift, IconPencil, IconTrash } from '@tabler/icons-react';
+import {
+  IconCash,
+  IconChefHat,
+  IconGift,
+  IconPencil,
+  IconTrash,
+} from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 import ClientNutrition from './ClientNutrition';
 
@@ -191,8 +197,8 @@ export default function AdminClients({
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
                         />
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
-                        <Button color="gray" onClick={cancelEditing}>Отмена</Button>
+                        <Button color="green" fullWidth onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
+                        <Button color="gray" fullWidth onClick={cancelEditing}>Отмена</Button>
                       </Group>
                     ) : (
                       <>
@@ -208,14 +214,14 @@ export default function AdminClients({
                         )}
 
                         <Group grow mt="xs">
-                          <Button variant="outline" color="pink" leftIcon={<IconKnifeFork size={16} />} onClick={() => {
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconChefHat size={16} />} onClick={() => {
                             setSelectedClient(client);
                             setView('nutrition');
                           }}>
                             Питание
                           </Button>
 
-                          <Button variant="outline" color="pink" leftIcon={<IconCash size={16} />} onClick={() => {
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconCash size={16} />} onClick={() => {
                             setSelectedClient(client);
                             setView('payments');
                           }}>
@@ -224,14 +230,14 @@ export default function AdminClients({
                         </Group>
 
                         <Group grow mt={6}>
-                          <Button variant="outline" color="pink" leftIcon={<IconGift size={16} />} onClick={() => onOpenHistory(client.id)}>
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconGift size={16} />} onClick={() => onOpenHistory(client.id)}>
                             История оплат
                           </Button>
                         </Group>
 
                         <Group grow mt={6}>
-                          <Button variant="filled" color="orange" leftIcon={<IconPencil size={16} />} onClick={() => startEditing(client)}>Псевдоним</Button>
-                          <Button variant="filled" color="red" leftIcon={<IconTrash size={16} />} onClick={() => deleteClient(client.id)}>Удалить</Button>
+                          <Button variant="outline" color="orange" fullWidth leftIcon={<IconPencil size={16} />} onClick={() => startEditing(client)}>Псевдоним</Button>
+                          <Button variant="outline" color="red" fullWidth leftIcon={<IconTrash size={16} />} onClick={() => deleteClient(client.id)}>Удалить</Button>
                         </Group>
                       </>
                     )}
