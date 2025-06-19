@@ -10,7 +10,14 @@ import {
   ActionIcon,
   Tooltip,
 } from '@mantine/core';
-import { IconBell, IconBellOff } from '@tabler/icons-react';
+import {
+  IconBell,
+  IconBellOff,
+  IconDumbbell,
+  IconSoup,
+  IconSettings,
+  IconLogout,
+} from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
 import ClientNutrition from './ClientNutrition';
 
@@ -170,11 +177,25 @@ export default function Profile({
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button fullWidth radius="md" variant="light" color="pink" onClick={() => setSection('trainings')}>
+            <Button
+              fullWidth
+              radius="md"
+              variant="light"
+              color="pink"
+              leftIcon={<IconDumbbell size={18} />}
+              onClick={() => setSection('trainings')}
+            >
               Мои тренировки
             </Button>
 
-            <Button fullWidth radius="md" variant="light" color="pink" onClick={() => setSection('nutrition')}>
+            <Button
+              fullWidth
+              radius="md"
+              variant="light"
+              color="pink"
+              leftIcon={<IconSoup size={18} />}
+              onClick={() => setSection('nutrition')}
+            >
               Моё питание
             </Button>
 
@@ -182,6 +203,7 @@ export default function Profile({
               fullWidth
               radius="md"
               disabled
+              leftIcon={<IconDumbbell size={18} />}
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
               Замеры (скоро)
@@ -191,6 +213,7 @@ export default function Profile({
               fullWidth
               radius="md"
               disabled
+              leftIcon={<IconDumbbell size={18} />}
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
               Фото (скоро)
@@ -200,6 +223,7 @@ export default function Profile({
               fullWidth
               radius="md"
               disabled
+              leftIcon={<IconSettings size={18} />}
               variant="light"
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
@@ -207,7 +231,15 @@ export default function Profile({
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth radius="md" variant="light" color="pink" onClick={onOpenAdmin}>
+              <Button
+                fullWidth
+                radius="md"
+                variant="light"
+                color="pink"
+                mt="sm"
+                leftIcon={<IconSettings size={18} />}
+                onClick={onOpenAdmin}
+              >
                 Панель тренера
               </Button>
             )}
@@ -216,6 +248,7 @@ export default function Profile({
               fullWidth
               mt="md"
               radius="md"
+              leftIcon={<IconLogout size={18} />}
               styles={{ root: { backgroundColor: '#ff6b6b', color: '#fff' } }}
               onClick={handleLogout}
             >
