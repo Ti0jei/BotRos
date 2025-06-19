@@ -144,8 +144,9 @@ export default function ClientNutrition({
     backgroundColor: 'transparent',
     color: '#d6336c',
     fontWeight: 500,
+    border: '1px solid #d6336c',
     borderRadius: 8,
-    transition: 'background-color 0.2s ease',
+    whiteSpace: 'nowrap',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
@@ -160,6 +161,7 @@ export default function ClientNutrition({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'start',
+        paddingBottom: 80,
       }}
     >
       <Box
@@ -204,28 +206,16 @@ export default function ClientNutrition({
             </Group>
             {!isAdmin && (
               <Group justify="space-between">
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  sx={pinkButtonSx}
-                  onClick={() => {
-                    setFormVisible(true);
-                    setCalories(selectedRecord.calories);
-                    setProtein(selectedRecord.protein);
-                    setFat(selectedRecord.fat);
-                    setCarbs(selectedRecord.carbs);
-                  }}
-                  leftIcon={<IconEdit size={14} />}
-                >
+                <Button size="xs" sx={pinkButtonSx} onClick={() => {
+                  setFormVisible(true);
+                  setCalories(selectedRecord.calories);
+                  setProtein(selectedRecord.protein);
+                  setFat(selectedRecord.fat);
+                  setCarbs(selectedRecord.carbs);
+                }} leftIcon={<IconEdit size={14} />}>
                   Редактировать
                 </Button>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="red"
-                  onClick={handleDelete}
-                  leftIcon={<IconTrash size={14} />}
-                >
+                <Button size="xs" color="red" variant="subtle" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
                   Удалить
                 </Button>
               </Group>
@@ -240,7 +230,6 @@ export default function ClientNutrition({
         {!isAdmin && !formVisible && (
           <Button
             fullWidth
-            variant="subtle"
             sx={pinkButtonSx}
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
@@ -308,14 +297,29 @@ export default function ClientNutrition({
             )}
           </Stack>
         )}
+      </Box>
 
+      {/* Кнопка назад — фиксированная снизу */}
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
         <Button
-          fullWidth
-          mt="lg"
           variant="subtle"
-          sx={pinkButtonSx}
-          leftIcon={<IconArrowBack size={14} />}
+          color="pink"
+          size="sm"
           onClick={onBack}
+          leftIcon={<IconArrowBack size={14} />}
+          sx={pinkButtonSx}
         >
           Назад к профилю
         </Button>
