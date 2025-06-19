@@ -12,6 +12,7 @@ import {
   Center,
   Stack,
   Box,
+  Divider,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import {
@@ -121,19 +122,29 @@ export default function CoachProfile({
   };
 
   return (
-    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Paper p="md" radius="md" shadow="md" withBorder>
+        <Paper
+          p="md"
+          radius="lg"
+          shadow="md"
+          withBorder
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.3)',
+          }}
+        >
           <Stack spacing="sm">
             <Title order={3} ta="center">
               Привет, {profile.name} 👋
             </Title>
 
-            <Button fullWidth onClick={onOpenClients} color="pink" variant="light">
+            <Button fullWidth onClick={onOpenClients} variant="subtle" color="pink">
               Клиенты
             </Button>
 
-            <Button fullWidth onClick={onOpenSchedule} color="pink" variant="light">
+            <Button fullWidth onClick={onOpenSchedule} variant="subtle" color="pink">
               Назначить тренировку
             </Button>
 
@@ -147,13 +158,14 @@ export default function CoachProfile({
           </Stack>
         </Paper>
 
-        {/* Тренировки */}
+        <Divider my="lg" />
+
         {loading ? (
           <Center mt="lg">
             <Loader size="sm" />
           </Center>
         ) : upcomingTrainings.length > 0 ? (
-          <Paper mt="lg" p="md" radius="md" shadow="sm" withBorder>
+          <Paper mt="sm" p="md" radius="md" shadow="xs" withBorder>
             <Group mb="xs">
               <IconAlarm size={18} />
               <Text fw={600}>Ближайшие тренировки сегодня</Text>
@@ -201,12 +213,12 @@ export default function CoachProfile({
           </Text>
         )}
 
-        {/* Код приглашения */}
+        <Divider my="lg" />
+
         <Button
           fullWidth
           variant="subtle"
           color="pink"
-          mt="lg"
           onClick={() => setShowCode((p) => !p)}
           rightIcon={showCode ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
         >
@@ -235,7 +247,7 @@ export default function CoachProfile({
         >
           <Button
             variant="subtle"
-            color="red"
+            color="pink"
             size="sm"
             onClick={onLogout}
             leftIcon={<IconLogout size={16} />}
