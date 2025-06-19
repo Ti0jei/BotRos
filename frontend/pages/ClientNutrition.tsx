@@ -1,4 +1,3 @@
-// frontend/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -141,11 +140,12 @@ export default function ClientNutrition({
     boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
   };
 
-  const pinkTextButton = {
+  const pinkButtonStyle = {
     root: {
       backgroundColor: 'transparent',
       color: '#d6336c',
       fontWeight: 500,
+      borderRadius: 8,
       '&:hover': {
         backgroundColor: '#ffe3ed',
       },
@@ -195,16 +195,28 @@ export default function ClientNutrition({
             </Group>
             {!isAdmin && (
               <Group justify="space-between">
-                <Button size="xs" variant="subtle" styles={pinkTextButton} onClick={() => {
-                  setFormVisible(true);
-                  setCalories(selectedRecord.calories);
-                  setProtein(selectedRecord.protein);
-                  setFat(selectedRecord.fat);
-                  setCarbs(selectedRecord.carbs);
-                }} leftIcon={<IconEdit size={14} />}>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  styles={pinkButtonStyle}
+                  onClick={() => {
+                    setFormVisible(true);
+                    setCalories(selectedRecord.calories);
+                    setProtein(selectedRecord.protein);
+                    setFat(selectedRecord.fat);
+                    setCarbs(selectedRecord.carbs);
+                  }}
+                  leftIcon={<IconEdit size={14} />}
+                >
                   Редактировать
                 </Button>
-                <Button size="xs" variant="subtle" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="red"
+                  onClick={handleDelete}
+                  leftIcon={<IconTrash size={14} />}
+                >
                   Удалить
                 </Button>
               </Group>
@@ -220,7 +232,7 @@ export default function ClientNutrition({
           <Button
             fullWidth
             variant="subtle"
-            styles={pinkTextButton}
+            styles={pinkButtonStyle}
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
               setCalories('');
@@ -292,7 +304,7 @@ export default function ClientNutrition({
           fullWidth
           mt="lg"
           variant="subtle"
-          styles={pinkTextButton}
+          styles={pinkButtonStyle}
           leftIcon={<IconArrowBack size={14} />}
           onClick={onBack}
         >
