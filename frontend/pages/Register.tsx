@@ -64,13 +64,11 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       const data = await res.json();
 
       if (res.ok) {
-        // Сохраняем для автоподстановки при входе
         sessionStorage.setItem('lastEmail', email);
         sessionStorage.setItem('lastPassword', password);
 
-        setSuccess(true); // сначала меняем состояние...
+        setSuccess(true);
 
-        // ...потом уведомляем
         showNotification({
           title: 'Проверьте почту',
           message: data.message || 'На email отправлено письмо для подтверждения.',
@@ -89,77 +87,100 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   const handleGoToLogin = () => {
     sessionStorage.setItem('lastEmail', email);
     sessionStorage.setItem('lastPassword', password);
-    onRegistered(); // переход ко входу
+    onRegistered();
   };
 
   return (
-    <Paper shadow="md" p="xl" withBorder>
-      <Stack>
-        <Title order={3}>Регистрация</Title>
+    <div
+      style={{
+        backgroundImage: 'url(/images/reg-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <Paper
+        shadow="md"
+        p="xl"
+        withBorder
+        style={{
+          maxWidth: 400,
+          width: '100%',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          borderRadius: 16,
+        }}
+      >
+        <Stack>
+          <Title order={3} ta="center">Регистрация</Title>
 
-        {error && (
-          <Notification
-            color="red"
-            icon={<IconAlertCircle size={18} />}
-            withCloseButton
-            onClose={() => setError(null)}
-          >
-            {error}
-          </Notification>
-        )}
+          {error && (
+            <Notification
+              color="red"
+              icon={<IconAlertCircle size={18} />}
+              withCloseButton
+              onClose={() => setError(null)}
+            >
+              {error}
+            </Notification>
+          )}
 
-        <TextInput
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={success}
-        />
+          <TextInput
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={success}
+          />
 
-        <PasswordInput
-          label="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={success}
-        />
+          <PasswordInput
+            label="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={success}
+          />
 
-        <TextInput
-          label="Имя"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={success}
-        />
+          <TextInput
+            label="Имя"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={success}
+          />
 
-        <TextInput
-          label="Фамилия"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          disabled={success}
-        />
+          <TextInput
+            label="Фамилия"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            disabled={success}
+          />
 
-        <TextInput
-          label="Возраст"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          disabled={success}
-        />
+          <TextInput
+            label="Возраст"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            disabled={success}
+          />
 
-        <TextInput
-          label="Инвайт-код"
-          value={inviteCode}
-          onChange={(e) => setInviteCode(e.target.value)}
-          disabled={success}
-        />
+          <TextInput
+            label="Инвайт-код"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            disabled={success}
+          />
 
-        {!success ? (
-          <Button fullWidth onClick={handleSubmit}>
-            Зарегистрироваться
-          </Button>
-        ) : (
-          <Button fullWidth color="blue" onClick={handleGoToLogin}>
-            Перейти ко входу
-          </Button>
-        )}
-      </Stack>
-    </Paper>
+          {!success ? (
+            <Button fullWidth onClick={handleSubmit} color="pink">
+              Зарегистрироваться
+            </Button>
+          ) : (
+            <Button fullWidth color="blue" onClick={handleGoToLogin}>
+              Перейти ко входу
+            </Button>
+          )}
+        </Stack>
+      </Paper>
+    </div>
   );
 }
