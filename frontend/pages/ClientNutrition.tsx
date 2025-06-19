@@ -219,8 +219,8 @@ export default function ClientNutrition({
         {!isAdmin && !formVisible && (
           <Button
             fullWidth
-            variant="filled"
-            color="pink"
+            variant="subtle"
+            styles={pinkTextButton}
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
               setCalories('');
