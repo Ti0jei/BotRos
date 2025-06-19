@@ -136,26 +136,34 @@ export default function ClientNutrition({
   };
 
   return (
-    <div
+    <Box
       style={{
+        minHeight: '100vh',
         backgroundImage: 'url(/images/client-bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        minHeight: '100vh',
-        padding: '16px 0',
+        padding: 16,
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'start',
       }}
     >
-      <Container size="xs" style={{
-        background: 'rgba(255,255,255,0.4)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 80,
-      }}>
-        <Title order={2} ta="center" mb="md">Моё питание</Title>
+      <Container
+        size="xs"
+        p="md"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          borderRadius: 20,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          width: '100%',
+          maxWidth: 420,
+          marginBottom: 80,
+        }}
+      >
+        <Title order={2} ta="center" mb="md">
+          Моё питание
+        </Title>
 
         <DatePickerInput
           value={selectedDate}
@@ -172,7 +180,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper withBorder radius="md" p="md" mb="md" shadow="sm" style={{ background: 'rgba(255,255,255,0.6)' }}>
+          <Paper withBorder radius="md" p="md" mb="md" shadow="sm">
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -184,7 +192,7 @@ export default function ClientNutrition({
             </Group>
             {!isAdmin && (
               <Group justify="space-between">
-                <Button size="xs" variant="light" leftIcon={<IconEdit size={14} />} onClick={() => {
+                <Button size="xs" leftIcon={<IconEdit size={14} />} variant="light" onClick={() => {
                   setFormVisible(true);
                   setCalories(selectedRecord.calories);
                   setProtein(selectedRecord.protein);
@@ -223,7 +231,7 @@ export default function ClientNutrition({
         )}
 
         {!isAdmin && formVisible && (
-          <Paper withBorder radius="md" p="md" mt="md" shadow="sm" style={{ background: 'rgba(255,255,255,0.6)' }}>
+          <Paper withBorder radius="md" p="md" mt="md" shadow="sm">
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -247,13 +255,11 @@ export default function ClientNutrition({
         <Divider my="md" label="Сводка" labelPosition="center" />
 
         {loading ? (
-          <Center>
-            <Loader />
-          </Center>
+          <Center><Loader /></Center>
         ) : (
           <Stack>
             {weekly && (
-              <Paper withBorder radius="md" p="md" shadow="xs" style={{ background: 'rgba(255,255,255,0.6)' }}>
+              <Paper withBorder radius="md" p="md" shadow="sm" bg="white">
                 <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -264,7 +270,7 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper withBorder radius="md" p="md" shadow="xs" style={{ background: 'rgba(255,255,255,0.6)' }}>
+              <Paper withBorder radius="md" p="md" shadow="sm" bg="white">
                 <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
@@ -277,19 +283,21 @@ export default function ClientNutrition({
           </Stack>
         )}
 
-        <Box mt="lg" ta="center">
-          <Button
-            variant="light"
-            color="blue"
-            size="sm"
-            leftIcon={<IconArrowBack size={14} />}
-            onClick={onBack}
-            style={{ marginTop: 20 }}
-          >
-            Назад к профилю
-          </Button>
-        </Box>
+        <Button
+          fullWidth
+          variant="light"
+          color="blue"
+          mt="xl"
+          size="sm"
+          leftIcon={<IconArrowBack size={14} />}
+          onClick={onBack}
+          style={{
+            marginTop: 32,
+          }}
+        >
+          Назад к профилю
+        </Button>
       </Container>
-    </div>
+    </Box>
   );
 }
