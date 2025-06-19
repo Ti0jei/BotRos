@@ -156,7 +156,7 @@ export default function ClientNutrition({
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: '#e8b3a6',
+        backgroundColor: '#f5d4ca',
         padding: 16,
         display: 'flex',
         justifyContent: 'center',
@@ -175,7 +175,7 @@ export default function ClientNutrition({
         }}
       >
         <Title order={2} ta="center" mb="md" color="#222">
-          Моё питание
+          {isAdmin ? 'Питание клиента' : 'Моё питание'}
         </Title>
 
         <DatePickerInput
