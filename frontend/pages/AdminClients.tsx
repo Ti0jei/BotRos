@@ -190,19 +190,22 @@ export default function AdminClients({
                     <Text size="sm" color="dimmed">{client.age} лет</Text>
 
                     {isEditing ? (
-                      <Group grow>
+                      <Stack spacing="xs">
                         <TextInput
                           value={internalTagValue}
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
                         />
-                        <Button color="green" fullWidth style={{ whiteSpace: 'nowrap' }}>
-                          Сохранить
+                        <Button variant="outline" color="pink" fullWidth>
+                          Толстый
                         </Button>
-                        <Button color="gray" fullWidth style={{ whiteSpace: 'nowrap' }}>
+                        <Button color="green" fullWidth onClick={() => saveInternalTag(client.id)}>
+                          💾 Сохранить
+                        </Button>
+                        <Button color="gray" fullWidth onClick={cancelEditing}>
                           Отмена
                         </Button>
-                      </Group>
+                      </Stack>
                     ) : (
                       <>
                         {block && (
@@ -217,69 +220,30 @@ export default function AdminClients({
                         )}
 
                         <Group grow mt="xs">
-                          <Button
-                            variant="outline"
-                            color="pink"
-                            fullWidth
-                            leftIcon={<IconChefHat size={16} />}
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={() => {
-                              setSelectedClient(client);
-                              setView('nutrition');
-                            }}
-                          >
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconChefHat size={16} />} onClick={() => {
+                            setSelectedClient(client);
+                            setView('nutrition');
+                          }}>
                             Питание
                           </Button>
 
-                          <Button
-                            variant="outline"
-                            color="pink"
-                            fullWidth
-                            leftIcon={<IconCash size={16} />}
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={() => {
-                              setSelectedClient(client);
-                              setView('payments');
-                            }}
-                          >
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconCash size={16} />} onClick={() => {
+                            setSelectedClient(client);
+                            setView('payments');
+                          }}>
                             Оплата
                           </Button>
                         </Group>
 
                         <Group grow mt={6}>
-                          <Button
-                            variant="outline"
-                            color="pink"
-                            fullWidth
-                            leftIcon={<IconGift size={16} />}
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={() => onOpenHistory(client.id)}
-                          >
+                          <Button variant="outline" color="pink" fullWidth leftIcon={<IconGift size={16} />} onClick={() => onOpenHistory(client.id)}>
                             История оплат
                           </Button>
                         </Group>
 
                         <Group grow mt={6}>
-                          <Button
-                            variant="outline"
-                            color="orange"
-                            fullWidth
-                            leftIcon={<IconPencil size={16} />}
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={() => startEditing(client)}
-                          >
-                            Псевдоним
-                          </Button>
-                          <Button
-                            variant="outline"
-                            color="red"
-                            fullWidth
-                            leftIcon={<IconTrash size={16} />}
-                            style={{ whiteSpace: 'nowrap' }}
-                            onClick={() => deleteClient(client.id)}
-                          >
-                            Удалить
-                          </Button>
+                          <Button variant="outline" color="orange" fullWidth leftIcon={<IconPencil size={16} />} onClick={() => startEditing(client)}>Псевдоним</Button>
+                          <Button variant="outline" color="red" fullWidth leftIcon={<IconTrash size={16} />} onClick={() => deleteClient(client.id)}>Удалить</Button>
                         </Group>
                       </>
                     )}
