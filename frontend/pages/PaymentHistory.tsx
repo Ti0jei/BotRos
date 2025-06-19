@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import {
   Container,
   Title,
-  Table,
-  Button,
-  Loader,
-  Text,
+  Paper,
   Badge,
   Group,
   Stack,
+  Text,
+  Button,
+  Loader,
+  Divider,
 } from '@mantine/core';
 
 interface Props {
@@ -45,7 +46,6 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
   const loadData = async () => {
     setLoading(true);
-
     try {
       const [blocksRes, singlesRes] = await Promise.all([
         fetch(`${API}/api/payment-blocks/user/${userId}`, {
@@ -68,7 +68,6 @@ export default function PaymentHistory({ userId, onBack }: Props) {
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
     }
-
     setLoading(false);
   };
 
@@ -78,7 +77,8 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ active: false }),
       });
       await loadData();
@@ -88,85 +88,74 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Container style={{ paddingBottom: 70 }}>
-      <Title order={3} mb="md">История оплат</Title>
+    <Container size="xs" style={{ paddingBottom: 80 }}>
+      <Title order={3} mb="md">
+        История оплат
+      </Title>
 
       {loading ? (
         <Loader />
       ) : (
-        <Stack>
-          <Title order={5}>Оплаченные блоки</Title>
-          <Table withColumnBorders striped>
-            <thead>
-              <tr>
-                <th>Дата оплаты</th>
-                <th>Всего</th>
-                <th>Исп.</th>
-                <th>Цена</th>
-                <th>Статус</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {blocks.map((b) => (
-                <tr key={b.id}>
-                  <td>{new Date(b.paidAt).toLocaleDateString()}</td>
-                  <td>{b.paidTrainings}</td>
-                  <td>{b.used}</td>
-                  <td>{b.pricePerTraining} ₽</td>
-                  <td>
-                    <Badge color={b.active ? 'green' : 'gray'}>
-                      {b.active ? 'Активен' : 'Завершён'}
-                    </Badge>
-                  </td>
-                  <td>
-                    {b.active && (
-                      <Button size="xs" color="red" onClick={() => markInactive(b.id)}>
-                        Завершить
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+        <Stack spacing="md">
+          {blocks.map((block) => (
+            <Paper key={block.id} withBorder radius="md" p="md" shadow="xs">
+              <Group position="apart" mb="xs">
+                <Text fw={600} size="sm">
+                  Оплата от {new Date(block.paidAt).toLocaleDateString()}
+                </Text>
+                <Badge color={block.active ? 'green' : 'gray'}>
+                  {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
+                </Badge>
+              </Group>
+              <Text size="sm" color="dimmed">
+                {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
+              </Text>
+              {block.active && (
+                <Button
+                  size="xs"
+                  color="red"
+                  fullWidth
+                  mt="sm"
+                  onClick={() => markInactive(block.id)}
+                >
+                  Завершить
+                </Button>
+              )}
+            </Paper>
+          ))}
 
           {singleTrainings.length > 0 && (
             <>
-              <Title order={5} mt="lg">Разовые тренировки</Title>
-              <Table withColumnBorders striped>
-                <thead>
-                  <tr>
-                    <th>Дата</th>
-                    <th>Время</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {singleTrainings.map((t) => (
-                    <tr key={t.id}>
-                      <td>{new Date(t.date).toLocaleDateString()}</td>
-                      <td>{t.hour}:00</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+              <Divider label="Разовые тренировки" labelPosition="center" />
+              <Stack spacing="xs">
+                {singleTrainings.map((t) => (
+                  <Paper key={t.id} withBorder radius="md" p="sm">
+                    <Group position="apart">
+                      <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                      <Text size="sm" color="dimmed">{t.hour}:00</Text>
+                    </Group>
+                  </Paper>
+                ))}
+              </Stack>
             </>
           )}
         </Stack>
       )}
 
-      {/* Закреплённая кнопка "Назад к профилю" */}
-      <div style={{
-        position: 'fixed',
-        bottom: 10,
-        left: 0,
-        width: '100%',
-        background: 'white',
-        padding: '8px 0',
-        textAlign: 'center',
-        boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-        zIndex: 1000,
-      }}>
+      {/* Закреплённая кнопка */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 10,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '8px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
         <Button
           variant="subtle"
           color="blue"
