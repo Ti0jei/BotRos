@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  Box,
   Container,
   Title,
   Paper,
@@ -13,7 +14,6 @@ import {
   Stack,
   Loader,
   Grid,
-  Box,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
@@ -137,7 +137,7 @@ export default function ClientNutrition({
 
   return (
     <Box
-      style={{
+      sx={{
         minHeight: '100vh',
         backgroundImage: 'url(/images/client-bg.jpg)',
         backgroundSize: 'cover',
@@ -145,19 +145,18 @@ export default function ClientNutrition({
         padding: 16,
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'start',
       }}
     >
-      <Container
-        size="xs"
-        p="md"
-        style={{
+      <Box
+        sx={{
           backgroundColor: 'rgba(255, 255, 255, 0.4)',
           borderRadius: 20,
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
+          padding: 16,
           width: '100%',
           maxWidth: 420,
-          marginBottom: 20,
         }}
       >
         <Title order={2} ta="center" mb="md">
@@ -179,7 +178,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper withBorder radius="md" p="md" mb="md" shadow="sm" bg="white">
+          <Paper withBorder radius="md" p="md" mb="md" shadow="sm">
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -224,13 +223,14 @@ export default function ClientNutrition({
               setCarbs('');
               setFormVisible(true);
             }}
+            mb="md"
           >
             Внести КБЖУ
           </Button>
         )}
 
         {!isAdmin && formVisible && (
-          <Paper withBorder radius="md" p="md" mt="md" shadow="sm" bg="white">
+          <Paper withBorder radius="md" p="md" mt="md" shadow="sm">
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -258,7 +258,7 @@ export default function ClientNutrition({
         ) : (
           <Stack>
             {weekly && (
-              <Paper withBorder radius="md" p="md" shadow="sm" bg="white">
+              <Paper withBorder radius="md" p="md" shadow="sm">
                 <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -269,7 +269,7 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper withBorder radius="md" p="md" shadow="sm" bg="white">
+              <Paper withBorder radius="md" p="md" shadow="sm">
                 <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
@@ -293,7 +293,7 @@ export default function ClientNutrition({
         >
           Назад к профилю
         </Button>
-      </Container>
+      </Box>
     </Box>
   );
 }
