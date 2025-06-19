@@ -145,7 +145,6 @@ export default function ClientNutrition({
         padding: 16,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'start',
       }}
     >
       <Container
@@ -158,7 +157,7 @@ export default function ClientNutrition({
           WebkitBackdropFilter: 'blur(6px)',
           width: '100%',
           maxWidth: 420,
-          marginBottom: 80,
+          marginBottom: 20,
         }}
       >
         <Title order={2} ta="center" mb="md">
@@ -180,7 +179,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper withBorder radius="md" p="md" mb="md" shadow="sm">
+          <Paper withBorder radius="md" p="md" mb="md" shadow="sm" bg="white">
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -231,7 +230,7 @@ export default function ClientNutrition({
         )}
 
         {!isAdmin && formVisible && (
-          <Paper withBorder radius="md" p="md" mt="md" shadow="sm">
+          <Paper withBorder radius="md" p="md" mt="md" shadow="sm" bg="white">
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -291,9 +290,6 @@ export default function ClientNutrition({
           size="sm"
           leftIcon={<IconArrowBack size={14} />}
           onClick={onBack}
-          style={{
-            marginTop: 32,
-          }}
         >
           Назад к профилю
         </Button>
