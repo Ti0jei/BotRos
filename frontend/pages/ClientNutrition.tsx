@@ -163,7 +163,17 @@ export default function ClientNutrition({
         alignItems: 'start',
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 420 }}>
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: 420,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: 24,
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
+          padding: 20,
+        }}
+      >
         <Title order={2} ta="center" mb="md" color="#222">
           Моё питание
         </Title>
