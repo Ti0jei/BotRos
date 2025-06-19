@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs'; // ✅ Заменили Bun на bcryptjs
 import { resend } from '../utils/resend.mjs';
 
 const router = express.Router();
@@ -86,7 +87,7 @@ router.post('/confirm', async (req, res) => {
 
     let hashed;
     try {
-      hashed = await Bun.password.hash(password);
+      hashed = await bcrypt.hash(password, 10); // ✅ bcryptjs вместо Bun
     } catch (err) {
       console.error('❌ Ошибка хэширования пароля:', err);
       return res.status(500).json({ error: 'Ошибка при шифровании пароля' });
