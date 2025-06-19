@@ -57,12 +57,13 @@ export default function Profile({
         if (data) {
           setUser(data);
 
-          // 🔔 Загружаем статус уведомлений
           fetch(`${API}/api/notifications`, { headers })
             .then((res) => res.json())
             .then((notif) => {
               if (notif?.muted !== undefined) {
-                setUser((prev) => prev ? { ...prev, notificationsMuted: notif.muted } : prev);
+                setUser((prev) =>
+                  prev ? { ...prev, notificationsMuted: notif.muted } : prev
+                );
               }
             });
         } else {
@@ -115,87 +116,120 @@ export default function Profile({
   }
 
   return (
-    <Container size="xs" py="xl" style={{ position: 'relative' }}>
-      {/* 🔔 Кнопка оповещений */}
-      {section === 'main' && (
-        <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
-          <ActionIcon
-            variant="light"
-            color={user.notificationsMuted ? 'gray' : 'blue'}
-            onClick={toggleNotifications}
-            radius="xl"
-            size="lg"
-            style={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              zIndex: 10,
-            }}
+    <div
+      style={{
+        backgroundImage: 'url(/images/client-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+      }}
+    >
+      <Container
+        size="xs"
+        p="xl"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          borderRadius: 16,
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          position: 'relative',
+        }}
+      >
+        {/* 🔔 Кнопка оповещений */}
+        {section === 'main' && (
+          <Tooltip
+            label={
+              user.notificationsMuted
+                ? 'Оповещения выключены'
+                : 'Оповещения включены'
+            }
           >
-            {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
-          </ActionIcon>
-        </Tooltip>
-      )}
+            <ActionIcon
+              variant="light"
+              color={user.notificationsMuted ? 'gray' : 'blue'}
+              onClick={toggleNotifications}
+              radius="xl"
+              size="lg"
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                zIndex: 10,
+              }}
+            >
+              {user.notificationsMuted ? (
+                <IconBellOff size={20} />
+              ) : (
+                <IconBell size={20} />
+              )}
+            </ActionIcon>
+          </Tooltip>
+        )}
 
-      {/* Главный экран */}
-      {section === 'main' && (
-        <Stack spacing="sm">
-          <Title order={2} mb="lg">
-            Привет, {user.name} {user.lastName ?? ''} 👋
-          </Title>
+        {/* Главный экран */}
+        {section === 'main' && (
+          <Stack spacing="sm">
+            <Title order={2} mb="lg" ta="center">
+              Привет, {user.name} {user.lastName ?? ''} 👋
+            </Title>
 
-          <Button fullWidth color="blue" onClick={() => setSection('trainings')}>
-            Мои тренировки
-          </Button>
-
-          <Button fullWidth color="blue" onClick={() => setSection('nutrition')}>
-            Моё питание
-          </Button>
-
-          <Button fullWidth color="blue" disabled>
-            Замеры (скоро)
-          </Button>
-          <Button fullWidth color="blue" disabled>
-            Фото (скоро)
-          </Button>
-          <Button fullWidth variant="light" color="gray" disabled>
-            Материал для изучения
-          </Button>
-
-          {user.role === 'ADMIN' && (
-            <Button fullWidth mt="sm" onClick={onOpenAdmin}>
-              Панель тренера
+            <Button fullWidth color="blue" onClick={() => setSection('trainings')}>
+              Мои тренировки
             </Button>
-          )}
 
-          <Button fullWidth color="red" mt="lg" onClick={handleLogout}>
-            Выйти
-          </Button>
-        </Stack>
-      )}
+            <Button fullWidth color="blue" onClick={() => setSection('nutrition')}>
+              Моё питание
+            </Button>
 
-      {/* Подстраницы */}
-      {section === 'trainings' && (
-        <ClientSchedule onBack={() => setSection('main')} />
-      )}
+            <Button fullWidth color="gray" disabled>
+              Замеры (скоро)
+            </Button>
+            <Button fullWidth color="gray" disabled>
+              Фото (скоро)
+            </Button>
+            <Button fullWidth variant="light" color="gray" disabled>
+              Материал для изучения
+            </Button>
 
-      {section === 'nutrition' && (
-        <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
-      )}
+            {user.role === 'ADMIN' && (
+              <Button fullWidth mt="sm" onClick={onOpenAdmin}>
+                Панель тренера
+              </Button>
+            )}
 
-      {['measurements', 'photos'].includes(section) && (
-        <Stack spacing="md">
-          <Title order={3}>
-            {section === 'measurements' ? 'Замеры' : 'Фото'}
-          </Title>
-          <Text size="sm" color="dimmed">
-            [Раздел в разработке]
-          </Text>
-          <Button variant="light" onClick={() => setSection('main')}>
-            ← Назад
-          </Button>
-        </Stack>
-      )}
-    </Container>
+            <Button fullWidth color="red" mt="lg" onClick={handleLogout}>
+              Выйти
+            </Button>
+          </Stack>
+        )}
+
+        {/* Подстраницы */}
+        {section === 'trainings' && (
+          <ClientSchedule onBack={() => setSection('main')} />
+        )}
+
+        {section === 'nutrition' && (
+          <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
+        )}
+
+        {['measurements', 'photos'].includes(section) && (
+          <Stack spacing="md">
+            <Title order={3}>
+              {section === 'measurements' ? 'Замеры' : 'Фото'}
+            </Title>
+            <Text size="sm" color="dimmed">
+              [Раздел в разработке]
+            </Text>
+            <Button variant="light" onClick={() => setSection('main')}>
+              ← Назад
+            </Button>
+          </Stack>
+        )}
+      </Container>
+    </div>
   );
 }
