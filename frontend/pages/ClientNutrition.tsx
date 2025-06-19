@@ -135,9 +135,17 @@ export default function ClientNutrition({
   };
 
   const cardStyle = {
-    background: '#fff',
+    background: '#ffffff',
     borderRadius: 12,
     boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+  };
+
+  const pinkTextButton = {
+    root: {
+      backgroundColor: 'transparent',
+      color: '#d6336c',
+      fontWeight: 500,
+    },
   };
 
   return (
@@ -151,12 +159,7 @@ export default function ClientNutrition({
         alignItems: 'start',
       }}
     >
-      <Box
-        sx={{
-          width: '100%',
-          maxWidth: 420,
-        }}
-      >
+      <Box sx={{ width: '100%', maxWidth: 420 }}>
         <Title order={2} ta="center" mb="md" color="#222">
           Моё питание
         </Title>
@@ -188,16 +191,16 @@ export default function ClientNutrition({
             </Group>
             {!isAdmin && (
               <Group justify="space-between">
-                <Button size="xs" leftIcon={<IconEdit size={14} />} variant="light" onClick={() => {
+                <Button size="xs" variant="subtle" styles={pinkTextButton} onClick={() => {
                   setFormVisible(true);
                   setCalories(selectedRecord.calories);
                   setProtein(selectedRecord.protein);
                   setFat(selectedRecord.fat);
                   setCarbs(selectedRecord.carbs);
-                }}>
+                }} leftIcon={<IconEdit size={14} />}>
                   Редактировать
                 </Button>
-                <Button size="xs" color="red" leftIcon={<IconTrash size={14} />} onClick={handleDelete}>
+                <Button size="xs" variant="subtle" color="red" onClick={handleDelete} leftIcon={<IconTrash size={14} />}>
                   Удалить
                 </Button>
               </Group>
@@ -212,6 +215,7 @@ export default function ClientNutrition({
         {!isAdmin && !formVisible && (
           <Button
             fullWidth
+            variant="filled"
             color="pink"
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
@@ -283,8 +287,8 @@ export default function ClientNutrition({
         <Button
           fullWidth
           mt="lg"
-          variant="filled"
-          color="pink"
+          variant="subtle"
+          styles={pinkTextButton}
           leftIcon={<IconArrowBack size={14} />}
           onClick={onBack}
         >
