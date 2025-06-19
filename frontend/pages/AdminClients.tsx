@@ -14,6 +14,7 @@ import {
   Box,
   Divider,
 } from '@mantine/core';
+import { IconCash, IconKnifeFork, IconGift, IconPencil, IconTrash } from '@tabler/icons-react';
 import ClientPayments from './ClientPayments';
 import ClientNutrition from './ClientNutrition';
 
@@ -162,7 +163,7 @@ export default function AdminClients({
               const isEditing = editingId === client.id;
 
               return (
-                <Card key={client.id} withBorder radius="md" p="md" shadow="sm" style={{ border: '1px solid #ddd' }}>
+                <Card key={client.id} withBorder radius="md" p="md" shadow="sm">
                   <Stack spacing="xs">
                     <Group position="apart">
                       <Text fw={600}>
@@ -190,8 +191,8 @@ export default function AdminClients({
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
                         />
-                        <Button color="green" variant="light" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
-                        <Button color="gray" variant="outline" onClick={cancelEditing}>Отмена</Button>
+                        <Button color="green" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
+                        <Button color="gray" onClick={cancelEditing}>Отмена</Button>
                       </Group>
                     ) : (
                       <>
@@ -206,37 +207,31 @@ export default function AdminClients({
                           </Group>
                         )}
 
-                        <Divider my="xs" />
-
-                        <Group grow>
-                          <Button variant="outline" color="pink" onClick={() => {
+                        <Group grow mt="xs">
+                          <Button variant="outline" color="pink" leftIcon={<IconKnifeFork size={16} />} onClick={() => {
                             setSelectedClient(client);
                             setView('nutrition');
                           }}>
-                            🍽 Питание
+                            Питание
                           </Button>
 
-                          <Button variant="outline" color="pink" onClick={() => {
+                          <Button variant="outline" color="pink" leftIcon={<IconCash size={16} />} onClick={() => {
                             setSelectedClient(client);
                             setView('payments');
                           }}>
-                            💸 Оплата
+                            Оплата
                           </Button>
                         </Group>
 
-                        <Button
-                          fullWidth
-                          variant="outline"
-                          color="pink"
-                          mt="xs"
-                          onClick={() => onOpenHistory(client.id)}
-                        >
-                          📊 История оплат
-                        </Button>
+                        <Group grow mt={6}>
+                          <Button variant="outline" color="pink" leftIcon={<IconGift size={16} />} onClick={() => onOpenHistory(client.id)}>
+                            История оплат
+                          </Button>
+                        </Group>
 
-                        <Group grow mt="xs">
-                          <Button color="orange" variant="light" onClick={() => startEditing(client)}>✏️ Псевдоним</Button>
-                          <Button color="red" variant="filled" onClick={() => deleteClient(client.id)}>Удалить</Button>
+                        <Group grow mt={6}>
+                          <Button variant="filled" color="orange" leftIcon={<IconPencil size={16} />} onClick={() => startEditing(client)}>Псевдоним</Button>
+                          <Button variant="filled" color="red" leftIcon={<IconTrash size={16} />} onClick={() => deleteClient(client.id)}>Удалить</Button>
                         </Group>
                       </>
                     )}
