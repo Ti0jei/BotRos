@@ -56,7 +56,6 @@ export default function Profile({
       .then((data) => {
         if (data) {
           setUser(data);
-
           fetch(`${API}/api/notifications`, { headers })
             .then((res) => res.json())
             .then((notif) => {
@@ -115,6 +114,20 @@ export default function Profile({
     );
   }
 
+  // кастомные стили кнопок
+  const primaryStyle = {
+    backgroundColor: '#d47291',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#c15f7e',
+    },
+  };
+
+  const secondaryStyle = {
+    backgroundColor: '#f0f0f0',
+    color: '#555',
+  };
+
   return (
     <div
       style={{
@@ -171,43 +184,33 @@ export default function Profile({
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button
-              fullWidth
-              color="blue"
-              radius="md"
-              onClick={() => setSection('trainings')}
-            >
+            <Button fullWidth radius="md" styles={{ root: primaryStyle }} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button
-              fullWidth
-              color="blue"
-              radius="md"
-              onClick={() => setSection('nutrition')}
-            >
+            <Button fullWidth radius="md" styles={{ root: primaryStyle }} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
-            <Button fullWidth color="gray" radius="md" disabled>
+            <Button fullWidth radius="md" disabled styles={{ root: secondaryStyle }}>
               Замеры (скоро)
             </Button>
 
-            <Button fullWidth color="gray" radius="md" disabled>
+            <Button fullWidth radius="md" disabled styles={{ root: secondaryStyle }}>
               Фото (скоро)
             </Button>
 
-            <Button fullWidth variant="light" color="gray" radius="md" disabled>
+            <Button fullWidth radius="md" variant="light" disabled styles={{ root: secondaryStyle }}>
               Материал для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" onClick={onOpenAdmin} radius="md">
+              <Button fullWidth mt="sm" radius="md" styles={{ root: primaryStyle }} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
 
-            <Button fullWidth color="red" mt="md" onClick={handleLogout} radius="md">
+            <Button fullWidth color="red" mt="md" radius="md" onClick={handleLogout}>
               Выйти
             </Button>
           </Stack>
