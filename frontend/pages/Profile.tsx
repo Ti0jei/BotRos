@@ -13,7 +13,7 @@ import {
 import {
   IconBell,
   IconBellOff,
-  IconDumbbell,
+  IconRun,
   IconSoup,
   IconSettings,
   IconLogout,
@@ -182,7 +182,7 @@ export default function Profile({
               radius="md"
               variant="light"
               color="pink"
-              leftIcon={<IconDumbbell size={18} />}
+              leftIcon={<IconRun size={18} />}
               onClick={() => setSection('trainings')}
             >
               Мои тренировки
@@ -203,7 +203,7 @@ export default function Profile({
               fullWidth
               radius="md"
               disabled
-              leftIcon={<IconDumbbell size={18} />}
+              leftIcon={<IconRun size={18} />}
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
               Замеры (скоро)
@@ -213,7 +213,7 @@ export default function Profile({
               fullWidth
               radius="md"
               disabled
-              leftIcon={<IconDumbbell size={18} />}
+              leftIcon={<IconRun size={18} />}
               styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
             >
               Фото (скоро)
