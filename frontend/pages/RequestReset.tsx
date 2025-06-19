@@ -71,34 +71,41 @@ export default function RequestReset({ onBack }: Props) {
       <Title order={2} mb="md">Сброс пароля</Title>
 
       {sent ? (
-        <Text>
-          Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
-        </Text>
+        <>
+          <Text mb="md">
+            Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
+          </Text>
+          <Center>
+            <Button variant="subtle" onClick={onBack} color="pink">
+              На главную
+            </Button>
+          </Center>
+        </>
       ) : (
-        <Stack>
-          <TextInput
-            label="Email"
-            placeholder="Введите ваш email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-          />
-          <Button
-            onClick={handleSubmit}
-            loading={loading}
-            disabled={!email}
-            leftIcon={<IconMail size={16} />}
-          >
-            Сбросить пароль
-          </Button>
-        </Stack>
-      )}
+        <>
+          <Stack>
+            <TextInput
+              label="Email"
+              placeholder="Введите ваш email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+            />
+            <Button
+              onClick={handleSubmit}
+              loading={loading}
+              disabled={!email}
+              leftIcon={<IconMail size={16} />}
+            >
+              Сбросить пароль
+            </Button>
+          </Stack>
 
-      {!sent && (
-        <Center mt="md">
-          <Button variant="subtle" onClick={onBack} color="pink">
-            Назад ко входу
-          </Button>
-        </Center>
+          <Center mt="md">
+            <Button variant="subtle" onClick={onBack} color="pink">
+              На главную
+            </Button>
+          </Center>
+        </>
       )}
     </Container>
   );
