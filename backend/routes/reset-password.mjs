@@ -21,7 +21,7 @@ router.post('/request', async (req, res) => {
     }
 
     const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 час
 
     await prisma.user.update({
       where: { id: user.id },
@@ -38,6 +38,7 @@ router.post('/request', async (req, res) => {
       from: 'Krissfit Support <support@krissfit.ru>',
       to: email,
       subject: '🔐 Восстановление доступа к Krissfit',
+      text: `Вы запросили сброс пароля в системе Krissfit.\nСбросьте пароль по ссылке:\n${resetUrl}\n\nЕсли вы не запрашивали — просто проигнорируйте это письмо.`,
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2>Сброс пароля</h2>
@@ -49,9 +50,12 @@ router.post('/request', async (req, res) => {
               Сбросить пароль
             </a>
           </p>
-          <p>Если это были не вы — просто игнорируйте письмо.</p>
+          <p style="margin-top: 20px; font-size: 14px; color: #555;">
+            Если это были не вы — просто проигнорируйте это письмо.
+          </p>
         </div>
       `,
+      reply_to: 'support@krissfit.ru', // 👈 если нужно
     });
 
     console.log('📨 [Resend] результат:', result);
