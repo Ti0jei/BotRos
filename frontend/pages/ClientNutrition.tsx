@@ -1,3 +1,4 @@
+// frontend/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -145,6 +146,9 @@ export default function ClientNutrition({
       backgroundColor: 'transparent',
       color: '#d6336c',
       fontWeight: 500,
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+      },
     },
   };
 
