@@ -8,13 +8,17 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
+import ResetRequest from './pages/ResetRequest';
+import ResetPassword from './pages/ResetPassword';
+
 import { Container, Button, Center, Loader, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
   const [view, setView] = useState<
-    'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar' | 'history'
+    'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar' | 'history' | 'reset-request' | 'reset-confirm'
   >('login');
+
   const [profile, setProfile] = useState<any>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -38,6 +42,10 @@ function App() {
         color: 'green',
       });
       navigate(window.location.pathname, { replace: true });
+    }
+
+    if (params.get('token')) {
+      setView('reset-confirm');
     }
   }, [params, navigate]);
 
@@ -93,7 +101,6 @@ function App() {
     setView('login');
   };
 
-  // Показываем loader при загрузке профиля
   if (profileLoading && localStorage.getItem('token')) {
     return (
       <Center h="100vh">
@@ -102,7 +109,6 @@ function App() {
     );
   }
 
-  // Защита от "белого экрана"
   if (!profile && view === 'profile') {
     console.warn('❌ Профиль пустой, возврат на login');
     setView('login');
@@ -117,6 +123,11 @@ function App() {
           <Center>
             <Button variant="subtle" mt="sm" onClick={() => setView('register')}>
               Зарегистрироваться
+            </Button>
+          </Center>
+          <Center>
+            <Button variant="subtle" mt="xs" color="blue" onClick={() => setView('reset-request')}>
+              Забыли пароль?
             </Button>
           </Center>
         </>
@@ -141,6 +152,18 @@ function App() {
               Назад ко входу
             </Button>
           </Center>
+        </>
+      )}
+
+      {view === 'reset-request' && (
+        <>
+          <ResetRequest onBack={() => setView('login')} />
+        </>
+      )}
+
+      {view === 'reset-confirm' && (
+        <>
+          <ResetPassword onBack={() => setView('login')} />
         </>
       )}
 

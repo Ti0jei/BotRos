@@ -6,6 +6,7 @@ import {
   Stack,
   Paper,
   Title,
+  Group,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -176,6 +177,17 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
             Отправить письмо повторно
           </Button>
         )}
+
+        <Group position="center" mt="xs">
+          <Button
+            variant="subtle"
+            color="gray"
+            size="xs"
+            onClick={() => navigate('?view=reset-request')} // или setView('reset-request') если view в App
+          >
+            Забыли пароль?
+          </Button>
+        </Group>
       </Stack>
     </Paper>
   );

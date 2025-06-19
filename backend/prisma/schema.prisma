@@ -8,28 +8,32 @@ datasource db {
 }
 
 model User {
-  id                 String         @id @default(cuid())
-  email              String         @unique
-  password           String
-  name               String
-  lastName           String?        // фамилия клиента
-  internalTag        String?        // псевдоним, для тренера
-  age                Int
-  role               String         @default("USER")
-  telegramId         String?        @unique
-  createdAt          DateTime?      @default(now()) @db.Timestamp(6)
-  updatedAt          DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
+  id                  String         @id @default(cuid())
+  email               String         @unique
+  password            String
+  name                String
+  lastName            String?        // фамилия клиента
+  internalTag         String?        // псевдоним, для тренера
+  age                 Int
+  role                String         @default("USER")
+  telegramId          String?        @unique
+  createdAt           DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
 
-  emailVerified      Boolean        @default(false)
-  emailToken         String?        @unique
-  emailTokenExpires  DateTime?
+  emailVerified       Boolean        @default(false)
+  emailToken          String?        @unique
+  emailTokenExpires   DateTime?
 
-  // Новое поле — выключение оповещений (кроме подтверждения тренировок)
-  notificationsMuted Boolean        @default(false)
+  // 🔐 поля для сброса пароля
+  resetToken          String?        @unique
+  resetTokenExpires   DateTime?
 
-  payments           PaymentBlock[]
-  trainings          Training[]
-  nutrition          Nutrition[]    // ← связь с питанием
+  // 🔕 выключение оповещений (кроме подтверждения тренировок)
+  notificationsMuted  Boolean        @default(false)
+
+  payments            PaymentBlock[]
+  trainings           Training[]
+  nutrition           Nutrition[]
 }
 
 model Training {

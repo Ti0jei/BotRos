@@ -16,6 +16,7 @@ import nutritionRoutes from './routes/nutrition.mjs'; // ✅ ручное пит
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
 import './cron/nutritionReminder.mjs'; // ⏰ автоматические уведомления
+import resetPasswordRoutes from './routes/reset-password.mjs';  
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
 app.use('/api/notifications', authMiddleware, notificationRoutes); // 🔥 БЫЛО БЕЗ authMiddleware
 app.use('/api/invite-code', inviteCodeRoutes);
 app.use('/api/nutrition', authMiddleware, nutritionRoutes);
+app.use('/api/reset-password', resetPasswordRoutes);
 
 // 🌐 Проверка внешнего IP
 app.get('/ip', async (req, res) => {
