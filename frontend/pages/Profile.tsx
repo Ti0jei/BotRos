@@ -1,3 +1,4 @@
+// frontend/pages/Profile.tsx
 import { useEffect, useState } from 'react';
 import {
   Button,
@@ -121,6 +122,17 @@ export default function Profile({
     );
   }
 
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    transition: 'background-color 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
   return (
     <div
       style={{
@@ -136,7 +148,8 @@ export default function Profile({
         size="xs"
         p={24}
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(8px)',
           borderRadius: 24,
           boxShadow: '0 0 12px rgba(0,0,0,0.1)',
           position: 'relative',
@@ -243,7 +256,8 @@ export default function Profile({
               mt="md"
               radius="md"
               leftIcon={<IconLogout size={18} />}
-              styles={{ root: { backgroundColor: '#ff6b6b', color: '#fff' } }}
+              variant="subtle"
+              sx={pinkButtonSx}
               onClick={handleLogout}
             >
               Выйти
