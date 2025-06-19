@@ -10,22 +10,24 @@ import {
   Box,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   IconCheck,
   IconAlertCircle,
   IconMail,
 } from '@tabler/icons-react';
 
-export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
+export default function Login({
+  onLoggedIn,
+  onResetRequest,
+}: {
+  onLoggedIn: () => void;
+  onResetRequest: () => void;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [params] = useSearchParams();
-  const [verifiedShown, setVerifiedShown] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [resending, setResending] = useState(false);
-  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -34,18 +36,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
     const savedPassword = sessionStorage.getItem('lastPassword');
     if (savedEmail) setEmail(savedEmail);
     if (savedPassword) setPassword(savedPassword);
-
-    if (!verifiedShown && params.get('verified') === 'true') {
-      showNotification({
-        title: 'Почта подтверждена',
-        message: 'Теперь вы можете войти',
-        color: 'green',
-        icon: <IconCheck size={18} />,
-      });
-      setVerifiedShown(true);
-      navigate(window.location.pathname);
-    }
-  }, [params, verifiedShown, navigate]);
+  }, []);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -210,7 +201,7 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
               variant="subtle"
               color="gray"
               size="xs"
-              onClick={() => navigate('?view=reset-request')}
+              onClick={onResetRequest}
             >
               Забыли пароль?
             </Button>
