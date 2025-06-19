@@ -8,7 +8,7 @@ import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
 import PaymentHistory from './pages/PaymentHistory';
-import ResetRequest from './pages/ResetRequest';
+import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 
 import { Container, Button, Center, Loader, Text } from '@mantine/core';
@@ -27,13 +27,13 @@ function App() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
+  // ✅ Запоминаем Telegram ID из URL
   useEffect(() => {
-    const tid = new URLSearchParams(window.location.search).get('tid');
-    if (tid) {
-      localStorage.setItem('telegramId', tid);
-    }
-  }, []);
+    const tid = params.get('tid');
+    if (tid) localStorage.setItem('telegramId', tid);
+  }, [params]);
 
+  // ✅ Обрабатываем подтверждение почты и переход на сброс пароля
   useEffect(() => {
     if (params.get('verified') === 'true') {
       showNotification({
@@ -49,6 +49,7 @@ function App() {
     }
   }, [params, navigate]);
 
+  // ✅ Загружаем профиль, если есть токен
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -80,14 +81,13 @@ function App() {
             });
           }
         } else {
-          console.warn('❌ Сервер не вернул профиль, токен удалён');
           localStorage.removeItem('token');
           setProfile(null);
           setView('login');
         }
       })
       .catch((err) => {
-        console.error('Ошибка при загрузке профиля:', err);
+        console.error('Ошибка загрузки профиля:', err);
         localStorage.removeItem('token');
         setProfile(null);
         setView('login');
@@ -156,15 +156,11 @@ function App() {
       )}
 
       {view === 'reset-request' && (
-        <>
-          <ResetRequest onBack={() => setView('login')} />
-        </>
+        <RequestReset onBack={() => setView('login')} />
       )}
 
       {view === 'reset-confirm' && (
-        <>
-          <ResetPassword onBack={() => setView('login')} />
-        </>
+        <ResetPassword onBack={() => setView('login')} />
       )}
 
       {view === 'profile' && profile && (
