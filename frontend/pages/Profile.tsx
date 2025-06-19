@@ -114,20 +114,6 @@ export default function Profile({
     );
   }
 
-  // кастомные стили кнопок
-  const primaryStyle = {
-    backgroundColor: '#d47291',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#c15f7e',
-    },
-  };
-
-  const secondaryStyle = {
-    backgroundColor: '#f0f0f0',
-    color: '#555',
-  };
-
   return (
     <div
       style={{
@@ -154,14 +140,14 @@ export default function Profile({
           maxWidth: 420,
         }}
       >
-        {/* 🔕 Иконка оповещений */}
+        {/* 🔔 Оповещения */}
         {section === 'main' && (
           <Tooltip
             label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}
           >
             <ActionIcon
               variant="light"
-              color={user.notificationsMuted ? 'gray' : 'blue'}
+              color={user.notificationsMuted ? 'gray' : 'pink'}
               onClick={toggleNotifications}
               radius="xl"
               size="lg"
@@ -177,46 +163,68 @@ export default function Profile({
           </Tooltip>
         )}
 
-        {/* Главная секция */}
+        {/* Главная */}
         {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm">
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button fullWidth radius="md" styles={{ root: primaryStyle }} onClick={() => setSection('trainings')}>
+            <Button fullWidth radius="md" variant="light" color="pink" onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth radius="md" styles={{ root: primaryStyle }} onClick={() => setSection('nutrition')}>
+            <Button fullWidth radius="md" variant="light" color="pink" onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
-            <Button fullWidth radius="md" disabled styles={{ root: secondaryStyle }}>
+            <Button
+              fullWidth
+              radius="md"
+              disabled
+              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
+            >
               Замеры (скоро)
             </Button>
 
-            <Button fullWidth radius="md" disabled styles={{ root: secondaryStyle }}>
+            <Button
+              fullWidth
+              radius="md"
+              disabled
+              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
+            >
               Фото (скоро)
             </Button>
 
-            <Button fullWidth radius="md" variant="light" disabled styles={{ root: secondaryStyle }}>
+            <Button
+              fullWidth
+              radius="md"
+              disabled
+              variant="light"
+              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
+            >
               Материал для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" radius="md" styles={{ root: primaryStyle }} onClick={onOpenAdmin}>
+              <Button fullWidth radius="md" variant="light" color="pink" onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
 
-            <Button fullWidth color="red" mt="md" radius="md" onClick={handleLogout}>
+            <Button
+              fullWidth
+              mt="md"
+              radius="md"
+              styles={{ root: { backgroundColor: '#ff6b6b', color: '#fff' } }}
+              onClick={handleLogout}
+            >
               Выйти
             </Button>
           </Stack>
         )}
 
-        {/* Подстраницы */}
+        {/* Разделы */}
         {section === 'trainings' && (
           <ClientSchedule onBack={() => setSection('main')} />
         )}
