@@ -1,8 +1,6 @@
-// frontend/pages/ClientNutrition.tsx
 import { useEffect, useState } from 'react';
 import {
   Box,
-  Container,
   Title,
   Paper,
   Group,
@@ -136,10 +134,11 @@ export default function ClientNutrition({
     }
   };
 
-  const gradientStyle = {
-    background: 'linear-gradient(135deg, #fcdde9, #f6cdd2)',
-    border: 'none',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+  const cardStyle = {
+    background: 'rgba(255, 255, 255, 0.2)',
+    backdropFilter: 'blur(5px)',
+    WebkitBackdropFilter: 'blur(5px)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
   };
 
   return (
@@ -157,7 +156,7 @@ export default function ClientNutrition({
     >
       <Box
         sx={{
-          ...gradientStyle,
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
           borderRadius: 20,
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
@@ -185,7 +184,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper radius="md" p="md" mb="md" style={gradientStyle}>
+          <Paper radius="md" p="md" mb="md" style={cardStyle}>
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -237,7 +236,7 @@ export default function ClientNutrition({
         )}
 
         {!isAdmin && formVisible && (
-          <Paper radius="md" p="md" mt="md" style={gradientStyle}>
+          <Paper radius="md" p="md" mt="md" style={cardStyle}>
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -265,7 +264,7 @@ export default function ClientNutrition({
         ) : (
           <Stack>
             {weekly && (
-              <Paper radius="md" p="md" style={gradientStyle}>
+              <Paper radius="md" p="md" style={cardStyle}>
                 <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
@@ -276,7 +275,7 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper radius="md" p="md" style={gradientStyle}>
+              <Paper radius="md" p="md" style={cardStyle}>
                 <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
@@ -291,10 +290,9 @@ export default function ClientNutrition({
 
         <Button
           fullWidth
-          variant="light"
-          color="blue"
-          mt="xl"
-          size="sm"
+          mt="lg"
+          variant="filled"
+          color="pink"
           leftIcon={<IconArrowBack size={14} />}
           onClick={onBack}
         >
