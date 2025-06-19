@@ -162,7 +162,7 @@ export default function AdminClients({
               const isEditing = editingId === client.id;
 
               return (
-                <Card key={client.id} withBorder radius="md" p="md" shadow="sm">
+                <Card key={client.id} withBorder radius="md" p="md" shadow="sm" style={{ border: '1px solid #ddd' }}>
                   <Stack spacing="xs">
                     <Group position="apart">
                       <Text fw={600}>
@@ -190,8 +190,8 @@ export default function AdminClients({
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
                         />
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
-                        <Button color="gray" onClick={cancelEditing}>Отмена</Button>
+                        <Button color="green" variant="light" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
+                        <Button color="gray" variant="outline" onClick={cancelEditing}>Отмена</Button>
                       </Group>
                     ) : (
                       <>
@@ -206,15 +206,17 @@ export default function AdminClients({
                           </Group>
                         )}
 
-                        <Group grow mt="xs">
-                          <Button variant="subtle" color="pink" onClick={() => {
+                        <Divider my="xs" />
+
+                        <Group grow>
+                          <Button variant="outline" color="pink" onClick={() => {
                             setSelectedClient(client);
                             setView('nutrition');
                           }}>
-                            Питание
+                            🍽 Питание
                           </Button>
 
-                          <Button variant="subtle" color="pink" onClick={() => {
+                          <Button variant="outline" color="pink" onClick={() => {
                             setSelectedClient(client);
                             setView('payments');
                           }}>
@@ -222,19 +224,19 @@ export default function AdminClients({
                           </Button>
                         </Group>
 
-                        <Group grow mt={6}>
-                          <Button
-                            variant="subtle"
-                            color="pink"
-                            onClick={() => onOpenHistory(client.id)}
-                          >
-                            📊 История оплат
-                          </Button>
-                        </Group>
+                        <Button
+                          fullWidth
+                          variant="outline"
+                          color="pink"
+                          mt="xs"
+                          onClick={() => onOpenHistory(client.id)}
+                        >
+                          📊 История оплат
+                        </Button>
 
-                        <Group grow mt={6}>
-                          <Button color="orange" onClick={() => startEditing(client)}>Псевдоним</Button>
-                          <Button color="red" onClick={() => deleteClient(client.id)}>Удалить</Button>
+                        <Group grow mt="xs">
+                          <Button color="orange" variant="light" onClick={() => startEditing(client)}>✏️ Псевдоним</Button>
+                          <Button color="red" variant="filled" onClick={() => deleteClient(client.id)}>Удалить</Button>
                         </Group>
                       </>
                     )}
