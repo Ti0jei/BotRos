@@ -123,7 +123,10 @@ export default function CoachProfile({
   const pinkButtonStyle = {
     root: {
       color: '#d6336c',
+      border: '1px solid #d6336c',
       borderRadius: 8,
+      fontWeight: 500,
+      backgroundColor: 'transparent',
       '&:hover': { backgroundColor: '#ffe3ed' },
     },
   };
@@ -147,11 +150,11 @@ export default function CoachProfile({
               Привет, {profile.name} 👋
             </Title>
 
-            <Button fullWidth onClick={onOpenClients} variant="subtle" styles={pinkButtonStyle}>
+            <Button fullWidth onClick={onOpenClients} styles={pinkButtonStyle}>
               Клиенты
             </Button>
 
-            <Button fullWidth onClick={onOpenSchedule} variant="subtle" styles={pinkButtonStyle}>
+            <Button fullWidth onClick={onOpenSchedule} styles={pinkButtonStyle}>
               Назначить тренировку
             </Button>
 
@@ -201,7 +204,6 @@ export default function CoachProfile({
                       {t.status === 'PENDING' && (
                         <Button
                           size="xs"
-                          variant="subtle"
                           styles={pinkButtonStyle}
                           onClick={() => sendReminder(t.id)}
                         >
@@ -224,7 +226,6 @@ export default function CoachProfile({
 
         <Button
           fullWidth
-          variant="subtle"
           onClick={() => setShowCode((p) => !p)}
           rightIcon={showCode ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
           styles={pinkButtonStyle}
@@ -253,7 +254,6 @@ export default function CoachProfile({
           }}
         >
           <Button
-            variant="subtle"
             size="sm"
             onClick={onLogout}
             leftIcon={<IconLogout size={16} />}
