@@ -16,7 +16,15 @@ import { showNotification } from '@mantine/notifications';
 
 function App() {
   const [view, setView] = useState<
-    'login' | 'register' | 'profile' | 'schedule' | 'clients' | 'client-calendar' | 'history' | 'reset-request' | 'reset-confirm'
+    | 'login'
+    | 'register'
+    | 'profile'
+    | 'schedule'
+    | 'clients'
+    | 'client-calendar'
+    | 'history'
+    | 'reset-request'
+    | 'reset-confirm'
   >('login');
 
   const [profile, setProfile] = useState<any>(null);
@@ -116,7 +124,10 @@ function App() {
     <Container size="xs" pt="xl">
       {view === 'login' && (
         <>
-          <Login onLoggedIn={() => setView('profile')} />
+          <Login
+            onLoggedIn={() => setView('profile')}
+            onResetRequest={() => setView('reset-request')}
+          />
           <Center>
             <Button variant="subtle" mt="sm" onClick={() => setView('register')}>
               Зарегистрироваться
