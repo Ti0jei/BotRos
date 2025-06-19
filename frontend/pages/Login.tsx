@@ -10,11 +10,7 @@ import {
   Box,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import {
-  IconCheck,
-  IconAlertCircle,
-  IconMail,
-} from '@tabler/icons-react';
+import { IconCheck, IconAlertCircle, IconMail } from '@tabler/icons-react';
 
 export default function Login({
   onLoggedIn,
@@ -74,7 +70,6 @@ export default function Login({
         }
       }
     } catch (err) {
-      console.error('Ошибка запроса:', err);
       showNotification({
         title: 'Сервер недоступен',
         message: 'Попробуйте позже',
@@ -124,7 +119,6 @@ export default function Login({
         });
       }
     } catch (err) {
-      console.error('Ошибка повторной отправки:', err);
       showNotification({
         title: 'Ошибка',
         message: 'Не удалось отправить письмо',
@@ -136,13 +130,19 @@ export default function Login({
     }
   };
 
+  const subtleButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
   return (
     <Box
       style={{
-        backgroundImage: 'url("/images/krissfit-bg-pink.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -150,16 +150,16 @@ export default function Login({
       }}
     >
       <Paper
-        shadow="xl"
+        shadow="md"
         radius="lg"
         p="xl"
-        withBorder
         style={{
-          backdropFilter: 'blur(10px)',
-          backgroundColor: 'rgba(255, 255, 255, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
           width: '100%',
           maxWidth: 400,
+          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
         }}
       >
         <Stack>
@@ -179,7 +179,7 @@ export default function Login({
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
           />
-          <Button fullWidth onClick={handleLogin} loading={loading} mt="sm">
+          <Button fullWidth onClick={handleLogin} loading={loading} mt="sm" color="pink">
             Войти
           </Button>
 
@@ -199,7 +199,7 @@ export default function Login({
           <Group position="center" mt="xs">
             <Button
               variant="subtle"
-              color="gray"
+              sx={subtleButtonSx}
               size="xs"
               onClick={onResetRequest}
             >
