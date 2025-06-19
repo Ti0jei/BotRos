@@ -7,7 +7,10 @@ import {
   Text,
   Center,
   Loader,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
+import { IconBell, IconBellOff } from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
 import ClientNutrition from './ClientNutrition';
 
@@ -18,6 +21,7 @@ interface User {
   age: number;
   role: 'USER' | 'ADMIN';
   id: string;
+  notificationsMuted?: boolean;
 }
 
 export default function Profile({
@@ -34,21 +38,33 @@ export default function Profile({
   >('main');
 
   const API = import.meta.env.VITE_API_BASE_URL;
+  const token = localStorage.getItem('token');
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (!token) {
       onLogout();
       return;
     }
 
-    fetch(`${API}/api/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API}/api/profile`, { headers })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) {
           setUser(data);
+
+          // 🔔 Загружаем статус уведомлений
+          fetch(`${API}/api/notifications`, { headers })
+            .then((res) => res.json())
+            .then((notif) => {
+              if (notif?.muted !== undefined) {
+                setUser((prev) => prev ? { ...prev, notificationsMuted: notif.muted } : prev);
+              }
+            });
         } else {
           throw new Error('Profile not found');
         }
@@ -64,6 +80,22 @@ export default function Profile({
   const handleLogout = () => {
     localStorage.removeItem('token');
     onLogout();
+  };
+
+  const toggleNotifications = async () => {
+    if (!user) return;
+    const newStatus = !user.notificationsMuted;
+
+    try {
+      await fetch(`${API}/api/notifications`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ muted: newStatus }),
+      });
+      setUser({ ...user, notificationsMuted: newStatus });
+    } catch (err) {
+      console.error('Ошибка обновления уведомлений:', err);
+    }
   };
 
   if (loading) {
@@ -83,7 +115,29 @@ export default function Profile({
   }
 
   return (
-    <Container size="xs" py="xl">
+    <Container size="xs" py="xl" style={{ position: 'relative' }}>
+      {/* 🔔 Кнопка оповещений */}
+      {section === 'main' && (
+        <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
+          <ActionIcon
+            variant="light"
+            color={user.notificationsMuted ? 'gray' : 'blue'}
+            onClick={toggleNotifications}
+            radius="xl"
+            size="lg"
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 10,
+            }}
+          >
+            {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
+          </ActionIcon>
+        </Tooltip>
+      )}
+
+      {/* Главный экран */}
       {section === 'main' && (
         <Stack spacing="sm">
           <Title order={2} mb="lg">
@@ -120,6 +174,7 @@ export default function Profile({
         </Stack>
       )}
 
+      {/* Подстраницы */}
       {section === 'trainings' && (
         <ClientSchedule onBack={() => setSection('main')} />
       )}

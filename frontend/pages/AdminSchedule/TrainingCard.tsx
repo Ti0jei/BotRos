@@ -1,4 +1,5 @@
 import { Paper, Text, Badge, Group, Button } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import dayjs from 'dayjs';
 import { Training, PaymentBlock } from './types';
 
@@ -23,6 +24,18 @@ export default function TrainingCard({
     if (training.isSinglePaid) return '💸';
     if (!block) return '📛';
     return '🧍';
+  };
+
+  const handleDeleteWithConfirm = () => {
+    modals.openConfirmModal({
+      title: 'Подтверждение',
+      children: (
+        <Text size="sm">Вы точно хотите отменить эту тренировку?</Text>
+      ),
+      labels: { confirm: 'Да, отменить', cancel: 'Нет' },
+      confirmProps: { color: 'red' },
+      onConfirm: onDelete,
+    });
   };
 
   return (
@@ -81,7 +94,12 @@ export default function TrainingCard({
             </Button>
           </>
         )}
-        <Button size="xs" color="gray" variant="light" onClick={onDelete}>
+        <Button
+          size="xs"
+          color="gray"
+          variant="light"
+          onClick={handleDeleteWithConfirm}
+        >
           Отмена
         </Button>
       </Group>

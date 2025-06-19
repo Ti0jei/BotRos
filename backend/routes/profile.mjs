@@ -6,7 +6,8 @@ const router = express.Router();
 
 // 🔐 Получить профиль текущего пользователя
 router.get('/', async (req, res) => {
-  const userId = req.user?.userId;
+  const userId = req.user?.id; // ✅ исправлено
+
   if (!userId) {
     return res.status(401).json({ error: 'Неавторизован' });
   }
@@ -21,6 +22,7 @@ router.get('/', async (req, res) => {
       internalTag: true,
       age: true,
       role: true,
+      notificationsMuted: true, // ✅ добавлено
     },
   });
 

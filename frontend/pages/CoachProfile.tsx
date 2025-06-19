@@ -62,18 +62,25 @@ export default function CoachProfile({
 
         const data: Training[] = await res.json();
 
-        const valid = data.filter(
-          (t) => t.status === 'PENDING' || t.status === 'CONFIRMED'
-        );
+        const now = new Date();
+        const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
 
-        const sorted = valid.sort((a, b) => a.hour - b.hour);
-        const nextHour = sorted.length > 0 ? sorted[0].hour : null;
+        const filtered = data
+          .filter((t) => {
+            const trainingTimeMinutes = t.hour * 60;
+            return (
+              (t.status === 'PENDING' || t.status === 'CONFIRMED') &&
+              trainingTimeMinutes > currentTimeMinutes
+            );
+          })
+          .sort((a, b) => a.hour - b.hour);
 
-        const filtered = nextHour !== null
-          ? sorted.filter((t) => t.hour === nextHour)
+        const nextHour = filtered.length > 0 ? filtered[0].hour : null;
+        const upcoming = nextHour !== null
+          ? filtered.filter((t) => t.hour === nextHour)
           : [];
 
-        setUpcomingTrainings(filtered);
+        setUpcomingTrainings(upcoming);
       } catch (err) {
         console.error('Ошибка при получении тренировок:', err);
         showNotification({
@@ -153,10 +160,7 @@ export default function CoachProfile({
                 <Text size="sm">
                   {t.hour}:00 — {t.user.name} {t.user.lastName ?? ''}
                   {t.user.internalTag && (
-                    <Text span color="dimmed">
-                      {' '}
-                      ({t.user.internalTag})
-                    </Text>
+                    <Text span color="dimmed"> ({t.user.internalTag})</Text>
                   )}
                 </Text>
               </Group>
@@ -187,7 +191,7 @@ export default function CoachProfile({
         </Text>
       )}
 
-      {/* 🔻 Код для регистрации — внизу */}
+      {/* 🔻 Код для регистрации */}
       <Button
         fullWidth
         variant="outline"
@@ -200,9 +204,7 @@ export default function CoachProfile({
 
       <Collapse in={showCode}>
         <Paper mt="sm" p="md" withBorder radius="md" shadow="xs">
-          <Title order={4} mb="sm">
-            Код для регистрации клиентов
-          </Title>
+          <Title order={4} mb="sm">Код для регистрации клиентов</Title>
           <InviteCodeViewer />
         </Paper>
       </Collapse>

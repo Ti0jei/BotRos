@@ -24,6 +24,9 @@ model User {
   emailToken         String?        @unique
   emailTokenExpires  DateTime?
 
+  // Новое поле — выключение оповещений (кроме подтверждения тренировок)
+  notificationsMuted Boolean        @default(false)
+
   payments           PaymentBlock[]
   trainings          Training[]
   nutrition          Nutrition[]    // ← связь с питанием
@@ -61,8 +64,6 @@ model InviteCode {
   createdAt DateTime @default(now())
   expiresAt DateTime
 }
-
-
 
 model Nutrition {
   id        String   @id @default(cuid())

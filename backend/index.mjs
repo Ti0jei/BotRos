@@ -15,13 +15,14 @@ import nutritionRoutes from './routes/nutrition.mjs'; // ✅ ручное пит
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
-import './cron/nutritionReminder.mjs';
+import './cron/nutritionReminder.mjs'; // ⏰ автоматические уведомления
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ Разрешённый фронтенд
 app.use(cors({
   origin: 'https://bot-ros-frontend.vercel.app',
   credentials: true,
@@ -35,13 +36,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', authMiddleware, profileRoutes);
 app.use('/api/clients', authMiddleware, clientsRoutes);
 app.use('/api/trainings', authMiddleware, trainingsRoutes);
-app.use('/api/users', usersRoute);
+app.use('/api/users', usersRoute); // регистрация и админ-аккаунт
 app.use('/api/payment-blocks', authMiddleware, paymentBlocksRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('/api/notifications', authMiddleware, notificationRoutes); // 🔥 БЫЛО БЕЗ authMiddleware
 app.use('/api/invite-code', inviteCodeRoutes);
 app.use('/api/nutrition', authMiddleware, nutritionRoutes);
 
-// 🌐 Узнать IP сервера
+// 🌐 Проверка внешнего IP
 app.get('/ip', async (req, res) => {
   try {
     const response = await fetch('https://api.ipify.org?format=json');
@@ -52,7 +53,7 @@ app.get('/ip', async (req, res) => {
   }
 });
 
-// 📤 Проверка email-отправки
+// 📤 Проверка email-отправки (Resend)
 app.get('/api/test-email', async (req, res) => {
   try {
     const to = 'zoty2104@gmail.com';
