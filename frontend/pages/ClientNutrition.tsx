@@ -13,6 +13,7 @@ import {
   Stack,
   Loader,
   Grid,
+  Box,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
@@ -20,6 +21,9 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconTrash,
+  IconEdit,
+  IconPlus,
+  IconArrowBack,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
@@ -70,16 +74,16 @@ export default function ClientNutrition({
   const loadData = () => {
     setLoading(true);
     Promise.all([
-      fetch(`${API}/api/nutrition/${userId}`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then(res => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then(res => res.json()),
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
     ])
       .then(([nutrition, week, month]) => {
         setData(Array.isArray(nutrition) ? nutrition : []);
         setWeekly(week);
         setMonthly(month);
       })
-      .catch(err => console.error(err))
+      .catch(console.error)
       .finally(() => setLoading(false));
   };
 
@@ -134,11 +138,12 @@ export default function ClientNutrition({
   };
 
   return (
-    <Container size="sm" pt="md" pb={80}>
-      <Title order={2} mb="md">Питание</Title>
+    <Container size="xs" pt="md" pb={90}>
+      <Title order={2} ta="center" mb="md">
+        Питание
+      </Title>
 
       <DatePickerInput
-        label="Выберите дату"
         value={selectedDate}
         onChange={(val) => {
           setSelectedDate(val);
@@ -146,14 +151,14 @@ export default function ClientNutrition({
         }}
         maxDate={new Date()}
         leftSection={<IconCalendar size={16} />}
-        leftSectionPointerEvents="none"
         nextIcon={<IconChevronRight size={16} />}
         previousIcon={<IconChevronLeft size={16} />}
+        mx="auto"
         mb="md"
       />
 
       {selectedRecord ? (
-        <Paper withBorder p="md" radius="md" mb="md">
+        <Paper withBorder p="md" radius="md" mb="md" shadow="xs">
           <Group justify="space-between" mb="xs">
             <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
             <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -165,43 +170,43 @@ export default function ClientNutrition({
           </Group>
 
           {!isAdmin && (
-            <Group mt="md">
-              <Button
-                size="xs"
-                onClick={() => {
-                  setFormVisible(true);
-                  setCalories(selectedRecord.calories);
-                  setProtein(selectedRecord.protein);
-                  setFat(selectedRecord.fat);
-                  setCarbs(selectedRecord.carbs);
-                }}
-              >
-                ✏️ Редактировать
+            <Group mt="md" justify="space-between">
+              <Button size="xs" variant="light" leftIcon={<IconEdit size={16} />} onClick={() => {
+                setFormVisible(true);
+                setCalories(selectedRecord.calories);
+                setProtein(selectedRecord.protein);
+                setFat(selectedRecord.fat);
+                setCarbs(selectedRecord.carbs);
+              }}>
+                Редактировать
               </Button>
-              <Button
-                size="xs"
-                color="red"
-                onClick={handleDelete}
-                leftIcon={<IconTrash size={14} />}
-              >
+              <Button size="xs" color="red" leftIcon={<IconTrash size={16} />} onClick={handleDelete}>
                 Удалить
               </Button>
             </Group>
           )}
         </Paper>
       ) : (
-        <Text size="sm" color="dimmed" mb="sm">Нет данных за выбранный день</Text>
+        <Text size="sm" color="dimmed" mb="sm" ta="center">
+          Нет данных за выбранный день
+        </Text>
       )}
 
       {!isAdmin && !formVisible && (
-        <Button fullWidth onClick={() => {
-          setCalories('');
-          setProtein('');
-          setFat('');
-          setCarbs('');
-          setFormVisible(true);
-        }}>
-          ➕ Внести КБЖУ
+        <Button
+          fullWidth
+          variant="filled"
+          color="pink"
+          onClick={() => {
+            setCalories('');
+            setProtein('');
+            setFat('');
+            setCarbs('');
+            setFormVisible(true);
+          }}
+          leftIcon={<IconPlus size={16} />}
+        >
+          Внести КБЖУ
         </Button>
       )}
 
@@ -209,51 +214,19 @@ export default function ClientNutrition({
         <Paper withBorder p="md" radius="md" mt="md">
           <Grid gutter="md">
             <Grid.Col span={6}>
-              <NumberInput
-                label="Калории"
-                value={calories}
-                onChange={setCalories}
-                min={0}
-                hideControls
-                inputWrapperOrder={['label', 'input']}
-                w="100%"
-              />
+              <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
             </Grid.Col>
             <Grid.Col span={6}>
-              <NumberInput
-                label="Белки"
-                value={protein}
-                onChange={setProtein}
-                min={0}
-                hideControls
-                inputWrapperOrder={['label', 'input']}
-                w="100%"
-              />
+              <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} hideControls />
             </Grid.Col>
             <Grid.Col span={6}>
-              <NumberInput
-                label="Жиры"
-                value={fat}
-                onChange={setFat}
-                min={0}
-                hideControls
-                inputWrapperOrder={['label', 'input']}
-                w="100%"
-              />
+              <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} hideControls />
             </Grid.Col>
             <Grid.Col span={6}>
-              <NumberInput
-                label="Углеводы"
-                value={carbs}
-                onChange={setCarbs}
-                min={0}
-                hideControls
-                inputWrapperOrder={['label', 'input']}
-                w="100%"
-              />
+              <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} hideControls />
             </Grid.Col>
           </Grid>
-          <Button mt="md" fullWidth onClick={handleSave}>
+          <Button mt="md" fullWidth color="pink" onClick={handleSave}>
             💾 Сохранить
           </Button>
         </Paper>
@@ -266,10 +239,10 @@ export default function ClientNutrition({
       ) : (
         <Stack>
           {weekly && (
-            <Paper withBorder p="md" radius="md">
+            <Paper withBorder p="md" radius="md" shadow="xs">
               <Text fw={600} mb={4}>Итого за неделю</Text>
               <Group gap="xs">
-                <Badge color="blue">Ккал: {weekly.calories}</Badge>
+                <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
                 <Badge color="green">Б: {weekly.protein}</Badge>
                 <Badge color="yellow">Ж: {weekly.fat}</Badge>
                 <Badge color="cyan">У: {weekly.carbs}</Badge>
@@ -277,10 +250,10 @@ export default function ClientNutrition({
             </Paper>
           )}
           {monthly && (
-            <Paper withBorder p="md" radius="md">
+            <Paper withBorder p="md" radius="md" shadow="xs">
               <Text fw={600} mb={4}>Итого за месяц</Text>
               <Group gap="xs">
-                <Badge color="blue">Ккал: {monthly.calories}</Badge>
+                <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
                 <Badge color="green">Б: {monthly.protein}</Badge>
                 <Badge color="yellow">Ж: {monthly.fat}</Badge>
                 <Badge color="cyan">У: {monthly.carbs}</Badge>
@@ -290,7 +263,7 @@ export default function ClientNutrition({
         </Stack>
       )}
 
-      <div
+      <Box
         style={{
           position: 'fixed',
           bottom: 10,
@@ -303,10 +276,10 @@ export default function ClientNutrition({
           zIndex: 1000,
         }}
       >
-        <Button variant="light" color="blue" size="sm" onClick={onBack}>
-          ← Назад к профилю
+        <Button variant="light" color="blue" size="sm" onClick={onBack} leftIcon={<IconArrowBack size={16} />}>
+          Назад к профилю
         </Button>
-      </div>
+      </Box>
     </Container>
   );
 }
