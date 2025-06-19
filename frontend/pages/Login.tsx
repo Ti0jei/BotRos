@@ -7,6 +7,7 @@ import {
   Paper,
   Title,
   Group,
+  Box,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -145,50 +146,76 @@ export default function Login({ onLoggedIn }: { onLoggedIn: () => void }) {
   };
 
   return (
-    <Paper shadow="md" p="xl" withBorder>
-      <Stack>
-        <Title order={3}>Вход</Title>
+    <Box
+      style={{
+        backgroundImage: 'url("/images/krissfit-bg-pink.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem',
+      }}
+    >
+      <Paper
+        shadow="xl"
+        radius="md"
+        p="xl"
+        withBorder
+        style={{
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          width: '100%',
+          maxWidth: 400,
+        }}
+      >
+        <Stack>
+          <Title order={2} align="center" fw={700} mb="sm">
+            Вход в Krissfit
+          </Title>
 
-        <TextInput
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
-        />
-        <PasswordInput
-          label="Пароль"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
-        />
-        <Button fullWidth onClick={handleLogin} loading={loading}>
-          Войти
-        </Button>
-
-        {showResend && (
-          <Button
-            variant="light"
-            color="blue"
-            mt="sm"
-            onClick={handleResend}
-            loading={resending}
-            leftIcon={<IconMail size={18} />}
-          >
-            Отправить письмо повторно
+          <TextInput
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+          <PasswordInput
+            label="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+          />
+          <Button fullWidth onClick={handleLogin} loading={loading} mt="sm">
+            Войти
           </Button>
-        )}
 
-        <Group position="center" mt="xs">
-          <Button
-            variant="subtle"
-            color="gray"
-            size="xs"
-            onClick={() => navigate('?view=reset-request')} // или setView('reset-request') если view в App
-          >
-            Забыли пароль?
-          </Button>
-        </Group>
-      </Stack>
-    </Paper>
+          {showResend && (
+            <Button
+              variant="light"
+              color="pink"
+              mt="sm"
+              onClick={handleResend}
+              loading={resending}
+              leftIcon={<IconMail size={18} />}
+            >
+              Отправить письмо повторно
+            </Button>
+          )}
+
+          <Group position="center" mt="xs">
+            <Button
+              variant="subtle"
+              color="gray"
+              size="xs"
+              onClick={() => navigate('?view=reset-request')}
+            >
+              Забыли пароль?
+            </Button>
+          </Group>
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
