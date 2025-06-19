@@ -123,30 +123,28 @@ export default function Profile({
         backgroundPosition: 'center',
         minHeight: '100vh',
         display: 'flex',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
         padding: 16,
       }}
     >
       <Container
         size="xs"
-        p="xl"
+        p={32}
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.4)',
-          borderRadius: 16,
+          borderRadius: 24,
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
           position: 'relative',
+          width: '100%',
+          maxWidth: 420,
         }}
       >
-        {/* 🔔 Кнопка оповещений */}
+        {/* 🔕 Иконка оповещений */}
         {section === 'main' && (
           <Tooltip
-            label={
-              user.notificationsMuted
-                ? 'Оповещения выключены'
-                : 'Оповещения включены'
-            }
+            label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}
           >
             <ActionIcon
               variant="light"
@@ -156,52 +154,60 @@ export default function Profile({
               size="lg"
               style={{
                 position: 'absolute',
-                top: 10,
-                right: 10,
-                zIndex: 10,
+                top: 12,
+                right: 12,
+                opacity: 0.7,
               }}
             >
-              {user.notificationsMuted ? (
-                <IconBellOff size={20} />
-              ) : (
-                <IconBell size={20} />
-              )}
+              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
             </ActionIcon>
           </Tooltip>
         )}
 
-        {/* Главный экран */}
+        {/* Главная секция */}
         {section === 'main' && (
           <Stack spacing="sm">
-            <Title order={2} mb="lg" ta="center">
+            <Title order={2} ta="center" mb="sm">
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button fullWidth color="blue" onClick={() => setSection('trainings')}>
+            <Button
+              fullWidth
+              color="blue"
+              radius="md"
+              onClick={() => setSection('trainings')}
+            >
               Мои тренировки
             </Button>
 
-            <Button fullWidth color="blue" onClick={() => setSection('nutrition')}>
+            <Button
+              fullWidth
+              color="blue"
+              radius="md"
+              onClick={() => setSection('nutrition')}
+            >
               Моё питание
             </Button>
 
-            <Button fullWidth color="gray" disabled>
+            <Button fullWidth color="gray" radius="md" disabled>
               Замеры (скоро)
             </Button>
-            <Button fullWidth color="gray" disabled>
+
+            <Button fullWidth color="gray" radius="md" disabled>
               Фото (скоро)
             </Button>
-            <Button fullWidth variant="light" color="gray" disabled>
+
+            <Button fullWidth variant="light" color="gray" radius="md" disabled>
               Материал для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" onClick={onOpenAdmin} radius="md">
                 Панель тренера
               </Button>
             )}
 
-            <Button fullWidth color="red" mt="lg" onClick={handleLogout}>
+            <Button fullWidth color="red" mt="md" onClick={handleLogout} radius="md">
               Выйти
             </Button>
           </Stack>
