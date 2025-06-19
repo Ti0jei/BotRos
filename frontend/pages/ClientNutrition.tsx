@@ -141,16 +141,14 @@ export default function ClientNutrition({
     boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
   };
 
-  const pinkButtonStyle = {
-    root: {
-      backgroundColor: 'transparent',
-      color: '#d6336c',
-      fontWeight: 500,
-      borderRadius: 8,
-      transition: 'background-color 0.2s ease',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    transition: 'background-color 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
     },
   };
 
@@ -200,7 +198,7 @@ export default function ClientNutrition({
                 <Button
                   size="xs"
                   variant="subtle"
-                  styles={pinkButtonStyle}
+                  sx={pinkButtonSx}
                   onClick={() => {
                     setFormVisible(true);
                     setCalories(selectedRecord.calories);
@@ -234,7 +232,7 @@ export default function ClientNutrition({
           <Button
             fullWidth
             variant="subtle"
-            styles={pinkButtonStyle}
+            sx={pinkButtonSx}
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
               setCalories('');
@@ -306,7 +304,7 @@ export default function ClientNutrition({
           fullWidth
           mt="lg"
           variant="subtle"
-          styles={pinkButtonStyle}
+          sx={pinkButtonSx}
           leftIcon={<IconArrowBack size={14} />}
           onClick={onBack}
         >
