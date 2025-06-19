@@ -10,6 +10,7 @@ import {
   Center,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
+import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
 
 interface Props {
   onBack: () => void;
@@ -22,19 +23,22 @@ export default function ResetPassword({ onBack }: Props) {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const API = import.meta.env.VITE_API_BASE_URL;
+
   const handleSubmit = async () => {
-    if (!password) {
+    if (!token || !password) {
       showNotification({
         title: 'Ошибка',
-        message: 'Пароль не может быть пустым',
+        message: 'Токен и пароль обязательны',
         color: 'red',
+        icon: <IconAlertCircle size={18} />,
       });
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch('/api/reset-password/confirm', {
+      const res = await fetch(`${API}/api/reset-password/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }),
@@ -42,12 +46,19 @@ export default function ResetPassword({ onBack }: Props) {
 
       if (res.ok) {
         setDone(true);
+        showNotification({
+          title: 'Готово',
+          message: 'Пароль успешно обновлён',
+          color: 'green',
+          icon: <IconCheck size={18} />,
+        });
       } else {
         const data = await res.json();
         showNotification({
           title: 'Ошибка',
           message: data.error || 'Не удалось сбросить пароль',
           color: 'red',
+          icon: <IconAlertCircle size={18} />,
         });
       }
     } catch (err) {
@@ -55,6 +66,7 @@ export default function ResetPassword({ onBack }: Props) {
         title: 'Ошибка сети',
         message: 'Проверьте подключение',
         color: 'red',
+        icon: <IconAlertCircle size={18} />,
       });
     } finally {
       setLoading(false);
@@ -63,15 +75,13 @@ export default function ResetPassword({ onBack }: Props) {
 
   return (
     <Container size="xs" mt="xl">
-      <Title order={2} mb="md">
-        Новый пароль
-      </Title>
+      <Title order={2} mb="md">Новый пароль</Title>
 
       {done ? (
         <>
           <Text mb="md">Пароль успешно обновлён. Теперь войдите с новым паролем.</Text>
           <Center>
-            <Button onClick={onBack}>Назад ко входу</Button>
+            <Button color="pink" onClick={onBack}>Назад ко входу</Button>
           </Center>
         </>
       ) : (
@@ -82,7 +92,7 @@ export default function ResetPassword({ onBack }: Props) {
             value={password}
             onChange={(e) => setPassword(e.currentTarget.value)}
           />
-          <Button onClick={handleSubmit} loading={loading}>
+          <Button onClick={handleSubmit} loading={loading} color="pink">
             Сохранить пароль
           </Button>
           <Button variant="subtle" onClick={onBack} color="gray">
