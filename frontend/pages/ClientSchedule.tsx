@@ -118,18 +118,10 @@ export default function ClientSchedule({
         style={{
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
-          paddingBottom: 100,
-          paddingTop: 32,
-          paddingLeft: 16,
-          paddingRight: 16,
+          padding: '32px 16px 100px',
         }}
       >
-        <Box
-          style={{
-            maxWidth: 420,
-            margin: '0 auto',
-          }}
-        >
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Stack spacing="lg">
             <Title order={2} ta="center">
               Мои тренировки
@@ -153,11 +145,11 @@ export default function ClientSchedule({
                 <Box
                   key={t.id}
                   style={{
-                    backgroundColor: '#fff',
                     borderRadius: 16,
                     padding: 16,
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
                     border: '1px solid #f3d3df',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                    backgroundColor: '#fff', // или можешь убрать, если хочешь вообще без карточек
                   }}
                 >
                   <Group justify="space-between" mb="xs">
