@@ -113,34 +113,14 @@ export default function ClientSchedule({
     },
   };
 
-  // Стиль кнопки "Назад к профилю" как в ClientNutrition
-  const backButtonStyle = {
-    root: {
-      width: '100%',
-      backgroundColor: 'white',
-      border: '1px solid #d6336c',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 16,
-      color: '#d6336c',
-      padding: '10px 0',
-      cursor: 'pointer',
-      transition: 'background 0.2s',
-      margin: 0,
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-    },
-  };
-
   return (
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca', // розовый фон снаружи
+          backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           paddingTop: 0,
-          paddingBottom: 60, // чтобы контент не перекрывала кнопка
+          paddingBottom: 60,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -148,7 +128,7 @@ export default function ClientSchedule({
       >
         <Box
           style={{
-            backgroundColor: 'white', // белый фон по середине
+            backgroundColor: 'white',
             borderRadius: 0,
             padding: 24,
             width: '100%',
@@ -258,7 +238,6 @@ export default function ClientSchedule({
         </Box>
       </Box>
 
-      {/* Фиксированная кнопка снизу */}
       <Box
         style={{
           position: 'fixed',
@@ -276,7 +255,23 @@ export default function ClientSchedule({
         <Button
           fullWidth
           onClick={onBack}
-          styles={backButtonStyle}
+          styles={{
+            root: {
+              width: '100%',
+              fontWeight: 600,
+              fontSize: 16,
+              color: '#d6336c',
+              border: '1.5px solid #d6336c',
+              borderRadius: 12,
+              padding: '12px 0',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+              '&:hover': {
+                backgroundColor: '#ffe3ed',
+              },
+            },
+          }}
           leftIcon={<IconArrowBack size={16} />}
         >
           Назад к профилю
