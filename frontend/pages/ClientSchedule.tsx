@@ -126,7 +126,7 @@ export default function ClientSchedule({
       >
         <Box
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'white', // Белый фон обертки
             borderRadius: 20,
             padding: 24,
             width: '100%',
@@ -160,8 +160,10 @@ export default function ClientSchedule({
                   style={{
                     padding: 16,
                     width: '100%',
-                    backgroundColor: 'white',
+                    backgroundColor: 'white', // Заменили фон на белый
                     borderBottom: '1px solid #f3bfcf',
+                    borderRadius: 12,
+                    marginTop: 12,
                   }}
                 >
                   <Group justify="space-between" mb="xs">
@@ -182,7 +184,7 @@ export default function ClientSchedule({
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLINED'
+                        : t.status === 'DECLИНED'
                         ? 'ОТМЕНЕНО'
                         : 'ОЖИДАНИЕ'}
                     </Badge>
