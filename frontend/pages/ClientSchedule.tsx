@@ -199,6 +199,7 @@ export default function ClientSchedule({
         </Container>
       </Box>
 
+      {/* 🔒 Только кнопка. Никакого @Krissfit_bot здесь больше нет */}
       <Box
         style={{
           position: 'fixed',
@@ -218,7 +219,7 @@ export default function ClientSchedule({
             sx={pinkOutlineButton}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
-            На главную
+            Назад к профилю
           </Button>
         </Container>
       </Box>
