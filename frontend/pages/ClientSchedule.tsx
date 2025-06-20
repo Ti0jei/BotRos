@@ -113,17 +113,20 @@ export default function ClientSchedule({
     },
   };
 
+  // Стиль кнопки "Назад к профилю" как в ClientNutrition
   const backButtonStyle = {
     root: {
-      color: '#d6336c',
-      border: '1px solid #d6336c',
-      borderRadius: 8,
-      fontWeight: 500,
-      backgroundColor: 'transparent',
       width: '100%',
+      backgroundColor: 'white',
+      border: '1px solid #d6336c',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 16,
+      color: '#d6336c',
       padding: '10px 0',
       cursor: 'pointer',
       transition: 'background 0.2s',
+      margin: 0,
       '&:hover': {
         backgroundColor: '#ffe3ed',
       },
@@ -137,7 +140,7 @@ export default function ClientSchedule({
           backgroundColor: '#f5d4ca', // розовый фон снаружи
           minHeight: '100vh',
           paddingTop: 0,
-          paddingBottom: 60, // Чтобы контент не закрывался кнопкой
+          paddingBottom: 60, // чтобы контент не перекрывала кнопка
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -145,7 +148,7 @@ export default function ClientSchedule({
       >
         <Box
           style={{
-            backgroundColor: 'white', // белый фон по центру
+            backgroundColor: 'white', // белый фон по середине
             borderRadius: 0,
             padding: 24,
             width: '100%',
@@ -255,7 +258,7 @@ export default function ClientSchedule({
         </Box>
       </Box>
 
-      {/* Фиксированная кнопка "Назад к профилю" снизу */}
+      {/* Фиксированная кнопка снизу */}
       <Box
         style={{
           position: 'fixed',
@@ -274,7 +277,7 @@ export default function ClientSchedule({
           fullWidth
           onClick={onBack}
           styles={backButtonStyle}
-          leftIcon={<IconArrowBack size={18} />}
+          leftIcon={<IconArrowBack size={16} />}
         >
           Назад к профилю
         </Button>
