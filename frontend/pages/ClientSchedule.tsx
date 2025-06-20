@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  Group,
   Stack,
   Text,
   Title,
   Badge,
+  Group,
 } from '@mantine/core';
 import { IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -32,30 +32,26 @@ export default function ClientSchedule({
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = getToken();
 
-  const loadTrainings = async () => {
-    const res = await fetch(`${API}/api/trainings`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-
-    const upcoming = data
-      .filter((t: Training) =>
-        dayjs(t.date).add(t.hour, 'hour').isAfter(dayjs())
-      )
-      .sort((a, b) => {
-        const aTime = dayjs(a.date).add(a.hour, 'hour');
-        const bTime = dayjs(b.date).add(b.hour, 'hour');
-        return aTime.diff(bTime);
+  useEffect(() => {
+    const loadTrainings = async () => {
+      const res = await fetch(`${API}/api/trainings`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) return;
+      const data = await res.json();
+      const upcoming = data
+        .filter((t: Training) =>
+          dayjs(t.date).add(t.hour, 'hour').isAfter(dayjs())
+        )
+        .sort((a, b) =>
+          dayjs(a.date).add(a.hour, 'hour').diff(dayjs(b.date).add(b.hour, 'hour'))
+        );
+      setTrainings(upcoming);
+    };
+    loadTrainings();
+  }, []);
 
-    setTrainings(upcoming);
-  };
-
-  const updateStatus = async (
-    id: string,
-    status: 'CONFIRMED' | 'DECLINED'
-  ) => {
+  const updateStatus = async (id: string, status: 'CONFIRMED' | 'DECLINED') => {
     await fetch(`${API}/api/trainings/${id}`, {
       method: 'PATCH',
       headers: {
@@ -65,182 +61,108 @@ export default function ClientSchedule({
       body: JSON.stringify({ status }),
     });
     setEditingId(null);
-    loadTrainings();
-  };
-
-  useEffect(() => {
-    loadTrainings();
-  }, []);
-
-  const outlinePinkButtonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      color: '#d6336c',
-      backgroundColor: 'transparent',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      transition: 'background 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-    },
-  };
-
-  const softGreenButton = {
-    root: {
-      backgroundColor: '#e6f4ea',
-      color: 'green',
-      fontWeight: 500,
-      borderRadius: 10,
-      height: 36,
-      fontSize: 14,
-      '&:hover': { backgroundColor: '#d3f0dc' },
-    },
-  };
-
-  const softRedButton = {
-    root: {
-      backgroundColor: '#ffe5e8',
-      color: '#d6336c',
-      fontWeight: 500,
-      borderRadius: 10,
-      height: 36,
-      fontSize: 14,
-      '&:hover': { backgroundColor: '#ffd6dc' },
-    },
+    const res = await fetch(`${API}/api/trainings`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const updated = await res.json();
+    setTrainings(updated);
   };
 
   return (
-    <>
-      <Box
-        style={{
-          backgroundColor: '#f5d4ca',
-          minHeight: '100vh',
-          padding: '32px 0 100px',
-        }}
-      >
-        <Box style={{ maxWidth: 420, margin: '0 auto', padding: '0 0' }}>
-          <Stack spacing="lg" px="md">
-            <Title order={2} ta="center">
-              Мои тренировки
-            </Title>
+    <Box style={{ background: '#f5d4ca', minHeight: '100vh', paddingBottom: 100 }}>
+      <Box style={{ maxWidth: 420, margin: '0 auto', padding: 16 }}>
+        <Stack spacing="md">
+          <Title order={2} align="center">
+            Мои тренировки
+          </Title>
 
-            <Button
-              onClick={onOpenBlock}
-              leftIcon={<IconPackage size={20} />}
-              styles={outlinePinkButtonStyle}
-              fullWidth
-            >
-              📦 Блок тренировок
-            </Button>
-
-            {trainings.length === 0 ? (
-              <Text ta="center" c="dimmed">
-                У вас пока нет назначенных тренировок.
-              </Text>
-            ) : (
-              trainings.map((t) => (
-                <Box
-                  key={t.id}
-                  style={{
-                    padding: 16,
-                    width: '100%',
-                    backgroundColor: '#f5d4ca',
-                    borderBottom: '1px solid #f3bfcf',
-                  }}
-                >
-                  <Group justify="space-between" mb="xs">
-                    <Text fw={600}>
-                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                    </Text>
-                    <Badge
-                      color={
-                        t.status === 'CONFIRMED'
-                          ? 'green'
-                          : t.status === 'DECLINED'
-                          ? 'red'
-                          : 'gray'
-                      }
-                      size="lg"
-                      radius="sm"
-                      variant="light"
-                    >
-                      {t.status === 'CONFIRMED'
-                        ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLINED'
-                        ? 'ОТМЕНЕНО'
-                        : 'ОЖИДАНИЕ'}
-                    </Badge>
-                  </Group>
-
-                  {t.status === 'PENDING' || editingId === t.id ? (
-                    <Stack spacing="xs" mt="xs">
-                      <Button
-                        fullWidth
-                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                        styles={softGreenButton}
-                      >
-                        ✅ Приду
-                      </Button>
-                      <Button
-                        fullWidth
-                        onClick={() => updateStatus(t.id, 'DECLINED')}
-                        styles={softRedButton}
-                      >
-                        ❌ Не приду
-                      </Button>
-                    </Stack>
-                  ) : (
-                    <>
-                      <Text mt="xs" size="sm" c="dimmed">
-                        {t.status === 'CONFIRMED'
-                          ? '✅ Вы подтвердили участие'
-                          : '🚫 Вы отказались от тренировки'}
-                      </Text>
-                      <Button
-                        mt="xs"
-                        size="xs"
-                        variant="light"
-                        color="blue"
-                        fullWidth
-                        onClick={() => setEditingId(t.id)}
-                      >
-                        Изменить решение
-                      </Button>
-                    </>
-                  )}
-                </Box>
-              ))
-            )}
-          </Stack>
-        </Box>
-      </Box>
-
-      <Box
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: '#f5d4ca',
-          padding: '12px 16px',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
-        }}
-      >
-        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Button
+            onClick={onOpenBlock}
+            leftIcon={<IconPackage size={20} />}
+            variant="outline"
+            color="pink"
+            radius="md"
             fullWidth
-            onClick={onBack}
-            styles={outlinePinkButtonStyle}
-            leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
-            Назад к профилю
+            📦 Блок тренировок
           </Button>
-        </Box>
+
+          {trainings.length === 0 ? (
+            <Text align="center" color="dimmed">
+              У вас пока нет назначенных тренировок.
+            </Text>
+          ) : (
+            trainings.map((t) => (
+              <Box
+                key={t.id}
+                style={{
+                  background: '#ffd7cf',
+                  borderRadius: 16,
+                  padding: 16,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                }}
+              >
+                <Group position="apart" mb="xs">
+                  <Text weight={600}>{dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00</Text>
+                  <Badge color={
+                    t.status === 'CONFIRMED' ? 'green' :
+                    t.status === 'DECLINED' ? 'red' : 'gray'
+                  } variant="light">
+                    {t.status === 'CONFIRMED' ? 'ПОДТВЕРЖДЕНО' :
+                     t.status === 'DECLINED' ? 'ОТМЕНЕНО' : 'ОЖИДАНИЕ'}
+                  </Badge>
+                </Group>
+
+                {t.status === 'PENDING' || editingId === t.id ? (
+                  <Stack spacing="xs">
+                    <Button
+                      color="green"
+                      variant="light"
+                      fullWidth
+                      onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                    >
+                      ✅ Приду
+                    </Button>
+                    <Button
+                      color="red"
+                      variant="light"
+                      fullWidth
+                      onClick={() => updateStatus(t.id, 'DECLINED')}
+                    >
+                      ❌ Не приду
+                    </Button>
+                  </Stack>
+                ) : (
+                  <>
+                    <Text mt="xs" size="sm" color="dimmed">
+                      {t.status === 'CONFIRMED' ? '✅ Вы подтвердили участие' : '🚫 Вы отказались от тренировки'}
+                    </Text>
+                    <Button
+                      mt="xs"
+                      variant="light"
+                      color="blue"
+                      fullWidth
+                      onClick={() => setEditingId(t.id)}
+                    >
+                      Изменить решение
+                    </Button>
+                  </>
+                )}
+              </Box>
+            ))
+          )}
+
+          <Button
+            onClick={onBack}
+            variant="outline"
+            color="pink"
+            radius="md"
+            fullWidth
+          >
+            ← Назад к профилю
+          </Button>
+        </Stack>
       </Box>
-    </>
+    </Box>
   );
 }
