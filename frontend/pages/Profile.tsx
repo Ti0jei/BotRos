@@ -119,6 +119,7 @@ export default function Profile({
     );
   }
 
+  // Стили кнопок
   const pinkButtonStyle = {
     root: {
       color: '#fff',
@@ -127,7 +128,9 @@ export default function Profile({
       fontWeight: 600,
       fontSize: 16,
       height: 44,
-      '&:hover': { backgroundColor: '#c1275c' },
+      '&:hover': {
+        backgroundColor: '#c1275c',
+      },
     },
   };
 
@@ -145,12 +148,13 @@ export default function Profile({
   return (
     <Box
       style={{
-        backgroundColor: '#e8b3a6',
+        backgroundColor: '#f5d4ca',
         minHeight: '100vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         padding: 16,
+        paddingBottom: 80,
       }}
     >
       <Container
@@ -165,6 +169,7 @@ export default function Profile({
           position: 'relative',
         }}
       >
+        {/* Уведомления */}
         {section === 'main' && (
           <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
             <ActionIcon
@@ -180,6 +185,7 @@ export default function Profile({
           </Tooltip>
         )}
 
+        {/* Главный экран */}
         {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm" style={{ fontWeight: 800 }}>
@@ -227,6 +233,7 @@ export default function Profile({
           </Stack>
         )}
 
+        {/* Тренировки / расписание */}
         {section === 'trainings' &&
           (showBlock ? (
             <ClientBlock onBack={() => setShowBlock(false)} />
@@ -237,6 +244,7 @@ export default function Profile({
             />
           ))}
 
+        {/* Питание */}
         {section === 'nutrition' && (
           <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
         )}
