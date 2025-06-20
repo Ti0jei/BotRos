@@ -293,7 +293,7 @@ export default function ClientNutrition({
           </Stack>
         )}
 
-        <Box h={100} /> {/* 🔧 Отступ под фиксированную кнопку */}
+        <Box h={100} /> {/* Отступ под фиксированную кнопку */}
       </Box>
 
       <Box
