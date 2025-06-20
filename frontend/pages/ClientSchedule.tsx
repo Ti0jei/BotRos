@@ -8,7 +8,7 @@ import {
   Title,
   Badge,
 } from '@mantine/core';
-import { IconPackage } from '@tabler/icons-react';
+import { IconPackage, IconArrowBack } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
 
@@ -113,6 +113,7 @@ export default function ClientSchedule({
     },
   };
 
+  // Стиль кнопки "Назад к профилю" как в ClientNutrition
   const backButtonStyle = {
     root: {
       width: '100%',
@@ -136,10 +137,10 @@ export default function ClientSchedule({
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca',
+          backgroundColor: '#f5d4ca', // розовый фон снаружи
           minHeight: '100vh',
           paddingTop: 0,
-          paddingBottom: 60, // Чтобы не закрывала контент фиксированная кнопка
+          paddingBottom: 60, // чтобы контент не перекрывала кнопка
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -147,7 +148,7 @@ export default function ClientSchedule({
       >
         <Box
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'white', // белый фон по середине
             borderRadius: 0,
             padding: 24,
             width: '100%',
@@ -257,6 +258,7 @@ export default function ClientSchedule({
         </Box>
       </Box>
 
+      {/* Фиксированная кнопка снизу */}
       <Box
         style={{
           position: 'fixed',
@@ -275,7 +277,7 @@ export default function ClientSchedule({
           fullWidth
           onClick={onBack}
           styles={backButtonStyle}
-          leftIcon={<span style={{ fontSize: 18 }}>←</span>}
+          leftIcon={<IconArrowBack size={16} />}
         >
           Назад к профилю
         </Button>
