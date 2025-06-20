@@ -74,17 +74,43 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  const pinkOutlineButton = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 600,
-    borderRadius: 12,
-    border: '1.5px solid #d6336c',
-    fontSize: 16,
-    height: 44,
-    transition: 'background-color 0.2s ease',
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
+  const outlinePinkButtonStyle = {
+    root: {
+      border: '1.5px solid #d6336c',
+      color: '#d6336c',
+      backgroundColor: 'transparent',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 15,
+      height: 44,
+      transition: 'background 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+      },
+    },
+  };
+
+  const softGreenButton = {
+    root: {
+      backgroundColor: '#e6f4ea',
+      color: 'green',
+      fontWeight: 500,
+      borderRadius: 10,
+      height: 36,
+      fontSize: 14,
+      '&:hover': { backgroundColor: '#d3f0dc' },
+    },
+  };
+
+  const softRedButton = {
+    root: {
+      backgroundColor: '#ffe5e8',
+      color: '#d6336c',
+      fontWeight: 500,
+      borderRadius: 10,
+      height: 36,
+      fontSize: 14,
+      '&:hover': { backgroundColor: '#ffd6dc' },
     },
   };
 
@@ -105,8 +131,9 @@ export default function ClientSchedule({
           <Button
             onClick={onOpenBlock}
             leftIcon={<IconPackage size={20} />}
-            sx={{ ...pinkOutlineButton, marginBottom: 24 }}
+            styles={outlinePinkButtonStyle}
             fullWidth
+            mb="md"
           >
             📦 Блок тренировок
           </Button>
@@ -122,11 +149,11 @@ export default function ClientSchedule({
                   key={t.id}
                   withBorder
                   radius="md"
-                  shadow="sm"
                   p="md"
                   style={{
                     background: 'white',
                     border: '1px solid #f3d3df',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                   }}
                 >
                   <Group justify="space-between" mb="xs">
@@ -141,6 +168,9 @@ export default function ClientSchedule({
                           ? 'red'
                           : 'gray'
                       }
+                      size="lg"
+                      radius="sm"
+                      variant="light"
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
@@ -154,21 +184,15 @@ export default function ClientSchedule({
                     <Stack spacing="xs" mt="xs">
                       <Button
                         fullWidth
-                        size="xs"
-                        color="green"
-                        variant="light"
                         onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                        sx={{ fontWeight: 500 }}
+                        styles={softGreenButton}
                       >
                         ✅ Приду
                       </Button>
                       <Button
                         fullWidth
-                        size="xs"
-                        color="red"
-                        variant="light"
                         onClick={() => updateStatus(t.id, 'DECLINED')}
-                        sx={{ fontWeight: 500 }}
+                        styles={softRedButton}
                       >
                         ❌ Не приду
                       </Button>
@@ -199,7 +223,7 @@ export default function ClientSchedule({
         </Container>
       </Box>
 
-      {/* 🔒 Только кнопка. Никакого @Krissfit_bot здесь больше нет */}
+      {/* Фиксированная кнопка "Назад" */}
       <Box
         style={{
           position: 'fixed',
@@ -216,7 +240,7 @@ export default function ClientSchedule({
           <Button
             fullWidth
             onClick={onBack}
-            sx={pinkOutlineButton}
+            styles={outlinePinkButtonStyle}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
