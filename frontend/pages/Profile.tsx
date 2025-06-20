@@ -82,20 +82,35 @@ export default function Profile({
     onLogout();
   };
 
-  const toggleNotifications = async () => {
-    if (!user) return;
-    const newStatus = !user.notificationsMuted;
+  // Стиль кнопок из CoachProfile
+  const coachButtonStyle = {
+    root: {
+      border: '1.5px solid #d6336c',
+      color: '#d6336c',
+      backgroundColor: 'transparent',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 16,
+      height: 44,
+      transition: 'background 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+      },
+      paddingLeft: 20,
+      paddingRight: 20,
+    },
+  };
 
-    try {
-      await fetch(`${API}/api/notifications`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ muted: newStatus }),
-      });
-      setUser({ ...user, notificationsMuted: newStatus });
-    } catch (err) {
-      console.error('Ошибка обновления уведомлений:', err);
-    }
+  // Стиль отключённых кнопок
+  const disabledButtonStyle = {
+    root: {
+      color: '#999',
+      backgroundColor: '#eceff1',
+      borderRadius: 12,
+      fontWeight: 500,
+      height: 44,
+      cursor: 'not-allowed',
+    },
   };
 
   if (loading) {
@@ -114,49 +129,6 @@ export default function Profile({
     );
   }
 
-  const outlinePinkButtonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      color: '#d6336c',
-      backgroundColor: 'transparent',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      transition: 'background 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-    },
-  };
-
-  const filledPinkButtonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      backgroundColor: '#ffe3ed',
-      color: '#d6336c',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      transition: 'background 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffd6e3',
-      },
-    },
-  };
-
-  const disabledButtonStyle = {
-    root: {
-      color: '#999',
-      backgroundColor: '#eceff1',
-      borderRadius: 12,
-      fontWeight: 500,
-      height: 44,
-      cursor: 'not-allowed',
-    },
-  };
-
   return (
     <Box
       style={{
@@ -167,6 +139,7 @@ export default function Profile({
         width: '100vw',
       }}
     >
+      {/* Уведомления */}
       {section === 'main' && (
         <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
           <ActionIcon
@@ -182,6 +155,7 @@ export default function Profile({
         </Tooltip>
       )}
 
+      {/* Главный экран */}
       {section === 'main' && (
         <Box p={16}>
           <Stack spacing="sm">
@@ -189,11 +163,11 @@ export default function Profile({
               Привет, {user.name} 👋
             </Title>
 
-            <Button fullWidth styles={outlinePinkButtonStyle} onClick={() => setSection('trainings')}>
+            <Button fullWidth styles={coachButtonStyle} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth styles={outlinePinkButtonStyle} onClick={() => setSection('nutrition')}>
+            <Button fullWidth styles={coachButtonStyle} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
@@ -210,7 +184,7 @@ export default function Profile({
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" styles={outlinePinkButtonStyle} onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" styles={coachButtonStyle} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
@@ -220,7 +194,23 @@ export default function Profile({
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
               fullWidth
-              styles={filledPinkButtonStyle}
+              styles={{
+                root: {
+                  borderRadius: 12,
+                  fontWeight: 600,
+                  fontSize: 16,
+                  height: 44,
+                  backgroundColor: '#ffe3ed',
+                  color: '#d6336c',
+                  border: '1.5px solid #d6336c',
+                  transition: 'background 0.2s',
+                  '&:hover': {
+                    backgroundColor: '#ffd6dc',
+                  },
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                },
+              }}
             >
               Выйти
             </Button>
@@ -228,6 +218,7 @@ export default function Profile({
         </Box>
       )}
 
+      {/* Тренировки */}
       {section === 'trainings' &&
         (showBlock ? (
           <ClientBlock onBack={() => setShowBlock(false)} />
@@ -238,6 +229,7 @@ export default function Profile({
           />
         ))}
 
+      {/* Питание */}
       {section === 'nutrition' && (
         <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
       )}
