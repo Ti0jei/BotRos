@@ -113,6 +113,22 @@ export default function ClientSchedule({
     },
   };
 
+  // Кнопка "Назад к профилю" из ClientNutrition
+  const backButtonStyle = {
+    root: {
+      color: '#d6336c',
+      border: '1px solid #d6336c',
+      borderRadius: 8,
+      fontWeight: 500,
+      backgroundColor: 'transparent',
+      width: '100%',
+      padding: '10px 0',
+      cursor: 'pointer',
+      transition: 'background 0.2s',
+      '&:hover': { backgroundColor: '#ffe3ed' },
+    },
+  };
+
   return (
     <>
       <Box
@@ -120,7 +136,7 @@ export default function ClientSchedule({
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           paddingTop: 0,
-          paddingBottom: 60,
+          paddingBottom: 60, // Чтобы контент не перекрывался кнопкой
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -238,44 +254,30 @@ export default function ClientSchedule({
         </Box>
       </Box>
 
+      {/* Фиксированная кнопка "Назад к профилю" */}
       <Box
         style={{
           position: 'fixed',
-          bottom: 16,
-          left: 16,
-          right: 16,
-          maxWidth: 420,
-          margin: '0 auto',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 16px',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
           zIndex: 1000,
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          backgroundColor: 'white',
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
-        <Button
-          fullWidth
-          onClick={onBack}
-          styles={{
-            root: {
-              width: '100%',
-              fontWeight: 600,
-              fontSize: 16,
-              color: '#d6336c',
-              border: '1.5px solid #d6336c',
-              borderRadius: 12,
-              padding: '12px 0',
-              backgroundColor: 'white',
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-              '&:hover': {
-                backgroundColor: '#ffe3ed',
-              },
-            },
-          }}
-          leftIcon={<IconArrowBack size={16} />}
-        >
-          Назад к профилю
-        </Button>
+        <Box style={{ maxWidth: 420, width: '100%' }}>
+          <Button
+            onClick={onBack}
+            leftIcon={<IconArrowBack size={16} />}
+            styles={backButtonStyle}
+          >
+            Назад к профилю
+          </Button>
+        </Box>
       </Box>
     </>
   );
