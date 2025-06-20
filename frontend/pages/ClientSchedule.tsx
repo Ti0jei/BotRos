@@ -8,11 +8,11 @@ import {
   Text,
   Title,
   Badge,
+  Container,
 } from '@mantine/core';
 import { IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
-import BackButtonFixed from '../components/BackButtonFixed'; // Импорт фиксированной кнопки
 
 interface Training {
   id: string;
@@ -75,36 +75,34 @@ export default function ClientSchedule({
     // eslint-disable-next-line
   }, []);
 
-  // Универсальный стиль розовой кнопки
-  const pinkButtonStyle: React.CSSProperties = {
-    background: 'transparent',
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
     color: '#d6336c',
-    fontWeight: 600,
-    border: '1.5px solid #d6336c',
-    borderRadius: 12,
-    height: 44,
+    fontWeight: 500,
+    borderRadius: 8,
+    transition: 'background-color 0.2s ease',
     width: '100%',
-    fontSize: 17,
-    transition: 'background 0.15s',
-    boxShadow: 'none',
-    cursor: 'pointer',
-    margin: 0,
+    border: '1.5px solid #d6336c',
+    fontSize: 18,
+    height: 46,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
+  const cardStyle = {
+    background: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
   };
 
   return (
-    <>
-      <Box
-        style={{
-          backgroundColor: '#f5d4ca',
-          minHeight: '100vh',
-          paddingBottom: 90, // Чтобы фиксированная кнопка не перекрывала контент
-          position: 'relative',
-        }}
-      >
+    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
+      <Container size="xs" py="md">
         <Card
           sx={{
             width: '100%',
-            maxWidth: 420,
             margin: '0 auto',
             background: 'rgba(255,255,255,0.94)',
             borderRadius: 24,
@@ -121,27 +119,14 @@ export default function ClientSchedule({
             Мои тренировки
           </Title>
 
-          <button
+          <Button
+            leftIcon={<IconPackage size={20} />}
             onClick={onOpenBlock}
-            style={{
-              ...pinkButtonStyle,
-              marginBottom: 24,
-              maxWidth: 320,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = '#ffe3ed')
-            }
-            onMouseOut={e =>
-              (e.currentTarget.style.background = 'transparent')
-            }
+            variant="outline"
+            sx={{ ...pinkButtonSx, marginBottom: 24, maxWidth: 320 }}
           >
-            <IconPackage size={20} style={{ marginRight: 6 }} />
-            <span>Блок тренировок</span>
-          </button>
+            Блок тренировок
+          </Button>
 
           <Stack spacing="md" w="100%" align="stretch">
             {trainings.length === 0 ? (
@@ -230,9 +215,33 @@ export default function ClientSchedule({
             )}
           </Stack>
         </Card>
+      </Container>
+
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
+        <Container size="xs">
+          <Button
+            variant="subtle"
+            sx={pinkButtonSx}
+            size="md"
+            onClick={onBack}
+            leftIcon={<span style={{ fontSize: 20, marginRight: 4 }}>←</span>}
+          >
+            На главную
+          </Button>
+        </Container>
       </Box>
-      {/* Новый компонент фиксированной кнопки */}
-      <BackButtonFixed onClick={onBack}>На главную</BackButtonFixed>
-    </>
+    </Box>
   );
 }
