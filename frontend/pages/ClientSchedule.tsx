@@ -71,23 +71,25 @@ export default function ClientSchedule({
 
   useEffect(() => {
     loadTrainings();
+    // eslint-disable-next-line
   }, []);
 
-  // Стиль для кнопки
-  const pinkButtonSx = {
-    backgroundColor: 'transparent',
+  // Стиль для всех "розовых" кнопок
+  const pinkButtonStyle = {
+    background: 'transparent',
     color: '#d6336c',
-    fontWeight: 500,
+    fontWeight: 600,
     border: '1.5px solid #d6336c',
-    borderRadius: 8,
-    height: 36,
+    borderRadius: 12,
+    height: 44,
     width: '100%',
-    fontSize: 16,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
+    fontSize: 17,
     transition: 'background 0.15s',
-  };
+    boxShadow: 'none',
+    cursor: 'pointer',
+    marginBottom: 0,
+    marginTop: 0,
+  } as React.CSSProperties;
 
   return (
     <>
@@ -119,18 +121,27 @@ export default function ClientSchedule({
             Мои тренировки
           </Title>
 
-          <Button
-            leftIcon={<IconPackage size={18} />}
+          <button
             onClick={onOpenBlock}
-            variant="outline"
-            sx={{
-              ...pinkButtonSx,
-              marginBottom: 20,
+            style={{
+              ...pinkButtonStyle,
+              marginBottom: 24,
               maxWidth: 320,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
             }}
+            onMouseOver={e =>
+              (e.currentTarget.style.background = '#ffe3ed')
+            }
+            onMouseOut={e =>
+              (e.currentTarget.style.background = 'transparent')
+            }
           >
-            📦 Блок тренировок
-          </Button>
+            <IconPackage size={20} style={{ marginRight: 6 }} />
+            <span>Блок тренировок</span>
+          </button>
 
           <Stack spacing="md" w="100%" align="stretch">
             {trainings.length === 0 ? (
@@ -220,29 +231,33 @@ export default function ClientSchedule({
           </Stack>
         </Card>
       </Box>
-      {/* Фиксированная кнопка на самом верхнем уровне JSX, вне Box и Card! */}
+      {/* Фиксированная кнопка снизу в едином стиле */}
       <Box
         style={{
           position: 'fixed',
           left: 0,
           bottom: 0,
           width: '100vw',
-          background: 'white',
-          padding: '10px 0',
-          textAlign: 'center',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 9999,
+          background: 'rgba(255,255,255,0.90)',
+          padding: '14px 0 10px 0',
+          boxShadow: '0 -2px 14px 0 rgba(0,0,0,0.07)',
+          zIndex: 1200,
         }}
       >
-        <Box sx={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
-          <Button
-            variant="outline"
+        <Box style={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
+          <button
             onClick={onBack}
-            leftIcon={<IconArrowBack size={14} />}
-            sx={pinkButtonSx}
+            style={pinkButtonStyle}
+            onMouseOver={e =>
+              (e.currentTarget.style.background = '#ffe3ed')
+            }
+            onMouseOut={e =>
+              (e.currentTarget.style.background = 'transparent')
+            }
           >
+            <IconArrowBack size={16} style={{ marginRight: 7, verticalAlign: 'middle' }} />
             На главную
-          </Button>
+          </button>
         </Box>
       </Box>
     </>
