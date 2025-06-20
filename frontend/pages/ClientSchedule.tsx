@@ -72,16 +72,17 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  // 🔴 Контурный розовый (как в клиентской и админке)
-  const cleanOutlineButtonStyle = {
+  const outlinePinkButtonStyle = {
     root: {
       border: '1.5px solid #d6336c',
       color: '#d6336c',
       backgroundColor: 'transparent',
       borderRadius: 12,
-      fontWeight: 500,
-      fontSize: 14,
-      height: 42,
+      fontWeight: 600,
+      fontSize: 15,
+      height: 44,
+      width: '100%',
+      transition: 'background 0.2s',
       '&:hover': {
         backgroundColor: '#ffe3ed',
       },
@@ -121,7 +122,7 @@ export default function ClientSchedule({
           padding: '32px 0 100px',
         }}
       >
-        <Box style={{ maxWidth: 420, margin: '0 auto', padding: '0 0' }}>
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Stack spacing="lg" px="md">
             <Title order={2} ta="center">
               Мои тренировки
@@ -130,7 +131,7 @@ export default function ClientSchedule({
             <Button
               onClick={onOpenBlock}
               leftIcon={<IconPackage size={20} />}
-              styles={cleanOutlineButtonStyle}
+              styles={outlinePinkButtonStyle}
               fullWidth
             >
               📦 Блок тренировок
@@ -203,7 +204,7 @@ export default function ClientSchedule({
                         mt="xs"
                         size="xs"
                         fullWidth
-                        styles={cleanOutlineButtonStyle}
+                        styles={outlinePinkButtonStyle}
                         onClick={() => setEditingId(t.id)}
                       >
                         Изменить решение
@@ -233,7 +234,7 @@ export default function ClientSchedule({
           <Button
             fullWidth
             onClick={onBack}
-            styles={cleanOutlineButtonStyle}
+            styles={outlinePinkButtonStyle}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
