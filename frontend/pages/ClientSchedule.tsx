@@ -69,6 +69,8 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
     fontWeight: 500,
     border: '1px solid #d6336c',
     borderRadius: 8,
+    height: 36,
+    padding: '0 14px',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
@@ -80,25 +82,20 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
         minHeight: '100vh',
         backgroundColor: '#e8b3a6',
         paddingBottom: 80,
-        paddingTop: 24,
+        paddingTop: 32,
         display: 'flex',
         justifyContent: 'center',
       }}
     >
-      <Box
-        sx={{
-          maxWidth: 420,
-          width: '100%',
-        }}
-      >
+      <Box sx={{ width: '100%', maxWidth: 420, padding: '0 16px' }}>
         <Card
           radius="lg"
           shadow="md"
           p="lg"
           sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
             borderRadius: 24,
-            marginBottom: 16,
+            boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
           }}
         >
           <Title order={2} ta="center" mb="md">
@@ -118,6 +115,8 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
                     backgroundColor: '#d6336c',
                     color: 'white',
                     fontWeight: 600,
+                    borderRadius: 8,
+                    padding: '6px 18px',
                     '&:hover': { backgroundColor: '#c0255c' },
                   }}
                 >
@@ -157,6 +156,7 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
                         color="green"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                        sx={{ fontSize: 14 }}
                       >
                         ✅ Приду
                       </Button>
@@ -165,6 +165,7 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
                         color="red"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'DECLINED')}
+                        sx={{ fontSize: 14 }}
                       >
                         ❌ Не приду
                       </Button>
@@ -192,29 +193,29 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
             </Stack>
           )}
         </Card>
+      </Box>
 
-        <Box
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-            zIndex: 1000,
-          }}
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          variant="subtle"
+          onClick={onBack}
+          leftIcon={<IconArrowBack size={14} />}
+          sx={pinkButtonSx}
         >
-          <Button
-            variant="subtle"
-            onClick={onBack}
-            leftIcon={<IconArrowBack size={14} />}
-            sx={pinkButtonSx}
-          >
-            Назад к профилю
-          </Button>
-        </Box>
+          Назад к профилю
+        </Button>
       </Box>
     </Box>
   );
