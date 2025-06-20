@@ -73,6 +73,9 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   const markInactive = async (blockId: string) => {
+    const confirmed = window.confirm('Завершить этот блок?');
+    if (!confirmed) return;
+
     try {
       await fetch(`${API}/api/payment-blocks/${blockId}`, {
         method: 'PATCH',
@@ -88,8 +91,26 @@ export default function PaymentHistory({ userId, onBack }: Props) {
     }
   };
 
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    border: '1px solid #d6336c',
+    borderRadius: 8,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
+  const cardStyle = {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+  };
+
   return (
-    <Box style={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
         <Title order={3} mb="md" style={{ color: '#222' }}>
           История оплат
@@ -100,7 +121,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         ) : (
           <Stack spacing="md">
             {blocks.map((block) => (
-              <Paper key={block.id} withBorder radius="md" p="md" shadow="sm">
+              <Paper key={block.id} style={cardStyle}>
                 <Group position="apart" mb="xs">
                   <Text fw={600} size="sm">
                     Оплата от {new Date(block.paidAt).toLocaleDateString()}
@@ -133,7 +154,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                 <Divider label="Разовые тренировки" labelPosition="center" />
                 <Stack spacing="xs">
                   {singleTrainings.map((t) => (
-                    <Paper key={t.id} withBorder radius="md" p="sm" shadow="xs">
+                    <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
                         <Text size="sm" color="dimmed">{t.hour}:00</Text>
@@ -161,7 +182,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         >
           <Button
             variant="subtle"
-            color="pink"
+            sx={pinkButtonSx}
             size="sm"
             onClick={onBack}
             leftIcon={<span style={{ fontSize: 16 }}>←</span>}
