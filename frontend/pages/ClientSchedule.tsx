@@ -74,16 +74,15 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  const pinkButtonSx = {
+  const pinkOutlineButton = {
     backgroundColor: 'transparent',
     color: '#d6336c',
-    fontWeight: 500,
-    borderRadius: 8,
-    transition: 'background-color 0.2s ease',
+    fontWeight: 600,
+    borderRadius: 12,
     border: '1.5px solid #d6336c',
-    fontSize: 17,
+    fontSize: 16,
     height: 44,
-    width: '100%',
+    transition: 'background-color 0.2s ease',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
@@ -91,7 +90,13 @@ export default function ClientSchedule({
 
   return (
     <>
-      <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 90 }}>
+      <Box
+        style={{
+          backgroundColor: '#f5d4ca',
+          minHeight: '100vh',
+          paddingBottom: 100,
+        }}
+      >
         <Container size="xs" py="md">
           <Title order={2} ta="center" mb="lg">
             Мои тренировки
@@ -100,8 +105,8 @@ export default function ClientSchedule({
           <Button
             onClick={onOpenBlock}
             leftIcon={<IconPackage size={20} />}
-            variant="outline"
-            sx={{ ...pinkButtonSx, marginBottom: 24 }}
+            sx={{ ...pinkOutlineButton, marginBottom: 24 }}
+            fullWidth
           >
             📦 Блок тренировок
           </Button>
@@ -194,7 +199,6 @@ export default function ClientSchedule({
         </Container>
       </Box>
 
-      {/* 🔒 Фиксированная кнопка — строго вне основного контейнера */}
       <Box
         style={{
           position: 'fixed',
@@ -204,27 +208,19 @@ export default function ClientSchedule({
           background: 'white',
           padding: '12px 16px',
           boxShadow: '0 -2px 10px rgba(0,0,0,0.06)',
-          zIndex: 9999,
+          zIndex: 1000,
         }}
       >
-        <Button
-          fullWidth
-          variant="subtle"
-          onClick={onBack}
-          sx={{
-            backgroundColor: 'transparent',
-            color: '#d6336c',
-            fontWeight: 600,
-            borderRadius: 8,
-            fontSize: 18,
-            border: 'none',
-            height: 44,
-            '&:hover': { backgroundColor: '#ffe3ed' },
-          }}
-          leftIcon={<span style={{ fontSize: 20, marginRight: 4 }}>←</span>}
-        >
-          На главную
-        </Button>
+        <Container size="xs">
+          <Button
+            fullWidth
+            onClick={onBack}
+            sx={pinkOutlineButton}
+            leftIcon={<span style={{ fontSize: 18 }}>←</span>}
+          >
+            На главную
+          </Button>
+        </Container>
       </Box>
     </>
   );
