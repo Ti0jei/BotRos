@@ -117,25 +117,30 @@ export default function ClientSchedule({
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca', // розовая обертка
+          backgroundColor: '#f5d4ca',
           minHeight: '100vh',
-          padding: '32px 0 100px',
+          paddingTop: 32,
+          paddingBottom: 32,
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'stretch',
         }}
       >
         <Box
           style={{
-            backgroundColor: 'white', // белый фон центрального блока
+            backgroundColor: 'white',
             borderRadius: 20,
             padding: 24,
             width: '100%',
             maxWidth: 420,
             boxSizing: 'border-box',
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 'calc(100vh - 64px)', // учитываем паддинги контейнера
           }}
         >
-          <Stack spacing="lg" px="md">
+          <Stack spacing="lg" px="md" style={{ flexGrow: 1 }}>
             <Title order={2} ta="center" mb="md">
               Мои тренировки
             </Title>
@@ -150,7 +155,7 @@ export default function ClientSchedule({
             </Button>
 
             {trainings.length === 0 ? (
-              <Text ta="center" c="dimmed">
+              <Text ta="center" c="dimmed" style={{ marginTop: 20, flexGrow: 1 }}>
                 У вас пока нет назначенных тренировок.
               </Text>
             ) : (
@@ -160,7 +165,7 @@ export default function ClientSchedule({
                   style={{
                     padding: 16,
                     width: '100%',
-                    backgroundColor: 'white', // Белый фон для каждой тренировки
+                    backgroundColor: 'white',
                     borderBottom: '1px solid #f3bfcf',
                     borderRadius: 12,
                     marginTop: 12,
@@ -184,7 +189,7 @@ export default function ClientSchedule({
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLИНED'
+                        : t.status === 'DECLИНЕД'
                         ? 'ОТМЕНЕНО'
                         : 'ОЖИДАНИЕ'}
                     </Badge>
