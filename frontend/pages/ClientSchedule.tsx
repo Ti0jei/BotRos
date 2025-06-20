@@ -1,4 +1,15 @@
 import { useEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Title,
+  Badge,
+} from '@mantine/core';
+import { IconPackage } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
 
 interface Training {
@@ -21,16 +32,30 @@ export default function ClientSchedule({
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = getToken();
 
-  const fetchTrainings = async () => {
+  const loadTrainings = async () => {
     const res = await fetch(`${API}/api/trainings`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
     const data = await res.json();
-    setTrainings(data);
+
+    const upcoming = data
+      .filter((t: Training) =>
+        dayjs(t.date).add(t.hour, 'hour').isAfter(dayjs())
+      )
+      .sort((a, b) => {
+        const aTime = dayjs(a.date).add(a.hour, 'hour');
+        const bTime = dayjs(b.date).add(b.hour, 'hour');
+        return aTime.diff(bTime);
+      });
+
+    setTrainings(upcoming);
   };
 
-  const updateStatus = async (id: string, status: 'CONFIRMED' | 'DECLINED') => {
+  const updateStatus = async (
+    id: string,
+    status: 'CONFIRMED' | 'DECLINED'
+  ) => {
     await fetch(`${API}/api/trainings/${id}`, {
       method: 'PATCH',
       headers: {
@@ -40,116 +65,182 @@ export default function ClientSchedule({
       body: JSON.stringify({ status }),
     });
     setEditingId(null);
-    fetchTrainings();
+    loadTrainings();
   };
 
   useEffect(() => {
-    fetchTrainings();
+    loadTrainings();
   }, []);
 
+  const outlinePinkButtonStyle = {
+    root: {
+      border: '1.5px solid #d6336c',
+      color: '#d6336c',
+      backgroundColor: 'transparent',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 15,
+      height: 44,
+      transition: 'background 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+      },
+    },
+  };
+
+  const softGreenButton = {
+    root: {
+      backgroundColor: '#e6f4ea',
+      color: 'green',
+      fontWeight: 500,
+      borderRadius: 10,
+      height: 36,
+      fontSize: 14,
+      '&:hover': { backgroundColor: '#d3f0dc' },
+    },
+  };
+
+  const softRedButton = {
+    root: {
+      backgroundColor: '#ffe5e8',
+      color: '#d6336c',
+      fontWeight: 500,
+      borderRadius: 10,
+      height: 36,
+      fontSize: 14,
+      '&:hover': { backgroundColor: '#ffd6dc' },
+    },
+  };
+
   return (
-    <div
-      style={{
-        backgroundColor: '#f5d4ca',
-        minHeight: '100vh',
-        padding: 32,
-        boxSizing: 'border-box',
-      }}
-    >
-      <div
+    <>
+      <Box
         style={{
           backgroundColor: '#f5d4ca',
-          padding: 24,
-          width: '100%',
-          boxSizing: 'border-box',
+          minHeight: '100vh',
+          padding: '32px 0 100px',
         }}
       >
-        <h2
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            marginBottom: 16,
-            textAlign: 'center',
-          }}
-        >
-          Мои тренировки
-        </h2>
+        <Box style={{ maxWidth: 420, margin: '0 auto', padding: '0 0' }}>
+          <Stack spacing="lg" px="md">
+            <Title order={2} ta="center">
+              Мои тренировки
+            </Title>
 
-        <button
-          onClick={onOpenBlock}
-          style={{
-            padding: '10px 16px',
-            marginBottom: 24,
-            width: '100%',
-            borderRadius: 6,
-            border: '1px solid black',
-            background: '#eee',
-            cursor: 'pointer',
-          }}
-        >
-          📦 Открыть блок тренировок
-        </button>
-
-        {trainings.length === 0 ? (
-          <p style={{ textAlign: 'center' }}>Нет тренировок</p>
-        ) : (
-          trainings.map((t) => (
-            <div
-              key={t.id}
-              style={{
-                background: '#ffcfc0',
-                padding: 16,
-                borderRadius: 12,
-                marginBottom: 16,
-              }}
+            <Button
+              onClick={onOpenBlock}
+              leftIcon={<IconPackage size={20} />}
+              styles={outlinePinkButtonStyle}
+              fullWidth
             >
-              <strong>
-                {new Date(t.date).toLocaleDateString('ru-RU')} в {t.hour}:00
-              </strong>
-              <p>Статус: {t.status}</p>
+              📦 Блок тренировок
+            </Button>
 
-              {t.status === 'PENDING' || editingId === t.id ? (
-                <div style={{ marginTop: 8 }}>
-                  <button
-                    onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                    style={{ marginRight: 8 }}
-                  >
-                    ✅ Приду
-                  </button>
-                  <button onClick={() => updateStatus(t.id, 'DECLINED')}>
-                    ❌ Не приду
-                  </button>
-                </div>
-              ) : (
-                <div style={{ marginTop: 8 }}>
-                  <p>
-                    {t.status === 'CONFIRMED'
-                      ? '✅ Вы подтвердили участие'
-                      : '🚫 Вы отказались'}
-                  </p>
-                  <button onClick={() => setEditingId(t.id)}>Изменить</button>
-                </div>
-              )}
-            </div>
-          ))
-        )}
+            {trainings.length === 0 ? (
+              <Text ta="center" c="dimmed">
+                У вас пока нет назначенных тренировок.
+              </Text>
+            ) : (
+              trainings.map((t) => (
+                <Box
+                  key={t.id}
+                  style={{
+                    padding: 16,
+                    width: '100%',
+                    backgroundColor: '#f5d4ca',
+                    borderBottom: '1px solid #f3bfcf',
+                  }}
+                >
+                  <Group justify="space-between" mb="xs">
+                    <Text fw={600}>
+                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                    </Text>
+                    <Badge
+                      color={
+                        t.status === 'CONFIRMED'
+                          ? 'green'
+                          : t.status === 'DECLINED'
+                          ? 'red'
+                          : 'gray'
+                      }
+                      size="lg"
+                      radius="sm"
+                      variant="light"
+                    >
+                      {t.status === 'CONFIRMED'
+                        ? 'ПОДТВЕРЖДЕНО'
+                        : t.status === 'DECLINED'
+                        ? 'ОТМЕНЕНО'
+                        : 'ОЖИДАНИЕ'}
+                    </Badge>
+                  </Group>
 
-        <button
-          onClick={onBack}
-          style={{
-            width: '100%',
-            padding: '10px 0',
-            fontSize: 16,
-            marginTop: 12,
-            border: '1px solid black',
-            borderRadius: 6,
-            background: 'white',
-            cursor: 'pointer',
-          }}
-        >
-          ← Назад
-        </button>
-      </div>
-    </div>
+                  {t.status === 'PENDING' || editingId === t.id ? (
+                    <Stack spacing="xs" mt="xs">
+                      <Button
+                        fullWidth
+                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                        styles={softGreenButton}
+                      >
+                        ✅ Приду
+                      </Button>
+                      <Button
+                        fullWidth
+                        onClick={() => updateStatus(t.id, 'DECLINED')}
+                        styles={softRedButton}
+                      >
+                        ❌ Не приду
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <>
+                      <Text mt="xs" size="sm" c="dimmed">
+                        {t.status === 'CONFIRMED'
+                          ? '✅ Вы подтвердили участие'
+                          : '🚫 Вы отказались от тренировки'}
+                      </Text>
+                      <Button
+                        mt="xs"
+                        size="xs"
+                        variant="light"
+                        color="blue"
+                        fullWidth
+                        onClick={() => setEditingId(t.id)}
+                      >
+                        Изменить решение
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              ))
+            )}
+          </Stack>
+        </Box>
+      </Box>
+
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: '#f5d4ca',
+          padding: '12px 16px',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
+          <Button
+            fullWidth
+            onClick={onBack}
+            styles={outlinePinkButtonStyle}
+            leftIcon={<span style={{ fontSize: 18 }}>←</span>}
+          >
+            Назад к профилю
+          </Button>
+        </Box>
+      </Box>
+    </>
   );
 }
