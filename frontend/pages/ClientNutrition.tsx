@@ -157,8 +157,7 @@ export default function ClientNutrition({
       sx={{
         minHeight: '100vh',
         backgroundColor: isAdmin ? '#f5d4ca' : '#e8b3a6',
-        paddingBottom: 80,
-        position: 'relative',
+        paddingBottom: 120,
       }}
     >
       <Box
@@ -268,7 +267,7 @@ export default function ClientNutrition({
         {loading ? (
           <Center><Loader /></Center>
         ) : (
-          <Stack>
+          <Stack spacing="md">
             {weekly && (
               <Paper p="md" style={cardStyle}>
                 <Text fw={600} mb={4}>Итого за неделю</Text>
@@ -293,6 +292,8 @@ export default function ClientNutrition({
             )}
           </Stack>
         )}
+
+        <Box h={100} /> {/* 🔧 Отступ под фиксированную кнопку */}
       </Box>
 
       <Box
