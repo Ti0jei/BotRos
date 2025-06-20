@@ -130,6 +130,22 @@ export default function Profile({
     },
   };
 
+  const filledPinkButtonStyle = {
+    root: {
+      border: '1.5px solid #d6336c',
+      backgroundColor: '#ffe3ed',
+      color: '#d6336c',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 15,
+      height: 44,
+      transition: 'background 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffd6e3',
+      },
+    },
+  };
+
   const disabledButtonStyle = {
     root: {
       color: '#999',
@@ -151,7 +167,6 @@ export default function Profile({
         width: '100vw',
       }}
     >
-      {/* Уведомления */}
       {section === 'main' && (
         <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
           <ActionIcon
@@ -167,7 +182,6 @@ export default function Profile({
         </Tooltip>
       )}
 
-      {/* Главный экран */}
       {section === 'main' && (
         <Box p={16}>
           <Stack spacing="sm">
@@ -206,7 +220,7 @@ export default function Profile({
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
               fullWidth
-              styles={outlinePinkButtonStyle}
+              styles={filledPinkButtonStyle}
             >
               Выйти
             </Button>
@@ -214,7 +228,6 @@ export default function Profile({
         </Box>
       )}
 
-      {/* Тренировки */}
       {section === 'trainings' &&
         (showBlock ? (
           <ClientBlock onBack={() => setShowBlock(false)} />
@@ -225,7 +238,6 @@ export default function Profile({
           />
         ))}
 
-      {/* Питание */}
       {section === 'nutrition' && (
         <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
       )}
