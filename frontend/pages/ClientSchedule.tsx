@@ -52,65 +52,96 @@ export default function ClientSchedule({
       style={{
         backgroundColor: '#f5d4ca',
         minHeight: '100vh',
-        width: '100vw',
-        padding: '20px 16px',
+        padding: 32,
         boxSizing: 'border-box',
       }}
     >
-      <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20 }}>
-        Мои тренировки
-      </h2>
+      <div
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 20,
+          padding: 24,
+          maxWidth: 360,
+          margin: '0 auto',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        }}
+      >
+        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16, textAlign: 'center' }}>
+          Мои тренировки
+        </h2>
 
-      <button onClick={onOpenBlock} style={{ padding: 10, marginBottom: 20 }}>
-        📦 Открыть блок тренировок
-      </button>
+        <button
+          onClick={onOpenBlock}
+          style={{
+            padding: '10px 16px',
+            marginBottom: 24,
+            width: '100%',
+            borderRadius: 6,
+            border: '1px solid black',
+            background: '#eee',
+            cursor: 'pointer',
+          }}
+        >
+          📦 Открыть блок тренировок
+        </button>
 
-      {trainings.length === 0 ? (
-        <p>Нет тренировок</p>
-      ) : (
-        trainings.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              background: '#ffcfc0',
-              padding: 16,
-              borderRadius: 12,
-              marginBottom: 16,
-            }}
-          >
-            <strong>
-              {new Date(t.date).toLocaleDateString('ru-RU')} в {t.hour}:00
-            </strong>
-            <p>Статус: {t.status}</p>
+        {trainings.length === 0 ? (
+          <p style={{ textAlign: 'center' }}>Нет тренировок</p>
+        ) : (
+          trainings.map((t) => (
+            <div
+              key={t.id}
+              style={{
+                background: '#ffcfc0',
+                padding: 16,
+                borderRadius: 12,
+                marginBottom: 16,
+              }}
+            >
+              <strong>
+                {new Date(t.date).toLocaleDateString('ru-RU')} в {t.hour}:00
+              </strong>
+              <p>Статус: {t.status}</p>
 
-            {t.status === 'PENDING' || editingId === t.id ? (
-              <div style={{ marginTop: 8 }}>
-                <button
-                  onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                  style={{ marginRight: 8 }}
-                >
-                  ✅ Приду
-                </button>
-                <button onClick={() => updateStatus(t.id, 'DECLINED')}>
-                  ❌ Не приду
-                </button>
-              </div>
-            ) : (
-              <div style={{ marginTop: 8 }}>
-                <p>
-                  {t.status === 'CONFIRMED'
-                    ? '✅ Вы подтвердили участие'
-                    : '🚫 Вы отказались'}
-                </p>
-                <button onClick={() => setEditingId(t.id)}>Изменить</button>
-              </div>
-            )}
-          </div>
-        ))
-      )}
+              {t.status === 'PENDING' || editingId === t.id ? (
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                    style={{ marginRight: 8 }}
+                  >
+                    ✅ Приду
+                  </button>
+                  <button onClick={() => updateStatus(t.id, 'DECLINED')}>❌ Не приду</button>
+                </div>
+              ) : (
+                <div style={{ marginTop: 8 }}>
+                  <p>
+                    {t.status === 'CONFIRMED'
+                      ? '✅ Вы подтвердили участие'
+                      : '🚫 Вы отказались'}
+                  </p>
+                  <button onClick={() => setEditingId(t.id)}>Изменить</button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
 
-      <div style={{ marginTop: 40 }}>
-        <button onClick={onBack}>← Назад</button>
+        <button
+          onClick={onBack}
+          style={{
+            width: '100%',
+            padding: '10px 0',
+            fontSize: 16,
+            marginTop: 12,
+            border: '1px solid black',
+            borderRadius: 6,
+            background: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          ← Назад
+        </button>
       </div>
     </div>
   );
