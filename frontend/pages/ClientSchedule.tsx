@@ -149,7 +149,6 @@ export default function ClientSchedule({
                     padding: 16,
                     border: '1px solid #f3d3df',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                    backgroundColor: '#fff', // или можешь убрать, если хочешь вообще без карточек
                   }}
                 >
                   <Group justify="space-between" mb="xs">
