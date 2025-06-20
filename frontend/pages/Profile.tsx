@@ -119,6 +119,29 @@ export default function Profile({
     );
   }
 
+  const pinkButtonStyle = {
+    root: {
+      color: '#fff',
+      backgroundColor: '#d6336c',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 16,
+      height: 44,
+      '&:hover': { backgroundColor: '#c1275c' },
+    },
+  };
+
+  const disabledButtonStyle = {
+    root: {
+      color: '#999',
+      backgroundColor: '#eceff1',
+      borderRadius: 12,
+      fontWeight: 500,
+      height: 44,
+      cursor: 'not-allowed',
+    },
+  };
+
   return (
     <Box
       style={{
@@ -150,11 +173,7 @@ export default function Profile({
               onClick={toggleNotifications}
               radius="xl"
               size="lg"
-              style={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-              }}
+              style={{ position: 'absolute', top: 16, right: 16 }}
             >
               {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
             </ActionIcon>
@@ -167,40 +186,28 @@ export default function Profile({
               Привет, {user.name} 👋
             </Title>
 
-            <Button
-              fullWidth
-              color="pink"
-              size="md"
-              radius="md"
-              onClick={() => setSection('trainings')}
-            >
+            <Button fullWidth styles={pinkButtonStyle} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button
-              fullWidth
-              color="pink"
-              size="md"
-              radius="md"
-              onClick={() => setSection('nutrition')}
-            >
+            <Button fullWidth styles={pinkButtonStyle} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
-            <Button fullWidth size="md" radius="md" disabled>
+            <Button fullWidth styles={disabledButtonStyle} disabled>
               Замеры (скоро)
             </Button>
 
-            <Button fullWidth size="md" radius="md" disabled>
+            <Button fullWidth styles={disabledButtonStyle} disabled>
               Фото (скоро)
             </Button>
 
-            <Button fullWidth size="md" radius="md" disabled>
+            <Button fullWidth styles={disabledButtonStyle} disabled>
               Материалы (скоро)
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" color="pink" radius="md" onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" styles={pinkButtonStyle} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
@@ -213,6 +220,7 @@ export default function Profile({
               leftIcon={<IconLogout size={18} />}
               fullWidth
               radius="md"
+              styles={{ root: { fontWeight: 600 } }}
             >
               Выйти
             </Button>
