@@ -11,7 +11,7 @@ import PaymentHistory from './pages/PaymentHistory';
 import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 
-import { Container, Button, Center, Loader } from '@mantine/core';
+import { Box, Button, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -121,7 +121,20 @@ function App() {
   }
 
   return (
-    <Container size="xs" pt="xl">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        height: '100vh',
+        background: '#e8b3a6',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        overflowY: 'auto',
+        width: '100vw',
+      }}
+    >
+      {/* Оставь Container только для отдельных страниц, если нужен отступ */}
       {view === 'login' && (
         <>
           <Login
@@ -206,7 +219,7 @@ function App() {
       {view === 'history' && selectedClientId && (
         <PaymentHistory userId={selectedClientId} onBack={() => setView('clients')} />
       )}
-    </Container>
+    </Box>
   );
 }
 
