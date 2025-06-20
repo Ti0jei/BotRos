@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  Card,
   Group,
   Stack,
   Text,
@@ -121,14 +120,14 @@ export default function ClientSchedule({
           minHeight: '100vh',
           paddingBottom: 100,
           paddingTop: 32,
+          paddingLeft: 16,
+          paddingRight: 16,
         }}
       >
         <Box
           style={{
             maxWidth: 420,
             margin: '0 auto',
-            padding: '0 16px',
-            backgroundColor: '#f5d4ca',
           }}
         >
           <Stack spacing="lg">
@@ -151,15 +150,14 @@ export default function ClientSchedule({
               </Text>
             ) : (
               trainings.map((t) => (
-                <Card
+                <Box
                   key={t.id}
-                  withBorder
-                  radius="md"
-                  p="md"
                   style={{
-                    background: 'white',
+                    backgroundColor: '#fff',
+                    borderRadius: 16,
+                    padding: 16,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
                     border: '1px solid #f3d3df',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                   }}
                 >
                   <Group justify="space-between" mb="xs">
@@ -222,14 +220,13 @@ export default function ClientSchedule({
                       </Button>
                     </>
                   )}
-                </Card>
+                </Box>
               ))
             )}
           </Stack>
         </Box>
       </Box>
 
-      {/* Фиксированная нижняя панель */}
       <Box
         style={{
           position: 'fixed',
