@@ -124,7 +124,6 @@ export default function ClientSchedule({
           justifyContent: 'center',
         }}
       >
-        {/* Белый контейнер по центру */}
         <Box
           style={{
             backgroundColor: 'white',
@@ -161,7 +160,7 @@ export default function ClientSchedule({
                   style={{
                     padding: 16,
                     width: '100%',
-                    backgroundColor: '#f5d4ca',
+                    backgroundColor: 'white',
                     borderBottom: '1px solid #f3bfcf',
                   }}
                 >
