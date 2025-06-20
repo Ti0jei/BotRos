@@ -14,7 +14,12 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { showNotification } from '@mantine/notifications';
-import { IconChevronLeft, IconChevronRight, IconEdit, IconCheck } from '@tabler/icons-react';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconEdit,
+  IconCheck,
+} from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -33,7 +38,13 @@ interface PaymentBlock {
   active: boolean;
 }
 
-export default function ClientPayments({ client, onBack }: { client: Client; onBack: () => void }) {
+export default function ClientPayments({
+  client,
+  onBack,
+}: {
+  client: Client;
+  onBack: () => void;
+}) {
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
 
@@ -68,6 +79,9 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   };
 
   const createBlock = async () => {
+    const confirm = window.confirm('Создать новый блок оплаты?');
+    if (!confirm) return;
+
     const res = await fetch(`${API}/api/payment-blocks`, {
       method: 'POST',
       headers: {
@@ -89,9 +103,6 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         color: 'green',
         icon: <IconCheck size={18} />,
       });
-      setDate(new Date());
-      setPaidTrainings(8);
-      setPricePerTraining(600);
       await loadBlock();
     } else {
       showNotification({
@@ -140,6 +151,24 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     loadBlock();
   }, []);
 
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    borderRadius: 8,
+    transition: 'background-color 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+  };
+
+  const cardStyle = {
+    background: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+  };
+
   return (
     <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
@@ -150,7 +179,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         {loading ? (
           <Text>Загрузка...</Text>
         ) : block ? (
-          <Paper withBorder p="md" mb="md" shadow="sm" style={{ border: '1px solid #ccc' }}>
+          <Paper style={cardStyle} mb="md">
             <Group position="apart" mb="xs">
               <Text fw={500}>Активный блок</Text>
               <Badge color={block.used >= block.paidTrainings ? 'red' : 'green'}>
@@ -239,38 +268,44 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
               ➕ Добавить блок
             </Title>
 
-            <DatePickerInput
-              label="Дата оплаты"
-              value={date}
-              onChange={setDate}
-              locale="ru"
-              dropdownType="popover"
-              clearable={false}
-              radius="md"
-              size="md"
-              nextIcon={<IconChevronRight size={16} />}
-              previousIcon={<IconChevronLeft size={16} />}
-            />
+            <Paper style={cardStyle} mt="sm">
+              <Stack>
+                <DatePickerInput
+                  label="Дата оплаты"
+                  value={date}
+                  onChange={setDate}
+                  locale="ru"
+                  dropdownType="popover"
+                  clearable={false}
+                  radius="md"
+                  size="md"
+                  nextIcon={<IconChevronRight size={16} />}
+                  previousIcon={<IconChevronLeft size={16} />}
+                />
 
-            <NumberInput
-              label="Кол-во тренировок"
-              value={paidTrainings}
-              onChange={(v) => setPaidTrainings(Number(v))}
-              min={1}
-              mt="sm"
-            />
+                <NumberInput
+                  label="Кол-во тренировок"
+                  value={paidTrainings}
+                  onChange={(v) => setPaidTrainings(Number(v))}
+                  min={1}
+                />
 
-            <NumberInput
-              label="Цена за тренировку, ₽"
-              value={pricePerTraining}
-              onChange={(v) => setPricePerTraining(Number(v))}
-              min={1}
-              mt="sm"
-            />
+                <NumberInput
+                  label="Цена за тренировку, ₽"
+                  value={pricePerTraining}
+                  onChange={(v) => setPricePerTraining(Number(v))}
+                  min={1}
+                />
 
-            <Button fullWidth mt="md" color="pink" onClick={createBlock}>
-              💾 Сохранить
-            </Button>
+                <Text size="sm" mt={-4} c="dimmed">
+                  💰 Итого: {paidTrainings * pricePerTraining}₽
+                </Text>
+
+                <Button color="pink" onClick={createBlock}>
+                  💾 Сохранить
+                </Button>
+              </Stack>
+            </Paper>
           </>
         )}
 
@@ -289,7 +324,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         >
           <Button
             variant="subtle"
-            color="pink"
+            sx={pinkButtonSx}
             size="sm"
             onClick={onBack}
             leftIcon={<span style={{ fontSize: 16 }}>←</span>}
