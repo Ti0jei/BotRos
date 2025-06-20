@@ -9,9 +9,10 @@ import {
   Title,
   Badge,
 } from '@mantine/core';
-import { IconArrowBack, IconPackage } from '@tabler/icons-react';
+import { IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { getToken } from '../utils/auth';
+import BackButtonFixed from '../components/BackButtonFixed'; // Импорт фиксированной кнопки
 
 interface Training {
   id: string;
@@ -74,7 +75,7 @@ export default function ClientSchedule({
     // eslint-disable-next-line
   }, []);
 
-  // Универсальный стиль розовой кнопки для всего приложения
+  // Универсальный стиль розовой кнопки
   const pinkButtonStyle: React.CSSProperties = {
     background: 'transparent',
     color: '#d6336c',
@@ -96,7 +97,7 @@ export default function ClientSchedule({
         style={{
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
-          paddingBottom: 90, // увеличено, чтобы кнопка не перекрывала контент
+          paddingBottom: 90, // Чтобы фиксированная кнопка не перекрывала контент
           position: 'relative',
         }}
       >
@@ -230,35 +231,8 @@ export default function ClientSchedule({
           </Stack>
         </Card>
       </Box>
-      {/* Фиксированная кнопка снизу ВНЕ Box и Card, всегда на виду */}
-      <Box
-        style={{
-          position: 'fixed',
-          left: 0,
-          bottom: 0,
-          width: '100vw',
-          background: 'rgba(255,255,255,0.94)',
-          padding: '14px 0 10px 0',
-          boxShadow: '0 -2px 14px 0 rgba(0,0,0,0.07)',
-          zIndex: 1200,
-        }}
-      >
-        <Box style={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
-          <button
-            onClick={onBack}
-            style={pinkButtonStyle}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = '#ffe3ed')
-            }
-            onMouseOut={e =>
-              (e.currentTarget.style.background = 'transparent')
-            }
-          >
-            <IconArrowBack size={16} style={{ marginRight: 7, verticalAlign: 'middle' }} />
-            На главную
-          </button>
-        </Box>
-      </Box>
+      {/* Новый компонент фиксированной кнопки */}
+      <BackButtonFixed onClick={onBack}>На главную</BackButtonFixed>
     </>
   );
 }
