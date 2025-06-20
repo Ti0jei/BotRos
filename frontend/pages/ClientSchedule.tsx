@@ -74,8 +74,8 @@ export default function ClientSchedule({
     // eslint-disable-next-line
   }, []);
 
-  // Стиль для всех "розовых" кнопок
-  const pinkButtonStyle = {
+  // Универсальный стиль розовой кнопки для всего приложения
+  const pinkButtonStyle: React.CSSProperties = {
     background: 'transparent',
     color: '#d6336c',
     fontWeight: 600,
@@ -87,9 +87,8 @@ export default function ClientSchedule({
     transition: 'background 0.15s',
     boxShadow: 'none',
     cursor: 'pointer',
-    marginBottom: 0,
-    marginTop: 0,
-  } as React.CSSProperties;
+    margin: 0,
+  };
 
   return (
     <>
@@ -97,7 +96,7 @@ export default function ClientSchedule({
         style={{
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
-          paddingBottom: 80,
+          paddingBottom: 90, // увеличено, чтобы кнопка не перекрывала контент
           position: 'relative',
         }}
       >
@@ -231,14 +230,14 @@ export default function ClientSchedule({
           </Stack>
         </Card>
       </Box>
-      {/* Фиксированная кнопка снизу в едином стиле */}
+      {/* Фиксированная кнопка снизу ВНЕ Box и Card, всегда на виду */}
       <Box
         style={{
           position: 'fixed',
           left: 0,
           bottom: 0,
           width: '100vw',
-          background: 'rgba(255,255,255,0.90)',
+          background: 'rgba(255,255,255,0.94)',
           padding: '14px 0 10px 0',
           boxShadow: '0 -2px 14px 0 rgba(0,0,0,0.07)',
           zIndex: 1200,
