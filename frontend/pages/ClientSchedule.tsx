@@ -137,7 +137,7 @@ export default function ClientSchedule({
         >
           <Stack spacing="lg" px="md">
             <Title order={2} ta="center" mb="md">
-              Мои тренировки
+              Мои тренировки📅
             </Title>
 
             <Button
