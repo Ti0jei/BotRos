@@ -119,21 +119,24 @@ export default function Profile({
     );
   }
 
-  // Стили кнопок
-  const pinkButtonStyle = {
+  // ✅ Контурная розовая кнопка
+  const outlinePinkButtonStyle = {
     root: {
-      color: '#fff',
-      backgroundColor: '#d6336c',
+      border: '1.5px solid #d6336c',
+      color: '#d6336c',
+      backgroundColor: 'transparent',
       borderRadius: 12,
       fontWeight: 600,
-      fontSize: 16,
+      fontSize: 15,
       height: 44,
+      transition: 'background 0.2s',
       '&:hover': {
-        backgroundColor: '#c1275c',
+        backgroundColor: '#ffe3ed',
       },
     },
   };
 
+  // 🚫 Стиль отключённых кнопок
   const disabledButtonStyle = {
     root: {
       color: '#999',
@@ -192,11 +195,11 @@ export default function Profile({
               Привет, {user.name} 👋
             </Title>
 
-            <Button fullWidth styles={pinkButtonStyle} onClick={() => setSection('trainings')}>
+            <Button fullWidth styles={outlinePinkButtonStyle} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth styles={pinkButtonStyle} onClick={() => setSection('nutrition')}>
+            <Button fullWidth styles={outlinePinkButtonStyle} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
@@ -213,7 +216,7 @@ export default function Profile({
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" styles={pinkButtonStyle} onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" styles={outlinePinkButtonStyle} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
