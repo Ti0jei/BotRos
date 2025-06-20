@@ -58,15 +58,20 @@ export default function ClientSchedule({
     >
       <div
         style={{
-          backgroundColor: 'white',
-          borderRadius: 20,
+          backgroundColor: '#f5d4ca',
           padding: 24,
-          maxWidth: 360,
-          margin: '0 auto',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
-        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16, textAlign: 'center' }}>
+        <h2
+          style={{
+            fontSize: 22,
+            fontWeight: 700,
+            marginBottom: 16,
+            textAlign: 'center',
+          }}
+        >
           Мои тренировки
         </h2>
 
@@ -111,7 +116,9 @@ export default function ClientSchedule({
                   >
                     ✅ Приду
                   </button>
-                  <button onClick={() => updateStatus(t.id, 'DECLINED')}>❌ Не приду</button>
+                  <button onClick={() => updateStatus(t.id, 'DECLINED')}>
+                    ❌ Не приду
+                  </button>
                 </div>
               ) : (
                 <div style={{ marginTop: 8 }}>
