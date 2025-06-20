@@ -117,24 +117,25 @@ export default function ClientSchedule({
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca',
+          backgroundColor: '#f5d4ca', // розовый фон снаружи
           minHeight: '100vh',
-          paddingTop: 32,
-          paddingBottom: 100,
+          paddingTop: 0,
+          paddingBottom: 0,
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        {/* Обертка с белым фоном и отступами сверху/снизу */}
         <Box
           style={{
-            backgroundColor: 'white',
+            backgroundColor: 'white', // белый фон по всей середине
             borderRadius: 20,
-            padding: '24px 24px 40px', // добавлен больший нижний padding для отступа
+            padding: 24,
             width: '100%',
             maxWidth: 420,
             boxSizing: 'border-box',
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            minHeight: '100vh',  // чтоб занять всю высоту и скрыть розовый снизу
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -189,7 +190,7 @@ export default function ClientSchedule({
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLINED'
+                        : t.status === 'DECLИНED'
                         ? 'ОТМЕНЕНО'
                         : 'ОЖИДАНИЕ'}
                     </Badge>
