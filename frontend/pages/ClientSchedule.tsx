@@ -9,6 +9,7 @@ import {
   Title,
   Badge,
   Center,
+  Container,
 } from '@mantine/core';
 import { IconArrowBack, IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -21,7 +22,13 @@ interface Training {
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
 }
 
-export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => void; onOpenBlock: () => void }) {
+export default function ClientSchedule({
+  onBack,
+  onOpenBlock,
+}: {
+  onBack: () => void;
+  onOpenBlock: () => void;
+}) {
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -36,7 +43,9 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
     const data = await res.json();
 
     const filtered = data
-      .filter((t: Training) => dayjs(t.date).add(t.hour, 'hour').isAfter(dayjs()))
+      .filter((t: Training) =>
+        dayjs(t.date).add(t.hour, 'hour').isAfter(dayjs())
+      )
       .sort((a, b) => {
         const d1 = dayjs(a.date).add(a.hour, 'hour');
         const d2 = dayjs(b.date).add(b.hour, 'hour');
@@ -46,7 +55,10 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
     setTrainings(filtered);
   };
 
-  const updateStatus = async (id: string, status: 'CONFIRMED' | 'DECLINED') => {
+  const updateStatus = async (
+    id: string,
+    status: 'CONFIRMED' | 'DECLINED'
+  ) => {
     await fetch(`${API}/api/trainings/${id}`, {
       method: 'PATCH',
       headers: {
@@ -71,6 +83,7 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
     borderRadius: 8,
     height: 36,
     padding: '0 14px',
+    width: '100%',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
@@ -81,13 +94,11 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
       sx={{
         minHeight: '100vh',
         backgroundColor: '#e8b3a6',
-        paddingBottom: 80,
+        paddingBottom: 90,
         paddingTop: 32,
-        display: 'flex',
-        justifyContent: 'center',
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 420, padding: '0 16px' }}>
+      <Container size={420} px="md">
         <Card
           radius="lg"
           shadow="md"
@@ -156,7 +167,6 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
                         color="green"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                        sx={{ fontSize: 14 }}
                       >
                         ✅ Приду
                       </Button>
@@ -165,7 +175,6 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
                         color="red"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'DECLINED')}
-                        sx={{ fontSize: 14 }}
                       >
                         ❌ Не приду
                       </Button>
@@ -193,7 +202,7 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
             </Stack>
           )}
         </Card>
-      </Box>
+      </Container>
 
       <Box
         style={{
@@ -208,14 +217,16 @@ export default function ClientSchedule({ onBack, onOpenBlock }: { onBack: () => 
           zIndex: 1000,
         }}
       >
-        <Button
-          variant="subtle"
-          onClick={onBack}
-          leftIcon={<IconArrowBack size={14} />}
-          sx={pinkButtonSx}
-        >
-          Назад к профилю
-        </Button>
+        <Container size={420}>
+          <Button
+            variant="subtle"
+            onClick={onBack}
+            leftIcon={<IconArrowBack size={14} />}
+            sx={pinkButtonSx}
+          >
+            Назад к профилю
+          </Button>
+        </Container>
       </Box>
     </Box>
   );
