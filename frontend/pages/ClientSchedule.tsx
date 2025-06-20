@@ -113,7 +113,6 @@ export default function ClientSchedule({
     },
   };
 
-  // Новый стиль для кнопки "Назад к профилю" по твоему дизайну
   const backButtonStyle = {
     root: {
       width: '100%',
@@ -140,7 +139,7 @@ export default function ClientSchedule({
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           paddingTop: 0,
-          paddingBottom: 0,
+          paddingBottom: 60, // Чтобы не закрывала контент фиксированная кнопка
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -255,14 +254,31 @@ export default function ClientSchedule({
               ))
             )}
           </Stack>
-          <Button
-            fullWidth
-            onClick={onBack}
-            styles={backButtonStyle}
-          >
-            Назад к профилю
-          </Button>
         </Box>
+      </Box>
+
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 16,
+          left: 16,
+          right: 16,
+          maxWidth: 420,
+          margin: '0 auto',
+          zIndex: 1000,
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          backgroundColor: 'white',
+        }}
+      >
+        <Button
+          fullWidth
+          onClick={onBack}
+          styles={backButtonStyle}
+          leftIcon={<span style={{ fontSize: 18 }}>←</span>}
+        >
+          Назад к профилю
+        </Button>
       </Box>
     </>
   );
