@@ -1,22 +1,21 @@
-import { useEffect, useState } from 'react';
+// frontend/pages/ClientSchedule.tsx
 import {
-  Container,
-  Title,
-  Card,
-  Text,
+  Box,
   Button,
+  Card,
+  Container,
   Group,
   Stack,
+  Text,
+  Title,
   Badge,
-  Box,
-  Center,
-  Paper,
 } from '@mantine/core';
+import { IconArrowBack, IconPackage } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import { getToken } from '../utils/auth';
 import ClientBlock from './ClientBlock';
-import { IconArrowBack, IconPackage } from '@tabler/icons-react';
 
 dayjs.extend(isSameOrBefore);
 
@@ -39,21 +38,15 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
     const res = await fetch(`${API}/api/trainings`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (!res.ok) {
-      console.error('Ошибка загрузки тренировок:', res.status);
-      return;
-    }
+    if (!res.ok) return;
 
     const data = await res.json();
 
     const sorted = data
       .filter((t: Training) => dayjs(t.date).isAfter(dayjs().subtract(1, 'day')))
-      .sort((a, b) => {
-        const d1 = dayjs(a.date).add(a.hour, 'hour');
-        const d2 = dayjs(b.date).add(b.hour, 'hour');
-        return d1.diff(d2);
-      });
+      .sort((a, b) =>
+        dayjs(a.date).add(a.hour, 'hour').diff(dayjs(b.date).add(b.hour, 'hour'))
+      );
 
     setTrainings(sorted);
   };
@@ -75,30 +68,52 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, []);
 
-  if (showBlock) {
-    return <ClientBlock onBack={() => setShowBlock(false)} />;
-  }
-
   return (
-    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
-      <Center>
-        <Paper mt="md" p="md" radius="lg" shadow="md" style={{ maxWidth: 420, width: '100%', backgroundColor: '#fff8f6' }}>
-          <Title order={2} ta="center" mb="md">Мои тренировки</Title>
+    <Box
+      style={{
+        backgroundColor: '#f5d4ca',
+        minHeight: '100vh',
+        paddingBottom: 80,
+      }}
+    >
+      <Container size="xs" py="md">
+        <Card radius="md" shadow="sm" p="md" withBorder>
+          <Title order={2} ta="center" mb="md">
+            Мои тренировки
+          </Title>
 
           <Stack spacing="sm">
             {trainings.length === 0 ? (
-              <Text ta="center">У вас пока нет назначенных тренировок.</Text>
+              <>
+                <Text ta="center" mb="sm">
+                  У вас пока нет назначенных тренировок.
+                </Text>
+                <Button
+                  variant="outline"
+                  color="pink"
+                  fullWidth
+                  leftIcon={<IconPackage size={16} />}
+                  onClick={() => setShowBlock(true)}
+                >
+                  Блок тренировок
+                </Button>
+              </>
             ) : (
               trainings.map((t) => (
-                <Card key={t.id} withBorder shadow="xs" radius="md" p="md">
+                <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
                   <Group position="apart" mb="xs">
                     <Text fw={500}>
                       {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
                     </Text>
-                    <Badge color={
-                      t.status === 'CONFIRMED' ? 'green' :
-                      t.status === 'DECLINED' ? 'red' : 'gray'
-                    }>
+                    <Badge
+                      color={
+                        t.status === 'CONFIRMED'
+                          ? 'green'
+                          : t.status === 'DECLINED'
+                          ? 'red'
+                          : 'gray'
+                      }
+                    >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
                         : t.status === 'DECLINED'
@@ -149,39 +164,32 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
             )}
           </Stack>
 
-          <Button
-            fullWidth
-            mt="lg"
-            variant="outline"
-            color="pink"
-            leftIcon={<IconPackage size={16} />}
-            onClick={() => setShowBlock(true)}
-          >
-            📦 Блок тренировок
-          </Button>
-
-          <Box mt="md" ta="center">
+          <Group grow mt="xl">
+            <Button
+              variant="outline"
+              color="pink"
+              fullWidth
+              leftIcon={<IconPackage size={16} />}
+              onClick={() => setShowBlock(true)}
+            >
+              Блок тренировок
+            </Button>
             <Button
               variant="subtle"
               color="pink"
               onClick={onBack}
+              fullWidth
               leftIcon={<IconArrowBack size={14} />}
-              styles={{
-                root: {
-                  color: '#d6336c',
-                  border: '1px solid #d6336c',
-                  borderRadius: 8,
-                  fontWeight: 500,
-                  backgroundColor: 'transparent',
-                  '&:hover': { backgroundColor: '#ffe3ed' },
-                },
-              }}
             >
               Назад
             </Button>
-          </Box>
-        </Paper>
-      </Center>
+          </Group>
+        </Card>
+
+        {showBlock && (
+          <ClientBlock userId="me" onBack={() => setShowBlock(false)} />
+        )}
+      </Container>
     </Box>
   );
 }
