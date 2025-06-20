@@ -120,125 +120,111 @@ export default function ClientSchedule({
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           paddingBottom: 100,
-          display: 'flex',
-          justifyContent: 'center',
           paddingTop: 32,
         }}
       >
         <Box
           style={{
             maxWidth: 420,
-            width: '100%',
             margin: '0 auto',
             padding: '0 16px',
           }}
         >
-          <Card
-            radius="xl"
-            p="lg"
-            style={{
-              backgroundColor: 'white',
-              border: 'none',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-              width: '100%',
-            }}
-          >
-            <Stack spacing="lg">
-              <Title order={2} ta="center">
-                Мои тренировки
-              </Title>
+          <Stack spacing="lg">
+            <Title order={2} ta="center">
+              Мои тренировки
+            </Title>
 
-              <Button
-                onClick={onOpenBlock}
-                leftIcon={<IconPackage size={20} />}
-                styles={outlinePinkButtonStyle}
-                fullWidth
-              >
-                📦 Блок тренировок
-              </Button>
+            <Button
+              onClick={onOpenBlock}
+              leftIcon={<IconPackage size={20} />}
+              styles={outlinePinkButtonStyle}
+              fullWidth
+            >
+              📦 Блок тренировок
+            </Button>
 
-              {trainings.length === 0 ? (
-                <Text ta="center" c="dimmed">
-                  У вас пока нет назначенных тренировок.
-                </Text>
-              ) : (
-                trainings.map((t) => (
-                  <Card
-                    key={t.id}
-                    withBorder
-                    radius="md"
-                    p="md"
-                    style={{
-                      background: 'white',
-                      border: '1px solid #f3d3df',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    }}
-                  >
-                    <Group justify="space-between" mb="xs">
-                      <Text fw={600}>
-                        {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                      </Text>
-                      <Badge
-                        color={
-                          t.status === 'CONFIRMED'
-                            ? 'green'
-                            : t.status === 'DECLINED'
-                            ? 'red'
-                            : 'gray'
-                        }
-                        size="lg"
-                        radius="sm"
-                        variant="light"
-                      >
-                        {t.status === 'CONFIRMED'
-                          ? 'ПОДТВЕРЖДЕНО'
+            {trainings.length === 0 ? (
+              <Text ta="center" c="dimmed">
+                У вас пока нет назначенных тренировок.
+              </Text>
+            ) : (
+              trainings.map((t) => (
+                <Card
+                  key={t.id}
+                  withBorder
+                  radius="md"
+                  p="md"
+                  style={{
+                    background: 'white',
+                    border: '1px solid #f3d3df',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                  }}
+                >
+                  <Group justify="space-between" mb="xs">
+                    <Text fw={600}>
+                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                    </Text>
+                    <Badge
+                      color={
+                        t.status === 'CONFIRMED'
+                          ? 'green'
                           : t.status === 'DECLINED'
-                          ? 'ОТМЕНЕНО'
-                          : 'ОЖИДАНИЕ'}
-                      </Badge>
-                    </Group>
+                          ? 'red'
+                          : 'gray'
+                      }
+                      size="lg"
+                      radius="sm"
+                      variant="light"
+                    >
+                      {t.status === 'CONFIRMED'
+                        ? 'ПОДТВЕРЖДЕНО'
+                        : t.status === 'DECLINED'
+                        ? 'ОТМЕНЕНО'
+                        : 'ОЖИДАНИЕ'}
+                    </Badge>
+                  </Group>
 
-                    {t.status === 'PENDING' || editingId === t.id ? (
-                      <Stack spacing="xs" mt="xs">
-                        <Button
-                          fullWidth
-                          onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                          styles={softGreenButton}
-                        >
-                          ✅ Приду
-                        </Button>
-                        <Button
-                          fullWidth
-                          onClick={() => updateStatus(t.id, 'DECLINED')}
-                          styles={softRedButton}
-                        >
-                          ❌ Не приду
-                        </Button>
-                      </Stack>
-                    ) : (
-                      <>
-                        <Text mt="xs" size="sm" c="dimmed">
-                          {t.status === 'CONFIRMED'
-                            ? '✅ Вы подтвердили участие'
-                            : '🚫 Вы отказались от тренировки'}
-                        </Text>
-                        <Button
-                          mt="xs"
-                          size="xs"
-                          variant="light"
-                          color="blue"
-                          fullWidth
-                          onClick={() => setEditingId(t.id)}
-                        >
-                          Изменить решение
-                        </Button>
-                      </>
-                    )}
-                  </Card>
-                ))
-              )}
-            </Stack>
-          </Card>
+                  {t.status === 'PENDING' || editingId === t.id ? (
+                    <Stack spacing="xs" mt="xs">
+                      <Button
+                        fullWidth
+                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                        styles={softGreenButton}
+                      >
+                        ✅ Приду
+                      </Button>
+                      <Button
+                        fullWidth
+                        onClick={() => updateStatus(t.id, 'DECLINED')}
+                        styles={softRedButton}
+                      >
+                        ❌ Не приду
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <>
+                      <Text mt="xs" size="sm" c="dimmed">
+                        {t.status === 'CONFIRMED'
+                          ? '✅ Вы подтвердили участие'
+                          : '🚫 Вы отказались от тренировки'}
+                      </Text>
+                      <Button
+                        mt="xs"
+                        size="xs"
+                        variant="light"
+                        color="blue"
+                        fullWidth
+                        onClick={() => setEditingId(t.id)}
+                      >
+                        Изменить решение
+                      </Button>
+                    </>
+                  )}
+                </Card>
+              ))
+            )}
+          </Stack>
         </Box>
       </Box>
 
