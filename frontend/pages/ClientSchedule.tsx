@@ -73,6 +73,22 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
+  // Стиль кнопок с рамкой
+  const pinkButtonSx = {
+    backgroundColor: 'transparent',
+    color: '#d6336c',
+    fontWeight: 500,
+    border: '1.5px solid #d6336c',
+    borderRadius: 8,
+    height: 36,
+    width: '100%',
+    fontSize: 16,
+    '&:hover': {
+      backgroundColor: '#ffe3ed',
+    },
+    transition: 'background 0.15s',
+  };
+
   return (
     <Box
       sx={{
@@ -80,9 +96,10 @@ export default function ClientSchedule({
         backgroundColor: '#e8b3a6',
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
       }}
     >
-      {/* Центрированная карточка */}
+      {/* Основной контент */}
       <Box
         sx={{
           flex: 1,
@@ -92,7 +109,7 @@ export default function ClientSchedule({
           justifyContent: 'flex-start',
           overflowY: 'auto',
           paddingTop: 48,
-          paddingBottom: 150,
+          paddingBottom: 120, // чтобы не перекрывало список кнопкой
         }}
       >
         <Card
@@ -118,20 +135,13 @@ export default function ClientSchedule({
             onClick={onOpenBlock}
             variant="outline"
             sx={{
-              color: '#d6336c',
-              border: '1.5px solid #d6336c',
-              backgroundColor: 'transparent',
-              fontWeight: 500,
-              borderRadius: 8,
-              height: 36,
-              width: '100%',
-              fontSize: 16,
+              ...pinkButtonSx,
               marginBottom: 20,
+              maxWidth: 320,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              '&:hover': { backgroundColor: '#ffe3ed' },
-              transition: 'background 0.15s',
+              fontWeight: 500,
             }}
           >
             📦 Блок тренировок
@@ -245,18 +255,7 @@ export default function ClientSchedule({
             variant="outline"
             onClick={onBack}
             leftIcon={<IconArrowBack size={14} />}
-            sx={{
-              color: '#d6336c',
-              border: '1.5px solid #d6336c',
-              backgroundColor: 'transparent',
-              fontWeight: 500,
-              borderRadius: 8,
-              height: 36,
-              width: '100%',
-              fontSize: 16,
-              '&:hover': { backgroundColor: '#ffe3ed' },
-              transition: 'background 0.15s',
-            }}
+            sx={pinkButtonSx}
           >
             На главную
           </Button>
