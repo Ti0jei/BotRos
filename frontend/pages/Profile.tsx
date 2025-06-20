@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   Button,
-  Container,
   Stack,
   Title,
   Text,
@@ -11,11 +10,7 @@ import {
   Tooltip,
   Box,
 } from '@mantine/core';
-import {
-  IconBell,
-  IconBellOff,
-  IconLogout,
-} from '@tabler/icons-react';
+import { IconBell, IconBellOff, IconLogout } from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
 import ClientNutrition from './ClientNutrition';
 import ClientBlock from './ClientBlock';
@@ -119,7 +114,6 @@ export default function Profile({
     );
   }
 
-  // ✅ Контурная розовая кнопка
   const outlinePinkButtonStyle = {
     root: {
       border: '1.5px solid #d6336c',
@@ -136,7 +130,6 @@ export default function Profile({
     },
   };
 
-  // 🚫 Стиль отключённых кнопок
   const disabledButtonStyle = {
     root: {
       color: '#999',
@@ -153,43 +146,30 @@ export default function Profile({
       style={{
         backgroundColor: '#f5d4ca',
         minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        padding: 16,
-        paddingBottom: 80,
+        padding: 0,
+        margin: 0,
+        width: '100vw',
       }}
     >
-      <Container
-        size="xs"
-        style={{
-          background: 'white',
-          borderRadius: 24,
-          padding: 24,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-          width: '100%',
-          maxWidth: 400,
-          position: 'relative',
-        }}
-      >
-        {/* Уведомления */}
-        {section === 'main' && (
-          <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
-            <ActionIcon
-              variant="filled"
-              color={user.notificationsMuted ? 'gray' : 'pink'}
-              onClick={toggleNotifications}
-              radius="xl"
-              size="lg"
-              style={{ position: 'absolute', top: 16, right: 16 }}
-            >
-              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
-            </ActionIcon>
-          </Tooltip>
-        )}
+      {/* Уведомления */}
+      {section === 'main' && (
+        <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
+          <ActionIcon
+            variant="filled"
+            color={user.notificationsMuted ? 'gray' : 'pink'}
+            onClick={toggleNotifications}
+            radius="xl"
+            size="lg"
+            style={{ position: 'absolute', top: 16, right: 16 }}
+          >
+            {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
+          </ActionIcon>
+        </Tooltip>
+      )}
 
-        {/* Главный экран */}
-        {section === 'main' && (
+      {/* Главный экран */}
+      {section === 'main' && (
+        <Box p={16}>
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm" style={{ fontWeight: 800 }}>
               Привет, {user.name} 👋
@@ -231,24 +211,24 @@ export default function Profile({
               Выйти
             </Button>
           </Stack>
-        )}
+        </Box>
+      )}
 
-        {/* Тренировки / расписание */}
-        {section === 'trainings' &&
-          (showBlock ? (
-            <ClientBlock onBack={() => setShowBlock(false)} />
-          ) : (
-            <ClientSchedule
-              onBack={() => setSection('main')}
-              onOpenBlock={() => setShowBlock(true)}
-            />
-          ))}
+      {/* Тренировки */}
+      {section === 'trainings' &&
+        (showBlock ? (
+          <ClientBlock onBack={() => setShowBlock(false)} />
+        ) : (
+          <ClientSchedule
+            onBack={() => setSection('main')}
+            onOpenBlock={() => setShowBlock(true)}
+          />
+        ))}
 
-        {/* Питание */}
-        {section === 'nutrition' && (
-          <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
-        )}
-      </Container>
+      {/* Питание */}
+      {section === 'nutrition' && (
+        <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
+      )}
     </Box>
   );
 }
