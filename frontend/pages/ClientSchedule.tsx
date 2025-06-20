@@ -275,7 +275,7 @@ export default function ClientSchedule({
           <Button
             fullWidth
             onClick={onBack}
-            styles={backButtonStyle}   {/* <-- Заменили стиль кнопки */}
+            styles={backButtonStyle}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
