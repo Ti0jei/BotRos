@@ -123,7 +123,7 @@ export default function ClientSchedule({
           paddingBottom: 0,
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'stretch', // чтобы белый блок занял всю высоту
         }}
       >
         <Box
@@ -135,7 +135,7 @@ export default function ClientSchedule({
             maxWidth: 420,
             boxSizing: 'border-box',
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            minHeight: '100vh',  // чтоб занять всю высоту и скрыть розовый снизу
+            minHeight: '100vh', // растягивает по высоте
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -190,7 +190,7 @@ export default function ClientSchedule({
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLИНED'
+                        : t.status === 'DECLИНЕД'
                         ? 'ОТМЕНЕНО'
                         : 'ОЖИДАНИЕ'}
                     </Badge>
