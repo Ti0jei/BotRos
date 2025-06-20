@@ -124,19 +124,25 @@ export default function Profile({
     );
   }
 
-  const pinkButtonSx = {
+  const pinkOutlineButton = {
     backgroundColor: 'transparent',
     color: '#d6336c',
     fontWeight: 600,
+    border: '1.5px solid #d6336c',
     borderRadius: 12,
-    border: 'none',
-    fontSize: 17,
+    fontSize: 16,
     height: 44,
-    width: '100%',
-    transition: 'background-color 0.2s ease',
+    transition: 'background 0.2s ease',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
+  };
+
+  const disabledButton = {
+    ...pinkOutlineButton,
+    color: '#999',
+    backgroundColor: '#f5f5f5',
+    border: 'none',
   };
 
   return (
@@ -162,7 +168,6 @@ export default function Profile({
           position: 'relative',
         }}
       >
-        {/* 🔔 Уведомление */}
         {section === 'main' && (
           <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
             <ActionIcon
@@ -182,35 +187,34 @@ export default function Profile({
           </Tooltip>
         )}
 
-        {/* 🏠 Главный экран */}
         {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm">
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button fullWidth onClick={() => setSection('trainings')} sx={pinkButtonSx}>
+            <Button fullWidth sx={pinkOutlineButton} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth onClick={() => setSection('nutrition')} sx={pinkButtonSx}>
+            <Button fullWidth sx={pinkOutlineButton} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
-            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
+            <Button fullWidth disabled sx={disabledButton}>
               Замеры (скоро)
             </Button>
 
-            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
+            <Button fullWidth disabled sx={disabledButton}>
               Фото (скоро)
             </Button>
 
-            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
+            <Button fullWidth disabled sx={disabledButton}>
               Материалы для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" onClick={onOpenAdmin} sx={pinkButtonSx}>
+              <Button fullWidth mt="sm" sx={pinkOutlineButton} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
@@ -220,7 +224,7 @@ export default function Profile({
               mt="md"
               variant="subtle"
               onClick={handleLogout}
-              sx={pinkButtonSx}
+              sx={pinkOutlineButton}
               leftIcon={<IconLogout size={18} />}
             >
               Выйти
@@ -228,7 +232,6 @@ export default function Profile({
           </Stack>
         )}
 
-        {/* 🗓️ Тренировки и блок */}
         {section === 'trainings' &&
           (showBlock ? (
             <ClientBlock onBack={() => setShowBlock(false)} />
@@ -239,7 +242,6 @@ export default function Profile({
             />
           ))}
 
-        {/* 🍲 Питание */}
         {section === 'nutrition' && (
           <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
         )}
