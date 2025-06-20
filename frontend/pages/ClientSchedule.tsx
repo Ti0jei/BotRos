@@ -39,7 +39,6 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
-
     const data = await res.json();
 
     const sorted = data
@@ -47,7 +46,6 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
       .sort((a, b) =>
         dayjs(a.date).add(a.hour, 'hour').diff(dayjs(b.date).add(b.hour, 'hour'))
       );
-
     setTrainings(sorted);
   };
 
@@ -68,6 +66,10 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, []);
 
+  if (showBlock) {
+    return <ClientBlock userId="me" onBack={() => setShowBlock(false)} />;
+  }
+
   return (
     <Box
       style={{
@@ -77,118 +79,110 @@ export default function ClientSchedule({ onBack }: { onBack: () => void }) {
       }}
     >
       <Container size="xs" py="md">
-        <Card radius="md" shadow="sm" p="md" withBorder>
-          <Title order={2} ta="center" mb="md">
-            Мои тренировки
-          </Title>
+        <Title order={2} ta="center" mb="md">
+          Мои тренировки
+        </Title>
 
-          <Stack spacing="sm">
-            {trainings.length === 0 ? (
-              <>
-                <Text ta="center" mb="sm">
-                  У вас пока нет назначенных тренировок.
-                </Text>
-                <Button
-                  variant="outline"
-                  color="pink"
-                  fullWidth
-                  leftIcon={<IconPackage size={16} />}
-                  onClick={() => setShowBlock(true)}
-                >
-                  Блок тренировок
-                </Button>
-              </>
-            ) : (
-              trainings.map((t) => (
-                <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
-                  <Group position="apart" mb="xs">
-                    <Text fw={500}>
-                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                    </Text>
-                    <Badge
-                      color={
-                        t.status === 'CONFIRMED'
-                          ? 'green'
-                          : t.status === 'DECLINED'
-                          ? 'red'
-                          : 'gray'
-                      }
-                    >
-                      {t.status === 'CONFIRMED'
-                        ? 'ПОДТВЕРЖДЕНО'
+        <Stack spacing="sm">
+          {trainings.length === 0 ? (
+            <Card withBorder radius="md" shadow="sm" p="md">
+              <Text ta="center" mb="md">
+                У вас пока нет назначенных тренировок.
+              </Text>
+              <Button
+                variant="outline"
+                color="pink"
+                fullWidth
+                leftIcon={<IconPackage size={16} />}
+                onClick={() => setShowBlock(true)}
+              >
+                Блок тренировок
+              </Button>
+            </Card>
+          ) : (
+            trainings.map((t) => (
+              <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
+                <Group position="apart" mb="xs">
+                  <Text fw={500}>
+                    {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                  </Text>
+                  <Badge
+                    color={
+                      t.status === 'CONFIRMED'
+                        ? 'green'
                         : t.status === 'DECLINED'
-                        ? 'ОТМЕНЕНО'
-                        : 'ОЖИДАНИЕ'}
-                    </Badge>
+                        ? 'red'
+                        : 'gray'
+                    }
+                  >
+                    {t.status === 'CONFIRMED'
+                      ? 'ПОДТВЕРЖДЕНО'
+                      : t.status === 'DECLINED'
+                      ? 'ОТМЕНЕНО'
+                      : 'ОЖИДАНИЕ'}
+                  </Badge>
+                </Group>
+
+                {t.status === 'PENDING' || editingId === t.id ? (
+                  <Group grow>
+                    <Button
+                      size="xs"
+                      color="green"
+                      variant="light"
+                      onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                    >
+                      ✅ Приду
+                    </Button>
+                    <Button
+                      size="xs"
+                      color="red"
+                      variant="light"
+                      onClick={() => updateStatus(t.id, 'DECLINED')}
+                    >
+                      ❌ Не приду
+                    </Button>
                   </Group>
+                ) : (
+                  <>
+                    <Text mt="xs">
+                      {t.status === 'CONFIRMED'
+                        ? '✅ Вы подтвердили участие'
+                        : '🚫 Вы отказались от тренировки'}
+                    </Text>
+                    <Button
+                      mt="xs"
+                      size="xs"
+                      variant="light"
+                      color="blue"
+                      onClick={() => setEditingId(t.id)}
+                    >
+                      Изменить решение
+                    </Button>
+                  </>
+                )}
+              </Card>
+            ))
+          )}
+        </Stack>
 
-                  {t.status === 'PENDING' || editingId === t.id ? (
-                    <Group grow>
-                      <Button
-                        size="xs"
-                        color="green"
-                        variant="light"
-                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                      >
-                        ✅ Приду
-                      </Button>
-                      <Button
-                        size="xs"
-                        color="red"
-                        variant="light"
-                        onClick={() => updateStatus(t.id, 'DECLINED')}
-                      >
-                        ❌ Не приду
-                      </Button>
-                    </Group>
-                  ) : (
-                    <>
-                      <Text mt="xs">
-                        {t.status === 'CONFIRMED'
-                          ? '✅ Вы подтвердили участие'
-                          : '🚫 Вы отказались от тренировки'}
-                      </Text>
-                      <Button
-                        mt="xs"
-                        size="xs"
-                        variant="light"
-                        color="blue"
-                        onClick={() => setEditingId(t.id)}
-                      >
-                        Изменить решение
-                      </Button>
-                    </>
-                  )}
-                </Card>
-              ))
-            )}
-          </Stack>
-
-          <Group grow mt="xl">
-            <Button
-              variant="outline"
-              color="pink"
-              fullWidth
-              leftIcon={<IconPackage size={16} />}
-              onClick={() => setShowBlock(true)}
-            >
-              Блок тренировок
-            </Button>
-            <Button
-              variant="subtle"
-              color="pink"
-              onClick={onBack}
-              fullWidth
-              leftIcon={<IconArrowBack size={14} />}
-            >
-              Назад
-            </Button>
-          </Group>
-        </Card>
-
-        {showBlock && (
-          <ClientBlock userId="me" onBack={() => setShowBlock(false)} />
-        )}
+        <Group grow mt="lg">
+          <Button
+            variant="outline"
+            color="pink"
+            leftIcon={<IconPackage size={16} />}
+            onClick={() => setShowBlock(true)}
+          >
+            Блок тренировок
+          </Button>
+          <Button
+            variant="subtle"
+            color="pink"
+            onClick={onBack}
+            leftIcon={<IconArrowBack size={14} />}
+          >
+            Назад
+          </Button>
+        </Group>
       </Container>
     </Box>
   );
