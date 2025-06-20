@@ -81,6 +81,7 @@ export default function ClientSchedule({
       fontWeight: 600,
       fontSize: 15,
       height: 44,
+      width: '100%',
       transition: 'background 0.2s',
       '&:hover': {
         backgroundColor: '#ffe3ed',
@@ -202,9 +203,8 @@ export default function ClientSchedule({
                       <Button
                         mt="xs"
                         size="xs"
-                        variant="light"
-                        color="blue"
                         fullWidth
+                        styles={outlinePinkButtonStyle}
                         onClick={() => setEditingId(t.id)}
                       >
                         Изменить решение
