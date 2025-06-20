@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
 import ClientNutrition from './ClientNutrition';
+import ClientBlock from './ClientBlock'; // ⬅️ добавили
 
 interface User {
   name: string;
@@ -44,6 +45,8 @@ export default function Profile({
   const [section, setSection] = useState<
     'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
   >('main');
+
+  const [showBlock, setShowBlock] = useState(false); // ⬅️ новое состояние
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
@@ -265,9 +268,15 @@ export default function Profile({
           </Stack>
         )}
 
-        {section === 'trainings' && (
-          <ClientSchedule onBack={() => setSection('main')} />
-        )}
+        {section === 'trainings' &&
+          (showBlock ? (
+            <ClientBlock onBack={() => setShowBlock(false)} />
+          ) : (
+            <ClientSchedule
+              onBack={() => setSection('main')}
+              onOpenBlock={() => setShowBlock(true)}
+            />
+          ))}
 
         {section === 'nutrition' && (
           <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
