@@ -81,7 +81,6 @@ export default function ClientSchedule({
     border: '1px solid #d6336c',
     borderRadius: 8,
     height: 36,
-    padding: '0 14px',
     width: '100%',
     '&:hover': {
       backgroundColor: '#ffe3ed',
@@ -114,14 +113,7 @@ export default function ClientSchedule({
             <Button
               leftIcon={<IconPackage size={18} />}
               onClick={onOpenBlock}
-              sx={{
-                backgroundColor: '#d6336c',
-                color: 'white',
-                fontWeight: 600,
-                borderRadius: 8,
-                padding: '6px 18px',
-                '&:hover': { backgroundColor: '#c0255c' },
-              }}
+              sx={pinkButtonSx}
             >
               📦 Блок тренировок
             </Button>
@@ -204,10 +196,15 @@ export default function ClientSchedule({
       {/* Нижняя фиксированная кнопка */}
       <Box
         sx={{
-          position: 'relative',
-          padding: '10px 0',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
           background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
           boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
         }}
       >
         <Container size="xs">
