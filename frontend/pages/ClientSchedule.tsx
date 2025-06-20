@@ -8,7 +8,6 @@ import {
   Text,
   Title,
   Badge,
-  Container,
 } from '@mantine/core';
 import { IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -126,7 +125,14 @@ export default function ClientSchedule({
           paddingTop: 32,
         }}
       >
-        <Container size="xs">
+        <Box
+          style={{
+            maxWidth: 420,
+            width: '100%',
+            margin: '0 auto',
+            padding: '0 16px',
+          }}
+        >
           <Card
             radius="xl"
             p="lg"
@@ -134,6 +140,7 @@ export default function ClientSchedule({
               backgroundColor: 'white',
               border: 'none',
               boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+              width: '100%',
             }}
           >
             <Stack spacing="lg">
@@ -232,7 +239,7 @@ export default function ClientSchedule({
               )}
             </Stack>
           </Card>
-        </Container>
+        </Box>
       </Box>
 
       {/* Фиксированная кнопка "Назад" */}
@@ -248,7 +255,7 @@ export default function ClientSchedule({
           zIndex: 1000,
         }}
       >
-        <Container size="xs">
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Button
             fullWidth
             onClick={onBack}
@@ -257,7 +264,7 @@ export default function ClientSchedule({
           >
             Назад к профилю
           </Button>
-        </Container>
+        </Box>
       </Box>
     </>
   );
