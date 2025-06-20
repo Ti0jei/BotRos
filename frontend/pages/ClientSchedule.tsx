@@ -7,6 +7,7 @@ import {
   Title,
   Badge,
   Group,
+  Container,
 } from '@mantine/core';
 import { IconPackage } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -70,11 +71,9 @@ export default function ClientSchedule({
 
   return (
     <Box style={{ background: '#f5d4ca', minHeight: '100vh', paddingBottom: 100 }}>
-      <Box style={{ maxWidth: 420, margin: '0 auto', padding: 16 }}>
-        <Stack spacing="md">
-          <Title order={2} align="center">
-            Мои тренировки
-          </Title>
+      <Container size="xs" py="md">
+        <Stack spacing="lg">
+          <Title order={2} ta="center">Мои тренировки</Title>
 
           <Button
             onClick={onOpenBlock}
@@ -88,7 +87,7 @@ export default function ClientSchedule({
           </Button>
 
           {trainings.length === 0 ? (
-            <Text align="center" color="dimmed">
+            <Text ta="center" c="dimmed">
               У вас пока нет назначенных тренировок.
             </Text>
           ) : (
@@ -96,25 +95,37 @@ export default function ClientSchedule({
               <Box
                 key={t.id}
                 style={{
-                  background: '#ffd7cf',
+                  background: '#fff',
                   borderRadius: 16,
                   padding: 16,
                   boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                  border: '1px solid #f3d3df',
                 }}
               >
-                <Group position="apart" mb="xs">
-                  <Text weight={600}>{dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00</Text>
-                  <Badge color={
-                    t.status === 'CONFIRMED' ? 'green' :
-                    t.status === 'DECLINED' ? 'red' : 'gray'
-                  } variant="light">
-                    {t.status === 'CONFIRMED' ? 'ПОДТВЕРЖДЕНО' :
-                     t.status === 'DECLINED' ? 'ОТМЕНЕНО' : 'ОЖИДАНИЕ'}
+                <Group justify="space-between" mb="xs">
+                  <Text fw={600}>
+                    {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                  </Text>
+                  <Badge
+                    color={
+                      t.status === 'CONFIRMED'
+                        ? 'green'
+                        : t.status === 'DECLINED'
+                        ? 'red'
+                        : 'gray'
+                    }
+                    variant="light"
+                  >
+                    {t.status === 'CONFIRMED'
+                      ? 'ПОДТВЕРЖДЕНО'
+                      : t.status === 'DECLINED'
+                      ? 'ОТМЕНЕНО'
+                      : 'ОЖИДАНИЕ'}
                   </Badge>
                 </Group>
 
                 {t.status === 'PENDING' || editingId === t.id ? (
-                  <Stack spacing="xs">
+                  <Stack spacing="xs" mt="xs">
                     <Button
                       color="green"
                       variant="light"
@@ -134,8 +145,10 @@ export default function ClientSchedule({
                   </Stack>
                 ) : (
                   <>
-                    <Text mt="xs" size="sm" color="dimmed">
-                      {t.status === 'CONFIRMED' ? '✅ Вы подтвердили участие' : '🚫 Вы отказались от тренировки'}
+                    <Text mt="xs" size="sm" c="dimmed">
+                      {t.status === 'CONFIRMED'
+                        ? '✅ Вы подтвердили участие'
+                        : '🚫 Вы отказались от тренировки'}
                     </Text>
                     <Button
                       mt="xs"
@@ -162,7 +175,7 @@ export default function ClientSchedule({
             ← Назад к профилю
           </Button>
         </Stack>
-      </Box>
+      </Container>
     </Box>
   );
 }
