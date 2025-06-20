@@ -73,7 +73,7 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  // Стиль кнопок с рамкой
+  // Универсальный стиль для рамочных кнопок
   const pinkButtonSx = {
     backgroundColor: 'transparent',
     color: '#d6336c',
@@ -99,7 +99,7 @@ export default function ClientSchedule({
         position: 'relative',
       }}
     >
-      {/* Основной контент */}
+      {/* Прокручиваемый контент */}
       <Box
         sx={{
           flex: 1,
@@ -109,7 +109,7 @@ export default function ClientSchedule({
           justifyContent: 'flex-start',
           overflowY: 'auto',
           paddingTop: 48,
-          paddingBottom: 120, // чтобы не перекрывало список кнопкой
+          paddingBottom: 140, // место для фиксированной кнопки
         }}
       >
         <Card
@@ -236,30 +236,34 @@ export default function ClientSchedule({
         </Card>
       </Box>
 
-      {/* Фиксированная кнопка "На главную" */}
+      {/* ФИКСИРОВАННАЯ КНОПКА */}
       <Box
         sx={{
           position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          background: 'white',
-          padding: '12px 0',
+          bottom: 24,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'calc(100vw - 32px)',
+          maxWidth: 420,
+          background: 'transparent',
           textAlign: 'center',
-          boxShadow: '0 -2px 12px rgba(0,0,0,0.06)',
           zIndex: 1000,
+          pointerEvents: 'none', // только для Box, чтобы не блокировать
         }}
       >
-        <Box sx={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
-          <Button
-            variant="outline"
-            onClick={onBack}
-            leftIcon={<IconArrowBack size={14} />}
-            sx={pinkButtonSx}
-          >
-            На главную
-          </Button>
-        </Box>
+        <Button
+          variant="outline"
+          onClick={onBack}
+          leftIcon={<IconArrowBack size={14} />}
+          sx={{
+            ...pinkButtonSx,
+            maxWidth: 220,
+            margin: '0 auto',
+            pointerEvents: 'auto', // разрешить клик по кнопке
+          }}
+        >
+          На главную
+        </Button>
       </Box>
     </Box>
   );
