@@ -91,118 +91,123 @@ export default function ClientSchedule({
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        height: '100vh',
         backgroundColor: '#e8b3a6',
-        paddingBottom: 90,
-        paddingTop: 32,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <Container size="xs" px="md">
-        <Stack spacing="md">
-          <Title order={2} ta="center">
-            Мои тренировки
-          </Title>
-
-          <Button
-            leftIcon={<IconPackage size={18} />}
-            onClick={onOpenBlock}
-            sx={{
-              backgroundColor: '#d6336c',
-              color: 'white',
-              fontWeight: 600,
-              borderRadius: 8,
-              padding: '6px 18px',
-              '&:hover': { backgroundColor: '#c0255c' },
-            }}
-          >
-            📦 Блок тренировок
-          </Button>
-
-          {trainings.length === 0 ? (
-            <Text ta="center" c="dimmed">
-              У вас пока нет назначенных тренировок.
-            </Text>
-          ) : (
-            trainings.map((t) => (
-              <Card key={t.id} withBorder radius="md" shadow="sm" p="md">
-                <Group justify="space-between" mb="xs">
-                  <Text fw={500}>
-                    {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                  </Text>
-                  <Badge
-                    color={
-                      t.status === 'CONFIRMED'
-                        ? 'green'
-                        : t.status === 'DECLINED'
-                        ? 'red'
-                        : 'gray'
-                    }
-                  >
-                    {t.status === 'CONFIRMED'
-                      ? 'ПОДТВЕРЖДЕНО'
-                      : t.status === 'DECLINED'
-                      ? 'ОТМЕНЕНО'
-                      : 'ОЖИДАНИЕ'}
-                  </Badge>
-                </Group>
-
-                {t.status === 'PENDING' || editingId === t.id ? (
-                  <Stack spacing="xs" mt="xs">
-                    <Button
-                      fullWidth
-                      size="xs"
-                      color="green"
-                      variant="light"
-                      onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                    >
-                      ✅ Приду
-                    </Button>
-                    <Button
-                      fullWidth
-                      size="xs"
-                      color="red"
-                      variant="light"
-                      onClick={() => updateStatus(t.id, 'DECLINED')}
-                    >
-                      ❌ Не приду
-                    </Button>
-                  </Stack>
-                ) : (
-                  <>
-                    <Text mt="xs" size="sm" c="dimmed">
-                      {t.status === 'CONFIRMED'
-                        ? '✅ Вы подтвердили участие'
-                        : '🚫 Вы отказались от тренировки'}
-                    </Text>
-                    <Button
-                      mt="xs"
-                      size="xs"
-                      variant="light"
-                      color="blue"
-                      fullWidth
-                      onClick={() => setEditingId(t.id)}
-                    >
-                      Изменить решение
-                    </Button>
-                  </>
-                )}
-              </Card>
-            ))
-          )}
-        </Stack>
-      </Container>
-
+      {/* Контент с прокруткой */}
       <Box
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          background: 'white',
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '32px 16px 100px',
+        }}
+      >
+        <Container size="xs">
+          <Stack spacing="md">
+            <Title order={2} ta="center">
+              Мои тренировки
+            </Title>
+
+            <Button
+              leftIcon={<IconPackage size={18} />}
+              onClick={onOpenBlock}
+              sx={{
+                backgroundColor: '#d6336c',
+                color: 'white',
+                fontWeight: 600,
+                borderRadius: 8,
+                padding: '6px 18px',
+                '&:hover': { backgroundColor: '#c0255c' },
+              }}
+            >
+              📦 Блок тренировок
+            </Button>
+
+            {trainings.length === 0 ? (
+              <Text ta="center" c="dimmed">
+                У вас пока нет назначенных тренировок.
+              </Text>
+            ) : (
+              trainings.map((t) => (
+                <Card key={t.id} withBorder radius="md" shadow="sm" p="md">
+                  <Group justify="space-between" mb="xs">
+                    <Text fw={500}>
+                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                    </Text>
+                    <Badge
+                      color={
+                        t.status === 'CONFIRMED'
+                          ? 'green'
+                          : t.status === 'DECLINED'
+                          ? 'red'
+                          : 'gray'
+                      }
+                    >
+                      {t.status === 'CONFIRMED'
+                        ? 'ПОДТВЕРЖДЕНО'
+                        : t.status === 'DECLINED'
+                        ? 'ОТМЕНЕНО'
+                        : 'ОЖИДАНИЕ'}
+                    </Badge>
+                  </Group>
+
+                  {t.status === 'PENDING' || editingId === t.id ? (
+                    <Stack spacing="xs" mt="xs">
+                      <Button
+                        fullWidth
+                        size="xs"
+                        color="green"
+                        variant="light"
+                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                      >
+                        ✅ Приду
+                      </Button>
+                      <Button
+                        fullWidth
+                        size="xs"
+                        color="red"
+                        variant="light"
+                        onClick={() => updateStatus(t.id, 'DECLINED')}
+                      >
+                        ❌ Не приду
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <>
+                      <Text mt="xs" size="sm" c="dimmed">
+                        {t.status === 'CONFIRMED'
+                          ? '✅ Вы подтвердили участие'
+                          : '🚫 Вы отказались от тренировки'}
+                      </Text>
+                      <Button
+                        mt="xs"
+                        size="xs"
+                        variant="light"
+                        color="blue"
+                        fullWidth
+                        onClick={() => setEditingId(t.id)}
+                      >
+                        Изменить решение
+                      </Button>
+                    </>
+                  )}
+                </Card>
+              ))
+            )}
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* Нижняя фиксированная кнопка */}
+      <Box
+        sx={{
+          position: 'relative',
           padding: '10px 0',
-          textAlign: 'center',
+          background: 'white',
           boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
         }}
       >
         <Container size="xs">
