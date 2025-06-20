@@ -73,6 +73,7 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
+  // Универсальный стиль для кнопок с рамкой
   const pinkButtonSx = {
     backgroundColor: 'transparent',
     color: '#d6336c',
@@ -81,9 +82,11 @@ export default function ClientSchedule({
     borderRadius: 8,
     height: 36,
     width: '100%',
+    fontSize: 16,
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
+    transition: 'background 0.15s',
   };
 
   return (
@@ -91,11 +94,11 @@ export default function ClientSchedule({
       sx={{
         minHeight: '100vh',
         backgroundColor: '#e8b3a6',
-        paddingBottom: 0,
         display: 'flex',
         flexDirection: 'column',
       }}
     >
+      {/* Центрированная карточка */}
       <Box
         sx={{
           flex: 1,
@@ -116,7 +119,6 @@ export default function ClientSchedule({
             borderRadius: 24,
             boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
             padding: '32px 20px 32px 20px',
-            marginBottom: 24,
             minHeight: 320,
             display: 'flex',
             flexDirection: 'column',
@@ -130,7 +132,15 @@ export default function ClientSchedule({
           <Button
             leftIcon={<IconPackage size={18} />}
             onClick={onOpenBlock}
-            sx={{ ...pinkButtonSx, marginBottom: 20, maxWidth: 320 }}
+            sx={{
+              ...pinkButtonSx,
+              marginBottom: 20,
+              maxWidth: 320,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 500,
+            }}
           >
             📦 Блок тренировок
           </Button>
