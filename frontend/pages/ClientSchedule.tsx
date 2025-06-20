@@ -72,7 +72,6 @@ export default function ClientSchedule({
 
   useEffect(() => {
     loadTrainings();
-    // eslint-disable-next-line
   }, []);
 
   const pinkButtonSx = {
@@ -80,8 +79,8 @@ export default function ClientSchedule({
     color: '#d6336c',
     fontWeight: 500,
     borderRadius: 8,
-    border: '1.5px solid #d6336c',
     transition: 'background-color 0.2s ease',
+    border: '1.5px solid #d6336c',
     fontSize: 17,
     height: 44,
     width: '100%',
@@ -92,13 +91,7 @@ export default function ClientSchedule({
 
   return (
     <>
-      <Box
-        style={{
-          backgroundColor: '#f5d4ca',
-          minHeight: '100vh',
-          paddingBottom: 90,
-        }}
-      >
+      <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 90 }}>
         <Container size="xs" py="md">
           <Title order={2} ta="center" mb="lg">
             Мои тренировки
@@ -201,31 +194,37 @@ export default function ClientSchedule({
         </Container>
       </Box>
 
-      {/* 🔒 Фиксированная нижняя кнопка — как в ClientPayments */}
+      {/* 🔒 Фиксированная кнопка — строго вне основного контейнера */}
       <Box
         style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
-          width: '100vw',
+          right: 0,
           background: 'white',
-          padding: '10px 0',
-          textAlign: 'center',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
+          padding: '12px 16px',
+          boxShadow: '0 -2px 10px rgba(0,0,0,0.06)',
+          zIndex: 9999,
         }}
       >
-        <div style={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
-          <Button
-            variant="subtle"
-            sx={pinkButtonSx}
-            size="md"
-            onClick={onBack}
-            leftIcon={<span style={{ fontSize: 18, marginRight: 4 }}>←</span>}
-          >
-            На главную
-          </Button>
-        </div>
+        <Button
+          fullWidth
+          variant="subtle"
+          onClick={onBack}
+          sx={{
+            backgroundColor: 'transparent',
+            color: '#d6336c',
+            fontWeight: 600,
+            borderRadius: 8,
+            fontSize: 18,
+            border: 'none',
+            height: 44,
+            '&:hover': { backgroundColor: '#ffe3ed' },
+          }}
+          leftIcon={<span style={{ fontSize: 20, marginRight: 4 }}>←</span>}
+        >
+          На главную
+        </Button>
       </Box>
     </>
   );
