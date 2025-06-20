@@ -25,7 +25,10 @@ interface Training {
   status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
 }
 
-export default function ClientSchedule({ onBack, onViewBlock }: {
+export default function ClientSchedule({
+  onBack,
+  onViewBlock,
+}: {
   onBack: () => void;
   onViewBlock: () => void;
 }) {
@@ -89,20 +92,18 @@ export default function ClientSchedule({ onBack, onViewBlock }: {
   return (
     <Box sx={{ backgroundColor: '#e8b3a6', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Paper withBorder radius="md" p="md" shadow="sm" sx={{ backgroundColor: '#fff', textAlign: 'center' }}>
-          <Title order={2} mb="xs" style={{ fontWeight: 700 }}>
+        <Paper withBorder radius="lg" p="lg" shadow="md" sx={{ backgroundColor: '#fff' }}>
+          <Title order={2} ta="center" mb="md">
             Мои тренировки
           </Title>
 
           {trainings.length === 0 ? (
             <>
-              <Text color="dimmed" size="sm" mb="sm">
+              <Text size="sm" ta="center" color="dimmed" mb="md">
                 У вас пока нет назначенных тренировок.
               </Text>
               <Button
-                variant="outline"
                 fullWidth
-                mt="sm"
                 leftIcon={<IconBox size={16} />}
                 sx={pinkButtonSx}
                 onClick={onViewBlock}
@@ -169,31 +170,31 @@ export default function ClientSchedule({ onBack, onViewBlock }: {
             </Stack>
           )}
         </Paper>
-
-        <Box
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-            zIndex: 1000,
-          }}
-        >
-          <Button
-            variant="subtle"
-            color="pink"
-            size="sm"
-            onClick={onBack}
-            leftIcon={<IconArrowBack size={14} />}
-          >
-            Назад
-          </Button>
-        </Box>
       </Container>
+
+      <Box
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 0',
+          textAlign: 'center',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          variant="subtle"
+          color="pink"
+          size="sm"
+          onClick={onBack}
+          leftIcon={<IconArrowBack size={14} />}
+        >
+          Назад
+        </Button>
+      </Box>
     </Box>
   );
 }
