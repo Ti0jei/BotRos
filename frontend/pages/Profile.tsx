@@ -1,4 +1,3 @@
-// frontend/pages/Profile.tsx
 import { useEffect, useState } from 'react';
 import {
   Button,
@@ -10,6 +9,7 @@ import {
   Loader,
   ActionIcon,
   Tooltip,
+  Box,
 } from '@mantine/core';
 import {
   IconBell,
@@ -21,7 +21,7 @@ import {
 } from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
 import ClientNutrition from './ClientNutrition';
-import ClientBlock from './ClientBlock'; // ⬅️ добавили
+import ClientBlock from './ClientBlock';
 
 interface User {
   name: string;
@@ -45,8 +45,7 @@ export default function Profile({
   const [section, setSection] = useState<
     'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
   >('main');
-
-  const [showBlock, setShowBlock] = useState(false); // ⬅️ новое состояние
+  const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
@@ -128,8 +127,12 @@ export default function Profile({
   const pinkButtonSx = {
     backgroundColor: 'transparent',
     color: '#d6336c',
-    fontWeight: 500,
-    borderRadius: 8,
+    fontWeight: 600,
+    borderRadius: 12,
+    border: 'none',
+    fontSize: 17,
+    height: 44,
+    width: '100%',
     transition: 'background-color 0.2s ease',
     '&:hover': {
       backgroundColor: '#ffe3ed',
@@ -137,33 +140,31 @@ export default function Profile({
   };
 
   return (
-    <div
+    <Box
       style={{
         backgroundColor: '#e8b3a6',
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
         padding: 16,
       }}
     >
       <Container
         size="xs"
-        p={24}
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(8px)',
+          background: 'white',
           borderRadius: 24,
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-          position: 'relative',
+          padding: 24,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.1)',
           width: '100%',
           maxWidth: 420,
+          position: 'relative',
         }}
       >
+        {/* 🔔 Уведомление */}
         {section === 'main' && (
-          <Tooltip
-            label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}
-          >
+          <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
             <ActionIcon
               variant="light"
               color={user.notificationsMuted ? 'gray' : 'pink'}
@@ -181,75 +182,35 @@ export default function Profile({
           </Tooltip>
         )}
 
+        {/* 🏠 Главный экран */}
         {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm">
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button
-              fullWidth
-              radius="md"
-              variant="light"
-              color="pink"
-              leftIcon={<IconRun size={18} />}
-              onClick={() => setSection('trainings')}
-            >
+            <Button fullWidth onClick={() => setSection('trainings')} sx={pinkButtonSx}>
               Мои тренировки
             </Button>
 
-            <Button
-              fullWidth
-              radius="md"
-              variant="light"
-              color="pink"
-              leftIcon={<IconSoup size={18} />}
-              onClick={() => setSection('nutrition')}
-            >
+            <Button fullWidth onClick={() => setSection('nutrition')} sx={pinkButtonSx}>
               Моё питание
             </Button>
 
-            <Button
-              fullWidth
-              radius="md"
-              disabled
-              leftIcon={<IconRun size={18} />}
-              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
-            >
+            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
               Замеры (скоро)
             </Button>
 
-            <Button
-              fullWidth
-              radius="md"
-              disabled
-              leftIcon={<IconRun size={18} />}
-              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
-            >
+            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
               Фото (скоро)
             </Button>
 
-            <Button
-              fullWidth
-              radius="md"
-              disabled
-              leftIcon={<IconSettings size={18} />}
-              variant="light"
-              styles={{ root: { backgroundColor: '#f5f5f5', color: '#999' } }}
-            >
+            <Button fullWidth disabled sx={{ ...pinkButtonSx, color: '#999', backgroundColor: '#f5f5f5' }}>
               Материалы для изучения
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button
-                fullWidth
-                radius="md"
-                variant="light"
-                color="pink"
-                mt="sm"
-                leftIcon={<IconSettings size={18} />}
-                onClick={onOpenAdmin}
-              >
+              <Button fullWidth mt="sm" onClick={onOpenAdmin} sx={pinkButtonSx}>
                 Панель тренера
               </Button>
             )}
@@ -257,17 +218,17 @@ export default function Profile({
             <Button
               fullWidth
               mt="md"
-              radius="md"
-              leftIcon={<IconLogout size={18} />}
               variant="subtle"
-              sx={pinkButtonSx}
               onClick={handleLogout}
+              sx={pinkButtonSx}
+              leftIcon={<IconLogout size={18} />}
             >
               Выйти
             </Button>
           </Stack>
         )}
 
+        {/* 🗓️ Тренировки и блок */}
         {section === 'trainings' &&
           (showBlock ? (
             <ClientBlock onBack={() => setShowBlock(false)} />
@@ -278,24 +239,11 @@ export default function Profile({
             />
           ))}
 
+        {/* 🍲 Питание */}
         {section === 'nutrition' && (
           <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
         )}
-
-        {['measurements', 'photos'].includes(section) && (
-          <Stack spacing="md">
-            <Title order={3}>
-              {section === 'measurements' ? 'Замеры' : 'Фото'}
-            </Title>
-            <Text size="sm" color="dimmed">
-              [Раздел в разработке]
-            </Text>
-            <Button variant="light" onClick={() => setSection('main')}>
-              ← Назад
-            </Button>
-          </Stack>
-        )}
       </Container>
-    </div>
+    </Box>
   );
 }
