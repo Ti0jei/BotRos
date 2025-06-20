@@ -113,6 +113,25 @@ export default function ClientSchedule({
     },
   };
 
+  // Новый стиль кнопки для "Назад к профилю"
+  const backButtonStyle = {
+    root: {
+      width: '100%',
+      padding: '10px 0',
+      fontWeight: 600,
+      fontSize: 15,
+      color: '#d6336c',
+      border: '1.5px solid #d6336c',
+      backgroundColor: 'white',
+      borderRadius: 12,
+      cursor: 'pointer',
+      transition: 'background 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+      },
+    },
+  };
+
   return (
     <>
       <Box
@@ -256,7 +275,7 @@ export default function ClientSchedule({
           <Button
             fullWidth
             onClick={onBack}
-            styles={outlinePinkButtonStyle}
+            styles={backButtonStyle}   {/* <-- Заменили стиль кнопки */}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
