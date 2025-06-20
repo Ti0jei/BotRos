@@ -72,17 +72,16 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  const outlinePinkButtonStyle = {
+  // 🔴 Контурный розовый (как в клиентской и админке)
+  const cleanOutlineButtonStyle = {
     root: {
       border: '1.5px solid #d6336c',
       color: '#d6336c',
       backgroundColor: 'transparent',
       borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      width: '100%',
-      transition: 'background 0.2s',
+      fontWeight: 500,
+      fontSize: 14,
+      height: 42,
       '&:hover': {
         backgroundColor: '#ffe3ed',
       },
@@ -131,7 +130,7 @@ export default function ClientSchedule({
             <Button
               onClick={onOpenBlock}
               leftIcon={<IconPackage size={20} />}
-              styles={outlinePinkButtonStyle}
+              styles={cleanOutlineButtonStyle}
               fullWidth
             >
               📦 Блок тренировок
@@ -204,7 +203,7 @@ export default function ClientSchedule({
                         mt="xs"
                         size="xs"
                         fullWidth
-                        styles={outlinePinkButtonStyle}
+                        styles={cleanOutlineButtonStyle}
                         onClick={() => setEditingId(t.id)}
                       >
                         Изменить решение
@@ -234,7 +233,7 @@ export default function ClientSchedule({
           <Button
             fullWidth
             onClick={onBack}
-            styles={outlinePinkButtonStyle}
+            styles={cleanOutlineButtonStyle}
             leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
