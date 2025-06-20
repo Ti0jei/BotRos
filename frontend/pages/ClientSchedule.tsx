@@ -129,7 +129,7 @@ export default function ClientSchedule({
         <Box
           style={{
             backgroundColor: 'white', // белый фон по всей середине
-            borderRadius: 20,
+            borderRadius: 0,
             padding: 24,
             width: '100%',
             maxWidth: 420,
