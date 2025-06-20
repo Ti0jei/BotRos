@@ -120,11 +120,24 @@ export default function ClientSchedule({
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           padding: '32px 0 100px',
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
-        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
+        {/* Белый контейнер по центру */}
+        <Box
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 20,
+            padding: 24,
+            width: '100%',
+            maxWidth: 420,
+            boxSizing: 'border-box',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+          }}
+        >
           <Stack spacing="lg" px="md">
-            <Title order={2} ta="center">
+            <Title order={2} ta="center" mb="md">
               Мои тренировки
             </Title>
 
@@ -228,9 +241,11 @@ export default function ClientSchedule({
           padding: '12px 16px',
           boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
           zIndex: 1000,
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
-        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
+        <Box style={{ maxWidth: 420, width: '100%' }}>
           <Button
             fullWidth
             onClick={onBack}
