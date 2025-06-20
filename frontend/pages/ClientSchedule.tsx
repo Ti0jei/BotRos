@@ -113,7 +113,7 @@ export default function ClientSchedule({
     },
   };
 
-  // Новый стиль кнопки для "Назад к профилю"
+  // Определяем backButtonStyle отдельно
   const backButtonStyle = {
     root: {
       width: '100%',
