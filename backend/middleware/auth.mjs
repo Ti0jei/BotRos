@@ -20,9 +20,10 @@ export function authMiddleware(req, res, next) {
       return res.status(401).json({ error: 'Неверный токен авторизации' });
     }
 
-    // ✅ Правильное сопоставление: используем userId и role
+    // ✅ Оба поля: для старых и новых роутов
     req.user = {
-      userId: decoded.userId,
+      id: decoded.userId,        // 🔁 для старых маршрутов
+      userId: decoded.userId,    // ✅ для новых маршрутов (telegram-connect и т.д.)
       role: decoded.role || 'USER',
     };
 
