@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Button,
+  Container,
   Stack,
   Title,
   Text,
@@ -82,35 +83,20 @@ export default function Profile({
     onLogout();
   };
 
-  // Стиль кнопок из CoachProfile
-  const coachButtonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      color: '#d6336c',
-      backgroundColor: 'transparent',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 16,
-      height: 44,
-      transition: 'background 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-      paddingLeft: 20,
-      paddingRight: 20,
-    },
-  };
+  const toggleNotifications = async () => {
+    if (!user) return;
+    const newStatus = !user.notificationsMuted;
 
-  // Стиль отключённых кнопок
-  const disabledButtonStyle = {
-    root: {
-      color: '#999',
-      backgroundColor: '#eceff1',
-      borderRadius: 12,
-      fontWeight: 500,
-      height: 44,
-      cursor: 'not-allowed',
-    },
+    try {
+      await fetch(`${API}/api/notifications`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ muted: newStatus }),
+      });
+      setUser({ ...user, notificationsMuted: newStatus });
+    } catch (err) {
+      console.error('Ошибка обновления уведомлений:', err);
+    }
   };
 
   if (loading) {
@@ -129,45 +115,88 @@ export default function Profile({
     );
   }
 
+  // Унифицированный стиль кнопок
+  const buttonStyle = {
+    root: {
+      border: '1.5px solid #d6336c',
+      color: '#d6336c',
+      backgroundColor: 'transparent',
+      borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 15,
+      height: 44,
+      transition: 'background 0.2s, color 0.2s',
+      '&:hover': {
+        backgroundColor: '#ffe3ed',
+        color: '#b3244a',
+      },
+    },
+  };
+
+  const disabledButtonStyle = {
+    root: {
+      color: '#999',
+      backgroundColor: '#eceff1',
+      borderRadius: 12,
+      fontWeight: 500,
+      height: 44,
+      cursor: 'not-allowed',
+      border: '1.5px solid #ccc',
+    },
+  };
+
   return (
     <Box
       style={{
         backgroundColor: '#f5d4ca',
         minHeight: '100vh',
-        padding: 0,
-        margin: 0,
-        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        padding: 16,
+        paddingBottom: 80,
       }}
     >
-      {/* Уведомления */}
-      {section === 'main' && (
-        <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
-          <ActionIcon
-            variant="filled"
-            color={user.notificationsMuted ? 'gray' : 'pink'}
-            onClick={toggleNotifications}
-            radius="xl"
-            size="lg"
-            style={{ position: 'absolute', top: 16, right: 16 }}
-          >
-            {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
-          </ActionIcon>
-        </Tooltip>
-      )}
+      <Container
+        size="xs"
+        style={{
+          background: 'white',
+          borderRadius: 24,
+          padding: 24,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+          width: '100%',
+          maxWidth: 400,
+          position: 'relative',
+        }}
+      >
+        {/* Уведомления */}
+        {section === 'main' && (
+          <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
+            <ActionIcon
+              variant="filled"
+              color={user.notificationsMuted ? 'gray' : 'pink'}
+              onClick={toggleNotifications}
+              radius="xl"
+              size="lg"
+              style={{ position: 'absolute', top: 16, right: 16 }}
+            >
+              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
+            </ActionIcon>
+          </Tooltip>
+        )}
 
-      {/* Главный экран */}
-      {section === 'main' && (
-        <Box p={16}>
+        {/* Главный экран */}
+        {section === 'main' && (
           <Stack spacing="sm">
             <Title order={2} ta="center" mb="sm" style={{ fontWeight: 800 }}>
               Привет, {user.name} 👋
             </Title>
 
-            <Button fullWidth styles={coachButtonStyle} onClick={() => setSection('trainings')}>
+            <Button fullWidth styles={buttonStyle} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth styles={coachButtonStyle} onClick={() => setSection('nutrition')}>
+            <Button fullWidth styles={buttonStyle} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
@@ -184,7 +213,7 @@ export default function Profile({
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" styles={coachButtonStyle} onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" styles={buttonStyle} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
@@ -194,45 +223,29 @@ export default function Profile({
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
               fullWidth
-              styles={{
-                root: {
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  fontSize: 16,
-                  height: 44,
-                  backgroundColor: '#ffe3ed',
-                  color: '#d6336c',
-                  border: '1.5px solid #d6336c',
-                  transition: 'background 0.2s',
-                  '&:hover': {
-                    backgroundColor: '#ffd6dc',
-                  },
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                },
-              }}
+              styles={buttonStyle}
             >
               Выйти
             </Button>
           </Stack>
-        </Box>
-      )}
+        )}
 
-      {/* Тренировки */}
-      {section === 'trainings' &&
-        (showBlock ? (
-          <ClientBlock onBack={() => setShowBlock(false)} />
-        ) : (
-          <ClientSchedule
-            onBack={() => setSection('main')}
-            onOpenBlock={() => setShowBlock(true)}
-          />
-        ))}
+        {/* Тренировки / расписание */}
+        {section === 'trainings' &&
+          (showBlock ? (
+            <ClientBlock onBack={() => setShowBlock(false)} />
+          ) : (
+            <ClientSchedule
+              onBack={() => setSection('main')}
+              onOpenBlock={() => setShowBlock(true)}
+            />
+          ))}
 
-      {/* Питание */}
-      {section === 'nutrition' && (
-        <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
-      )}
+        {/* Питание */}
+        {section === 'nutrition' && (
+          <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
+        )}
+      </Container>
     </Box>
   );
 }
