@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Card,
-  Container,
   Group,
   Stack,
   Text,
@@ -90,41 +89,71 @@ export default function ClientSchedule({
   return (
     <Box
       sx={{
-        height: '100vh',
+        minHeight: '100vh',
         backgroundColor: '#e8b3a6',
+        paddingBottom: 0,
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      {/* Прокручиваемый контент */}
       <Box
         sx={{
           flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
           overflowY: 'auto',
-          padding: '32px 16px 120px',
+          paddingTop: 48,
+          paddingBottom: 150,
         }}
       >
-        <Container size="xs">
-          <Stack spacing="md">
-            <Title order={2} ta="center">
-              Мои тренировки
-            </Title>
+        <Card
+          sx={{
+            width: '100%',
+            maxWidth: 420,
+            background: 'rgba(255,255,255,0.94)',
+            borderRadius: 24,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
+            padding: '32px 20px 32px 20px',
+            marginBottom: 24,
+            minHeight: 320,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Title order={2} ta="center" mb={20}>
+            Мои тренировки
+          </Title>
 
-            <Button
-              leftIcon={<IconPackage size={18} />}
-              onClick={onOpenBlock}
-              sx={pinkButtonSx}
-            >
-              📦 Блок тренировок
-            </Button>
+          <Button
+            leftIcon={<IconPackage size={18} />}
+            onClick={onOpenBlock}
+            sx={{ ...pinkButtonSx, marginBottom: 20, maxWidth: 320 }}
+          >
+            📦 Блок тренировок
+          </Button>
 
+          <Stack spacing="md" w="100%" align="stretch">
             {trainings.length === 0 ? (
               <Text ta="center" c="dimmed">
                 У вас пока нет назначенных тренировок.
               </Text>
             ) : (
               trainings.map((t) => (
-                <Card key={t.id} withBorder radius="md" shadow="sm" p="md">
+                <Card
+                  key={t.id}
+                  withBorder
+                  radius="md"
+                  shadow="sm"
+                  p="md"
+                  sx={{
+                    marginBottom: 6,
+                    background: 'white',
+                    border: '1px solid #f3d3df',
+                  }}
+                >
                   <Group justify="space-between" mb="xs">
                     <Text fw={500}>
                       {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
@@ -154,6 +183,7 @@ export default function ClientSchedule({
                         color="green"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                        sx={{ fontWeight: 500 }}
                       >
                         ✅ Приду
                       </Button>
@@ -163,6 +193,7 @@ export default function ClientSchedule({
                         color="red"
                         variant="light"
                         onClick={() => updateStatus(t.id, 'DECLINED')}
+                        sx={{ fontWeight: 500 }}
                       >
                         ❌ Не приду
                       </Button>
@@ -190,10 +221,10 @@ export default function ClientSchedule({
               ))
             )}
           </Stack>
-        </Container>
+        </Card>
       </Box>
 
-      {/* Закреплённая кнопка "На главную" */}
+      {/* Фиксированная кнопка "На главную" */}
       <Box
         sx={{
           position: 'fixed',
@@ -201,13 +232,13 @@ export default function ClientSchedule({
           left: 0,
           width: '100%',
           background: 'white',
-          padding: '10px 0',
+          padding: '12px 0',
           textAlign: 'center',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+          boxShadow: '0 -2px 12px rgba(0,0,0,0.06)',
           zIndex: 1000,
         }}
       >
-        <Container size="xs">
+        <Box sx={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
           <Button
             variant="subtle"
             onClick={onBack}
@@ -216,7 +247,7 @@ export default function ClientSchedule({
           >
             На главную
           </Button>
-        </Container>
+        </Box>
       </Box>
     </Box>
   );
