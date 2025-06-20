@@ -101,7 +101,7 @@ export default function ClientSchedule({
         sx={{
           flex: 1,
           overflowY: 'auto',
-          padding: '32px 16px 100px',
+          padding: '32px 16px 120px',
         }}
       >
         <Container size="xs">
