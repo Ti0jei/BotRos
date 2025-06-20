@@ -14,9 +14,6 @@ import {
 import {
   IconBell,
   IconBellOff,
-  IconRun,
-  IconSoup,
-  IconSettings,
   IconLogout,
 } from '@tabler/icons-react';
 import ClientSchedule from './ClientSchedule';
@@ -42,9 +39,7 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState<
-    'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'
-  >('main');
+  const [section, setSection] = useState<'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'>('main');
   const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -124,29 +119,6 @@ export default function Profile({
     );
   }
 
-  const pinkButtonSx = {
-    border: '1.5px solid #d6336c',
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 600,
-    fontSize: 16,
-    height: 44,
-    borderRadius: 12,
-    width: '100%',
-    transition: 'all 0.2s ease',
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-  };
-
-  const disabledButtonSx = {
-    ...pinkButtonSx,
-    backgroundColor: '#f0f0f0',
-    border: 'none',
-    color: '#999',
-    cursor: 'default',
-  };
-
   return (
     <Box
       style={{
@@ -164,24 +136,24 @@ export default function Profile({
           background: 'white',
           borderRadius: 24,
           padding: 24,
-          boxShadow: '0 4px 24px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
           width: '100%',
-          maxWidth: 420,
+          maxWidth: 400,
           position: 'relative',
         }}
       >
         {section === 'main' && (
           <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
             <ActionIcon
-              variant="light"
+              variant="filled"
               color={user.notificationsMuted ? 'gray' : 'pink'}
               onClick={toggleNotifications}
               radius="xl"
               size="lg"
               style={{
                 position: 'absolute',
-                top: 12,
-                right: 12,
+                top: 16,
+                right: 16,
               }}
             >
               {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
@@ -191,32 +163,44 @@ export default function Profile({
 
         {section === 'main' && (
           <Stack spacing="sm">
-            <Title order={2} ta="center" mb="sm">
-              Привет, {user.name} {user.lastName ?? ''} 👋
+            <Title order={2} ta="center" mb="sm" style={{ fontWeight: 800 }}>
+              Привет, {user.name} 👋
             </Title>
 
-            <Button sx={pinkButtonSx} onClick={() => setSection('trainings')}>
+            <Button
+              fullWidth
+              color="pink"
+              size="md"
+              radius="md"
+              onClick={() => setSection('trainings')}
+            >
               Мои тренировки
             </Button>
 
-            <Button sx={pinkButtonSx} onClick={() => setSection('nutrition')}>
+            <Button
+              fullWidth
+              color="pink"
+              size="md"
+              radius="md"
+              onClick={() => setSection('nutrition')}
+            >
               Моё питание
             </Button>
 
-            <Button sx={disabledButtonSx} disabled>
+            <Button fullWidth size="md" radius="md" disabled>
               Замеры (скоро)
             </Button>
 
-            <Button sx={disabledButtonSx} disabled>
+            <Button fullWidth size="md" radius="md" disabled>
               Фото (скоро)
             </Button>
 
-            <Button sx={disabledButtonSx} disabled>
+            <Button fullWidth size="md" radius="md" disabled>
               Материалы (скоро)
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button mt="sm" sx={pinkButtonSx} onClick={onOpenAdmin}>
+              <Button fullWidth mt="sm" color="pink" radius="md" onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
@@ -224,9 +208,11 @@ export default function Profile({
             <Button
               mt="md"
               variant="subtle"
+              color="pink"
               onClick={handleLogout}
-              sx={pinkButtonSx}
               leftIcon={<IconLogout size={18} />}
+              fullWidth
+              radius="md"
             >
               Выйти
             </Button>
