@@ -124,25 +124,26 @@ export default function Profile({
     );
   }
 
-  const pinkOutlineButton = {
+  const pinkButtonSx = {
+    border: '1.5px solid #d6336c',
     backgroundColor: 'transparent',
     color: '#d6336c',
     fontWeight: 600,
-    border: '1.5px solid #d6336c',
-    borderRadius: 12,
     fontSize: 16,
     height: 44,
-    transition: 'background 0.2s ease',
+    borderRadius: 12,
+    width: '100%',
+    transition: 'all 0.2s ease',
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
   };
 
-  const disabledButton = {
-    ...pinkOutlineButton,
-    color: '#999',
-    backgroundColor: '#f5f5f5',
+  const disabledButtonSx = {
+    ...pinkButtonSx,
+    backgroundColor: '#f0f0f0',
     border: 'none',
+    color: '#999',
     cursor: 'default',
   };
 
@@ -194,38 +195,37 @@ export default function Profile({
               Привет, {user.name} {user.lastName ?? ''} 👋
             </Title>
 
-            <Button fullWidth sx={pinkOutlineButton} onClick={() => setSection('trainings')}>
+            <Button sx={pinkButtonSx} onClick={() => setSection('trainings')}>
               Мои тренировки
             </Button>
 
-            <Button fullWidth sx={pinkOutlineButton} onClick={() => setSection('nutrition')}>
+            <Button sx={pinkButtonSx} onClick={() => setSection('nutrition')}>
               Моё питание
             </Button>
 
-            <Button fullWidth disabled sx={disabledButton}>
+            <Button sx={disabledButtonSx} disabled>
               Замеры (скоро)
             </Button>
 
-            <Button fullWidth disabled sx={disabledButton}>
+            <Button sx={disabledButtonSx} disabled>
               Фото (скоро)
             </Button>
 
-            <Button fullWidth disabled sx={disabledButton}>
-              Материалы для изучения
+            <Button sx={disabledButtonSx} disabled>
+              Материалы (скоро)
             </Button>
 
             {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" sx={pinkOutlineButton} onClick={onOpenAdmin}>
+              <Button mt="sm" sx={pinkButtonSx} onClick={onOpenAdmin}>
                 Панель тренера
               </Button>
             )}
 
             <Button
-              fullWidth
               mt="md"
               variant="subtle"
               onClick={handleLogout}
-              sx={pinkOutlineButton}
+              sx={pinkButtonSx}
               leftIcon={<IconLogout size={18} />}
             >
               Выйти
