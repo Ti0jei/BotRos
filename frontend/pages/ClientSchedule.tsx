@@ -48,37 +48,47 @@ export default function ClientSchedule({
   }, []);
 
   return (
-    <div style={{ background: '#f5d4ca', minHeight: '100vh', padding: 16 }}>
-      <h2 style={{ fontSize: 24, fontWeight: 700, textAlign: 'center' }}>
+    <div
+      style={{
+        backgroundColor: '#f5d4ca',
+        minHeight: '100vh',
+        width: '100vw',
+        padding: '20px 16px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 20 }}>
         Мои тренировки
       </h2>
 
-      <div style={{ textAlign: 'center', margin: '16px 0' }}>
-        <button onClick={onOpenBlock}>📦 Открыть блок тренировок</button>
-      </div>
+      <button onClick={onOpenBlock} style={{ padding: 10, marginBottom: 20 }}>
+        📦 Открыть блок тренировок
+      </button>
 
       {trainings.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#555' }}>Нет тренировок</p>
+        <p>Нет тренировок</p>
       ) : (
         trainings.map((t) => (
           <div
             key={t.id}
             style={{
-              background: '#ffe8e2',
-              borderRadius: 12,
+              background: '#ffcfc0',
               padding: 16,
-              marginBottom: 12,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              borderRadius: 12,
+              marginBottom: 16,
             }}
           >
-            <p style={{ fontWeight: 600 }}>
-              {new Date(t.date).toLocaleDateString()} в {t.hour}:00
-            </p>
+            <strong>
+              {new Date(t.date).toLocaleDateString('ru-RU')} в {t.hour}:00
+            </strong>
             <p>Статус: {t.status}</p>
 
             {t.status === 'PENDING' || editingId === t.id ? (
               <div style={{ marginTop: 8 }}>
-                <button onClick={() => updateStatus(t.id, 'CONFIRMED')} style={{ marginRight: 8 }}>
+                <button
+                  onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                  style={{ marginRight: 8 }}
+                >
                   ✅ Приду
                 </button>
                 <button onClick={() => updateStatus(t.id, 'DECLINED')}>
@@ -99,7 +109,7 @@ export default function ClientSchedule({
         ))
       )}
 
-      <div style={{ textAlign: 'center', marginTop: 32 }}>
+      <div style={{ marginTop: 40 }}>
         <button onClick={onBack}>← Назад</button>
       </div>
     </div>
