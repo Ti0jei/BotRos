@@ -223,13 +223,10 @@ export default function Profile({
 
             <Button
               mt="md"
-              variant="subtle"
-              color="pink"
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
               fullWidth
-              radius="md"
-              styles={{ root: { fontWeight: 600 } }}
+              styles={outlinePinkButtonStyle}
             >
               Выйти
             </Button>
