@@ -75,17 +75,16 @@ export default function ClientSchedule({
     // eslint-disable-next-line
   }, []);
 
-  // Стиль для розовой кнопки
   const pinkButtonSx = {
     backgroundColor: 'transparent',
     color: '#d6336c',
     fontWeight: 500,
     borderRadius: 8,
+    border: '1.5px solid #d6336c',
     transition: 'background-color 0.2s ease',
+    fontSize: 17,
+    height: 44,
     width: '100%',
-    border: 'none',
-    fontSize: 20,
-    height: 46,
     '&:hover': {
       backgroundColor: '#ffe3ed',
     },
@@ -97,141 +96,112 @@ export default function ClientSchedule({
         style={{
           backgroundColor: '#f5d4ca',
           minHeight: '100vh',
-          paddingBottom: 90, // чтобы не перекрывал контент
+          paddingBottom: 90,
         }}
       >
         <Container size="xs" py="md">
-          <Card
-            sx={{
-              width: '100%',
-              margin: '0 auto',
-              background: 'rgba(255,255,255,0.94)',
-              borderRadius: 24,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
-              padding: '32px 20px 32px 20px',
-              minHeight: 320,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              marginTop: 36,
-            }}
+          <Title order={2} ta="center" mb="lg">
+            Мои тренировки
+          </Title>
+
+          <Button
+            onClick={onOpenBlock}
+            leftIcon={<IconPackage size={20} />}
+            variant="outline"
+            sx={{ ...pinkButtonSx, marginBottom: 24 }}
           >
-            <Title order={2} ta="center" mb={20}>
-              Мои тренировки
-            </Title>
+            📦 Блок тренировок
+          </Button>
 
-            <Button
-              leftIcon={<IconPackage size={20} />}
-              onClick={onOpenBlock}
-              variant="outline"
-              sx={{ 
-                backgroundColor: 'transparent',
-                color: '#d6336c',
-                fontWeight: 500,
-                borderRadius: 8,
-                border: '1.5px solid #d6336c',
-                fontSize: 18,
-                height: 46,
-                marginBottom: 24,
-                maxWidth: 320,
-                transition: 'background-color 0.2s',
-                '&:hover': { backgroundColor: '#ffe3ed' },
-              }}
-            >
-              Блок тренировок
-            </Button>
-
-            <Stack spacing="md" w="100%" align="stretch">
-              {trainings.length === 0 ? (
-                <Text ta="center" c="dimmed">
-                  У вас пока нет назначенных тренировок.
-                </Text>
-              ) : (
-                trainings.map((t) => (
-                  <Card
-                    key={t.id}
-                    withBorder
-                    radius="md"
-                    shadow="sm"
-                    p="md"
-                    sx={{
-                      marginBottom: 6,
-                      background: 'white',
-                      border: '1px solid #f3d3df',
-                    }}
-                  >
-                    <Group justify="space-between" mb="xs">
-                      <Text fw={500}>
-                        {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                      </Text>
-                      <Badge
-                        color={
-                          t.status === 'CONFIRMED'
-                            ? 'green'
-                            : t.status === 'DECLINED'
-                            ? 'red'
-                            : 'gray'
-                        }
-                      >
-                        {t.status === 'CONFIRMED'
-                          ? 'ПОДТВЕРЖДЕНО'
+          <Stack spacing="md">
+            {trainings.length === 0 ? (
+              <Text ta="center" c="dimmed">
+                У вас пока нет назначенных тренировок.
+              </Text>
+            ) : (
+              trainings.map((t) => (
+                <Card
+                  key={t.id}
+                  withBorder
+                  radius="md"
+                  shadow="sm"
+                  p="md"
+                  style={{
+                    background: 'white',
+                    border: '1px solid #f3d3df',
+                  }}
+                >
+                  <Group justify="space-between" mb="xs">
+                    <Text fw={600}>
+                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                    </Text>
+                    <Badge
+                      color={
+                        t.status === 'CONFIRMED'
+                          ? 'green'
                           : t.status === 'DECLINED'
-                          ? 'ОТМЕНЕНО'
-                          : 'ОЖИДАНИЕ'}
-                      </Badge>
-                    </Group>
+                          ? 'red'
+                          : 'gray'
+                      }
+                    >
+                      {t.status === 'CONFIRMED'
+                        ? 'ПОДТВЕРЖДЕНО'
+                        : t.status === 'DECLINED'
+                        ? 'ОТМЕНЕНО'
+                        : 'ОЖИДАНИЕ'}
+                    </Badge>
+                  </Group>
 
-                    {t.status === 'PENDING' || editingId === t.id ? (
-                      <Stack spacing="xs" mt="xs">
-                        <Button
-                          fullWidth
-                          size="xs"
-                          color="green"
-                          variant="light"
-                          onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                          sx={{ fontWeight: 500 }}
-                        >
-                          ✅ Приду
-                        </Button>
-                        <Button
-                          fullWidth
-                          size="xs"
-                          color="red"
-                          variant="light"
-                          onClick={() => updateStatus(t.id, 'DECLINED')}
-                          sx={{ fontWeight: 500 }}
-                        >
-                          ❌ Не приду
-                        </Button>
-                      </Stack>
-                    ) : (
-                      <>
-                        <Text mt="xs" size="sm" c="dimmed">
-                          {t.status === 'CONFIRMED'
-                            ? '✅ Вы подтвердили участие'
-                            : '🚫 Вы отказались от тренировки'}
-                        </Text>
-                        <Button
-                          mt="xs"
-                          size="xs"
-                          variant="light"
-                          color="blue"
-                          fullWidth
-                          onClick={() => setEditingId(t.id)}
-                        >
-                          Изменить решение
-                        </Button>
-                      </>
-                    )}
-                  </Card>
-                ))
-              )}
-            </Stack>
-          </Card>
+                  {t.status === 'PENDING' || editingId === t.id ? (
+                    <Stack spacing="xs" mt="xs">
+                      <Button
+                        fullWidth
+                        size="xs"
+                        color="green"
+                        variant="light"
+                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                        sx={{ fontWeight: 500 }}
+                      >
+                        ✅ Приду
+                      </Button>
+                      <Button
+                        fullWidth
+                        size="xs"
+                        color="red"
+                        variant="light"
+                        onClick={() => updateStatus(t.id, 'DECLINED')}
+                        sx={{ fontWeight: 500 }}
+                      >
+                        ❌ Не приду
+                      </Button>
+                    </Stack>
+                  ) : (
+                    <>
+                      <Text mt="xs" size="sm" c="dimmed">
+                        {t.status === 'CONFIRMED'
+                          ? '✅ Вы подтвердили участие'
+                          : '🚫 Вы отказались от тренировки'}
+                      </Text>
+                      <Button
+                        mt="xs"
+                        size="xs"
+                        variant="light"
+                        color="blue"
+                        fullWidth
+                        onClick={() => setEditingId(t.id)}
+                      >
+                        Изменить решение
+                      </Button>
+                    </>
+                  )}
+                </Card>
+              ))
+            )}
+          </Stack>
         </Container>
       </Box>
 
-      {/* Фиксированная кнопка в самом низу, вне всех контейнеров и Box! */}
+      {/* 🔒 Фиксированная нижняя кнопка — как в ClientPayments */}
       <Box
         style={{
           position: 'fixed',
@@ -251,7 +221,7 @@ export default function ClientSchedule({
             sx={pinkButtonSx}
             size="md"
             onClick={onBack}
-            leftIcon={<span style={{ fontSize: 20, marginRight: 4 }}>←</span>}
+            leftIcon={<span style={{ fontSize: 18, marginRight: 4 }}>←</span>}
           >
             На главную
           </Button>
