@@ -117,7 +117,7 @@ export default function ClientSchedule({
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca',
+          backgroundColor: '#f5d4ca', // розовый фон снаружи
           minHeight: '100vh',
           padding: '32px 0 100px',
           display: 'flex',
@@ -126,7 +126,7 @@ export default function ClientSchedule({
       >
         <Box
           style={{
-            backgroundColor: 'white', // Белый фон обертки
+            backgroundColor: 'white', // белый фон внутри
             borderRadius: 20,
             padding: 24,
             width: '100%',
@@ -160,7 +160,7 @@ export default function ClientSchedule({
                   style={{
                     padding: 16,
                     width: '100%',
-                    backgroundColor: 'white', // Заменили фон на белый
+                    backgroundColor: 'white', // белый фон блока тренировки
                     borderBottom: '1px solid #f3bfcf',
                     borderRadius: 12,
                     marginTop: 12,
@@ -184,7 +184,7 @@ export default function ClientSchedule({
                     >
                       {t.status === 'CONFIRMED'
                         ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLИНED'
+                        : t.status === 'DECLINED'
                         ? 'ОТМЕНЕНО'
                         : 'ОЖИДАНИЕ'}
                     </Badge>
