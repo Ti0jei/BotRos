@@ -113,19 +113,20 @@ export default function ClientSchedule({
     },
   };
 
-  // Определяем backButtonStyle отдельно
+  // Новый стиль для кнопки "Назад к профилю" по твоему дизайну
   const backButtonStyle = {
     root: {
       width: '100%',
-      padding: '10px 0',
-      fontWeight: 600,
-      fontSize: 15,
-      color: '#d6336c',
-      border: '1.5px solid #d6336c',
       backgroundColor: 'white',
+      border: '1px solid #d6336c',
       borderRadius: 12,
+      fontWeight: 600,
+      fontSize: 16,
+      color: '#d6336c',
+      padding: '10px 0',
       cursor: 'pointer',
       transition: 'background 0.2s',
+      margin: 0,
       '&:hover': {
         backgroundColor: '#ffe3ed',
       },
@@ -136,25 +137,25 @@ export default function ClientSchedule({
     <>
       <Box
         style={{
-          backgroundColor: '#f5d4ca', // розовый фон снаружи
+          backgroundColor: '#f5d4ca',
           minHeight: '100vh',
           paddingTop: 0,
           paddingBottom: 0,
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'stretch', // чтобы белый блок занял всю высоту
+          alignItems: 'stretch',
         }}
       >
         <Box
           style={{
-            backgroundColor: 'white', // белый фон по всей середине
+            backgroundColor: 'white',
             borderRadius: 0,
             padding: 24,
             width: '100%',
             maxWidth: 420,
             boxSizing: 'border-box',
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            minHeight: '100vh', // растягивает по высоте
+            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -254,29 +255,10 @@ export default function ClientSchedule({
               ))
             )}
           </Stack>
-        </Box>
-      </Box>
-
-      <Box
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: '#f5d4ca',
-          padding: '12px 16px',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-        <Box style={{ maxWidth: 420, width: '100%' }}>
           <Button
             fullWidth
             onClick={onBack}
             styles={backButtonStyle}
-            leftIcon={<span style={{ fontSize: 18 }}>←</span>}
           >
             Назад к профилю
           </Button>
