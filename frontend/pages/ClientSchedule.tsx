@@ -113,23 +113,19 @@ export default function ClientSchedule({
     },
   };
 
-  // Стиль кнопки "Назад к профилю" как в ClientNutrition
+  // Стили кнопки "Назад к профилю" из ClientNutrition
   const backButtonStyle = {
     root: {
-      width: '100%',
-      backgroundColor: 'white',
-      border: '1px solid #d6336c',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 16,
       color: '#d6336c',
+      border: '1px solid #d6336c',
+      borderRadius: 8,
+      fontWeight: 500,
+      backgroundColor: 'transparent',
+      width: '100%',
       padding: '10px 0',
       cursor: 'pointer',
       transition: 'background 0.2s',
-      margin: 0,
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
+      '&:hover': { backgroundColor: '#ffe3ed' },
     },
   };
 
@@ -262,25 +258,24 @@ export default function ClientSchedule({
       <Box
         style={{
           position: 'fixed',
-          bottom: 16,
-          left: 16,
-          right: 16,
-          maxWidth: 420,
-          margin: '0 auto',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '10px 16px',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
           zIndex: 1000,
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          backgroundColor: 'white',
         }}
       >
-        <Button
-          fullWidth
-          onClick={onBack}
-          styles={backButtonStyle}
-          leftIcon={<IconArrowBack size={16} />}
-        >
-          Назад к профилю
-        </Button>
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
+          <Button
+            onClick={onBack}
+            leftIcon={<IconArrowBack size={14} />}
+            styles={backButtonStyle}
+          >
+            Назад к профилю
+          </Button>
+        </Box>
       </Box>
     </>
   );
