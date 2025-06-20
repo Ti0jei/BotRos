@@ -96,7 +96,7 @@ export default function ClientSchedule({
         flexDirection: 'column',
       }}
     >
-      {/* Контент с прокруткой */}
+      {/* Прокручиваемый контент */}
       <Box
         sx={{
           flex: 1,
@@ -193,7 +193,7 @@ export default function ClientSchedule({
         </Container>
       </Box>
 
-      {/* Нижняя фиксированная кнопка */}
+      {/* Закреплённая кнопка "На главную" */}
       <Box
         sx={{
           position: 'fixed',
@@ -214,7 +214,7 @@ export default function ClientSchedule({
             leftIcon={<IconArrowBack size={14} />}
             sx={pinkButtonSx}
           >
-            Назад к профилю
+            На главную
           </Button>
         </Container>
       </Box>
