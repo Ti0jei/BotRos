@@ -73,22 +73,6 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  // Универсальный стиль для кнопок с рамкой
-  const pinkButtonSx = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 500,
-    border: '1px solid #d6336c',
-    borderRadius: 8,
-    height: 36,
-    width: '100%',
-    fontSize: 16,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-    transition: 'background 0.15s',
-  };
-
   return (
     <Box
       sx={{
@@ -132,14 +116,22 @@ export default function ClientSchedule({
           <Button
             leftIcon={<IconPackage size={18} />}
             onClick={onOpenBlock}
+            variant="outline"
             sx={{
-              ...pinkButtonSx,
+              color: '#d6336c',
+              border: '1.5px solid #d6336c',
+              backgroundColor: 'transparent',
+              fontWeight: 500,
+              borderRadius: 8,
+              height: 36,
+              width: '100%',
+              fontSize: 16,
               marginBottom: 20,
-              maxWidth: 320,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 500,
+              '&:hover': { backgroundColor: '#ffe3ed' },
+              transition: 'background 0.15s',
             }}
           >
             📦 Блок тренировок
@@ -250,10 +242,21 @@ export default function ClientSchedule({
       >
         <Box sx={{ maxWidth: 420, margin: '0 auto', padding: '0 20px' }}>
           <Button
-            variant="subtle"
+            variant="outline"
             onClick={onBack}
             leftIcon={<IconArrowBack size={14} />}
-            sx={pinkButtonSx}
+            sx={{
+              color: '#d6336c',
+              border: '1.5px solid #d6336c',
+              backgroundColor: 'transparent',
+              fontWeight: 500,
+              borderRadius: 8,
+              height: 36,
+              width: '100%',
+              fontSize: 16,
+              '&:hover': { backgroundColor: '#ffe3ed' },
+              transition: 'background 0.15s',
+            }}
           >
             На главную
           </Button>
