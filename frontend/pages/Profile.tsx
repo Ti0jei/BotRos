@@ -143,6 +143,7 @@ export default function Profile({
     color: '#999',
     backgroundColor: '#f5f5f5',
     border: 'none',
+    cursor: 'default',
   };
 
   return (
