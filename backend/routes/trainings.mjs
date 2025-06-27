@@ -44,7 +44,6 @@ router.post('/', authMiddleware, async (req, res) => {
     },
   });
 
-  // ❗ Блокируем уведомление, если тренировка в прошлом
   const now = new Date();
   const trainingDateTime = new Date(`${date}T${hour.toString().padStart(2, '0')}:00:00`);
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -103,7 +102,10 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     const msg = status === 'CONFIRMED'
       ? `👤 ${training.user.name} подтвердил участие ${dateStr} в ${training.hour}:00`
       : `👤 ${training.user.name} не подтвердил участие ${dateStr} в ${training.hour}:00`;
-    await notifyTelegram(trainer.telegramId, msg);
+
+    if (shouldNotify(trainer.telegramId)) {
+      await notifyTelegram(trainer.telegramId, msg);
+    }
   }
 
   res.json(updated);
