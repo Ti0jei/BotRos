@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../utils/telegram.mjs';
 import { authMiddleware } from '../middleware/auth.mjs';
+import { shouldNotify } from '../lib/antiSpam.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -48,7 +49,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const trainingDateTime = new Date(`${date}T${hour.toString().padStart(2, '0')}:00:00`);
   const user = await prisma.user.findUnique({ where: { id: userId } });
 
-  if (user?.telegramId && trainingDateTime > now) {
+  if (user?.telegramId && trainingDateTime > now && shouldNotify(user.telegramId)) {
     await notifyTelegram(
       user.telegramId,
       `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00\nПодтвердите участие в приложении ✅❌`
