@@ -2,7 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../utils/telegram.mjs';
 import { authMiddleware } from '../middleware/auth.mjs';
-import { shouldNotify } from '../lib/antiSpam.mjs';
+import { shouldNotifyUser, shouldNotifyTrainer } from '../lib/antiSpam.mjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -48,7 +48,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const trainingDateTime = new Date(`${date}T${hour.toString().padStart(2, '0')}:00:00`);
   const user = await prisma.user.findUnique({ where: { id: userId } });
 
-  if (user?.telegramId && trainingDateTime > now && shouldNotify(user.telegramId)) {
+  if (user?.telegramId && trainingDateTime > now && shouldNotifyUser(user.telegramId)) {
     await notifyTelegram(
       user.telegramId,
       `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00\nПодтвердите участие в приложении ✅❌`
@@ -91,21 +91,18 @@ router.patch('/:id', authMiddleware, async (req, res) => {
 
   const updated = await prisma.training.update({ where: { id }, data: { status } });
 
-  if (training.user?.telegramId) {
+  if (training.user?.telegramId && shouldNotifyUser(training.user.telegramId)) {
     const msg = status === 'CONFIRMED' ? '✅ вы подтвердили участие' : '🚫 вы отказались от тренировки';
     await notifyTelegram(training.user.telegramId, `📌 Вы обновили статус тренировки: ${msg}`);
   }
 
   const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-  if (trainer?.telegramId) {
+  if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
     const dateStr = new Date(training.date).toLocaleDateString();
     const msg = status === 'CONFIRMED'
       ? `👤 ${training.user.name} подтвердил участие ${dateStr} в ${training.hour}:00`
       : `👤 ${training.user.name} не подтвердил участие ${dateStr} в ${training.hour}:00`;
-
-    if (shouldNotify(trainer.telegramId)) {
-      await notifyTelegram(trainer.telegramId, msg);
-    }
+    await notifyTelegram(trainer.telegramId, msg);
   }
 
   res.json(updated);
@@ -164,7 +161,7 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
         });
 
         const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-        if (trainer?.telegramId) {
+        if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
           await notifyTelegram(
             trainer.telegramId,
             `❗ У клиента ${training.user.name} закончился блок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему об оплате.`
