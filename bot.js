@@ -201,11 +201,13 @@ bot.hears(/^(.{1,300})$/, onlyRegistered, async (ctx) => {
     const answer = await ctx.reply(replyText);
     const reminder = await ctx.reply('🔄 Вы можете задать ещё один вопрос, или нажмите 📋 Меню, чтобы выйти.');
 
+    // ❗ Удаляем все сообщения и выходим из AI-режима через 3 минуты
     setTimeout(() => {
       ctx.telegram.deleteMessage(ctx.chat.id, questionMessageId).catch(() => {});
       ctx.telegram.deleteMessage(ctx.chat.id, answer.message_id).catch(() => {});
       ctx.telegram.deleteMessage(ctx.chat.id, reminder.message_id).catch(() => {});
-    }, 172800000); // 48 часов
+      aiContexts.delete(telegramId); // ⛔ сброс контекста
+    }, 180000); // 3 минуты
 
   } catch (err) {
     const fail = await ctx.reply('❌ Ошибка при обращении к ИИ. Попробуй позже.');
