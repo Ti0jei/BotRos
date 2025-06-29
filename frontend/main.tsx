@@ -7,7 +7,7 @@ import { Notifications } from '@mantine/notifications';
 import { ModalsProvider } from '@mantine/modals';
 import { BrowserRouter } from 'react-router-dom';
 
-import { theme } from './theme'; // подключение кастомной темы
+import { theme } from './src/theme'; // подключение кастомной темы
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
