@@ -1,16 +1,16 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import {
-  Container,
-  Title,
   PasswordInput,
-  Button,
-  Stack,
   Text,
+  Stack,
   Center,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
+
+import FormSection from '../components/ui/FormSection';
+import ActionButton from '../components/ui/ActionButton';
 
 interface Props {
   onBack: () => void;
@@ -73,51 +73,21 @@ export default function ResetPassword({ onBack }: Props) {
     }
   };
 
-  const pinkButtonSx = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 500,
-    borderRadius: 8,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-  };
-
   return (
-    <div
-      style={{
-        backgroundColor: '#e8b3a6',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
-    >
-      <Container
-        size="xs"
-        p="xl"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          borderRadius: 24,
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-        }}
+    <div style={{ padding: 16 }}>
+      <FormSection
+        title="Новый пароль"
+        description={!done ? 'Введите новый пароль и сохраните' : undefined}
       >
-        <Title order={2} mb="md" ta="center">
-          Новый пароль
-        </Title>
-
         {done ? (
           <>
             <Text mb="md" ta="center">
               Пароль успешно обновлён. Теперь войдите с новым паролем.
             </Text>
             <Center>
-              <Button sx={pinkButtonSx} variant="subtle" onClick={onBack}>
+              <ActionButton variant="subtle" onClick={onBack}>
                 Назад ко входу
-              </Button>
+              </ActionButton>
             </Center>
           </>
         ) : (
@@ -128,15 +98,15 @@ export default function ResetPassword({ onBack }: Props) {
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
             />
-            <Button onClick={handleSubmit} loading={loading} color="pink">
+            <ActionButton onClick={handleSubmit} loading={loading}>
               Сохранить пароль
-            </Button>
-            <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
+            </ActionButton>
+            <ActionButton variant="subtle" onClick={onBack}>
               Назад ко входу
-            </Button>
+            </ActionButton>
           </Stack>
         )}
-      </Container>
+      </FormSection>
     </div>
   );
 }

@@ -1,16 +1,15 @@
-// frontend/pages/Register.tsx
 import { useState, useEffect } from 'react';
 import {
   TextInput,
   PasswordInput,
-  Button,
   Stack,
-  Paper,
-  Title,
   Notification,
 } from '@mantine/core';
 import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
+
+import ActionButton from '../components/ui/ActionButton';
+import FormSection from '../components/ui/FormSection';
 
 export default function Register({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState('');
@@ -67,7 +66,6 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
       if (res.ok) {
         sessionStorage.setItem('lastEmail', email);
         sessionStorage.setItem('lastPassword', password);
-
         setSuccess(true);
 
         showNotification({
@@ -92,33 +90,9 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: '#e8b3a6',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
-    >
-      <Paper
-        p="xl"
-        style={{
-          maxWidth: 400,
-          width: '100%',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          borderRadius: 24,
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-        }}
-      >
+    <div style={{ padding: 16 }}>
+      <FormSection title="Регистрация" description="Заполните все поля, чтобы зарегистрироваться">
         <Stack>
-          <Title order={3} ta="center">
-            Регистрация
-          </Title>
-
           {error && (
             <Notification
               color="red"
@@ -130,59 +104,22 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
             </Notification>
           )}
 
-          <TextInput
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={success}
-          />
-
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={success}
-          />
-
-          <TextInput
-            label="Имя"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={success}
-          />
-
-          <TextInput
-            label="Фамилия"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={success}
-          />
-
-          <TextInput
-            label="Возраст"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            disabled={success}
-          />
-
-          <TextInput
-            label="Инвайт-код"
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.target.value)}
-            disabled={success}
-          />
+          <TextInput label="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={success} />
+          <PasswordInput label="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} disabled={success} />
+          <TextInput label="Имя" value={name} onChange={(e) => setName(e.target.value)} disabled={success} />
+          <TextInput label="Фамилия" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={success} />
+          <TextInput label="Возраст" value={age} onChange={(e) => setAge(e.target.value)} disabled={success} />
+          <TextInput label="Инвайт-код" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} disabled={success} />
 
           {!success ? (
-            <Button fullWidth onClick={handleSubmit} color="pink">
-              Зарегистрироваться
-            </Button>
+            <ActionButton onClick={handleSubmit}>Зарегистрироваться</ActionButton>
           ) : (
-            <Button fullWidth color="blue" onClick={handleGoToLogin}>
+            <ActionButton color="blue" onClick={handleGoToLogin}>
               Перейти ко входу
-            </Button>
+            </ActionButton>
           )}
         </Stack>
-      </Paper>
+      </FormSection>
     </div>
   );
 }

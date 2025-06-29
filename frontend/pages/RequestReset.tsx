@@ -1,16 +1,15 @@
-// frontend/pages/RequestReset.tsx
 import { useState } from 'react';
 import {
-  Button,
   TextInput,
-  Title,
-  Container,
   Text,
   Stack,
   Center,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconMail } from '@tabler/icons-react';
+
+import ActionButton from '../components/ui/ActionButton';
+import FormSection from '../components/ui/FormSection';
 
 interface Props {
   onBack: () => void;
@@ -67,81 +66,47 @@ export default function RequestReset({ onBack }: Props) {
     }
   };
 
-  const pinkButtonSx = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 500,
-    borderRadius: 8,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-  };
-
   return (
-    <div
-      style={{
-        backgroundColor: '#e8b3a6',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
-    >
-      <Container
-        size="xs"
-        p="xl"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          borderRadius: 24,
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-        }}
+    <div style={{ padding: 16 }}>
+      <FormSection
+        title="Сброс пароля"
+        description={sent ? undefined : 'Введите email, на который придёт письмо'}
       >
-        <Title order={2} mb="md" ta="center">
-          Сброс пароля
-        </Title>
-
         {sent ? (
           <>
             <Text mb="md" ta="center">
               Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
             </Text>
             <Center>
-              <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
+              <ActionButton variant="subtle" onClick={onBack}>
                 На главную
-              </Button>
+              </ActionButton>
             </Center>
           </>
         ) : (
-          <>
-            <Stack>
-              <TextInput
-                label="Email"
-                placeholder="Введите ваш email"
-                value={email}
-                onChange={(e) => setEmail(e.currentTarget.value)}
-              />
-              <Button
-                onClick={handleSubmit}
-                loading={loading}
-                disabled={!email}
-                leftIcon={<IconMail size={16} />}
-                color="pink"
-              >
-                Сбросить пароль
-              </Button>
-            </Stack>
-
-            <Center mt="md">
-              <Button variant="subtle" onClick={onBack} sx={pinkButtonSx}>
+          <Stack>
+            <TextInput
+              label="Email"
+              placeholder="Введите ваш email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+            />
+            <ActionButton
+              onClick={handleSubmit}
+              loading={loading}
+              disabled={!email}
+              leftIcon={<IconMail size={16} />}
+            >
+              Сбросить пароль
+            </ActionButton>
+            <Center>
+              <ActionButton variant="subtle" onClick={onBack}>
                 На главную
-              </Button>
+              </ActionButton>
             </Center>
-          </>
+          </Stack>
         )}
-      </Container>
+      </FormSection>
     </div>
   );
 }

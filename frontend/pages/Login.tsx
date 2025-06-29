@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import {
   TextInput,
   PasswordInput,
-  Button,
   Stack,
-  Paper,
-  Title,
   Group,
-  Box,
+  Loader,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconAlertCircle, IconMail } from '@tabler/icons-react';
+import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
+
+import FormSection from '../components/ui/FormSection';
+import ActionButton from '../components/ui/ActionButton';
 
 export default function Login({
   onLoggedIn,
@@ -36,8 +36,6 @@ export default function Login({
 
   const handleLogin = async () => {
     setLoading(true);
-    setShowResend(false);
-
     try {
       const res = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
@@ -47,53 +45,35 @@ export default function Login({
 
       const data = await res.json();
 
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-        sessionStorage.removeItem('lastEmail');
-        sessionStorage.removeItem('lastPassword');
-        onLoggedIn();
-      } else {
-        const errorMsg = data.error || 'Неверные данные';
+      if (!res.ok) {
+        if (data.reason === 'email_not_verified') {
+          setShowResend(true);
+        }
 
         showNotification({
           title: 'Ошибка входа',
-          message:
-            errorMsg === 'Подтвердите email перед входом'
-              ? 'Пожалуйста, подтвердите почту по ссылке в письме'
-              : errorMsg,
+          message: data.message || 'Неверные данные',
           color: 'red',
-          icon: <IconAlertCircle size={18} />,
+          icon: <IconAlertCircle />,
         });
-
-        if (errorMsg === 'Подтвердите email перед входом') {
-          setShowResend(true);
-        }
+      } else {
+        sessionStorage.setItem('lastEmail', email);
+        sessionStorage.setItem('lastPassword', password);
+        onLoggedIn();
       }
     } catch (err) {
       showNotification({
-        title: 'Сервер недоступен',
-        message: 'Попробуйте позже',
+        title: 'Ошибка',
+        message: 'Сервер недоступен',
         color: 'red',
-        icon: <IconAlertCircle size={18} />,
+        icon: <IconAlertCircle />,
       });
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const handleResend = async () => {
-    if (!email) {
-      showNotification({
-        title: 'Email не указан',
-        message: 'Введите email, чтобы отправить письмо повторно',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
-      return;
-    }
-
     setResending(true);
-
     try {
       const res = await fetch(`${API}/api/auth/resend`, {
         method: 'POST',
@@ -106,108 +86,63 @@ export default function Login({
       if (res.ok) {
         showNotification({
           title: 'Письмо отправлено',
-          message: 'Проверьте почту и подтвердите email',
+          message: 'Проверьте почту для подтверждения',
           color: 'green',
-          icon: <IconMail size={18} />,
+          icon: <IconCheck />,
         });
       } else {
         showNotification({
           title: 'Ошибка',
-          message: data?.error || 'Не удалось отправить письмо',
+          message: data.message || 'Не удалось отправить',
           color: 'red',
-          icon: <IconAlertCircle size={18} />,
+          icon: <IconAlertCircle />,
         });
       }
-    } catch (err) {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Не удалось отправить письмо',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
     } finally {
       setResending(false);
     }
   };
 
-  const subtleButtonSx = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 500,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-  };
-
   return (
-    <Box
-      style={{
-        backgroundColor: '#e8b3a6',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Paper
-        shadow="md"
-        radius="lg"
-        p="xl"
-        style={{
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          width: '100%',
-          maxWidth: 400,
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-        }}
-      >
-        <Stack>
-          <Title order={2} align="center" fw={700} mb="sm">
-            Вход в Krissfit
-          </Title>
-
+    <div style={{ padding: 16 }}>
+      <FormSection title="Вход в Krissfit" description="Введите почту и пароль">
+        <Stack spacing="sm">
           <TextInput
             label="Email"
+            placeholder="you@email.com"
+            type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            required
           />
           <PasswordInput
             label="Пароль"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            required
           />
-          <Button fullWidth onClick={handleLogin} loading={loading} mt="sm" color="pink">
-            Войти
-          </Button>
+
+          <ActionButton onClick={handleLogin} disabled={loading}>
+            {loading ? <Loader size="xs" color="white" /> : 'Войти'}
+          </ActionButton>
 
           {showResend && (
-            <Button
-              variant="light"
-              color="pink"
-              mt="sm"
-              onClick={handleResend}
-              loading={resending}
-              leftIcon={<IconMail size={18} />}
-            >
-              Отправить письмо повторно
-            </Button>
+            <ActionButton onClick={handleResend} variant="outline" disabled={resending}>
+              {resending ? <Loader size="xs" /> : 'Отправить письмо повторно'}
+            </ActionButton>
           )}
 
-          <Group position="center" mt="xs">
-            <Button
+          <Group position="right">
+            <ActionButton
               variant="subtle"
-              sx={subtleButtonSx}
-              size="xs"
               onClick={onResetRequest}
+              style={{ padding: 0 }}
             >
               Забыли пароль?
-            </Button>
+            </ActionButton>
           </Group>
         </Stack>
-      </Paper>
-    </Box>
+      </FormSection>
+    </div>
   );
 }
