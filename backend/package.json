@@ -2,10 +2,11 @@
   "name": "telegram-backend",
   "version": "1.0.0",
   "type": "module",
-  "main": "bot.js",
+  "main": "backend/bot.mjs",
   "scripts": {
-    "dev": "node bot.js",
-    "start": "node bot.js"
+    "dev": "node backend/bot.mjs",
+    "start": "node backend/bot.mjs",
+    "api": "node backend/index.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.10.0",
