@@ -7,7 +7,7 @@ import CoachProfile from './pages/CoachProfile';
 import AdminSchedule from './pages/AdminSchedule';
 import AdminClients from './pages/AdminClients';
 import ClientSchedule from './pages/ClientSchedule';
-import ClientBlock from './pages/ClientBlock'; // ✅ добавлен импорт
+import ClientBlock from './pages/ClientBlock';
 import PaymentHistory from './pages/PaymentHistory';
 import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
@@ -24,7 +24,7 @@ function App() {
     | 'schedule'
     | 'clients'
     | 'client-calendar'
-    | 'client-block' // ✅ добавлен
+    | 'client-block'
     | 'history'
     | 'reset-request'
     | 'reset-confirm'
@@ -118,7 +118,7 @@ function App() {
     );
   }
 
-  if (!profile && view === 'profile') {
+  if (!profile && view === 'profile' && !profileLoading) {
     console.warn('❌ Профиль пустой, возврат на login');
     setView('login');
     return null;
@@ -205,14 +205,14 @@ function App() {
       {view === 'client-calendar' && profile?.role === 'USER' && (
         <ClientSchedule
           onBack={() => setView('profile')}
-          onOpenBlock={() => setView('client-block')} // ✅ добавлено
+          onOpenBlock={() => setView('client-block')}
         />
       )}
 
       {view === 'client-block' && profile?.role === 'USER' && (
         <ClientBlock
           onBack={() => setView('client-calendar')}
-          onToProfile={() => setView('profile')} // ✅ будет работать
+          onToProfile={() => setView('profile')}
         />
       )}
 
