@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { Telegraf, Markup } from 'telegraf';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';

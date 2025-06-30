@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
@@ -80,6 +83,10 @@ app.get('/api/test-email', async (req, res) => {
   try {
     const to = 'zoty2104@gmail.com';
     const from = process.env.EMAIL_FROM;
+
+    if (!from) {
+      return res.status(400).json({ error: 'EMAIL_FROM не задан' });
+    }
 
     const result = await resend.emails.send({
       from,
