@@ -1,10 +1,6 @@
-// ✅ ДОРАБОТАННЫЙ И ПРОВЕРЕННЫЙ КОД
 import { Telegraf, Markup } from 'telegraf';
-import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
-
-dotenv.config();
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = process.env.WEB_APP_URL;
@@ -29,7 +25,6 @@ function autoDelete(ctx, message, delay = 3000) {
   }, delay);
 }
 
-// Middleware
 async function onlyRegistered(ctx, next) {
   const telegramId = ctx.from?.id;
   if (!telegramId) return ctx.reply('⚠️ Не удалось определить Telegram ID');
@@ -153,7 +148,10 @@ bot.action('ai_nutrition', onlyRegistered, async (ctx) => {
   }
 
   aiContexts.set(telegramId, {
-    messages: [{ role: 'system', content: 'Ты — диетолог и консультант по питанию. Отвечай на вопросы о продуктах, питательной ценности, составе, а также можешь давать рецепты здоровой пищи. Если вопрос не связан с едой или диетой — откажись.' }],
+    messages: [{
+      role: 'system',
+      content: 'Ты — диетолог и консультант по питанию. Отвечай на вопросы о продуктах, составе и здоровом питании. Игнорируй нееду.'
+    }],
     lastUsed: Date.now(),
   });
 
@@ -201,14 +199,12 @@ bot.hears(/^(.{1,300})$/, onlyRegistered, async (ctx) => {
     const answer = await ctx.reply(replyText);
     const reminder = await ctx.reply('🔄 Вы можете задать ещё один вопрос, или нажмите 📋 Меню, чтобы выйти.');
 
-    // ❗ Удаляем все сообщения и выходим из AI-режима через 3 минуты
     setTimeout(() => {
       ctx.telegram.deleteMessage(ctx.chat.id, questionMessageId).catch(() => {});
       ctx.telegram.deleteMessage(ctx.chat.id, answer.message_id).catch(() => {});
       ctx.telegram.deleteMessage(ctx.chat.id, reminder.message_id).catch(() => {});
-      aiContexts.delete(telegramId); // ⛔ сброс контекста
-    }, 180000); // 3 минуты
-
+      aiContexts.delete(telegramId);
+    }, 180000);
   } catch (err) {
     const fail = await ctx.reply('❌ Ошибка при обращении к ИИ. Попробуй позже.');
     autoDelete(ctx, fail);

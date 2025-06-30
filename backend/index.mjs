@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import path from 'path';
 import fs from 'fs';
@@ -20,8 +19,6 @@ import resetPasswordRoutes from './routes/reset-password.mjs';
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
 import './cron/nutritionReminder.mjs';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
