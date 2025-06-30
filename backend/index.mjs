@@ -111,10 +111,10 @@ app.listen(PORT, () => {
 
 // Безопасный запуск Telegram-бота
 (async () => {
-  const botPath = path.join(__dirname, '../bot.js');
+  const botPath = path.join(__dirname, '../bot.mjs);
   if (fs.existsSync(botPath)) {
     try {
-      await import('../bot.js');
+      await import('../bot.mjs);
       console.log('🤖 Telegram-бот успешно запущен');
     } catch (err) {
       console.error('❌ Ошибка при запуске Telegram-бота:', err.message);
