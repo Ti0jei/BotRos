@@ -1,29 +1,29 @@
 {
-  "name": "fittelega-frontend",
+  "name": "telegram-backend",
   "version": "1.0.0",
-  "private": true,
+  "type": "module",
+  "main": "backend/bot.mjs",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "node backend/bot.mjs",
+    "start": "node backend/bot.mjs",
+    "api": "node backend/index.mjs" // 👈 если нужно запустить только API
   },
   "dependencies": {
-    "@mantine/core": "8.1.1",
-    "@mantine/dates": "8.1.1",
-    "@mantine/hooks": "8.1.1",
-    "@mantine/modals": "8.1.1",
-    "@mantine/notifications": "8.1.1",
-    "@remix-run/router": "^1.23.0",
-    "@tabler/icons-react": "^3.34.0",
-    "bcryptjs": "^3.0.2",
+    "@prisma/client": "^6.10.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "data-uri-to-buffer": "^4.0.1",
     "dayjs": "^1.11.13",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.30.1"
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.0",
+    "node-cron": "^4.1.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.7.0",
+    "resend": "^4.6.0",
+    "telegraf": "^4.16.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.0"
+    "prisma": "^6.10.0"
   }
 }

@@ -141,7 +141,10 @@ function App() {
       {view === 'login' && (
         <>
           <Login
-            onLoggedIn={() => setView('profile')}
+            onLoggedIn={(userProfile) => {
+              setProfile(userProfile);
+              setView('profile');
+            }}
             onResetRequest={() => setView('reset-request')}
           />
           <Center>

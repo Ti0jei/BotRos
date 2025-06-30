@@ -16,7 +16,7 @@ export default function Login({
   onLoggedIn,
   onResetRequest,
 }: {
-  onLoggedIn: () => void;
+  onLoggedIn: (profile: any) => void;
   onResetRequest: () => void;
 }) {
   const [email, setEmail] = useState('');
@@ -57,9 +57,26 @@ export default function Login({
           icon: <IconAlertCircle />,
         });
       } else {
+        localStorage.setItem('token', data.token);
         sessionStorage.setItem('lastEmail', email);
         sessionStorage.setItem('lastPassword', password);
-        onLoggedIn();
+
+        // сразу получаем профиль
+        const profileRes = await fetch(`${API}/api/profile`, {
+          headers: { Authorization: 'Bearer ' + data.token },
+        });
+
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          onLoggedIn(profile);
+        } else {
+          showNotification({
+            title: 'Ошибка',
+            message: 'Не удалось загрузить профиль',
+            color: 'red',
+            icon: <IconAlertCircle />,
+          });
+        }
       }
     } catch (err) {
       showNotification({
