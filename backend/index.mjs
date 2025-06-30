@@ -24,6 +24,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// -------------------- Middleware --------------------
+app.use(cors({
+  origin: process.env.WEB_APP_URL || '*',
+  credentials: true,
+}));
+app.options('*', cors());
+app.use(express.json());
+
+// -------------------- Logging --------------------
 process.on('uncaughtException', (err) => {
   console.error('❗ Uncaught Exception:', err);
 });
@@ -34,23 +46,12 @@ process.on('unhandledRejection', (err) => {
 console.log('🧪 Запуск сервера... NODE_ENV =', NODE_ENV);
 console.log('🧪 Запуск на порту:', PORT);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Middleware
-app.use(cors({
-  origin: process.env.WEB_APP_URL || '*',
-  credentials: true,
-}));
-app.options('*', cors());
-app.use(express.json());
-
-// Health-check
+// -------------------- Health-check --------------------
 app.get('/health', (req, res) => {
   res.status(200).json({ status: '🟢 API работает', timestamp: new Date().toISOString() });
 });
 
-// API маршруты
+// -------------------- API маршруты --------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', authMiddleware, profileRoutes);
 app.use('/api/clients', authMiddleware, clientsRoutes);
@@ -62,7 +63,7 @@ app.use('/api/invite-code', inviteCodeRoutes);
 app.use('/api/nutrition', authMiddleware, nutritionRoutes);
 app.use('/api/reset-password', resetPasswordRoutes);
 
-// IP
+// -------------------- IP --------------------
 app.get('/ip', async (req, res) => {
   try {
     const response = await fetch('https://api.ipify.org?format=json');
@@ -74,7 +75,7 @@ app.get('/ip', async (req, res) => {
   }
 });
 
-// Email test
+// -------------------- Email тест --------------------
 app.get('/api/test-email', async (req, res) => {
   try {
     const to = 'zoty2104@gmail.com';
@@ -95,23 +96,27 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
-// Статический фронт
+// -------------------- Фронт --------------------
 if (NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname, '../frontend/dist');
-  app.use(express.static(frontendDistPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendDistPath, 'index.html'));
-  });
+  if (fs.existsSync(frontendDistPath)) {
+    app.use(express.static(frontendDistPath));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendDistPath, 'index.html'));
+    });
+  } else {
+    console.warn('⚠️ Папка frontend/dist не найдена');
+  }
 }
 
-// Запуск сервера
+// -------------------- Запуск --------------------
 app.listen(PORT, () => {
   console.log(`✅ Сервер запущен на http://localhost:${PORT}`);
 });
 
-// Безопасный запуск Telegram-бота
+// -------------------- Безопасный запуск Telegram-бота --------------------
 (async () => {
-  const botPath = path.join(__dirname, '../bot.mjs');
+  const botPath = path.join(__dirname, './bot.mjs');
   if (fs.existsSync(botPath)) {
     try {
       await import(botPath);
