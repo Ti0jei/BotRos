@@ -1,12 +1,9 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const API_URL = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
 
 export async function notifyTelegram(telegramId, text) {
   if (!telegramId || !TOKEN) {
-    console.warn('❗ notifyTelegram: нет telegramId или токена');
+    console.warn('❗ notifyTelegram: нет telegramId или TELEGRAM_BOT_TOKEN');
     return;
   }
 
@@ -28,6 +25,6 @@ export async function notifyTelegram(telegramId, text) {
       console.log('✅ Уведомление отправлено:', telegramId);
     }
   } catch (err) {
-    console.error('❌ Ошибка отправки уведомления:', err);
+    console.error('❌ Ошибка отправки уведомления:', err.message);
   }
 }
