@@ -38,11 +38,15 @@ function App() {
   const API = import.meta.env.VITE_API_BASE_URL;
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const tid = params.get('tid');
-    if (tid) localStorage.setItem('telegramId', tid);
-  }, [params]);
+    // ✅ Автоопределение Telegram ID через SDK
+    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgUserId) {
+      localStorage.setItem('telegramId', tgUserId.toString());
+    }
+  }, []);
 
   useEffect(() => {
     if (params.get('verified') === 'true') {
@@ -60,13 +64,12 @@ function App() {
   }, [params, navigate]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (!token) return;
 
     setProfileLoading(true);
 
     fetch(`${API}/api/profile`, {
-      headers: { Authorization: 'Bearer ' + token },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -102,7 +105,7 @@ function App() {
         setView('login');
       })
       .finally(() => setProfileLoading(false));
-  }, []);
+  }, [token, API]);
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -110,7 +113,7 @@ function App() {
     setView('login');
   };
 
-  if (profileLoading && localStorage.getItem('token')) {
+  if (profileLoading && token) {
     return (
       <Center h="100vh">
         <Loader size="lg" />
@@ -119,7 +122,6 @@ function App() {
   }
 
   if (!profile && view === 'profile' && !profileLoading) {
-    console.warn('❌ Профиль пустой, возврат на login');
     setView('login');
     return null;
   }

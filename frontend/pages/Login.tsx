@@ -29,9 +29,7 @@ export default function Login({
 
   useEffect(() => {
     const savedEmail = sessionStorage.getItem('lastEmail');
-    const savedPassword = sessionStorage.getItem('lastPassword');
     if (savedEmail) setEmail(savedEmail);
-    if (savedPassword) setPassword(savedPassword);
   }, []);
 
   const handleLogin = async () => {
@@ -59,11 +57,11 @@ export default function Login({
       } else {
         localStorage.setItem('token', data.token);
         sessionStorage.setItem('lastEmail', email);
-        sessionStorage.setItem('lastPassword', password);
 
-        // сразу получаем профиль
         const profileRes = await fetch(`${API}/api/profile`, {
-          headers: { Authorization: 'Bearer ' + data.token },
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
         });
 
         if (profileRes.ok) {
@@ -85,8 +83,9 @@ export default function Login({
         color: 'red',
         icon: <IconAlertCircle />,
       });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleResend = async () => {
