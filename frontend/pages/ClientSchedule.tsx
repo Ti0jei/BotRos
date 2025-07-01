@@ -66,9 +66,9 @@ export default function ClientSchedule({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen pb-28 px-4">
-      <div className="max-w-sm mx-auto">
-        <div className="bg-[#fff0f6] rounded-2xl shadow-md p-4 w-full">
+    <div className="bg-white min-h-screen px-4 pb-28">
+      <div className="max-w-sm mx-auto mt-6">
+        <CardBlock>
           <h2 className="text-lg font-semibold mb-4">Мои тренировки</h2>
 
           <ActionButton
@@ -150,7 +150,7 @@ export default function ClientSchedule({
               ))}
             </div>
           )}
-        </div>
+        </CardBlock>
       </div>
 
       {/* Кнопка ВНИЗУ ЭКРАНА */}
