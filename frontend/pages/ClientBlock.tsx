@@ -1,19 +1,10 @@
-import { useEffect, useState } from 'react';
-import {
-  Box,
-  Title,
-  Paper,
-  Text,
-  Badge,
-  Group,
-  Button,
-  Stack,
-  Loader,
-  Container,
-} from '@mantine/core';
-import { getToken } from '../utils/auth';
-import { IconHome } from '@tabler/icons-react';
-import BackToProfileButton from '../components/BackToProfileButton';
+import { useEffect, useState } from "react";
+import { IconHome, IconArrowBack } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import { getToken } from "../utils/auth";
+import CardBlock from "@/components/ui/CardBlock";
+import FormSection from "@/components/ui/FormSection";
+import ActionButton from "@/components/ui/ActionButton";
 
 interface PaymentBlock {
   id: string;
@@ -42,7 +33,7 @@ export default function ClientBlock({
     const loadBlock = async () => {
       if (!token) {
         setBlock(null);
-        setErrorMessage('Токен отсутствует. Повторите вход.');
+        setErrorMessage("Токен отсутствует. Повторите вход.");
         setLoading(false);
         return;
       }
@@ -51,7 +42,7 @@ export default function ClientBlock({
         const res = await fetch(`${API}/api/payment-blocks/user/me/active`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
@@ -61,11 +52,11 @@ export default function ClientBlock({
           setBlock(data);
         } else {
           setBlock(null);
-          setErrorMessage('У вас нет активного блока тренировок.');
+          setErrorMessage("У вас нет активного блока тренировок.");
         }
       } catch (error: any) {
         setBlock(null);
-        setErrorMessage(error.message || 'Неизвестная ошибка');
+        setErrorMessage(error.message || "Неизвестная ошибка");
       } finally {
         setLoading(false);
       }
@@ -75,76 +66,79 @@ export default function ClientBlock({
   }, []);
 
   return (
-    <Box className="bg-[#f5d4ca] min-h-screen flex justify-center">
-      <Container
-        size="xs"
-        className="bg-white min-h-screen w-full max-w-sm flex flex-col relative px-6 pt-8 pb-28"
-      >
-        <Title order={2} ta="center" mb="md" fw={700}>
-          📦 Блок тренировок
-        </Title>
-
-        {loading ? (
-          <Loader size="sm" mx="auto" />
-        ) : !block ? (
-          <Text ta="center" color="red" mt="md">
-            ❌ {errorMessage || 'У вас нет активного блока тренировок.'}
-          </Text>
-        ) : (
-          <Paper withBorder radius="md" shadow="sm" p="md">
-            <Group justify="space-between" mb="xs">
-              <Text fw={600}>Дата оплаты</Text>
-              <Text>{new Date(block.paidAt).toLocaleDateString()}</Text>
-            </Group>
-            <Text size="sm" c="dimmed" mb={4}>
-              Всего тренировок: <b>{block.paidTrainings}</b>
-            </Text>
-            <Text size="sm" c="dimmed" mb={4}>
-              Использовано: <b>{block.used}</b>
-            </Text>
-            <Text size="sm" c="dimmed" mb={4}>
-              Осталось: <b>{block.paidTrainings - block.used}</b>
-            </Text>
-            {block.pricePerBlock !== undefined && (
-              <Text size="sm" c="dimmed" mb={4}>
-                Цена за блок: <b>{block.pricePerBlock} ₽</b>
-              </Text>
+    <div className="bg-white min-h-screen flex justify-center p-4">
+      <div className="w-full max-w-sm pb-28">
+        <CardBlock>
+          <FormSection title="📦 Блок тренировок">
+            {loading ? (
+              <div className="flex justify-center mt-4">
+                <div className="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : !block ? (
+              <p className="text-center text-red-500 text-sm mt-4">
+                ❌ {errorMessage || "У вас нет активного блока тренировок."}
+              </p>
+            ) : (
+              <div className="border border-gray-200 rounded-xl p-4 shadow-md space-y-2 mt-4 text-sm text-gray-700">
+                <div className="flex justify-between">
+                  <span className="font-medium">Дата оплаты:</span>
+                  <span>{dayjs(block.paidAt).format("DD.MM.YYYY")}</span>
+                </div>
+                <div>
+                  Всего тренировок:{" "}
+                  <b className="text-gray-800">{block.paidTrainings}</b>
+                </div>
+                <div>
+                  Использовано:{" "}
+                  <b className="text-gray-800">{block.used}</b>
+                </div>
+                <div>
+                  Осталось:{" "}
+                  <b className="text-gray-800">
+                    {block.paidTrainings - block.used}
+                  </b>
+                </div>
+                {block.pricePerBlock !== undefined && (
+                  <div>
+                    Цена за блок:{" "}
+                    <b className="text-gray-800">{block.pricePerBlock} ₽</b>
+                  </div>
+                )}
+                <div
+                  className={`inline-block mt-2 text-xs font-semibold px-2 py-1 rounded ${
+                    block.active
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-500"
+                  }`}
+                >
+                  {block.active ? "Активен" : "Завершён"}
+                </div>
+              </div>
             )}
-            <Badge
-              color={block.active ? 'green' : 'gray'}
-              mt={8}
-              size="lg"
-              variant="light"
-            >
-              {block.active ? 'Активен' : 'Завершён'}
-            </Badge>
-          </Paper>
-        )}
+          </FormSection>
+        </CardBlock>
 
-        {/* Нижняя кнопочная панель */}
-        <Box className="fixed bottom-0 left-0 w-full bg-white py-5 px-4 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] z-10">
-          <Box className="max-w-sm mx-auto flex flex-col gap-3">
-            <BackToProfileButton onBack={onBack} />
-            <Button
-              onClick={onToProfile}
+        <div className="fixed bottom-0 left-0 w-full bg-white py-5 px-4 shadow-md z-50">
+          <div className="max-w-sm mx-auto flex flex-col gap-3">
+            <ActionButton
               fullWidth
-              leftIcon={<IconHome size={14} />}
-              styles={{
-                root: {
-                  color: '#d6336c',
-                  border: '1px solid #d6336c',
-                  borderRadius: 8,
-                  fontWeight: 500,
-                  backgroundColor: 'transparent',
-                  '&:hover': { backgroundColor: '#ffe3ed' },
-                },
-              }}
+              variant="outline"
+              leftIcon={<IconArrowBack size={16} />}
+              onClick={onBack}
+            >
+              Назад
+            </ActionButton>
+            <ActionButton
+              fullWidth
+              variant="outline"
+              leftIcon={<IconHome size={16} />}
+              onClick={onToProfile}
             >
               На главную
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-    </Box>
+            </ActionButton>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
