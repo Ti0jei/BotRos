@@ -142,34 +142,35 @@ export default function Profile({
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative overflow-visible">
-
-        {/* Иконка уведомлений (исправлено позиционирование) */}
-        <div className="absolute top-4 right-4 z-10">
-          <Tooltip
-            label={
-              user.notificationsMuted
-                ? "Оповещения выключены"
-                : "Оповещения включены"
-            }
-          >
-            <ActionIcon
-              variant="light"
-              size="lg"
-              radius="xl"
-              color={user.notificationsMuted ? "gray" : "pink"}
-              onClick={toggleNotifications}
-              className="shadow-md"
-            >
-              {user.notificationsMuted ? (
-                <IconBellOff size={18} />
-              ) : (
-                <IconBellRinging size={18} />
-              )}
-            </ActionIcon>
-          </Tooltip>
-        </div>
-
-        <FormSection title={`Привет, ${user.name} 👋`}>
+        <FormSection
+          title={
+            <div className="flex items-center justify-between">
+              <span>{`Привет, ${user.name} 👋`}</span>
+              <Tooltip
+                label={
+                  user.notificationsMuted
+                    ? "Оповещения выключены"
+                    : "Оповещения включены"
+                }
+              >
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  radius="xl"
+                  color={user.notificationsMuted ? "gray" : "pink"}
+                  onClick={toggleNotifications}
+                  className="shadow-md"
+                >
+                  {user.notificationsMuted ? (
+                    <IconBellOff size={18} />
+                  ) : (
+                    <IconBellRinging size={18} />
+                  )}
+                </ActionIcon>
+              </Tooltip>
+            </div>
+          }
+        >
           <Stack spacing="xs">
             <ActionButton fullWidth onClick={() => setSection("trainings")}>
               Мои тренировки
