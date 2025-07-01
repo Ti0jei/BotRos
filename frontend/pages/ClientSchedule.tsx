@@ -66,7 +66,7 @@ export default function ClientSchedule({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen p-4">
+    <div className="bg-white min-h-screen p-4 pb-28">
       <div className="max-w-sm mx-auto">
         <CardBlock>
           <h2 className="text-lg font-semibold mb-4">Мои тренировки</h2>
@@ -150,17 +150,21 @@ export default function ClientSchedule({
               ))}
             </div>
           )}
+        </CardBlock>
+      </div>
 
+      {/* КНОПКА ВНИЗУ */}
+      <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow z-50">
+        <div className="max-w-sm mx-auto">
           <ActionButton
             fullWidth
             variant="outline"
-            className="mt-6"
             leftIcon={<IconArrowBack size={18} />}
             onClick={onBack}
           >
             Назад к профилю
           </ActionButton>
-        </CardBlock>
+        </div>
       </div>
     </div>
   );
