@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import {
   IconBellRinging,
-  IconBellOffFilled,
+  IconBellOff,
   IconLogout,
 } from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
@@ -160,7 +160,7 @@ export default function Profile({
               className="shadow-md"
             >
               {user.notificationsMuted ? (
-                <IconBellOffFilled size={18} />
+                <IconBellOff size={18} />
               ) : (
                 <IconBellRinging size={18} />
               )}
