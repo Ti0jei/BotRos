@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Center,
   Loader,
-  ActionIcon,
   Tooltip,
   Stack,
   Title,
@@ -13,6 +12,8 @@ import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
 import ActionButton from "@/components/ui/ActionButton";
+import CardBlock from "@/components/ui/CardBlock";
+import FormSection from "@/components/ui/FormSection";
 
 interface User {
   name: string;
@@ -33,7 +34,9 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState<"main" | "trainings" | "nutrition">("main");
+  const [section, setSection] = useState<
+    "main" | "trainings" | "nutrition" | "measurements" | "photos"
+  >("main");
   const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -113,34 +116,56 @@ export default function Profile({
     );
   }
 
+  if (section === "trainings") {
+    return showBlock ? (
+      <ClientBlock
+        onBack={() => setShowBlock(false)}
+        onToProfile={() => setSection("main")}
+      />
+    ) : (
+      <ClientSchedule
+        onBack={() => setSection("main")}
+        onOpenBlock={() => setShowBlock(true)}
+      />
+    );
+  }
+
+  if (section === "nutrition") {
+    return (
+      <ClientNutrition
+        userId={user.id}
+        onBack={() => setSection("main")}
+      />
+    );
+  }
+
   return (
-    <div className="bg-pink-50 min-h-screen flex justify-center items-start py-8">
-      <div className="bg-white w-full max-w-[380px] rounded-3xl shadow-md px-6 py-8 relative">
+    <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
+      <CardBlock>
         {/* Уведомления */}
-        {section === "main" && (
+        <div className="absolute top-3 right-3">
           <Tooltip
-            label={user.notificationsMuted ? "Оповещения выключены" : "Оповещения включены"}
+            label={
+              user.notificationsMuted
+                ? "Оповещения выключены"
+                : "Оповещения включены"
+            }
           >
-            <ActionIcon
-              variant="light"
-              color={user.notificationsMuted ? "gray" : "pink"}
+            <button
               onClick={toggleNotifications}
-              radius="xl"
-              size="lg"
-              className="absolute top-4 right-4"
+              className="text-pink-500 hover:text-pink-600 transition-colors"
             >
-              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
-            </ActionIcon>
+              {user.notificationsMuted ? (
+                <IconBellOff size={20} />
+              ) : (
+                <IconBell size={20} />
+              )}
+            </button>
           </Tooltip>
-        )}
+        </div>
 
-        {/* Главный экран */}
-        {section === "main" && (
-          <Stack spacing="sm">
-            <Title order={2} ta="center" className="font-extrabold text-xl mb-4 text-gray-800">
-              Привет, {user.name} 👋
-            </Title>
-
+        <FormSection title={`Привет, ${user.name} 👋`}>
+          <Stack spacing="xs">
             <ActionButton fullWidth onClick={() => setSection("trainings")}>
               Мои тренировки
             </ActionButton>
@@ -172,32 +197,12 @@ export default function Profile({
               variant="outline"
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
-              className="mt-4"
             >
               Выйти
             </ActionButton>
           </Stack>
-        )}
-
-        {/* Тренировки / расписание */}
-        {section === "trainings" &&
-          (showBlock ? (
-            <ClientBlock
-              onBack={() => setShowBlock(false)}
-              onToProfile={() => setSection("main")}
-            />
-          ) : (
-            <ClientSchedule
-              onBack={() => setSection("main")}
-              onOpenBlock={() => setShowBlock(true)}
-            />
-          ))}
-
-        {/* Питание */}
-        {section === "nutrition" && (
-          <ClientNutrition userId={user.id} onBack={() => setSection("main")} />
-        )}
-      </div>
+        </FormSection>
+      </CardBlock>
     </div>
   );
 }
