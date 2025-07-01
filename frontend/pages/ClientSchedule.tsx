@@ -5,7 +5,6 @@ import { getToken } from "../utils/auth";
 import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
-import { Tooltip, ActionIcon } from "@mantine/core";
 
 interface Training {
   id: string;
@@ -68,8 +67,8 @@ export default function ClientSchedule({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen flex justify-center p-4">
-      <div className="w-full max-w-sm space-y-4 pb-28">
+    <div className="bg-white min-h-screen p-4 pb-28">
+      <div className="max-w-sm mx-auto">
         <CardBlock>
           <FormSection title="Мои тренировки">
             <ActionButton
@@ -91,7 +90,7 @@ export default function ClientSchedule({
                 {trainings.map((t) => (
                   <div
                     key={t.id}
-                    className="border border-gray-200 rounded-xl p-4 shadow-md"
+                    className="border border-gray-200 rounded-xl p-4 shadow-sm"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <p className="font-semibold text-sm">

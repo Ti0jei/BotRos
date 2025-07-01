@@ -66,8 +66,8 @@ export default function ClientBlock({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen flex justify-center p-4">
-      <div className="w-full max-w-sm pb-28">
+    <div className="bg-white min-h-screen p-4 pb-28">
+      <div className="max-w-sm mx-auto">
         <CardBlock>
           <FormSection title="📦 Блок тренировок">
             {loading ? (
@@ -79,7 +79,7 @@ export default function ClientBlock({
                 ❌ {errorMessage || "У вас нет активного блока тренировок."}
               </p>
             ) : (
-              <div className="border border-gray-200 rounded-xl p-4 shadow-md space-y-2 mt-4 text-sm text-gray-700">
+              <div className="border border-gray-200 rounded-xl p-4 shadow-sm space-y-2 text-sm text-gray-700 mt-4">
                 <div className="flex justify-between">
                   <span className="font-medium">Дата оплаты:</span>
                   <span>{dayjs(block.paidAt).format("DD.MM.YYYY")}</span>
