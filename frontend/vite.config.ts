@@ -8,11 +8,11 @@ export default defineConfig({
   base: './',
   resolve: {
     alias: {
-      '@': resolve(__dirname, '.'), // ✅ указывает на корень, где лежат App.tsx и components/
+      '@': resolve(__dirname, '.'),
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: 'build', // ⬅️ ВАЖНО
     emptyOutDir: true,
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
