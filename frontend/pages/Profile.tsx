@@ -12,7 +12,7 @@ import { IconBell, IconBellOff, IconLogout } from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
-import ActionButton from "@/components/ui/ActionButton"; // ✅ исправлено: убраны фигурные скобки
+import ActionButton from "@/components/ui/ActionButton";
 
 interface User {
   name: string;
@@ -33,9 +33,7 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState<
-    "main" | "trainings" | "nutrition" | "measurements" | "photos"
-  >("main");
+  const [section, setSection] = useState<"main" | "trainings" | "nutrition">("main");
   const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -116,16 +114,12 @@ export default function Profile({
   }
 
   return (
-    <div className="bg-pink-50 min-h-screen flex justify-center items-start py-4 pb-20">
-      <div className="bg-white w-full max-w-sm rounded-2xl shadow-md p-6 relative">
-        {/* Иконка уведомлений */}
+    <div className="bg-pink-50 min-h-screen flex justify-center items-start py-8">
+      <div className="bg-white w-full max-w-[380px] rounded-3xl shadow-md px-6 py-8 relative">
+        {/* Уведомления */}
         {section === "main" && (
           <Tooltip
-            label={
-              user.notificationsMuted
-                ? "Оповещения выключены"
-                : "Оповещения включены"
-            }
+            label={user.notificationsMuted ? "Оповещения выключены" : "Оповещения включены"}
           >
             <ActionIcon
               variant="light"
@@ -135,18 +129,15 @@ export default function Profile({
               size="lg"
               className="absolute top-4 right-4"
             >
-              {user.notificationsMuted ? (
-                <IconBellOff size={20} />
-              ) : (
-                <IconBell size={20} />
-              )}
+              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
             </ActionIcon>
           </Tooltip>
         )}
 
+        {/* Главный экран */}
         {section === "main" && (
           <Stack spacing="sm">
-            <Title order={2} ta="center" className="font-bold mb-2">
+            <Title order={2} ta="center" className="font-extrabold text-xl mb-4 text-gray-800">
               Привет, {user.name} 👋
             </Title>
 
@@ -181,12 +172,14 @@ export default function Profile({
               variant="outline"
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
+              className="mt-4"
             >
               Выйти
             </ActionButton>
           </Stack>
         )}
 
+        {/* Тренировки / расписание */}
         {section === "trainings" &&
           (showBlock ? (
             <ClientBlock
@@ -200,11 +193,9 @@ export default function Profile({
             />
           ))}
 
+        {/* Питание */}
         {section === "nutrition" && (
-          <ClientNutrition
-            userId={user.id}
-            onBack={() => setSection("main")}
-          />
+          <ClientNutrition userId={user.id} onBack={() => setSection("main")} />
         )}
       </div>
     </div>
