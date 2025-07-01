@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Center, Loader, Tooltip, Stack, Text } from "@mantine/core";
 import {
-  IconBellRinging,
-  IconBellOffFilled,
+  IconBell,
+  IconBellOff,
   IconLogout,
 } from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
@@ -149,9 +149,9 @@ export default function Profile({
               className="text-pink-500 hover:text-pink-600 transition-colors"
             >
               {user.notificationsMuted ? (
-                <IconBellOffFilled size={20} />
+                <IconBellOff size={20} />
               ) : (
-                <IconBellRinging size={20} />
+                <IconBell size={20} />
               )}
             </button>
           </Tooltip>
