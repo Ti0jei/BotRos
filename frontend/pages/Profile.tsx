@@ -142,36 +142,34 @@ export default function Profile({
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative overflow-visible">
-        {/* Иконка уведомлений */}
-        <div className="absolute top-4 right-4 z-10">
-          <Tooltip
-            label={
-              user.notificationsMuted
-                ? "Оповещения выключены"
-                : "Оповещения включены"
-            }
-          >
-            <ActionIcon
-              variant="light"
-              size="lg"
-              radius="xl"
-              color={user.notificationsMuted ? "gray" : "pink"}
-              onClick={toggleNotifications}
-              className="shadow-sm"
-            >
-              {user.notificationsMuted ? (
-                <IconBellOff size={18} />
-              ) : (
-                <IconBellRinging size={18} />
-              )}
-            </ActionIcon>
-          </Tooltip>
-        </div>
-
         <FormSection
           title={
-            <div className="text-center text-lg font-bold">
-              Привет, {user.name} 👋
+            <div className="flex items-center justify-between w-full">
+              <span className="text-lg font-bold text-black">
+                Привет, {user.name} 👋
+              </span>
+              <Tooltip
+                label={
+                  user.notificationsMuted
+                    ? "Оповещения выключены"
+                    : "Оповещения включены"
+                }
+              >
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  radius="xl"
+                  color={user.notificationsMuted ? "gray" : "pink"}
+                  onClick={toggleNotifications}
+                  className="shadow-sm"
+                >
+                  {user.notificationsMuted ? (
+                    <IconBellOff size={18} />
+                  ) : (
+                    <IconBellRinging size={18} />
+                  )}
+                </ActionIcon>
+              </Tooltip>
             </div>
           }
         >
