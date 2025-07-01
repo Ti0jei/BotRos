@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
+import { Center, Loader, Tooltip, Stack, Text } from "@mantine/core";
 import {
-  Center,
-  Loader,
-  Tooltip,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { IconBell, IconBellOff, IconLogout } from "@tabler/icons-react";
+  IconBellRinging,
+  IconBellOffFilled,
+  IconLogout,
+} from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
 import ActionButton from "@/components/ui/ActionButton";
-import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 
 interface User {
@@ -131,10 +128,7 @@ export default function Profile({
 
   if (section === "nutrition") {
     return (
-      <ClientNutrition
-        userId={user.id}
-        onBack={() => setSection("main")}
-      />
+      <ClientNutrition userId={user.id} onBack={() => setSection("main")} />
     );
   }
 
@@ -142,7 +136,7 @@ export default function Profile({
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative">
         {/* Уведомления */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute left-4 top-4 z-10">
           <Tooltip
             label={
               user.notificationsMuted
@@ -155,9 +149,9 @@ export default function Profile({
               className="text-pink-500 hover:text-pink-600 transition-colors"
             >
               {user.notificationsMuted ? (
-                <IconBellOff size={20} />
+                <IconBellOffFilled size={20} />
               ) : (
-                <IconBell size={20} />
+                <IconBellRinging size={20} />
               )}
             </button>
           </Tooltip>
