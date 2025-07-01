@@ -66,9 +66,9 @@ export default function ClientSchedule({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen p-4 pb-28">
+    <div className="bg-white min-h-screen pb-28 px-4">
       <div className="max-w-sm mx-auto">
-        <CardBlock>
+        <div className="bg-[#fff0f6] rounded-2xl shadow-md p-4 w-full">
           <h2 className="text-lg font-semibold mb-4">Мои тренировки</h2>
 
           <ActionButton
@@ -82,7 +82,7 @@ export default function ClientSchedule({
           </ActionButton>
 
           {trainings.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm mt-4">
+            <p className="text-center text-gray-500 text-sm mt-4">
               У вас пока нет назначенных тренировок.
             </p>
           ) : (
@@ -90,7 +90,7 @@ export default function ClientSchedule({
               {trainings.map((t) => (
                 <div
                   key={t.id}
-                  className="border border-gray-200 rounded-xl p-4 shadow-sm"
+                  className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white"
                 >
                   <div className="flex justify-between items-center mb-2">
                     <p className="font-semibold text-sm">
@@ -150,10 +150,10 @@ export default function ClientSchedule({
               ))}
             </div>
           )}
-        </CardBlock>
+        </div>
       </div>
 
-      {/* КНОПКА ВНИЗУ */}
+      {/* Кнопка ВНИЗУ ЭКРАНА */}
       <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow z-50">
         <div className="max-w-sm mx-auto">
           <ActionButton
