@@ -142,8 +142,9 @@ export default function Profile({
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative overflow-visible">
-        {/* Иконка уведомлений */}
-        <div className="absolute -top-4 -right-4 z-10">
+
+        {/* Иконка уведомлений (исправлено позиционирование) */}
+        <div className="absolute top-4 right-4 z-10">
           <Tooltip
             label={
               user.notificationsMuted
