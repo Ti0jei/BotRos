@@ -6,6 +6,11 @@ export default defineConfig({
   root: './',
   plugins: [react()],
   base: './',
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, '.'), // ✅ указывает на корень, где лежат App.tsx и components/
+    },
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

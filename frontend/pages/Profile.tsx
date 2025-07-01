@@ -12,7 +12,7 @@ import { IconBell, IconBellOff, IconLogout } from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
-import { ActionButton } from "@/components/ui/ActionButton"; // ваш общий компонент
+import ActionButton from "@/components/ui/ActionButton"; // ✅ исправлено: убраны фигурные скобки
 
 interface User {
   name: string;
