@@ -9,6 +9,7 @@ import {
   Button,
   Stack,
   Loader,
+  Container,
 } from '@mantine/core';
 import { getToken } from '../utils/auth';
 import { IconHome } from '@tabler/icons-react';
@@ -74,72 +75,55 @@ export default function ClientBlock({
   }, []);
 
   return (
-    <Box bg="#f5d4ca" mih="100vh" display="flex" justify="center">
-      <Box
-        bg="white"
-        w="100%"
-        maw={420}
-        mih="100vh"
-        display="flex"
-        direction="column"
-        pos="relative"
+    <Box className="bg-[#f5d4ca] min-h-screen flex justify-center">
+      <Container
+        size="xs"
+        className="bg-white min-h-screen w-full max-w-sm flex flex-col relative px-6 pt-8 pb-28"
       >
-        <Box px={24} py={32} pb={120} style={{ flex: 1 }}>
-          <Title order={2} ta="center" mb="md" fw={700}>
-            📦 Блок тренировок
-          </Title>
+        <Title order={2} ta="center" mb="md" fw={700}>
+          📦 Блок тренировок
+        </Title>
 
-          {loading ? (
-            <Loader size="sm" mx="auto" />
-          ) : !block ? (
-            <Text ta="center" color="red" mt="md">
-              ❌ {errorMessage || 'У вас нет активного блока тренировок.'}
+        {loading ? (
+          <Loader size="sm" mx="auto" />
+        ) : !block ? (
+          <Text ta="center" color="red" mt="md">
+            ❌ {errorMessage || 'У вас нет активного блока тренировок.'}
+          </Text>
+        ) : (
+          <Paper withBorder radius="md" shadow="sm" p="md">
+            <Group justify="space-between" mb="xs">
+              <Text fw={600}>Дата оплаты</Text>
+              <Text>{new Date(block.paidAt).toLocaleDateString()}</Text>
+            </Group>
+            <Text size="sm" c="dimmed" mb={4}>
+              Всего тренировок: <b>{block.paidTrainings}</b>
             </Text>
-          ) : (
-            <Paper withBorder radius="md" shadow="sm" p="md">
-              <Group justify="space-between" mb="xs">
-                <Text fw={600}>Дата оплаты</Text>
-                <Text>{new Date(block.paidAt).toLocaleDateString()}</Text>
-              </Group>
+            <Text size="sm" c="dimmed" mb={4}>
+              Использовано: <b>{block.used}</b>
+            </Text>
+            <Text size="sm" c="dimmed" mb={4}>
+              Осталось: <b>{block.paidTrainings - block.used}</b>
+            </Text>
+            {block.pricePerBlock !== undefined && (
               <Text size="sm" c="dimmed" mb={4}>
-                Всего тренировок: <b>{block.paidTrainings}</b>
+                Цена за блок: <b>{block.pricePerBlock} ₽</b>
               </Text>
-              <Text size="sm" c="dimmed" mb={4}>
-                Использовано: <b>{block.used}</b>
-              </Text>
-              <Text size="sm" c="dimmed" mb={4}>
-                Осталось: <b>{block.paidTrainings - block.used}</b>
-              </Text>
-              {block.pricePerBlock !== undefined && (
-                <Text size="sm" c="dimmed" mb={4}>
-                  Цена за блок: <b>{block.pricePerBlock} ₽</b>
-                </Text>
-              )}
-              <Badge
-                color={block.active ? 'green' : 'gray'}
-                mt={8}
-                size="lg"
-                variant="light"
-              >
-                {block.active ? 'Активен' : 'Завершён'}
-              </Badge>
-            </Paper>
-          )}
-        </Box>
+            )}
+            <Badge
+              color={block.active ? 'green' : 'gray'}
+              mt={8}
+              size="lg"
+              variant="light"
+            >
+              {block.active ? 'Активен' : 'Завершён'}
+            </Badge>
+          </Paper>
+        )}
 
-        <Box h={36} bg="white" pos="absolute" bottom={98} w="100%" zIndex={5} />
-
-        <Box
-          pos="fixed"
-          bottom={0}
-          left={0}
-          w="100%"
-          bg="white"
-          py={16}
-          pt={20}
-          style={{ boxShadow: '0 -2px 12px rgba(0,0,0,0.06)', zIndex: 10 }}
-        >
-          <Stack gap="sm" px={16} maw={420} mx="auto">
+        {/* Нижняя кнопочная панель */}
+        <Box className="fixed bottom-0 left-0 w-full bg-white py-5 px-4 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] z-10">
+          <Box className="max-w-sm mx-auto flex flex-col gap-3">
             <BackToProfileButton onBack={onBack} />
             <Button
               onClick={onToProfile}
@@ -158,9 +142,9 @@ export default function ClientBlock({
             >
               На главную
             </Button>
-          </Stack>
+          </Box>
         </Box>
-      </Box>
+      </Container>
     </Box>
   );
 }

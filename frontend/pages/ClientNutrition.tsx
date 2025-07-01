@@ -70,23 +70,6 @@ export default function ClientNutrition({
     'Content-Type': 'application/json',
   };
 
-  const commonButtonStyle = {
-    root: {
-      color: '#d6336c',
-      border: '1px solid #d6336c',
-      borderRadius: 8,
-      fontWeight: 500,
-      backgroundColor: 'white',
-      fontSize: 13,
-      fontFamily: 'Inter, sans-serif',
-      height: 34,
-      padding: '2px 10px',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-    },
-  };
-
   const loadData = () => {
     setLoading(true);
     Promise.all([
@@ -154,25 +137,10 @@ export default function ClientNutrition({
     }
   };
 
-  const cardStyle = {
-    background: '#ffffff',
-    borderRadius: 12,
-    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
-  };
-
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: isAdmin ? '#f5d4ca' : '#e8b3a6', paddingBottom: 120 }}>
-      <Box
-        sx={{
-          maxWidth: 420,
-          margin: '0 auto',
-          padding: 16,
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
-          borderRadius: 24,
-          boxShadow: '0 0 12px rgba(0,0,0,0.1)',
-        }}
-      >
-        <Title order={2} ta="center" mb="md" color="#222">
+    <Box className="bg-[#f5d4ca] min-h-screen pb-[100px]">
+      <Box className="max-w-[420px] mx-auto px-4 pt-6 pb-8 bg-white bg-opacity-90 rounded-3xl shadow">
+        <Title order={2} ta="center" mb="md">
           {isAdmin ? 'Питание клиента' : 'Моё питание'}
         </Title>
 
@@ -191,7 +159,7 @@ export default function ClientNutrition({
         />
 
         {selectedRecord ? (
-          <Paper p="md" mb="md" style={cardStyle}>
+          <Paper className="mb-4 rounded-xl shadow-sm p-4">
             <Group justify="space-between" mb="xs">
               <Text fw={600}>{dayjs(selectedRecord.date).format('DD MMM YYYY')}</Text>
               <Badge color="blue">{selectedRecord.calories} ККАЛ</Badge>
@@ -205,7 +173,7 @@ export default function ClientNutrition({
               <Group justify="space-between">
                 <Button
                   size="xs"
-                  styles={commonButtonStyle}
+                  className="border border-[#d6336c] text-[#d6336c] rounded-md bg-white hover:bg-[#ffe3ed] font-medium text-sm"
                   onClick={() => {
                     setFormVisible(true);
                     setCalories(selectedRecord.calories);
@@ -219,7 +187,7 @@ export default function ClientNutrition({
                 </Button>
                 <Button
                   size="xs"
-                  styles={commonButtonStyle}
+                  className="border border-[#d6336c] text-[#d6336c] rounded-md bg-white hover:bg-[#ffe3ed] font-medium text-sm"
                   variant="outline"
                   onClick={handleDelete}
                   leftIcon={<IconTrash size={14} />}
@@ -238,7 +206,7 @@ export default function ClientNutrition({
         {!isAdmin && !formVisible && (
           <Button
             fullWidth
-            styles={commonButtonStyle}
+            className="border border-[#d6336c] text-[#d6336c] rounded-md bg-white hover:bg-[#ffe3ed] font-medium text-sm"
             leftIcon={<IconPlus size={16} />}
             onClick={() => {
               setCalories('');
@@ -254,7 +222,7 @@ export default function ClientNutrition({
         )}
 
         {!isAdmin && formVisible && (
-          <Paper radius="md" p="md" mt="md" style={cardStyle}>
+          <Paper radius="md" p="md" mt="md" className="rounded-xl shadow-sm">
             <Grid gutter="md">
               <Grid.Col span={6}>
                 <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} hideControls />
@@ -272,7 +240,7 @@ export default function ClientNutrition({
             <Button
               fullWidth
               mt="md"
-              styles={commonButtonStyle}
+              className="border border-[#d6336c] text-[#d6336c] rounded-md bg-white hover:bg-[#ffe3ed] font-medium text-sm"
               onClick={handleSave}
               leftIcon={<IconPlus size={16} />}
             >
@@ -290,10 +258,8 @@ export default function ClientNutrition({
         ) : (
           <Stack spacing="md">
             {weekly && (
-              <Paper p="md" style={cardStyle}>
-                <Text fw={600} mb={4}>
-                  Итого за неделю
-                </Text>
+              <Paper p="md" className="rounded-xl shadow-sm">
+                <Text fw={600} mb={4}>Итого за неделю</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {weekly.calories}</Badge>
                   <Badge color="green">Б: {weekly.protein}</Badge>
@@ -303,10 +269,8 @@ export default function ClientNutrition({
               </Paper>
             )}
             {monthly && (
-              <Paper p="md" style={cardStyle}>
-                <Text fw={600} mb={4}>
-                  Итого за месяц
-                </Text>
+              <Paper p="md" className="rounded-xl shadow-sm">
+                <Text fw={600} mb={4}>Итого за месяц</Text>
                 <Group gap="xs">
                   <Badge color="blue">ККАЛ: {monthly.calories}</Badge>
                   <Badge color="green">Б: {monthly.protein}</Badge>
@@ -321,19 +285,7 @@ export default function ClientNutrition({
         <Box h={100} />
       </Box>
 
-      <Box
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          background: 'white',
-          padding: '10px 0',
-          textAlign: 'center',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
-        }}
-      >
+      <Box className="fixed bottom-0 left-0 w-full bg-white text-center shadow z-[1000] py-2">
         <BackToProfileButton onBack={onBack} />
       </Box>
     </Box>

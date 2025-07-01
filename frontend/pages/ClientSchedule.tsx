@@ -7,6 +7,7 @@ import {
   Text,
   Title,
   Badge,
+  Card,
 } from '@mantine/core';
 import { IconPackage, IconArrowBack } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -72,209 +73,124 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  const outlinePinkButtonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      color: '#d6336c',
-      backgroundColor: 'transparent',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      width: '100%',
-      transition: 'background 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-      },
-    },
-  };
-
-  const softGreenButton = {
-    root: {
-      backgroundColor: '#e6f4ea',
-      color: 'green',
-      fontWeight: 500,
-      borderRadius: 10,
-      height: 36,
-      fontSize: 14,
-      '&:hover': { backgroundColor: '#d3f0dc' },
-    },
-  };
-
-  const softRedButton = {
-    root: {
-      backgroundColor: '#ffe5e8',
-      color: '#d6336c',
-      fontWeight: 500,
-      borderRadius: 10,
-      height: 36,
-      fontSize: 14,
-      '&:hover': { backgroundColor: '#ffd6dc' },
-    },
-  };
-
-  const backButtonStyle = {
-    root: {
-      color: '#d6336c',
-      border: '1px solid #d6336c',
-      borderRadius: 8,
-      fontWeight: 500,
-      backgroundColor: 'transparent',
-      width: '100%',
-      padding: '10px 0',
-      cursor: 'pointer',
-      transition: 'background 0.2s',
-      '&:hover': { backgroundColor: '#ffe3ed' },
-    },
-  };
-
   return (
-    <>
-      <Box
-        style={{
-          backgroundColor: '#f5d4ca',
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'stretch',
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: 'white',
-            borderRadius: 0,
-            padding: 24,
-            width: '100%',
-            maxWidth: 360,
-            boxSizing: 'border-box',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            minHeight: '100vh',
-            paddingBottom: 100, // 👈 чтобы перекрывал низ
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Stack spacing="lg" px="md" style={{ flexGrow: 1 }}>
-            <Title order={2} ta="center" mb="md">
-              Мои тренировки
-            </Title>
+    <Box className="bg-[#f5d4ca] min-h-screen flex justify-center">
+      <Box className="bg-white w-full max-w-[380px] p-6 pb-28 shadow-md flex flex-col">
+        <Stack spacing="lg" className="flex-grow">
+          <Title order={2} ta="center" className="font-bold text-xl">
+            Мои тренировки
+          </Title>
 
+          <Button
+            onClick={onOpenBlock}
+            leftIcon={<IconPackage size={20} />}
+            variant="outline"
+            color="pink"
+            radius="xl"
+            fullWidth
+          >
+            📦 Блок тренировок
+          </Button>
+
+          {trainings.length === 0 ? (
+            <Text ta="center" c="dimmed" mt="md">
+              У вас пока нет назначенных тренировок.
+            </Text>
+          ) : (
+            trainings.map((t) => (
+              <Card
+                key={t.id}
+                padding="md"
+                radius="lg"
+                withBorder
+                shadow="xs"
+                className="mt-3"
+              >
+                <Group position="apart" mb="xs">
+                  <Text fw={600}>
+                    {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
+                  </Text>
+                  <Badge
+                    color={
+                      t.status === 'CONFIRMED'
+                        ? 'green'
+                        : t.status === 'DECLINED'
+                        ? 'red'
+                        : 'gray'
+                    }
+                    size="lg"
+                    radius="sm"
+                    variant="light"
+                  >
+                    {t.status === 'CONFIRMED'
+                      ? 'ПОДТВЕРЖДЕНО'
+                      : t.status === 'DECLINED'
+                      ? 'ОТМЕНЕНО'
+                      : 'ОЖИДАНИЕ'}
+                  </Badge>
+                </Group>
+
+                {t.status === 'PENDING' || editingId === t.id ? (
+                  <Stack spacing="xs" mt="xs">
+                    <Button
+                      fullWidth
+                      onClick={() => updateStatus(t.id, 'CONFIRMED')}
+                      variant="light"
+                      color="green"
+                      radius="md"
+                    >
+                      ✅ Приду
+                    </Button>
+                    <Button
+                      fullWidth
+                      onClick={() => updateStatus(t.id, 'DECLINED')}
+                      variant="light"
+                      color="red"
+                      radius="md"
+                    >
+                      ❌ Не приду
+                    </Button>
+                  </Stack>
+                ) : (
+                  <>
+                    <Text mt="xs" size="sm" c="dimmed">
+                      {t.status === 'CONFIRMED'
+                        ? '✅ Вы подтвердили участие'
+                        : '🚫 Вы отказались от тренировки'}
+                    </Text>
+                    <Button
+                      mt="xs"
+                      size="xs"
+                      fullWidth
+                      variant="outline"
+                      color="pink"
+                      radius="xl"
+                      onClick={() => setEditingId(t.id)}
+                    >
+                      Изменить решение
+                    </Button>
+                  </>
+                )}
+              </Card>
+            ))
+          )}
+        </Stack>
+
+        <Box className="fixed bottom-0 left-0 w-full bg-white p-4 shadow z-50">
+          <Box className="max-w-[420px] mx-auto">
             <Button
-              onClick={onOpenBlock}
-              leftIcon={<IconPackage size={20} />}
-              styles={outlinePinkButtonStyle}
+              onClick={onBack}
+              leftIcon={<IconArrowBack size={14} />}
+              variant="outline"
+              color="pink"
+              radius="xl"
               fullWidth
             >
-              📦 Блок тренировок
+              Назад к профилю
             </Button>
-
-            {trainings.length === 0 ? (
-              <Text ta="center" c="dimmed" mt="md">
-                У вас пока нет назначенных тренировок.
-              </Text>
-            ) : (
-              trainings.map((t) => (
-                <Box
-                  key={t.id}
-                  style={{
-                    padding: 16,
-                    width: '100%',
-                    backgroundColor: 'white',
-                    borderBottom: '1px solid #f3bfcf',
-                    borderRadius: 12,
-                    marginTop: 12,
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                  }}
-                >
-                  <Group justify="space-between" mb="xs">
-                    <Text fw={600}>
-                      {dayjs(t.date).format('DD.MM.YYYY')} в {t.hour}:00
-                    </Text>
-                    <Badge
-                      color={
-                        t.status === 'CONFIRMED'
-                          ? 'green'
-                          : t.status === 'DECLINED'
-                          ? 'red'
-                          : 'gray'
-                      }
-                      size="lg"
-                      radius="sm"
-                      variant="light"
-                    >
-                      {t.status === 'CONFIRMED'
-                        ? 'ПОДТВЕРЖДЕНО'
-                        : t.status === 'DECLINED'
-                        ? 'ОТМЕНЕНО'
-                        : 'ОЖИДАНИЕ'}
-                    </Badge>
-                  </Group>
-
-                  {t.status === 'PENDING' || editingId === t.id ? (
-                    <Stack spacing="xs" mt="xs">
-                      <Button
-                        fullWidth
-                        onClick={() => updateStatus(t.id, 'CONFIRMED')}
-                        styles={softGreenButton}
-                      >
-                        ✅ Приду
-                      </Button>
-                      <Button
-                        fullWidth
-                        onClick={() => updateStatus(t.id, 'DECLINED')}
-                        styles={softRedButton}
-                      >
-                        ❌ Не приду
-                      </Button>
-                    </Stack>
-                  ) : (
-                    <>
-                      <Text mt="xs" size="sm" c="dimmed">
-                        {t.status === 'CONFIRMED'
-                          ? '✅ Вы подтвердили участие'
-                          : '🚫 Вы отказались от тренировки'}
-                      </Text>
-                      <Button
-                        mt="xs"
-                        size="xs"
-                        fullWidth
-                        styles={outlinePinkButtonStyle}
-                        onClick={() => setEditingId(t.id)}
-                      >
-                        Изменить решение
-                      </Button>
-                    </>
-                  )}
-                </Box>
-              ))
-            )}
-          </Stack>
+          </Box>
         </Box>
       </Box>
-
-      {/* Нижняя фиксированная кнопка */}
-      <Box
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          background: 'white',
-          padding: '10px 16px',
-          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-          zIndex: 1000,
-        }}
-      >
-        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
-          <Button
-            onClick={onBack}
-            leftIcon={<IconArrowBack size={14} />}
-            styles={backButtonStyle}
-          >
-            Назад к профилю
-          </Button>
-        </Box>
-      </Box>
-    </>
+    </Box>
   );
 }

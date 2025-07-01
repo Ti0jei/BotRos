@@ -1,27 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
-  Button,
-  Container,
-  Stack,
-  Title,
-  Text,
   Center,
   Loader,
   ActionIcon,
   Tooltip,
-  Box,
-} from '@mantine/core';
-import { IconBell, IconBellOff, IconLogout } from '@tabler/icons-react';
-import ClientSchedule from './ClientSchedule';
-import ClientNutrition from './ClientNutrition';
-import ClientBlock from './ClientBlock';
+  Stack,
+  Title,
+  Text,
+} from "@mantine/core";
+import { IconBell, IconBellOff, IconLogout } from "@tabler/icons-react";
+import ClientSchedule from "./ClientSchedule";
+import ClientNutrition from "./ClientNutrition";
+import ClientBlock from "./ClientBlock";
+import { ActionButton } from "@/components/ui/ActionButton"; // ваш общий компонент
 
 interface User {
   name: string;
   lastName?: string | null;
   email: string;
   age: number;
-  role: 'USER' | 'ADMIN';
+  role: "USER" | "ADMIN";
   id: string;
   notificationsMuted?: boolean;
 }
@@ -35,15 +33,17 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState<'main' | 'trainings' | 'nutrition' | 'measurements' | 'photos'>('main');
+  const [section, setSection] = useState<
+    "main" | "trainings" | "nutrition" | "measurements" | "photos"
+  >("main");
   const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const headers = {
     Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
   useEffect(() => {
@@ -67,19 +67,19 @@ export default function Profile({
               }
             });
         } else {
-          throw new Error('Profile not found');
+          throw new Error("Profile not found");
         }
       })
       .catch((err) => {
-        console.error('Ошибка:', err);
-        localStorage.removeItem('token');
+        console.error("Ошибка:", err);
+        localStorage.removeItem("token");
         onLogout();
       })
       .finally(() => setLoading(false));
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     onLogout();
   };
 
@@ -89,19 +89,19 @@ export default function Profile({
 
     try {
       await fetch(`${API}/api/notifications`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers,
         body: JSON.stringify({ muted: newStatus }),
       });
       setUser({ ...user, notificationsMuted: newStatus });
     } catch (err) {
-      console.error('Ошибка обновления уведомлений:', err);
+      console.error("Ошибка обновления уведомлений:", err);
     }
   };
 
   if (loading) {
     return (
-      <Center h="100vh">
+      <Center className="min-h-screen">
         <Loader size="lg" />
       </Center>
     );
@@ -109,145 +109,104 @@ export default function Profile({
 
   if (!user) {
     return (
-      <Center h="100vh">
+      <Center className="min-h-screen">
         <Text color="red">Не удалось загрузить профиль</Text>
       </Center>
     );
   }
 
-  const buttonStyle = {
-    root: {
-      border: '1.5px solid #d6336c',
-      color: '#d6336c',
-      backgroundColor: 'transparent',
-      borderRadius: 12,
-      fontWeight: 600,
-      fontSize: 15,
-      height: 44,
-      transition: 'background 0.2s, color 0.2s',
-      '&:hover': {
-        backgroundColor: '#ffe3ed',
-        color: '#b3244a',
-      },
-    },
-  };
-
-  const disabledButtonStyle = {
-    root: {
-      color: '#999',
-      backgroundColor: '#eceff1',
-      borderRadius: 12,
-      fontWeight: 500,
-      height: 44,
-      cursor: 'not-allowed',
-      border: '1.5px solid #ccc',
-    },
-  };
-
   return (
-    <Box
-      style={{
-        backgroundColor: '#f5d4ca',
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        padding: 16,
-        paddingBottom: 80,
-      }}
-    >
-      <Container
-        size="xs"
-        style={{
-          background: 'white',
-          borderRadius: 24,
-          padding: 24,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-          width: '100%',
-          maxWidth: 400,
-          position: 'relative',
-        }}
-      >
-        {/* Уведомления */}
-        {section === 'main' && (
-          <Tooltip label={user.notificationsMuted ? 'Оповещения выключены' : 'Оповещения включены'}>
+    <div className="bg-pink-50 min-h-screen flex justify-center items-start py-4 pb-20">
+      <div className="bg-white w-full max-w-sm rounded-2xl shadow-md p-6 relative">
+        {/* Иконка уведомлений */}
+        {section === "main" && (
+          <Tooltip
+            label={
+              user.notificationsMuted
+                ? "Оповещения выключены"
+                : "Оповещения включены"
+            }
+          >
             <ActionIcon
-              variant="filled"
-              color={user.notificationsMuted ? 'gray' : 'pink'}
+              variant="light"
+              color={user.notificationsMuted ? "gray" : "pink"}
               onClick={toggleNotifications}
               radius="xl"
               size="lg"
-              style={{ position: 'absolute', top: 16, right: 16 }}
+              className="absolute top-4 right-4"
             >
-              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBell size={20} />}
+              {user.notificationsMuted ? (
+                <IconBellOff size={20} />
+              ) : (
+                <IconBell size={20} />
+              )}
             </ActionIcon>
           </Tooltip>
         )}
 
-        {/* Главный экран */}
-        {section === 'main' && (
+        {section === "main" && (
           <Stack spacing="sm">
-            <Title order={2} ta="center" mb="sm" style={{ fontWeight: 800 }}>
+            <Title order={2} ta="center" className="font-bold mb-2">
               Привет, {user.name} 👋
             </Title>
 
-            <Button fullWidth styles={buttonStyle} onClick={() => setSection('trainings')}>
+            <ActionButton fullWidth onClick={() => setSection("trainings")}>
               Мои тренировки
-            </Button>
+            </ActionButton>
 
-            <Button fullWidth styles={buttonStyle} onClick={() => setSection('nutrition')}>
+            <ActionButton fullWidth onClick={() => setSection("nutrition")}>
               Моё питание
-            </Button>
+            </ActionButton>
 
-            <Button fullWidth styles={disabledButtonStyle} disabled>
+            <ActionButton fullWidth disabled>
               Замеры (скоро)
-            </Button>
+            </ActionButton>
 
-            <Button fullWidth styles={disabledButtonStyle} disabled>
+            <ActionButton fullWidth disabled>
               Фото (скоро)
-            </Button>
+            </ActionButton>
 
-            <Button fullWidth styles={disabledButtonStyle} disabled>
+            <ActionButton fullWidth disabled>
               Материалы (скоро)
-            </Button>
+            </ActionButton>
 
-            {user.role === 'ADMIN' && (
-              <Button fullWidth mt="sm" styles={buttonStyle} onClick={onOpenAdmin}>
+            {user.role === "ADMIN" && (
+              <ActionButton fullWidth onClick={onOpenAdmin}>
                 Панель тренера
-              </Button>
+              </ActionButton>
             )}
 
-            <Button
-              mt="md"
+            <ActionButton
+              fullWidth
+              variant="outline"
               onClick={handleLogout}
               leftIcon={<IconLogout size={18} />}
-              fullWidth
-              styles={buttonStyle}
             >
               Выйти
-            </Button>
+            </ActionButton>
           </Stack>
         )}
 
-        {/* Тренировки / расписание */}
-        {section === 'trainings' &&
+        {section === "trainings" &&
           (showBlock ? (
             <ClientBlock
               onBack={() => setShowBlock(false)}
-              onToProfile={() => setSection('main')} // ✅ добавлено
+              onToProfile={() => setSection("main")}
             />
           ) : (
             <ClientSchedule
-              onBack={() => setSection('main')}
+              onBack={() => setSection("main")}
               onOpenBlock={() => setShowBlock(true)}
             />
           ))}
 
-        {/* Питание */}
-        {section === 'nutrition' && (
-          <ClientNutrition userId={user.id} onBack={() => setSection('main')} />
+        {section === "nutrition" && (
+          <ClientNutrition
+            userId={user.id}
+            onBack={() => setSection("main")}
+          />
         )}
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }
