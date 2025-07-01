@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
-import { Center, Loader, Tooltip, Stack, Text } from "@mantine/core";
 import {
-  IconBell,
-  IconBellOff,
+  Center,
+  Loader,
+  Tooltip,
+  Stack,
+  Text,
+  ActionIcon,
+} from "@mantine/core";
+import {
+  IconBellRinging,
+  IconBellOffFilled,
   IconLogout,
 } from "@tabler/icons-react";
 import ClientSchedule from "./ClientSchedule";
@@ -134,9 +141,9 @@ export default function Profile({
 
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative">
-        {/* Уведомления */}
-        <div className="absolute left-4 top-4 z-10">
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative overflow-visible">
+        {/* Иконка уведомлений */}
+        <div className="absolute -top-4 -right-4 z-10">
           <Tooltip
             label={
               user.notificationsMuted
@@ -144,16 +151,20 @@ export default function Profile({
                 : "Оповещения включены"
             }
           >
-            <button
+            <ActionIcon
+              variant="light"
+              size="lg"
+              radius="xl"
+              color={user.notificationsMuted ? "gray" : "pink"}
               onClick={toggleNotifications}
-              className="text-pink-500 hover:text-pink-600 transition-colors"
+              className="shadow-md"
             >
               {user.notificationsMuted ? (
-                <IconBellOff size={20} />
+                <IconBellOffFilled size={18} />
               ) : (
-                <IconBell size={20} />
+                <IconBellRinging size={18} />
               )}
-            </button>
+            </ActionIcon>
           </Tooltip>
         </div>
 
