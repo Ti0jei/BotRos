@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import fetch from 'node-fetch';
 import path from 'path';
 import fs from 'fs';
@@ -37,6 +38,20 @@ app.use(cors({
 }));
 app.options('*', cors());
 app.use(express.json());
+
+// ✅ Сессии (обязательно ДО роутов)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 дней
+      sameSite: 'lax',
+      secure: NODE_ENV === 'production',
+    },
+  })
+);
 
 // -------------------- Logging --------------------
 process.on('uncaughtException', (err) => {

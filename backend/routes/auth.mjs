@@ -29,22 +29,18 @@ router.post('/register', async (req, res) => {
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return res.status(400).json({ error: 'Пользователь уже существует' });
-  }
+  if (existing) return res.status(400).json({ error: 'Пользователь уже существует' });
 
   if (telegramId) {
     const existingTg = await prisma.user.findFirst({
       where: { telegramId: String(telegramId) },
     });
-    if (existingTg) {
-      return res.status(400).json({ error: 'Этот Telegram уже привязан' });
-    }
+    if (existingTg) return res.status(400).json({ error: 'Этот Telegram уже привязан' });
   }
 
   const hashed = await bcrypt.hash(password, 10);
   const emailToken = crypto.randomBytes(32).toString('hex');
-  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 ч
+  const emailTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
   const user = await prisma.user.create({
     data: {
@@ -61,7 +57,7 @@ router.post('/register', async (req, res) => {
     },
   });
 
-  await prisma.inviteCode.deleteMany({ where: { id: validCode.id } });
+  await prisma.inviteCode.delete({ where: { id: validCode.id } });
 
   const verifyUrl = `https://ti0jei-botros-7a22.twc1.net/api/auth/verify?token=${emailToken}`;
 
@@ -125,7 +121,7 @@ router.post('/login', async (req, res) => {
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(400).json({ error: 'Неверный пароль' });
 
-  const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET);
+  const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
   res.json({
     token,
@@ -140,7 +136,7 @@ router.post('/login', async (req, res) => {
   });
 });
 
-// 📬 Повторная отправка письма подтверждения
+// 📬 Повторная отправка письма
 router.post('/resend', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email обязателен' });
