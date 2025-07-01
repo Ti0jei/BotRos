@@ -4,7 +4,6 @@ import {
   Loader,
   Tooltip,
   Stack,
-  Title,
   Text,
 } from "@mantine/core";
 import { IconBell, IconBellOff, IconLogout } from "@tabler/icons-react";
@@ -141,9 +140,9 @@ export default function Profile({
 
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
-      <CardBlock>
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative">
         {/* Уведомления */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-4 right-4">
           <Tooltip
             label={
               user.notificationsMuted
@@ -202,7 +201,7 @@ export default function Profile({
             </ActionButton>
           </Stack>
         </FormSection>
-      </CardBlock>
+      </div>
     </div>
   );
 }
