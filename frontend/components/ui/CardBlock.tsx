@@ -1,21 +1,9 @@
-// CardBlock.tsx
-import { Card, Group, Text, Box, CardProps } from '@mantine/core';
+import { ReactNode } from "react";
 
-interface CardBlockProps extends CardProps {
-  title: string;
-  description?: string;
-  rightSection?: React.ReactNode;
-}
-
-export default function CardBlock({ title, description, rightSection, children, ...props }: CardBlockProps) {
+export default function CardBlock({ children }: { children: ReactNode }) {
   return (
-    <Card {...props}>
-      <Group position="apart" mb="sm">
-        <Text weight={600}>{title}</Text>
-        {rightSection}
-      </Group>
-      {description && <Text size="sm" color="dimmed">{description}</Text>}
-      <Box mt="md">{children}</Box>
-    </Card>
+    <div className="bg-white rounded-2xl shadow-md p-4 w-full">
+      {children}
+    </div>
   );
 }
