@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface StatusBadgeProps {
@@ -9,11 +8,11 @@ interface StatusBadgeProps {
 const statusMap = {
   active: {
     label: "Активно",
-    classes: "bg-[#f06595] text-white",
+    classes: "bg-pink text-white",
   },
   pending: {
     label: "Ожидает",
-    classes: "bg-[#fff0f6] text-[#f06595] border border-[#f06595]",
+    classes: "bg-pink-light text-pink border border-pink",
   },
   declined: {
     label: "Отменено",
@@ -27,7 +26,7 @@ export default function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={twMerge(
-        "inline-block px-2 py-1 text-xs font-semibold rounded-md",
+        "inline-block px-2 py-1 text-xs font-semibold rounded-xl transition",
         classes,
         className
       )}

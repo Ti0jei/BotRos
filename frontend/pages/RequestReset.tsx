@@ -15,7 +15,7 @@ export default function RequestReset({ onBack }: Props) {
   const API = import.meta.env.VITE_API_BASE_URL;
 
   const notify = (title: string, message: string) => {
-    alert(`${title}: ${message}`); // можно заменить на custom toast
+    alert(`${title}: ${message}`);
   };
 
   const handleSubmit = async () => {
@@ -47,49 +47,55 @@ export default function RequestReset({ onBack }: Props) {
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <FormSection
-        title="Сброс пароля"
-        description={sent ? undefined : 'Введите email, на который придёт письмо'}
-      >
-        {sent ? (
-          <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
-              Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
-            </p>
-            <ActionButton variant="outline" onClick={onBack}>
-              На главную
-            </ActionButton>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
-                placeholder="Введите ваш email"
-              />
-            </div>
-            <ActionButton
-              onClick={handleSubmit}
-              disabled={!email || loading}
-              leftIcon={<IconMail size={16} />}
-            >
-              {loading ? 'Отправка...' : 'Сбросить пароль'}
-            </ActionButton>
-            <div className="text-center">
-              <ActionButton variant="outline" onClick={onBack}>
-                На главную
+    <div className="min-h-screen flex items-center justify-center bg-pink-light p-4">
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6">
+        <FormSection
+          title="Сброс пароля"
+          description={!sent ? 'Введите email, на который придёт письмо' : undefined}
+        >
+          {sent ? (
+            <div className="text-center space-y-4 text-sm text-gray-600">
+              <p>
+                Если такой email существует, письмо с инструкцией отправлено.
+                Проверьте почту.
+              </p>
+              <ActionButton fullWidth variant="outline" onClick={onBack}>
+                Назад ко входу
               </ActionButton>
             </div>
-          </div>
-        )}
-      </FormSection>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink"
+                  placeholder="Введите ваш email"
+                />
+              </div>
+
+              <ActionButton
+                onClick={handleSubmit}
+                disabled={!email || loading}
+                fullWidth
+                leftIcon={<IconMail size={16} />}
+              >
+                {loading ? 'Отправка...' : 'Сбросить пароль'}
+              </ActionButton>
+
+              <div className="text-center">
+                <ActionButton variant="outline" fullWidth onClick={onBack}>
+                  Назад ко входу
+                </ActionButton>
+              </div>
+            </div>
+          )}
+        </FormSection>
+      </div>
     </div>
   );
 }

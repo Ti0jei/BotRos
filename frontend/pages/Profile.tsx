@@ -30,7 +30,7 @@ export default function Profile({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [section, setSection] = useState<
-    "main" | "trainings" | "nutrition" | "measurements" | "photos"
+    "main" | "trainings" | "nutrition"
   >("main");
   const [showBlock, setShowBlock] = useState(false);
 
@@ -66,8 +66,7 @@ export default function Profile({
           throw new Error("Profile not found");
         }
       })
-      .catch((err) => {
-        console.error("Ошибка:", err);
+      .catch(() => {
         localStorage.removeItem("token");
         onLogout();
       })
@@ -90,15 +89,15 @@ export default function Profile({
         body: JSON.stringify({ muted: newStatus }),
       });
       setUser({ ...user, notificationsMuted: newStatus });
-    } catch (err) {
-      console.error("Ошибка обновления уведомлений:", err);
+    } catch {
+      // ignore
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-[#f06595] border-t-transparent animate-spin rounded-full" />
+        <div className="w-6 h-6 border-2 border-pink border-t-transparent animate-spin rounded-full" />
       </div>
     );
   }
@@ -132,12 +131,12 @@ export default function Profile({
   }
 
   return (
-    <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative">
+    <div className="min-h-screen bg-pink-light flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6">
         <FormSection
           title={
-            <div className="flex items-center justify-between w-full mb-4">
-              <span className="text-lg font-bold text-black">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-lg font-semibold text-gray-900">
                 Привет, {user.name} 👋
               </span>
               <button
@@ -150,7 +149,7 @@ export default function Profile({
                 className={`p-2 rounded-full shadow-sm border ${
                   user.notificationsMuted
                     ? "bg-gray-100 text-gray-500"
-                    : "bg-[#fff0f6] text-[#f06595]"
+                    : "bg-pink-light text-pink"
                 }`}
               >
                 {user.notificationsMuted ? (

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface FormSectionProps {
   title?: string;
@@ -14,14 +15,14 @@ export default function FormSection({
   className,
 }: FormSectionProps) {
   return (
-    <div className={`space-y-2 w-full ${className || ""}`}>
+    <div className={twMerge("space-y-3 w-full", className)}>
       {title && (
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
       )}
       {description && (
         <p className="text-sm text-gray-500">{description}</p>
       )}
-      <div>{children}</div>
+      <div className="space-y-2">{children}</div>
     </div>
   );
 }

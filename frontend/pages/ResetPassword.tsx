@@ -50,45 +50,49 @@ export default function ResetPassword({ onBack }: Props) {
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <FormSection
-        title="Новый пароль"
-        description={!done ? 'Введите новый пароль и сохраните' : undefined}
-      >
-        {done ? (
-          <div className="text-center space-y-4">
-            <p className="text-sm text-gray-600">
-              Пароль успешно обновлён. Теперь войдите с новым паролем.
-            </p>
-            <ActionButton variant="outline" onClick={onBack}>
-              Назад ко входу
-            </ActionButton>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Новый пароль
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
-                placeholder="Введите новый пароль"
-              />
-            </div>
-            <ActionButton onClick={handleSubmit} disabled={loading || !password}>
-              {loading ? 'Сохранение...' : 'Сохранить пароль'}
-            </ActionButton>
-            <div className="text-center">
-              <ActionButton variant="outline" onClick={onBack}>
+    <div className="min-h-screen flex items-center justify-center bg-pink-light p-4">
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6">
+        <FormSection
+          title="Новый пароль"
+          description={!done ? 'Введите новый пароль и сохраните' : undefined}
+        >
+          {done ? (
+            <div className="text-center space-y-4 text-sm text-gray-600">
+              <p>Пароль успешно обновлён. Теперь войдите с новым паролем.</p>
+              <ActionButton fullWidth variant="outline" onClick={onBack}>
                 Назад ко входу
               </ActionButton>
             </div>
-          </div>
-        )}
-      </FormSection>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Новый пароль
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink"
+                  placeholder="Введите новый пароль"
+                />
+              </div>
+              <ActionButton
+                onClick={handleSubmit}
+                fullWidth
+                disabled={loading || !password}
+              >
+                {loading ? 'Сохранение...' : 'Сохранить пароль'}
+              </ActionButton>
+              <div className="text-center">
+                <ActionButton fullWidth variant="outline" onClick={onBack}>
+                  Назад ко входу
+                </ActionButton>
+              </div>
+            </div>
+          )}
+        </FormSection>
+      </div>
     </div>
   );
 }

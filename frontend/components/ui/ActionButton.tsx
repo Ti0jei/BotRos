@@ -14,22 +14,25 @@ export default function ActionButton({
   leftIcon,
   variant = "primary",
   className,
+  disabled,
   ...rest
 }: ActionButtonProps) {
   const base =
-    "flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition";
+    "flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition rounded-2xl";
 
   const variants = {
-    primary: "bg-[#f06595] text-white hover:bg-[#f4b6c2]",
-    outline:
-      "border border-[#f06595] text-[#f06595] hover:bg-[#fff0f6] bg-white",
+    primary: "bg-pink text-white hover:bg-pink-alt",
+    outline: "border border-pink text-pink hover:bg-pink-light bg-white",
   };
+
+  const disabledClasses = "bg-pink-alt text-white opacity-50 cursor-not-allowed";
 
   return (
     <button
+      disabled={disabled}
       className={twMerge(
         base,
-        variants[variant],
+        disabled ? disabledClasses : variants[variant],
         fullWidth && "w-full",
         className
       )}
