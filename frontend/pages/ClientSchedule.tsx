@@ -3,6 +3,7 @@ import { IconPackage, IconArrowBack } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { getToken } from "../utils/auth";
 import CardBlock from "@/components/ui/CardBlock";
+import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
 
 interface Training {
@@ -69,91 +70,90 @@ export default function ClientSchedule({
     <div className="bg-white min-h-screen px-4 pb-28">
       <div className="max-w-sm mx-auto mt-6">
         <CardBlock>
-          <h2 className="text-lg font-semibold mb-4">Мои тренировки</h2>
+          <FormSection title="Мои тренировки">
+            <ActionButton
+              fullWidth
+              variant="outline"
+              leftIcon={<IconPackage size={20} />}
+              className="mb-4"
+              onClick={onOpenBlock}
+            >
+              📦 Блок тренировок
+            </ActionButton>
 
-          <ActionButton
-            fullWidth
-            variant="outline"
-            leftIcon={<IconPackage size={20} />}
-            className="mb-4"
-            onClick={onOpenBlock}
-          >
-            📦 Блок тренировок
-          </ActionButton>
-
-          {trainings.length === 0 ? (
-            <p className="text-center text-gray-500 text-sm mt-4">
-              У вас пока нет назначенных тренировок.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {trainings.map((t) => (
-                <div
-                  key={t.id}
-                  className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="font-semibold text-sm">
-                      {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
-                    </p>
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded ${
-                        t.status === "CONFIRMED"
-                          ? "bg-green-100 text-green-700"
-                          : t.status === "DECLINED"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {t.status === "CONFIRMED"
-                        ? "ПОДТВЕРЖДЕНО"
-                        : t.status === "DECLINED"
-                        ? "ОТМЕНЕНО"
-                        : "ОЖИДАНИЕ"}
-                    </span>
-                  </div>
-
-                  {t.status === "PENDING" || editingId === t.id ? (
-                    <div className="space-y-2">
-                      <ActionButton
-                        fullWidth
-                        onClick={() => updateStatus(t.id, "CONFIRMED")}
-                        className="bg-green-500 hover:bg-green-600 text-white"
-                      >
-                        ✅ Приду
-                      </ActionButton>
-                      <ActionButton
-                        fullWidth
-                        onClick={() => updateStatus(t.id, "DECLINED")}
-                        className="bg-red-500 hover:bg-red-600 text-white"
-                      >
-                        ❌ Не приду
-                      </ActionButton>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-500">
-                        {t.status === "CONFIRMED"
-                          ? "✅ Вы подтвердили участие"
-                          : "🚫 Вы отказались от тренировки"}
+            {trainings.length === 0 ? (
+              <p className="text-center text-gray-600 text-sm mt-4">
+                У вас пока нет назначенных тренировок.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {trainings.map((t) => (
+                  <div
+                    key={t.id}
+                    className="rounded-xl p-4 shadow-md border border-gray-100 bg-white"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="font-semibold text-sm">
+                        {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
                       </p>
-                      <ActionButton
-                        fullWidth
-                        variant="outline"
-                        onClick={() => setEditingId(t.id)}
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded ${
+                          t.status === "CONFIRMED"
+                            ? "bg-green-100 text-green-700"
+                            : t.status === "DECLINED"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
                       >
-                        Изменить решение
-                      </ActionButton>
+                        {t.status === "CONFIRMED"
+                          ? "ПОДТВЕРЖДЕНО"
+                          : t.status === "DECLINED"
+                          ? "ОТМЕНЕНО"
+                          : "ОЖИДАНИЕ"}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+
+                    {t.status === "PENDING" || editingId === t.id ? (
+                      <div className="space-y-2">
+                        <ActionButton
+                          fullWidth
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                          onClick={() => updateStatus(t.id, "CONFIRMED")}
+                        >
+                          ✅ Приду
+                        </ActionButton>
+                        <ActionButton
+                          fullWidth
+                          className="bg-red-500 hover:bg-red-600 text-white"
+                          onClick={() => updateStatus(t.id, "DECLINED")}
+                        >
+                          ❌ Не приду
+                        </ActionButton>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-500">
+                          {t.status === "CONFIRMED"
+                            ? "✅ Вы подтвердили участие"
+                            : "🚫 Вы отказались от тренировки"}
+                        </p>
+                        <ActionButton
+                          fullWidth
+                          variant="outline"
+                          onClick={() => setEditingId(t.id)}
+                        >
+                          Изменить решение
+                        </ActionButton>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </FormSection>
         </CardBlock>
       </div>
 
-      {/* Кнопка ВНИЗУ ЭКРАНА */}
       <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow z-50">
         <div className="max-w-sm mx-auto">
           <ActionButton
