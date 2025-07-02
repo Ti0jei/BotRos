@@ -1,15 +1,7 @@
 import { useState } from 'react';
-import {
-  TextInput,
-  Text,
-  Stack,
-  Center,
-} from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
 import { IconMail } from '@tabler/icons-react';
-
-import ActionButton from '../components/ui/ActionButton';
-import FormSection from '../components/ui/FormSection';
+import ActionButton from '@/components/ui/ActionButton';
+import FormSection from '@/components/ui/FormSection';
 
 interface Props {
   onBack: () => void;
@@ -22,13 +14,13 @@ export default function RequestReset({ onBack }: Props) {
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
+  const notify = (title: string, message: string) => {
+    alert(`${title}: ${message}`); // можно заменить на custom toast
+  };
+
   const handleSubmit = async () => {
     if (!email) {
-      showNotification({
-        title: 'Email не указан',
-        message: 'Введите email для сброса пароля',
-        color: 'red',
-      });
+      notify('Email не указан', 'Введите email для сброса пароля');
       return;
     }
 
@@ -42,69 +34,60 @@ export default function RequestReset({ onBack }: Props) {
 
       if (res.ok) {
         setSent(true);
-        showNotification({
-          title: 'Письмо отправлено',
-          message: 'Если email существует, инструкция отправлена',
-          color: 'green',
-        });
+        notify('Письмо отправлено', 'Если email существует, инструкция отправлена');
       } else {
         const err = await res.json();
-        showNotification({
-          title: 'Ошибка',
-          message: err.error || 'Не удалось отправить письмо',
-          color: 'red',
-        });
+        notify('Ошибка', err.error || 'Не удалось отправить письмо');
       }
-    } catch (err) {
-      showNotification({
-        title: 'Ошибка сети',
-        message: 'Проверьте подключение к интернету',
-        color: 'red',
-      });
+    } catch {
+      notify('Ошибка сети', 'Проверьте подключение к интернету');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="p-4 max-w-sm mx-auto">
       <FormSection
         title="Сброс пароля"
         description={sent ? undefined : 'Введите email, на который придёт письмо'}
       >
         {sent ? (
-          <>
-            <Text mb="md" ta="center">
+          <div className="text-center space-y-4">
+            <p className="text-sm text-gray-600">
               Если такой email существует, письмо с инструкцией отправлено. Проверьте почту.
-            </Text>
-            <Center>
-              <ActionButton variant="subtle" onClick={onBack}>
-                На главную
-              </ActionButton>
-            </Center>
-          </>
+            </p>
+            <ActionButton variant="outline" onClick={onBack}>
+              На главную
+            </ActionButton>
+          </div>
         ) : (
-          <Stack>
-            <TextInput
-              label="Email"
-              placeholder="Введите ваш email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
+                placeholder="Введите ваш email"
+              />
+            </div>
             <ActionButton
               onClick={handleSubmit}
-              loading={loading}
-              disabled={!email}
+              disabled={!email || loading}
               leftIcon={<IconMail size={16} />}
             >
-              Сбросить пароль
+              {loading ? 'Отправка...' : 'Сбросить пароль'}
             </ActionButton>
-            <Center>
-              <ActionButton variant="subtle" onClick={onBack}>
+            <div className="text-center">
+              <ActionButton variant="outline" onClick={onBack}>
                 На главную
               </ActionButton>
-            </Center>
-          </Stack>
+            </div>
+          </div>
         )}
       </FormSection>
     </div>

@@ -1,32 +1,27 @@
-import { Paper, Stack, Title, Text, PaperProps } from '@mantine/core';
+import { ReactNode } from "react";
 
-interface FormSectionProps extends PaperProps {
+interface FormSectionProps {
   title?: string;
   description?: string;
-  children: React.ReactNode;
+  children: ReactNode;
+  className?: string;
 }
 
-export default function FormSection({ title, description, children, ...props }: FormSectionProps) {
+export default function FormSection({
+  title,
+  description,
+  children,
+  className,
+}: FormSectionProps) {
   return (
-    <div style={{ width: '100%', padding: 16 }}>
-      <Paper
-        withBorder
-        radius="xl"
-        p="xl"
-        style={{
-          width: '100%',
-          maxWidth: 500,
-          margin: '0 auto',
-          backgroundColor: '#fff0f6',
-        }}
-        {...props}
-      >
-        <Stack spacing="md">
-          {title && <Title order={3}>{title}</Title>}
-          {description && <Text color="dimmed" size="sm">{description}</Text>}
-          {children}
-        </Stack>
-      </Paper>
+    <div className={`space-y-2 w-full ${className || ""}`}>
+      {title && (
+        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+      )}
+      {description && (
+        <p className="text-sm text-gray-500">{description}</p>
+      )}
+      <div>{children}</div>
     </div>
   );
 }

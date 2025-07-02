@@ -72,7 +72,7 @@ export default function ClientBlock({
           <FormSection title="📦 Блок тренировок">
             {loading ? (
               <div className="flex justify-center mt-4">
-                <div className="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-[#f06595] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : !block ? (
               <p className="text-center text-red-500 text-sm mt-4">

@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
-import {
-  TextInput,
-  PasswordInput,
-  Stack,
-  Group,
-  Loader,
-} from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
 import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
-
-import FormSection from '../components/ui/FormSection';
-import ActionButton from '../components/ui/ActionButton';
+import FormSection from '@/components/ui/FormSection';
+import ActionButton from '@/components/ui/ActionButton';
 
 export default function Login({
   onLoggedIn,
@@ -32,6 +23,11 @@ export default function Login({
     if (savedEmail) setEmail(savedEmail);
   }, []);
 
+  const notify = (title: string, message: string, color: 'red' | 'green') => {
+    alert(`${title}: ${message}`);
+    // TODO: заменить на собственный компонент уведомлений
+  };
+
   const handleLogin = async () => {
     setLoading(true);
     try {
@@ -47,42 +43,24 @@ export default function Login({
         if (data.reason === 'email_not_verified') {
           setShowResend(true);
         }
-
-        showNotification({
-          title: 'Ошибка входа',
-          message: data.message || 'Неверные данные',
-          color: 'red',
-          icon: <IconAlertCircle />,
-        });
+        notify('Ошибка входа', data.message || 'Неверные данные', 'red');
       } else {
         localStorage.setItem('token', data.token);
         sessionStorage.setItem('lastEmail', email);
 
         const profileRes = await fetch(`${API}/api/profile`, {
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
+          headers: { Authorization: `Bearer ${data.token}` },
         });
 
         if (profileRes.ok) {
           const profile = await profileRes.json();
           onLoggedIn(profile);
         } else {
-          showNotification({
-            title: 'Ошибка',
-            message: 'Не удалось загрузить профиль',
-            color: 'red',
-            icon: <IconAlertCircle />,
-          });
+          notify('Ошибка', 'Не удалось загрузить профиль', 'red');
         }
       }
-    } catch (err) {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Сервер недоступен',
-        color: 'red',
-        icon: <IconAlertCircle />,
-      });
+    } catch {
+      notify('Ошибка', 'Сервер недоступен', 'red');
     } finally {
       setLoading(false);
     }
@@ -100,19 +78,9 @@ export default function Login({
       const data = await res.json();
 
       if (res.ok) {
-        showNotification({
-          title: 'Письмо отправлено',
-          message: 'Проверьте почту для подтверждения',
-          color: 'green',
-          icon: <IconCheck />,
-        });
+        notify('Письмо отправлено', 'Проверьте почту для подтверждения', 'green');
       } else {
-        showNotification({
-          title: 'Ошибка',
-          message: data.message || 'Не удалось отправить',
-          color: 'red',
-          icon: <IconAlertCircle />,
-        });
+        notify('Ошибка', data.message || 'Не удалось отправить', 'red');
       }
     } finally {
       setResending(false);
@@ -120,44 +88,52 @@ export default function Login({
   };
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="p-4 max-w-sm mx-auto">
       <FormSection title="Вход в Krissfit" description="Введите почту и пароль">
-        <Stack spacing="sm">
-          <TextInput
-            label="Email"
-            placeholder="you@email.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            required
-          />
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            required
-          />
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
+              placeholder="you@email.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Пароль</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
+              placeholder="••••••••"
+            />
+          </div>
 
           <ActionButton onClick={handleLogin} disabled={loading}>
-            {loading ? <Loader size="xs" color="white" /> : 'Войти'}
+            {loading ? 'Загрузка...' : 'Войти'}
           </ActionButton>
 
           {showResend && (
             <ActionButton onClick={handleResend} variant="outline" disabled={resending}>
-              {resending ? <Loader size="xs" /> : 'Отправить письмо повторно'}
+              {resending ? 'Отправка...' : 'Отправить письмо повторно'}
             </ActionButton>
           )}
 
-          <Group position="right">
-            <ActionButton
-              variant="subtle"
+          <div className="flex justify-end">
+            <button
               onClick={onResetRequest}
-              style={{ padding: 0 }}
+              className="text-sm text-[#f06595] hover:underline"
             >
               Забыли пароль?
-            </ActionButton>
-          </Group>
-        </Stack>
+            </button>
+          </div>
+        </div>
       </FormSection>
     </div>
   );

@@ -1,16 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import {
-  PasswordInput,
-  Text,
-  Stack,
-  Center,
-} from '@mantine/core';
-import { showNotification } from '@mantine/notifications';
-import { IconCheck, IconAlertCircle } from '@tabler/icons-react';
-
-import FormSection from '../components/ui/FormSection';
-import ActionButton from '../components/ui/ActionButton';
+import FormSection from '@/components/ui/FormSection';
+import ActionButton from '@/components/ui/ActionButton';
 
 interface Props {
   onBack: () => void;
@@ -25,14 +16,13 @@ export default function ResetPassword({ onBack }: Props) {
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
+  const notify = (title: string, message: string) => {
+    alert(`${title}: ${message}`);
+  };
+
   const handleSubmit = async () => {
     if (!token || !password) {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Токен и пароль обязательны',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
+      notify('Ошибка', 'Токен и пароль обязательны');
       return;
     }
 
@@ -44,67 +34,59 @@ export default function ResetPassword({ onBack }: Props) {
         body: JSON.stringify({ token, password }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setDone(true);
-        showNotification({
-          title: 'Готово',
-          message: 'Пароль успешно обновлён',
-          color: 'green',
-          icon: <IconCheck size={18} />,
-        });
+        notify('Готово', 'Пароль успешно обновлён');
       } else {
-        const data = await res.json();
-        showNotification({
-          title: 'Ошибка',
-          message: data.error || 'Не удалось сбросить пароль',
-          color: 'red',
-          icon: <IconAlertCircle size={18} />,
-        });
+        notify('Ошибка', data.error || 'Не удалось сбросить пароль');
       }
-    } catch (err) {
-      showNotification({
-        title: 'Ошибка сети',
-        message: 'Проверьте подключение',
-        color: 'red',
-        icon: <IconAlertCircle size={18} />,
-      });
+    } catch {
+      notify('Ошибка сети', 'Проверьте подключение');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 16 }}>
+    <div className="p-4 max-w-sm mx-auto">
       <FormSection
         title="Новый пароль"
         description={!done ? 'Введите новый пароль и сохраните' : undefined}
       >
         {done ? (
-          <>
-            <Text mb="md" ta="center">
+          <div className="text-center space-y-4">
+            <p className="text-sm text-gray-600">
               Пароль успешно обновлён. Теперь войдите с новым паролем.
-            </Text>
-            <Center>
-              <ActionButton variant="subtle" onClick={onBack}>
-                Назад ко входу
-              </ActionButton>
-            </Center>
-          </>
-        ) : (
-          <Stack>
-            <PasswordInput
-              label="Новый пароль"
-              placeholder="Введите новый пароль"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-            />
-            <ActionButton onClick={handleSubmit} loading={loading}>
-              Сохранить пароль
-            </ActionButton>
-            <ActionButton variant="subtle" onClick={onBack}>
+            </p>
+            <ActionButton variant="outline" onClick={onBack}>
               Назад ко входу
             </ActionButton>
-          </Stack>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Новый пароль
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f06595]"
+                placeholder="Введите новый пароль"
+              />
+            </div>
+            <ActionButton onClick={handleSubmit} disabled={loading || !password}>
+              {loading ? 'Сохранение...' : 'Сохранить пароль'}
+            </ActionButton>
+            <div className="text-center">
+              <ActionButton variant="outline" onClick={onBack}>
+                Назад ко входу
+              </ActionButton>
+            </div>
+          </div>
         )}
       </FormSection>
     </div>

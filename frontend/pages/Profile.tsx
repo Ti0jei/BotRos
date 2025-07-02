@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Center,
-  Loader,
-  Tooltip,
-  Stack,
-  Text,
-  ActionIcon,
-} from "@mantine/core";
-import {
   IconBellRinging,
   IconBellOff,
   IconLogout,
@@ -105,17 +97,17 @@ export default function Profile({
 
   if (loading) {
     return (
-      <Center className="min-h-screen">
-        <Loader size="lg" />
-      </Center>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#f06595] border-t-transparent animate-spin rounded-full" />
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <Center className="min-h-screen">
-        <Text color="red">Не удалось загрузить профиль</Text>
-      </Center>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500 text-sm">Не удалось загрузить профиль</p>
+      </div>
     );
   }
 
@@ -141,39 +133,36 @@ export default function Profile({
 
   return (
     <div className="min-h-screen bg-[#fff0f6] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative overflow-visible">
+      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6 relative">
         <FormSection
           title={
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center justify-between w-full mb-4">
               <span className="text-lg font-bold text-black">
                 Привет, {user.name} 👋
               </span>
-              <Tooltip
-                label={
+              <button
+                title={
                   user.notificationsMuted
                     ? "Оповещения выключены"
                     : "Оповещения включены"
                 }
+                onClick={toggleNotifications}
+                className={`p-2 rounded-full shadow-sm border ${
+                  user.notificationsMuted
+                    ? "bg-gray-100 text-gray-500"
+                    : "bg-[#fff0f6] text-[#f06595]"
+                }`}
               >
-                <ActionIcon
-                  variant="light"
-                  size="lg"
-                  radius="xl"
-                  color={user.notificationsMuted ? "gray" : "pink"}
-                  onClick={toggleNotifications}
-                  className="shadow-sm"
-                >
-                  {user.notificationsMuted ? (
-                    <IconBellOff size={18} />
-                  ) : (
-                    <IconBellRinging size={18} />
-                  )}
-                </ActionIcon>
-              </Tooltip>
+                {user.notificationsMuted ? (
+                  <IconBellOff size={18} />
+                ) : (
+                  <IconBellRinging size={18} />
+                )}
+              </button>
             </div>
           }
         >
-          <Stack spacing="xs">
+          <div className="space-y-2">
             <ActionButton fullWidth onClick={() => setSection("trainings")}>
               Мои тренировки
             </ActionButton>
@@ -208,7 +197,7 @@ export default function Profile({
             >
               Выйти
             </ActionButton>
-          </Stack>
+          </div>
         </FormSection>
       </div>
     </div>

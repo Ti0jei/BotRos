@@ -66,6 +66,29 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
+  const getStatusLabel = (status: Training["status"]) => {
+    switch (status) {
+      case "CONFIRMED":
+        return (
+          <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
+            ПОДТВЕРЖДЕНО
+          </span>
+        );
+      case "DECLINED":
+        return (
+          <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded">
+            ОТМЕНЕНО
+          </span>
+        );
+      default:
+        return (
+          <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">
+            ОЖИДАНИЕ
+          </span>
+        );
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen px-4 pb-28">
       <div className="max-w-sm mx-auto mt-6">
@@ -96,21 +119,7 @@ export default function ClientSchedule({
                       <p className="font-semibold text-sm">
                         {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
                       </p>
-                      <span
-                        className={`text-xs font-semibold px-2 py-1 rounded ${
-                          t.status === "CONFIRMED"
-                            ? "bg-green-100 text-green-700"
-                            : t.status === "DECLINED"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {t.status === "CONFIRMED"
-                          ? "ПОДТВЕРЖДЕНО"
-                          : t.status === "DECLINED"
-                          ? "ОТМЕНЕНО"
-                          : "ОЖИДАНИЕ"}
-                      </span>
+                      {getStatusLabel(t.status)}
                     </div>
 
                     {t.status === "PENDING" || editingId === t.id ? (

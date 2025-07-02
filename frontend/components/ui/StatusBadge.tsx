@@ -1,20 +1,38 @@
-// StatusBadge.tsx
-import { Badge } from '@mantine/core';
+import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface StatusBadgeProps {
-  status: 'active' | 'pending' | 'declined';
+  status: "active" | "pending" | "declined";
+  className?: string;
 }
 
-export default function StatusBadge({ status }: StatusBadgeProps) {
-  const map = {
-    active: { color: 'pink', label: 'Активно' },
-    pending: { color: 'yellow', label: 'Ожидает' },
-    declined: { color: 'gray', label: 'Отменено' },
-  };
+const statusMap = {
+  active: {
+    label: "Активно",
+    classes: "bg-[#f06595] text-white",
+  },
+  pending: {
+    label: "Ожидает",
+    classes: "bg-[#fff0f6] text-[#f06595] border border-[#f06595]",
+  },
+  declined: {
+    label: "Отменено",
+    classes: "bg-gray-100 text-gray-500",
+  },
+};
+
+export default function StatusBadge({ status, className }: StatusBadgeProps) {
+  const { label, classes } = statusMap[status];
 
   return (
-    <Badge color={map[status].color} radius="sm" variant="filled">
-      {map[status].label}
-    </Badge>
+    <span
+      className={twMerge(
+        "inline-block px-2 py-1 text-xs font-semibold rounded-md",
+        classes,
+        className
+      )}
+    >
+      {label}
+    </span>
   );
 }
