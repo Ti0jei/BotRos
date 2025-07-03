@@ -118,6 +118,7 @@ export default function Login({
         style={{ width: "100%", maxWidth: 420, background: "white" }}
       >
         <Stack spacing="lg">
+          {/* Заголовок */}
           <Stack spacing={4} align="center">
             <Title order={2} c="#d6336c">
               Вход в аккаунт
@@ -127,6 +128,7 @@ export default function Login({
             </Text>
           </Stack>
 
+          {/* Поля */}
           <TextInput
             label="Email"
             type="email"
@@ -148,6 +150,7 @@ export default function Login({
             placeholder="••••••••"
           />
 
+          {/* Кнопка входа */}
           <ActionButton
             onClick={handleLogin}
             loading={loading}
@@ -158,6 +161,7 @@ export default function Login({
             Войти
           </ActionButton>
 
+          {/* Повторное письмо */}
           {showResend && (
             <ActionButton
               onClick={handleResend}
@@ -169,6 +173,7 @@ export default function Login({
             </ActionButton>
           )}
 
+          {/* Забыли пароль */}
           <Text
             size="sm"
             align="center"
@@ -179,20 +184,16 @@ export default function Login({
             Забыли пароль?
           </Text>
 
+          {/* Кнопка регистрации — теперь отдельной кнопкой */}
           {onRegisterRequest && (
-            <Text size="sm" align="center">
-              Нет аккаунта?{" "}
-              <span
-                style={{
-                  color: "#d6336c",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-                onClick={onRegisterRequest}
-              >
-                Зарегистрироваться
-              </span>
-            </Text>
+            <ActionButton
+              variant="outline"
+              colorStyle="primary"
+              onClick={onRegisterRequest}
+              fullWidth
+            >
+              Зарегистрироваться
+            </ActionButton>
           )}
         </Stack>
       </Card>
