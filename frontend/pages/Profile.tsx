@@ -20,7 +20,6 @@ import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
 
 import ActionButton from "@/components/ui/ActionButton";
-import FormSection from "@/components/ui/FormSection";
 
 interface User {
   name: string;
@@ -122,7 +121,6 @@ export default function Profile({
     );
   }
 
-  // секция тренировок
   if (section === "trainings") {
     return showBlock ? (
       <ClientBlock
@@ -137,7 +135,6 @@ export default function Profile({
     );
   }
 
-  // секция питания
   if (section === "nutrition") {
     return (
       <ClientNutrition userId={user.id} onBack={() => setSection("main")} />
@@ -181,34 +178,53 @@ export default function Profile({
                   : "Оповещения включены"
               }
             >
-              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBellRinging size={20} />}
+              {user.notificationsMuted ? (
+                <IconBellOff size={20} />
+              ) : (
+                <IconBellRinging size={20} />
+              )}
             </ActionIcon>
           </Group>
 
           {/* Кнопки */}
           <Stack spacing="sm">
-            <ActionButton fullWidth onClick={() => setSection("trainings")}>
+            <ActionButton
+              fullWidth
+              variant="filled"
+              colorStyle="black"
+              onClick={() => setSection("trainings")}
+            >
               Мои тренировки
             </ActionButton>
 
-            <ActionButton fullWidth onClick={() => setSection("nutrition")}>
+            <ActionButton
+              fullWidth
+              variant="filled"
+              colorStyle="black"
+              onClick={() => setSection("nutrition")}
+            >
               Моё питание
             </ActionButton>
 
-            <ActionButton fullWidth disabled>
+            <ActionButton fullWidth variant="outline" disabled>
               Замеры (скоро)
             </ActionButton>
 
-            <ActionButton fullWidth disabled>
+            <ActionButton fullWidth variant="outline" disabled>
               Фото (скоро)
             </ActionButton>
 
-            <ActionButton fullWidth disabled>
+            <ActionButton fullWidth variant="outline" disabled>
               Материалы (скоро)
             </ActionButton>
 
             {user.role === "ADMIN" && (
-              <ActionButton fullWidth onClick={onOpenAdmin}>
+              <ActionButton
+                fullWidth
+                variant="outline"
+                colorStyle="black"
+                onClick={onOpenAdmin}
+              >
                 Панель тренера
               </ActionButton>
             )}
@@ -217,6 +233,7 @@ export default function Profile({
           <ActionButton
             fullWidth
             variant="outline"
+            colorStyle="black"
             onClick={handleLogout}
             leftIcon={<IconLogout size={18} />}
           >
