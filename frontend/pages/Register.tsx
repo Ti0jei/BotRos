@@ -11,7 +11,12 @@ import {
 } from "@mantine/core";
 import ActionButton from "@/components/ui/ActionButton";
 
-export default function Register({ onRegistered }: { onRegistered: () => void }) {
+interface Props {
+  onRegistered: () => void;
+  onBackToLogin: () => void;
+}
+
+export default function Register({ onRegistered, onBackToLogin }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -122,6 +127,7 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
                 color: "#a11a1a",
                 padding: "0.75rem 1rem",
                 borderRadius: "0.5rem",
+                border: "1px solid #f5c2c7",
               }}
             >
               {error}
@@ -185,11 +191,13 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
             radius="xl"
           />
 
+          {/* Основная кнопка */}
           {!success ? (
             <ActionButton
               onClick={handleSubmit}
               disabled={loading}
               fullWidth
+              variant="filled"
               colorStyle="black"
             >
               {loading ? "Регистрация..." : "Зарегистрироваться"}
@@ -198,12 +206,22 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
             <ActionButton
               onClick={handleGoToLogin}
               fullWidth
-              variant="outline"
+              variant="filled"
               colorStyle="black"
             >
-              Назад ко входу
+              Готово
             </ActionButton>
           )}
+
+          {/* Кнопка "Назад" */}
+          <ActionButton
+            onClick={onBackToLogin}
+            fullWidth
+            variant="outline"
+            colorStyle="black"
+          >
+            Назад
+          </ActionButton>
         </Stack>
       </Card>
     </Center>
