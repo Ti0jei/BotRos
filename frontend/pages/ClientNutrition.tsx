@@ -19,7 +19,7 @@ import {
   Title,
   Divider,
 } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 
 import CardBlock from "@/components/ui/CardBlock";
@@ -72,9 +72,15 @@ export default function ClientNutrition({
   const loadData = () => {
     setLoading(true);
     Promise.all([
-      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
-      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) =>
+        res.json()
+      ),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, {
+        headers,
+      }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, {
+        headers,
+      }).then((res) => res.json()),
     ])
       .then(([nutrition, week, month]) => {
         setData(Array.isArray(nutrition) ? nutrition : []);
@@ -90,11 +96,19 @@ export default function ClientNutrition({
   }, [userId]);
 
   const selectedRecord = data.find(
-    (d) => dayjs(d.date).format("YYYY-MM-DD") === dayjs(selectedDate).format("YYYY-MM-DD")
+    (d) =>
+      dayjs(d.date).format("YYYY-MM-DD") ===
+      dayjs(selectedDate).format("YYYY-MM-DD")
   );
 
   const handleSave = async () => {
-    if (!selectedDate || calories === "" || protein === "" || fat === "" || carbs === "") {
+    if (
+      !selectedDate ||
+      calories === "" ||
+      protein === "" ||
+      fat === "" ||
+      carbs === ""
+    ) {
       alert("Заполните все поля");
       return;
     }
@@ -122,13 +136,18 @@ export default function ClientNutrition({
 
   const handleDelete = async () => {
     if (!selectedDate) return;
-    const confirmed = window.confirm("Вы точно хотите удалить запись за этот день?");
+    const confirmed = window.confirm(
+      "Вы точно хотите удалить запись за этот день?"
+    );
     if (!confirmed) return;
 
-    const res = await fetch(`${API}/api/nutrition/${userId}/${dayjs(selectedDate).format("YYYY-MM-DD")}`, {
-      method: "DELETE",
-      headers,
-    });
+    const res = await fetch(
+      `${API}/api/nutrition/${userId}/${dayjs(selectedDate).format("YYYY-MM-DD")}`,
+      {
+        method: "DELETE",
+        headers,
+      }
+    );
 
     if (res.ok) loadData();
     else alert("Ошибка при удалении");
@@ -136,15 +155,26 @@ export default function ClientNutrition({
 
   return (
     <Center
-      style={{ minHeight: "100vh", backgroundColor: "#f7f7f7", padding: "2rem 1rem" }}
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
     >
-      <Card withBorder radius="xl" p="xl" shadow="xs" style={{ width: "100%", maxWidth: 420 }}>
+      <Card
+        withBorder
+        radius="xl"
+        p="xl"
+        shadow="xs"
+        style={{ width: "100%", maxWidth: 420 }}
+      >
         <Stack spacing="lg">
           <Title order={3} c="#1a1a1a">
             {isAdmin ? "Питание клиента" : "Моё питание"}
           </Title>
 
-          <DateInput
+          {/* Календарь */}
+          <DatePickerInput
             value={selectedDate}
             onChange={(val) => {
               setSelectedDate(val);
@@ -157,22 +187,42 @@ export default function ClientNutrition({
             leftSection={<IconCalendar size={16} />}
             radius="xl"
             size="md"
-            label="Выберите дату"
-            placeholder="ДД.ММ.ГГГГ"
+            placeholder="Выберите дату"
+            dropdownType="modal"
+            popoverProps={{
+              withinPortal: true,
+              shadow: "md",
+              position: "bottom-start",
+            }}
           />
 
+          {/* Просмотр КБЖУ */}
+          <Divider label="Выбранный день" labelPosition="center" />
+
           {selectedRecord ? (
-            <Stack spacing="xs" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
+            <Stack
+              spacing="xs"
+              p="sm"
+              style={{ border: "1px solid #eee", borderRadius: 12 }}
+            >
               <Group position="apart">
-                <Text size="sm">{dayjs(selectedRecord.date).format("DD MMM YYYY")}</Text>
+                <Text size="sm">
+                  {dayjs(selectedRecord.date).format("DD MMM YYYY")}
+                </Text>
                 <Text size="xs" c="pink">
                   {selectedRecord.calories} ККАЛ
                 </Text>
               </Group>
               <Group spacing={8}>
-                <Text size="xs" c="green">Б: {selectedRecord.protein} г</Text>
-                <Text size="xs" c="yellow">Ж: {selectedRecord.fat} г</Text>
-                <Text size="xs" c="cyan">У: {selectedRecord.carbs} г</Text>
+                <Text size="xs" c="green">
+                  Б: {selectedRecord.protein} г
+                </Text>
+                <Text size="xs" c="yellow">
+                  Ж: {selectedRecord.fat} г
+                </Text>
+                <Text size="xs" c="cyan">
+                  У: {selectedRecord.carbs} г
+                </Text>
               </Group>
               {!isAdmin && (
                 <Group grow>
@@ -205,6 +255,7 @@ export default function ClientNutrition({
             </Text>
           )}
 
+          {/* Ввод КБЖУ */}
           {!isAdmin && !formVisible && (
             <ActionButton
               fullWidth
@@ -223,18 +274,52 @@ export default function ClientNutrition({
           )}
 
           {!isAdmin && formVisible && (
-            <Stack spacing="sm" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
-              <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} radius="xl" />
-              <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} radius="xl" />
-              <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} radius="xl" />
-              <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} radius="xl" />
-              <ActionButton fullWidth variant="outline" onClick={handleSave} leftIcon={<IconPlus size={16} />}>
+            <Stack
+              spacing="sm"
+              p="sm"
+              style={{ border: "1px solid #eee", borderRadius: 12 }}
+            >
+              <NumberInput
+                label="Калории"
+                value={calories}
+                onChange={setCalories}
+                min={0}
+                radius="xl"
+              />
+              <NumberInput
+                label="Белки"
+                value={protein}
+                onChange={setProtein}
+                min={0}
+                radius="xl"
+              />
+              <NumberInput
+                label="Жиры"
+                value={fat}
+                onChange={setFat}
+                min={0}
+                radius="xl"
+              />
+              <NumberInput
+                label="Углеводы"
+                value={carbs}
+                onChange={setCarbs}
+                min={0}
+                radius="xl"
+              />
+              <ActionButton
+                fullWidth
+                variant="outline"
+                onClick={handleSave}
+                leftIcon={<IconPlus size={16} />}
+              >
                 Сохранить
               </ActionButton>
             </Stack>
           )}
 
-          <Divider my="sm" />
+          {/* Статистика */}
+          <Divider label="Статистика" labelPosition="center" />
 
           {loading ? (
             <Center>
