@@ -11,7 +11,6 @@ import {
   PasswordInput,
   Stack,
   Group,
-  Center,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import ActionButton from "@/components/ui/ActionButton";
@@ -107,71 +106,79 @@ export default function Login({
   };
 
   return (
-    <div className="min-h-screen bg-pink-light flex flex-col items-center justify-center px-4 pb-6">
-      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-        <Stack spacing="lg">
-          <div>
-            <Title order={2} className="text-center text-pink mb-1">
-              Вход в аккаунт
-            </Title>
-            <Text size="sm" color="dimmed" className="text-center">
-              Введите email и пароль для авторизации
-            </Text>
-          </div>
+    <>
+      <div className="min-h-screen bg-pink-light flex flex-col items-center justify-center px-4 pb-24">
+        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+          <Stack spacing="lg">
+            <div>
+              <Title order={2} className="text-center text-pink mb-1">
+                Вход в аккаунт
+              </Title>
+              <Text size="sm" color="dimmed" className="text-center">
+                Введите email и пароль для авторизации
+              </Text>
+            </div>
 
-          <TextInput
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            required
-            radius="xl"
-            size="md"
-            placeholder="you@email.com"
-          />
+            <TextInput
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              required
+              radius="xl"
+              size="md"
+              placeholder="you@email.com"
+            />
 
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            required
-            radius="xl"
-            size="md"
-            placeholder="••••••••"
-          />
+            <PasswordInput
+              label="Пароль"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              required
+              radius="xl"
+              size="md"
+              placeholder="••••••••"
+            />
 
-          <ActionButton onClick={handleLogin} disabled={loading} fullWidth>
-            {loading ? "Вход..." : "Войти"}
-          </ActionButton>
-
-          {showResend && (
-            <ActionButton
-              onClick={handleResend}
-              variant="outline"
-              disabled={resending}
-              fullWidth
-            >
-              {resending ? "Отправка..." : "Отправить письмо повторно"}
+            <ActionButton onClick={handleLogin} disabled={loading} fullWidth>
+              {loading ? "Вход..." : "Войти"}
             </ActionButton>
-          )}
 
-          <Group position="right">
-            <Text
-              component="button"
-              onClick={onResetRequest}
-              size="sm"
-              c="pink"
-              fw={500}
-              className="hover:underline transition"
-            >
-              Забыли пароль?
-            </Text>
-          </Group>
-        </Stack>
-      </Card>
+            {showResend && (
+              <ActionButton
+                onClick={handleResend}
+                variant="outline"
+                disabled={resending}
+                fullWidth
+              >
+                {resending ? "Отправка..." : "Отправить письмо повторно"}
+              </ActionButton>
+            )}
+
+            <Group position="right">
+              <Text
+                component="button"
+                onClick={onResetRequest}
+                size="sm"
+                fw={500}
+                className="hover:underline transition"
+                style={{
+                  all: "unset",
+                  color: "#d6336c",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                Забыли пароль?
+              </Text>
+            </Group>
+          </Stack>
+        </Card>
+      </div>
 
       {onRegisterRequest && (
-        <Center className="mt-6 w-full max-w-md">
+        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
           <ActionButton
             variant="light"
             onClick={onRegisterRequest}
@@ -179,8 +186,8 @@ export default function Login({
           >
             Зарегистрироваться
           </ActionButton>
-        </Center>
+        </div>
       )}
-    </div>
+    </>
   );
 }
