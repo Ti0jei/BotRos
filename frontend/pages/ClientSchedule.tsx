@@ -24,7 +24,7 @@ interface Training {
   id: string;
   date: string;
   hour: number;
-  status: "PENDING" | "CONFIRMED" | "DECLINED";
+  status?: "PENDING" | "CONFIRMED" | "DECLINED"; // ← делаем статус опциональным
 }
 
 export default function ClientSchedule({
@@ -47,13 +47,15 @@ export default function ClientSchedule({
   };
 
   const loadTrainings = async () => {
-    setLoading(true);
-    const res = await fetch(`${API}/api/trainings`, { headers });
-    if (res.ok) {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API}/api/trainings`, { headers });
+      if (!res.ok) throw new Error("Ошибка загрузки тренировок");
       const data = await res.json();
       const upcoming = data
-        .filter((t: Training) =>
-          dayjs(t.date).add(t.hour, "hour").isAfter(dayjs())
+        .filter(
+          (t: Training) =>
+            t.date && dayjs(t.date).add(t.hour, "hour").isAfter(dayjs())
         )
         .sort((a, b) => {
           const aTime = dayjs(a.date).add(a.hour, "hour");
@@ -61,32 +63,41 @@ export default function ClientSchedule({
           return aTime.diff(bTime);
         });
       setTrainings(upcoming);
+    } catch (err) {
+      console.error("Ошибка при загрузке тренировок:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const updateStatus = async (id: string, status: "CONFIRMED" | "DECLINED") => {
-    await fetch(`${API}/api/trainings/${id}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ status }),
-    });
-    setEditingId(null);
-    loadTrainings();
+    try {
+      await fetch(`${API}/api/trainings/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ status }),
+      });
+      setEditingId(null);
+      loadTrainings();
+    } catch (err) {
+      console.error("Ошибка обновления статуса:", err);
+    }
   };
 
   useEffect(() => {
     loadTrainings();
   }, []);
 
-  const getStatusBadge = (status: Training["status"]) => {
+  const getStatusBadge = (status?: Training["status"]) => {
     switch (status) {
       case "CONFIRMED":
         return <StatusBadge status="active">Подтверждено</StatusBadge>;
       case "DECLINED":
         return <StatusBadge status="declined">Отменено</StatusBadge>;
-      default:
+      case "PENDING":
         return <StatusBadge status="pending">Ожидание</StatusBadge>;
+      default:
+        return <StatusBadge status="pending">—</StatusBadge>; // если статус некорректен
     }
   };
 
