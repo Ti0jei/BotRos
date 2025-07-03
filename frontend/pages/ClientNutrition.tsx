@@ -1,313 +1,281 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import {
+  IconCalendar,
   IconChevronLeft,
   IconChevronRight,
+  IconTrash,
   IconEdit,
+  IconPlus,
   IconArrowBack,
 } from "@tabler/icons-react";
+import {
+  Center,
+  Card,
+  Stack,
+  Text,
+  Group,
+  Loader,
+  NumberInput,
+  TextInput,
+  Title,
+  Divider,
+} from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+
 import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
 
-interface Client {
-  id: string;
-  name: string;
-}
-
-interface PaymentBlock {
-  id: string;
+interface NutritionDay {
   date: string;
-  paidTrainings: number;
-  used: number;
-  pricePerTraining: number;
-  pricePerBlock?: number;
-  active: boolean;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
 }
 
-export default function ClientPayments({
-  client,
+interface Summary {
+  period: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+}
+
+export default function ClientNutrition({
+  userId,
+  isAdmin = false,
   onBack,
 }: {
-  client: Client;
+  userId: string;
+  isAdmin?: boolean;
   onBack: () => void;
 }) {
+  const [data, setData] = useState<NutritionDay[]>([]);
+  const [weekly, setWeekly] = useState<Summary | null>(null);
+  const [monthly, setMonthly] = useState<Summary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [formVisible, setFormVisible] = useState(false);
+  const [calories, setCalories] = useState<number | "">("");
+  const [protein, setProtein] = useState<number | "">("");
+  const [fat, setFat] = useState<number | "">("");
+  const [carbs, setCarbs] = useState<number | "">("");
+
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
-
-  const [block, setBlock] = useState<PaymentBlock | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
-
-  const [date, setDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
-  const [paidTrainings, setPaidTrainings] = useState<number>(8);
-  const [pricePerTraining, setPricePerTraining] = useState<number>(600);
-  const [pricePerBlock, setPricePerBlock] = useState<number>(4800);
-  const [used, setUsed] = useState<number>(0);
-
-  const syncFromTraining = (val: number) => {
-    setPricePerTraining(val);
-    setPricePerBlock(val * paidTrainings);
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 
-  const syncFromBlock = (val: number) => {
-    setPricePerBlock(val);
-    setPricePerTraining(paidTrainings > 0 ? Math.round(val / paidTrainings) : 0);
-  };
-
-  const syncFromTrainings = (val: number) => {
-    setPaidTrainings(val);
-    setPricePerBlock(val * pricePerTraining);
-  };
-
-  const loadBlock = async () => {
+  const loadData = () => {
     setLoading(true);
-    const res = await fetch(`${API}/api/payment-blocks/user/${client.id}/active`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      setBlock(data);
-      setDate(dayjs(data.date).format("YYYY-MM-DD"));
-      setPaidTrainings(data.paidTrainings);
-      setPricePerTraining(data.pricePerTraining);
-      setPricePerBlock(data.pricePerBlock || data.pricePerTraining * data.paidTrainings);
-      setUsed(data.used);
-    } else {
-      setBlock(null);
-    }
-
-    setLoading(false);
-  };
-
-  const createBlock = async () => {
-    if (!window.confirm("Создать новый блок оплаты?")) return;
-
-    const res = await fetch(`${API}/api/payment-blocks`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: client.id,
-        paidAt: date,
-        paidTrainings,
-        pricePerTraining,
-        pricePerBlock,
-      }),
-    });
-
-    if (res.ok) {
-      alert("✅ Блок оплаты создан");
-      await loadBlock();
-    } else {
-      alert("❌ Не удалось создать блок");
-    }
-  };
-
-  const updateBlock = async () => {
-    if (!block) return;
-
-    const res = await fetch(`${API}/api/payment-blocks/${block.id}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        paidAt: date,
-        paidTrainings,
-        pricePerTraining,
-        pricePerBlock,
-        used,
-      }),
-    });
-
-    if (res.ok) {
-      alert("✅ Обновлено");
-      setEditMode(false);
-      await loadBlock();
-    } else {
-      alert("❌ Ошибка при обновлении");
-    }
+    Promise.all([
+      fetch(`${API}/api/nutrition/${userId}`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=week`, { headers }).then((res) => res.json()),
+      fetch(`${API}/api/nutrition/summary/${userId}?period=month`, { headers }).then((res) => res.json()),
+    ])
+      .then(([nutrition, week, month]) => {
+        setData(Array.isArray(nutrition) ? nutrition : []);
+        setWeekly(week);
+        setMonthly(month);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    loadBlock();
-  }, []);
+    loadData();
+  }, [userId]);
+
+  const selectedRecord = data.find(
+    (d) => dayjs(d.date).format("YYYY-MM-DD") === dayjs(selectedDate).format("YYYY-MM-DD")
+  );
+
+  const handleSave = async () => {
+    if (!selectedDate || calories === "" || protein === "" || fat === "" || carbs === "") {
+      alert("Заполните все поля");
+      return;
+    }
+
+    const res = await fetch(`${API}/api/nutrition`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        userId,
+        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        calories,
+        protein,
+        fat,
+        carbs,
+      }),
+    });
+
+    if (res.ok) {
+      loadData();
+      setFormVisible(false);
+    } else {
+      alert("Ошибка при сохранении");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedDate) return;
+    const confirmed = window.confirm("Вы точно хотите удалить запись за этот день?");
+    if (!confirmed) return;
+
+    const res = await fetch(`${API}/api/nutrition/${userId}/${dayjs(selectedDate).format("YYYY-MM-DD")}`, {
+      method: "DELETE",
+      headers,
+    });
+
+    if (res.ok) loadData();
+    else alert("Ошибка при удалении");
+  };
 
   return (
-    <div className="bg-white min-h-screen px-4 pb-28">
-      <div className="max-w-sm mx-auto pt-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          💸 Оплаты — {client.name}
-        </h2>
+    <Center
+      style={{ minHeight: "100vh", backgroundColor: "#f7f7f7", padding: "2rem 1rem" }}
+    >
+      <Card withBorder radius="xl" p="xl" shadow="xs" style={{ width: "100%", maxWidth: 420 }}>
+        <Stack spacing="lg">
+          <Title order={3} c="#1a1a1a">
+            {isAdmin ? "Питание клиента" : "Моё питание"}
+          </Title>
 
-        {loading ? (
-          <p className="text-sm text-gray-500">Загрузка...</p>
-        ) : block ? (
-          <CardBlock>
-            <FormSection title="Активный блок">
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Использовано:</span>
-                <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    block.used >= block.paidTrainings
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
-                >
-                  {block.used} / {block.paidTrainings}
-                </span>
-              </div>
+          <DatePickerInput
+            value={selectedDate}
+            onChange={(val) => {
+              setSelectedDate(val);
+              setFormVisible(false);
+            }}
+            maxDate={new Date()}
+            leftSection={<IconCalendar size={16} />}
+            nextIcon={<IconChevronRight size={16} />}
+            previousIcon={<IconChevronLeft size={16} />}
+          />
 
-              {editMode ? (
-                <div className="space-y-3">
-                  <label className="block text-xs text-gray-600">Дата оплаты</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full border rounded p-2 text-sm"
-                  />
-
-                  <label className="block text-xs text-gray-600">Кол-во тренировок</label>
-                  <input
-                    type="number"
-                    value={paidTrainings}
-                    onChange={(e) => syncFromTrainings(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <label className="block text-xs text-gray-600">Цена за тренировку, ₽</label>
-                  <input
-                    type="number"
-                    value={pricePerTraining}
-                    onChange={(e) => syncFromTraining(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <label className="block text-xs text-gray-600">Цена за блок, ₽</label>
-                  <input
-                    type="number"
-                    value={pricePerBlock}
-                    onChange={(e) => syncFromBlock(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <label className="block text-xs text-gray-600">Уже использовано</label>
-                  <input
-                    type="number"
-                    value={used}
-                    onChange={(e) => setUsed(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={0}
-                    max={paidTrainings}
-                  />
-
-                  <ActionButton fullWidth onClick={updateBlock}>
-                    💾 Сохранить изменения
-                  </ActionButton>
-                </div>
-              ) : (
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p>Дата оплаты: {dayjs(block.date).format("DD.MM.YYYY")}</p>
-                  <p>Цена за тренировку: {block.pricePerTraining}₽</p>
-                  <p>Всего тренировок: {block.paidTrainings}</p>
-                  <p>Использовано: {block.used}</p>
-                  <p className="font-semibold">
-                    Осталось: {block.paidTrainings - block.used}
-                  </p>
-                  <p className="font-medium">
-                    Цена блока: {block.pricePerBlock || pricePerBlock}₽
-                  </p>
-
+          {selectedRecord ? (
+            <Stack spacing="xs" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
+              <Group position="apart">
+                <Text size="sm">{dayjs(selectedRecord.date).format("DD MMM YYYY")}</Text>
+                <Text size="xs" c="pink">
+                  {selectedRecord.calories} ККАЛ
+                </Text>
+              </Group>
+              <Group spacing={8}>
+                <Text size="xs" c="green">Б: {selectedRecord.protein} г</Text>
+                <Text size="xs" c="yellow">Ж: {selectedRecord.fat} г</Text>
+                <Text size="xs" c="cyan">У: {selectedRecord.carbs} г</Text>
+              </Group>
+              {!isAdmin && (
+                <Group grow>
                   <ActionButton
-                    fullWidth
                     variant="outline"
-                    onClick={() => setEditMode(true)}
-                    leftIcon={<IconEdit size={16} />}
+                    onClick={() => {
+                      setFormVisible(true);
+                      setCalories(selectedRecord.calories);
+                      setProtein(selectedRecord.protein);
+                      setFat(selectedRecord.fat);
+                      setCarbs(selectedRecord.carbs);
+                    }}
+                    leftIcon={<IconEdit size={14} />}
                   >
                     Редактировать
                   </ActionButton>
-                </div>
-              )}
-            </FormSection>
-          </CardBlock>
-        ) : (
-          <>
-            <p className="text-sm text-red-500 font-semibold mb-2">
-              🔴 Блок не оплачен
-            </p>
-            <CardBlock>
-              <FormSection title="➕ Добавить блок">
-                <div className="space-y-3">
-                  <label className="block text-xs text-gray-600">Дата оплаты</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full border rounded p-2 text-sm"
-                  />
-
-                  <label className="block text-xs text-gray-600">Кол-во тренировок</label>
-                  <input
-                    type="number"
-                    value={paidTrainings}
-                    onChange={(e) => syncFromTrainings(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <label className="block text-xs text-gray-600">Цена за тренировку, ₽</label>
-                  <input
-                    type="number"
-                    value={pricePerTraining}
-                    onChange={(e) => syncFromTraining(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <label className="block text-xs text-gray-600">Цена за блок, ₽</label>
-                  <input
-                    type="number"
-                    value={pricePerBlock}
-                    onChange={(e) => syncFromBlock(Number(e.target.value))}
-                    className="w-full border rounded p-2 text-sm"
-                    min={1}
-                  />
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    💰 Итого: {pricePerBlock}₽
-                  </p>
-
-                  <ActionButton fullWidth onClick={createBlock}>
-                    💾 Сохранить
+                  <ActionButton
+                    variant="outline"
+                    onClick={handleDelete}
+                    leftIcon={<IconTrash size={14} />}
+                  >
+                    Удалить
                   </ActionButton>
-                </div>
-              </FormSection>
-            </CardBlock>
-          </>
-        )}
+                </Group>
+              )}
+            </Stack>
+          ) : (
+            <Text size="sm" c="dimmed" align="center">
+              Нет данных за выбранный день
+            </Text>
+          )}
 
-        <div className="fixed bottom-0 left-0 w-full bg-white py-4 shadow-md z-50">
-          <div className="max-w-sm mx-auto px-4">
+          {!isAdmin && !formVisible && (
             <ActionButton
               fullWidth
               variant="outline"
-              leftIcon={<IconArrowBack size={16} />}
-              onClick={onBack}
+              leftIcon={<IconPlus size={16} />}
+              onClick={() => {
+                setCalories("");
+                setProtein("");
+                setFat("");
+                setCarbs("");
+                setFormVisible(true);
+              }}
             >
-              Назад к профилю
+              Внести КБЖУ
             </ActionButton>
-          </div>
-        </div>
-      </div>
-    </div>
+          )}
+
+          {!isAdmin && formVisible && (
+            <Stack spacing="sm" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
+              <NumberInput label="Калории" value={calories} onChange={setCalories} min={0} radius="xl" />
+              <NumberInput label="Белки" value={protein} onChange={setProtein} min={0} radius="xl" />
+              <NumberInput label="Жиры" value={fat} onChange={setFat} min={0} radius="xl" />
+              <NumberInput label="Углеводы" value={carbs} onChange={setCarbs} min={0} radius="xl" />
+              <ActionButton fullWidth variant="outline" onClick={handleSave} leftIcon={<IconPlus size={16} />}>
+                Сохранить
+              </ActionButton>
+            </Stack>
+          )}
+
+          <Divider my="sm" />
+
+          {loading ? (
+            <Center>
+              <Loader size="sm" />
+            </Center>
+          ) : (
+            <Stack spacing="sm">
+              {weekly && (
+                <CardBlock>
+                  <FormSection title="Итого за неделю">
+                    <Group spacing={8}>
+                      <Text size="xs">ККАЛ: {weekly.calories}</Text>
+                      <Text size="xs">Б: {weekly.protein}</Text>
+                      <Text size="xs">Ж: {weekly.fat}</Text>
+                      <Text size="xs">У: {weekly.carbs}</Text>
+                    </Group>
+                  </FormSection>
+                </CardBlock>
+              )}
+              {monthly && (
+                <CardBlock>
+                  <FormSection title="Итого за месяц">
+                    <Group spacing={8}>
+                      <Text size="xs">ККАЛ: {monthly.calories}</Text>
+                      <Text size="xs">Б: {monthly.protein}</Text>
+                      <Text size="xs">Ж: {monthly.fat}</Text>
+                      <Text size="xs">У: {monthly.carbs}</Text>
+                    </Group>
+                  </FormSection>
+                </CardBlock>
+              )}
+            </Stack>
+          )}
+
+          <ActionButton
+            fullWidth
+            variant="outline"
+            colorStyle="black"
+            leftIcon={<IconArrowBack size={16} />}
+            onClick={onBack}
+          >
+            Назад
+          </ActionButton>
+        </Stack>
+      </Card>
+    </Center>
   );
 }

@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import { IconPackage, IconArrowBack } from "@tabler/icons-react";
+import { IconArrowBack, IconPackage, IconCheck, IconX } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import { getToken } from "../utils/auth";
-import CardBlock from "@/components/ui/CardBlock";
-import FormSection from "@/components/ui/FormSection";
+import {
+  Card,
+  Center,
+  Stack,
+  Title,
+  Text,
+  Group,
+  Loader,
+} from "@mantine/core";
+
 import ActionButton from "@/components/ui/ActionButton";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 interface Training {
   id: string;
@@ -22,40 +30,39 @@ export default function ClientSchedule({
 }) {
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const API = import.meta.env.VITE_API_BASE_URL;
-  const token = getToken();
+  const token = localStorage.getItem("token");
 
-  const loadTrainings = async () => {
-    const res = await fetch(`${API}/api/trainings`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-
-    const upcoming = data
-      .filter((t: Training) =>
-        dayjs(t.date).add(t.hour, "hour").isAfter(dayjs())
-      )
-      .sort((a, b) => {
-        const aTime = dayjs(a.date).add(a.hour, "hour");
-        const bTime = dayjs(b.date).add(b.hour, "hour");
-        return aTime.diff(bTime);
-      });
-
-    setTrainings(upcoming);
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 
-  const updateStatus = async (
-    id: string,
-    status: "CONFIRMED" | "DECLINED"
-  ) => {
+  const loadTrainings = async () => {
+    setLoading(true);
+    const res = await fetch(`${API}/api/trainings`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      const upcoming = data
+        .filter((t: Training) =>
+          dayjs(t.date).add(t.hour, "hour").isAfter(dayjs())
+        )
+        .sort((a, b) => {
+          const aTime = dayjs(a.date).add(a.hour, "hour");
+          const bTime = dayjs(b.date).add(b.hour, "hour");
+          return aTime.diff(bTime);
+        });
+      setTrainings(upcoming);
+    }
+    setLoading(false);
+  };
+
+  const updateStatus = async (id: string, status: "CONFIRMED" | "DECLINED") => {
     await fetch(`${API}/api/trainings/${id}`, {
       method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ status }),
     });
     setEditingId(null);
@@ -66,115 +73,106 @@ export default function ClientSchedule({
     loadTrainings();
   }, []);
 
-  const getStatusLabel = (status: Training["status"]) => {
+  const getStatusBadge = (status: Training["status"]) => {
     switch (status) {
       case "CONFIRMED":
-        return (
-          <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
-            ПОДТВЕРЖДЕНО
-          </span>
-        );
+        return <StatusBadge status="active">Подтверждено</StatusBadge>;
       case "DECLINED":
-        return (
-          <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded">
-            ОТМЕНЕНО
-          </span>
-        );
+        return <StatusBadge status="declined">Отменено</StatusBadge>;
       default:
-        return (
-          <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">
-            ОЖИДАНИЕ
-          </span>
-        );
+        return <StatusBadge status="pending">Ожидание</StatusBadge>;
     }
   };
 
   return (
-    <div className="bg-white min-h-screen px-4 pb-28">
-      <div className="max-w-sm mx-auto mt-6">
-        <CardBlock>
-          <FormSection title="Мои тренировки">
-            <ActionButton
-              fullWidth
-              variant="outline"
-              leftIcon={<IconPackage size={20} />}
-              className="mb-4"
-              onClick={onOpenBlock}
-            >
-              📦 Блок тренировок
-            </ActionButton>
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Stack spacing="lg" style={{ width: "100%", maxWidth: 420 }}>
+        <Card withBorder radius="xl" p="xl" shadow="xs">
+          <Stack spacing="sm">
+            <Group position="apart">
+              <Title order={3} c="#1a1a1a">
+                Мои тренировки
+              </Title>
+              <ActionButton
+                size="xs"
+                variant="light"
+                leftIcon={<IconPackage size={16} />}
+                onClick={onOpenBlock}
+              >
+                Блок
+              </ActionButton>
+            </Group>
 
-            {trainings.length === 0 ? (
-              <p className="text-center text-gray-600 text-sm mt-4">
-                У вас пока нет назначенных тренировок.
-              </p>
+            {loading ? (
+              <Center py="md">
+                <Loader size="sm" />
+              </Center>
+            ) : trainings.length === 0 ? (
+              <Text size="sm" align="center" c="dimmed">
+                Нет назначенных тренировок
+              </Text>
             ) : (
-              <div className="space-y-4">
+              <Stack spacing="sm">
                 {trainings.map((t) => (
-                  <div
-                    key={t.id}
-                    className="rounded-xl p-4 shadow-md border border-gray-100 bg-white"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-semibold text-sm">
-                        {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
-                      </p>
-                      {getStatusLabel(t.status)}
-                    </div>
+                  <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
+                    <Stack spacing={6}>
+                      <Group position="apart">
+                        <Text fw={500}>
+                          {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
+                        </Text>
+                        {getStatusBadge(t.status)}
+                      </Group>
 
-                    {t.status === "PENDING" || editingId === t.id ? (
-                      <div className="space-y-2">
+                      {t.status === "PENDING" || editingId === t.id ? (
+                        <Stack spacing={6}>
+                          <ActionButton
+                            fullWidth
+                            onClick={() => updateStatus(t.id, "CONFIRMED")}
+                            leftIcon={<IconCheck size={16} />}
+                          >
+                            Приду
+                          </ActionButton>
+                          <ActionButton
+                            fullWidth
+                            onClick={() => updateStatus(t.id, "DECLINED")}
+                            leftIcon={<IconX size={16} />}
+                            colorStyle="red"
+                          >
+                            Не приду
+                          </ActionButton>
+                        </Stack>
+                      ) : (
                         <ActionButton
                           fullWidth
-                          className="bg-green-500 hover:bg-green-600 text-white"
-                          onClick={() => updateStatus(t.id, "CONFIRMED")}
-                        >
-                          ✅ Приду
-                        </ActionButton>
-                        <ActionButton
-                          fullWidth
-                          className="bg-red-500 hover:bg-red-600 text-white"
-                          onClick={() => updateStatus(t.id, "DECLINED")}
-                        >
-                          ❌ Не приду
-                        </ActionButton>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-500">
-                          {t.status === "CONFIRMED"
-                            ? "✅ Вы подтвердили участие"
-                            : "🚫 Вы отказались от тренировки"}
-                        </p>
-                        <ActionButton
-                          fullWidth
-                          variant="outline"
+                          variant="light"
                           onClick={() => setEditingId(t.id)}
                         >
                           Изменить решение
                         </ActionButton>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </Stack>
+                  </Card>
                 ))}
-              </div>
+              </Stack>
             )}
-          </FormSection>
-        </CardBlock>
-      </div>
+          </Stack>
+        </Card>
 
-      <div className="fixed bottom-0 left-0 w-full bg-white p-4 shadow z-50">
-        <div className="max-w-sm mx-auto">
-          <ActionButton
-            fullWidth
-            variant="outline"
-            leftIcon={<IconArrowBack size={18} />}
-            onClick={onBack}
-          >
-            Назад к профилю
-          </ActionButton>
-        </div>
-      </div>
-    </div>
+        <ActionButton
+          variant="outline"
+          fullWidth
+          leftIcon={<IconArrowBack size={16} />}
+          onClick={onBack}
+        >
+          Назад
+        </ActionButton>
+      </Stack>
+    </Center>
   );
 }

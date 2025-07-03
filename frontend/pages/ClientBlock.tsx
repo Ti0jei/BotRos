@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
-import { IconHome, IconArrowBack } from "@tabler/icons-react";
+import { IconHome, IconArrowLeft } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import {
+  Card,
+  Stack,
+  Center,
+  Text,
+  Loader,
+  Group,
+  Title,
+  Divider,
+} from "@mantine/core";
+
 import { getToken } from "../utils/auth";
-import CardBlock from "@/components/ui/CardBlock";
-import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 interface PaymentBlock {
   id: string;
@@ -66,79 +76,77 @@ export default function ClientBlock({
   }, []);
 
   return (
-    <div className="bg-white min-h-screen p-4 pb-28">
-      <div className="max-w-sm mx-auto">
-        <CardBlock>
-          <FormSection title="📦 Блок тренировок">
-            {loading ? (
-              <div className="flex justify-center mt-4">
-                <div className="w-5 h-5 border-2 border-[#f06595] border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : !block ? (
-              <p className="text-center text-red-500 text-sm mt-4">
-                ❌ {errorMessage || "У вас нет активного блока тренировок."}
-              </p>
-            ) : (
-              <div className="border border-gray-200 rounded-xl p-4 shadow-sm space-y-2 text-sm text-gray-700 mt-4">
-                <div className="flex justify-between">
-                  <span className="font-medium">Дата оплаты:</span>
-                  <span>{dayjs(block.paidAt).format("DD.MM.YYYY")}</span>
-                </div>
-                <div>
-                  Всего тренировок:{" "}
-                  <b className="text-gray-800">{block.paidTrainings}</b>
-                </div>
-                <div>
-                  Использовано:{" "}
-                  <b className="text-gray-800">{block.used}</b>
-                </div>
-                <div>
-                  Осталось:{" "}
-                  <b className="text-gray-800">
-                    {block.paidTrainings - block.used}
-                  </b>
-                </div>
-                {block.pricePerBlock !== undefined && (
-                  <div>
-                    Цена за блок:{" "}
-                    <b className="text-gray-800">{block.pricePerBlock} ₽</b>
-                  </div>
-                )}
-                <div
-                  className={`inline-block mt-2 text-xs font-semibold px-2 py-1 rounded ${
-                    block.active
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-500"
-                  }`}
-                >
-                  {block.active ? "Активен" : "Завершён"}
-                </div>
-              </div>
-            )}
-          </FormSection>
-        </CardBlock>
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        withBorder
+        radius="xl"
+        p="xl"
+        shadow="xs"
+        style={{ width: "100%", maxWidth: 420 }}
+      >
+        <Stack spacing="lg">
+          <Title order={3} c="#1a1a1a">
+            📦 Блок тренировок
+          </Title>
 
-        <div className="fixed bottom-0 left-0 w-full bg-white py-5 px-4 shadow-md z-50">
-          <div className="max-w-sm mx-auto flex flex-col gap-3">
-            <ActionButton
-              fullWidth
-              variant="outline"
-              leftIcon={<IconArrowBack size={16} />}
-              onClick={onBack}
-            >
-              Назад
-            </ActionButton>
-            <ActionButton
-              fullWidth
-              variant="outline"
-              leftIcon={<IconHome size={16} />}
-              onClick={onToProfile}
-            >
-              На главную
-            </ActionButton>
-          </div>
-        </div>
-      </div>
-    </div>
+          {loading ? (
+            <Center>
+              <Loader size="sm" />
+            </Center>
+          ) : !block ? (
+            <Text size="sm" c="red" align="center">
+              ❌ {errorMessage || "Нет активного блока"}
+            </Text>
+          ) : (
+            <Stack spacing="sm" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
+              <Group position="apart">
+                <Text size="sm">Дата оплаты:</Text>
+                <Text size="sm">{dayjs(block.paidAt).format("DD.MM.YYYY")}</Text>
+              </Group>
+
+              <Text size="sm">Всего тренировок: <b>{block.paidTrainings}</b></Text>
+              <Text size="sm">Использовано: <b>{block.used}</b></Text>
+              <Text size="sm">Осталось: <b>{block.paidTrainings - block.used}</b></Text>
+
+              {block.pricePerBlock !== undefined && (
+                <Text size="sm">
+                  Сумма блока: <b>{block.pricePerBlock} ₽</b>
+                </Text>
+              )}
+
+              <Divider />
+
+              <StatusBadge status={block.active ? "active" : "inactive"} />
+            </Stack>
+          )}
+
+          <ActionButton
+            fullWidth
+            variant="outline"
+            colorStyle="black"
+            leftIcon={<IconArrowLeft size={16} />}
+            onClick={onBack}
+          >
+            Назад
+          </ActionButton>
+
+          <ActionButton
+            fullWidth
+            variant="outline"
+            colorStyle="black"
+            leftIcon={<IconHome size={16} />}
+            onClick={onToProfile}
+          >
+            На главную
+          </ActionButton>
+        </Stack>
+      </Card>
+    </Center>
   );
 }
