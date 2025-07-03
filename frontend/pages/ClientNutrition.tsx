@@ -19,13 +19,12 @@ import {
   Title,
   Divider,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DateInput } from "@mantine/dates";
+import "@mantine/dates/styles.css";
 
 import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
-
-dayjs.locale("ru");
 
 interface NutritionDay {
   date: string;
@@ -145,7 +144,7 @@ export default function ClientNutrition({
             {isAdmin ? "Питание клиента" : "Моё питание"}
           </Title>
 
-          <DatePickerInput
+          <DateInput
             value={selectedDate}
             onChange={(val) => {
               setSelectedDate(val);
@@ -153,12 +152,13 @@ export default function ClientNutrition({
             }}
             locale="ru"
             clearable
-            dropdownType="modal"
-            placeholder="Выберите дату"
-            leftSection={<IconCalendar size={16} />}
             maxDate={new Date()}
+            valueFormat="DD.MM.YYYY"
+            leftSection={<IconCalendar size={16} />}
             radius="xl"
-            withAsterisk={false}
+            size="md"
+            label="Выберите дату"
+            placeholder="ДД.ММ.ГГГГ"
           />
 
           {selectedRecord ? (
