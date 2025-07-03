@@ -69,7 +69,7 @@ export default function RequestReset({ onBack }: Props) {
             </div>
 
             {sent ? (
-              <Text className="text-center text-gray-600 text-sm">
+              <Text className="text-center text-gray-600 text-sm mt-2">
                 Если такой email существует, инструкция по сбросу отправлена.
                 Проверьте свою почту.
               </Text>
@@ -93,9 +93,11 @@ export default function RequestReset({ onBack }: Props) {
           onClick={sent ? onBack : handleSubmit}
           disabled={!sent && (!email || loading)}
           fullWidth
+          variant={sent ? "light" : "filled"}
+          color="pink"
           leftIcon={!sent ? <IconMail size={16} /> : undefined}
         >
-          {sent ? "Назад ко входу" : loading ? "Отправка..." : "Сбросить пароль"}
+          {sent ? "Назад" : loading ? "Отправка..." : "Сбросить пароль"}
         </ActionButton>
       </div>
     </>

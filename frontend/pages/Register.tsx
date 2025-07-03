@@ -173,8 +173,13 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
             {loading ? "Регистрация..." : "Зарегистрироваться"}
           </ActionButton>
         ) : (
-          <ActionButton onClick={handleGoToLogin} fullWidth>
-            Перейти ко входу
+          <ActionButton
+            onClick={handleGoToLogin}
+            fullWidth
+            variant="light"
+            color="pink"
+          >
+            Назад
           </ActionButton>
         )}
       </div>

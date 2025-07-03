@@ -91,16 +91,13 @@ export default function ResetPassword({ onBack }: Props) {
 
       <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
         <ActionButton
-          onClick={onBack}
+          onClick={done ? onBack : handleSubmit}
           fullWidth
           variant={done ? "light" : "filled"}
+          color="pink"
           disabled={!done && (loading || !password)}
         >
-          {done
-            ? "Назад ко входу"
-            : loading
-            ? "Сохранение..."
-            : "Сохранить пароль"}
+          {done ? "Назад" : loading ? "Сохранение..." : "Сохранить пароль"}
         </ActionButton>
       </div>
     </>
