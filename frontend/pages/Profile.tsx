@@ -4,9 +4,21 @@ import {
   IconBellOff,
   IconLogout,
 } from "@tabler/icons-react";
+import {
+  Card,
+  Center,
+  Stack,
+  Title,
+  Text,
+  Loader,
+  Group,
+  ActionIcon,
+} from "@mantine/core";
+
 import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
 import ClientBlock from "./ClientBlock";
+
 import ActionButton from "@/components/ui/ActionButton";
 import FormSection from "@/components/ui/FormSection";
 
@@ -29,9 +41,7 @@ export default function Profile({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState<
-    "main" | "trainings" | "nutrition"
-  >("main");
+  const [section, setSection] = useState<"main" | "trainings" | "nutrition">("main");
   const [showBlock, setShowBlock] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -96,20 +106,23 @@ export default function Profile({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-pink border-t-transparent animate-spin rounded-full" />
-      </div>
+      <Center h="100vh">
+        <Loader size="md" />
+      </Center>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-sm">Не удалось загрузить профиль</p>
-      </div>
+      <Center h="100vh">
+        <Text c="red" size="sm">
+          Не удалось загрузить профиль
+        </Text>
+      </Center>
     );
   }
 
+  // секция тренировок
   if (section === "trainings") {
     return showBlock ? (
       <ClientBlock
@@ -124,6 +137,7 @@ export default function Profile({
     );
   }
 
+  // секция питания
   if (section === "nutrition") {
     return (
       <ClientNutrition userId={user.id} onBack={() => setSection("main")} />
@@ -131,37 +145,48 @@ export default function Profile({
   }
 
   return (
-    <div className="min-h-screen bg-pink-light flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6">
-        <FormSection
-          title={
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-lg font-semibold text-gray-900">
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        withBorder
+        radius="xl"
+        p="xl"
+        shadow="xs"
+        style={{ width: "100%", maxWidth: 420 }}
+      >
+        <Stack spacing="lg">
+          {/* Заголовок и уведомления */}
+          <Group position="apart">
+            <div>
+              <Title order={3} c="#1a1a1a">
                 Привет, {user.name} 👋
-              </span>
-              <button
-                title={
-                  user.notificationsMuted
-                    ? "Оповещения выключены"
-                    : "Оповещения включены"
-                }
-                onClick={toggleNotifications}
-                className={`p-2 rounded-full shadow-sm border ${
-                  user.notificationsMuted
-                    ? "bg-gray-100 text-gray-500"
-                    : "bg-pink-light text-pink"
-                }`}
-              >
-                {user.notificationsMuted ? (
-                  <IconBellOff size={18} />
-                ) : (
-                  <IconBellRinging size={18} />
-                )}
-              </button>
+              </Title>
+              <Text size="sm" c="dimmed">
+                Вы вошли как {user.email}
+              </Text>
             </div>
-          }
-        >
-          <div className="space-y-2">
+
+            <ActionIcon
+              variant="light"
+              size="lg"
+              onClick={toggleNotifications}
+              title={
+                user.notificationsMuted
+                  ? "Оповещения выключены"
+                  : "Оповещения включены"
+              }
+            >
+              {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBellRinging size={20} />}
+            </ActionIcon>
+          </Group>
+
+          {/* Кнопки */}
+          <Stack spacing="sm">
             <ActionButton fullWidth onClick={() => setSection("trainings")}>
               Мои тренировки
             </ActionButton>
@@ -187,18 +212,18 @@ export default function Profile({
                 Панель тренера
               </ActionButton>
             )}
+          </Stack>
 
-            <ActionButton
-              fullWidth
-              variant="outline"
-              onClick={handleLogout}
-              leftIcon={<IconLogout size={18} />}
-            >
-              Выйти
-            </ActionButton>
-          </div>
-        </FormSection>
-      </div>
-    </div>
+          <ActionButton
+            fullWidth
+            variant="outline"
+            onClick={handleLogout}
+            leftIcon={<IconLogout size={18} />}
+          >
+            Выйти
+          </ActionButton>
+        </Stack>
+      </Card>
+    </Center>
   );
 }
