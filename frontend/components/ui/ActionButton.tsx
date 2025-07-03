@@ -17,19 +17,41 @@ export default function ActionButton({
   leftIcon,
   ...rest
 }: ActionButtonProps) {
-  let color = "#d6336c"; // основной розовый
-  let bg = "white";
-  let hover = "#ffe3ec";
+  const stylesByColorStyle = {
+    primary: {
+      color: "#d6336c",
+      hover: "#ffe3ec",
+    },
+    danger: {
+      color: "#c92a2a",
+      hover: "#ffe3e3",
+    },
+    gradient: {
+      gradient: "linear-gradient(to right, #ff8ca3, #ff4d6d)",
+      hover: "linear-gradient(to right, #ff6b91, #ff1f4c)",
+      color: "white",
+    },
+  };
 
-  if (colorStyle === "danger") {
-    color = "#c92a2a";
-    hover = "#ffe3e3";
-  }
+  const current = stylesByColorStyle[colorStyle];
 
-  if (colorStyle === "gradient") {
-    bg = "linear-gradient(to right, #ff8ca3, #ff4d6d)";
-    color = "white";
-  }
+  const getBackground = () => {
+    if (colorStyle === "gradient") return current.gradient;
+    if (variant === "filled") return current.color;
+    if (variant === "light") return "white";
+    return "transparent";
+  };
+
+  const getTextColor = () => {
+    if (colorStyle === "gradient") return current.color;
+    if (variant === "filled") return "white";
+    return current.color;
+  };
+
+  const getBorder = () => {
+    if (variant === "outline") return `1px solid ${current.color}`;
+    return "transparent";
+  };
 
   return (
     <Button
@@ -38,25 +60,23 @@ export default function ActionButton({
       radius={radius}
       size={size}
       variant={variant}
-      styles={(theme) => ({
+      styles={{
         root: {
-          background:
-            colorStyle === "gradient" ? bg : variant === "filled" ? color : bg,
-          color:
-            colorStyle === "gradient"
-              ? "white"
-              : variant === "filled"
-              ? "white"
-              : color,
-          border:
-            variant === "outline" ? `1px solid ${color}` : "transparent",
+          background: getBackground(),
+          color: getTextColor(),
+          border: getBorder(),
           transition: "all 0.2s ease",
+          fontWeight: 500,
           "&:hover": {
             background:
-              variant === "outline" || variant === "light" ? hover : undefined,
+              colorStyle === "gradient"
+                ? current.hover
+                : variant === "outline" || variant === "light"
+                ? current.hover
+                : undefined,
           },
         },
-      })}
+      }}
       {...rest}
     >
       {children}

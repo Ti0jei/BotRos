@@ -6,7 +6,6 @@ import {
   TextInput,
   PasswordInput,
   Stack,
-  Button,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
@@ -141,7 +140,8 @@ export default function Login({
               onClick={handleLogin}
               disabled={loading}
               fullWidth
-              color="pink"
+              variant="filled"
+              colorStyle="primary"
             >
               {loading ? "Вход..." : "Войти"}
             </ActionButton>
@@ -157,15 +157,13 @@ export default function Login({
               </ActionButton>
             )}
 
-            <Button
+            <ActionButton
               onClick={onResetRequest}
-              variant="subtle"
-              size="sm"
-              color="pink"
+              variant="outline"
               fullWidth
             >
               Забыли пароль?
-            </Button>
+            </ActionButton>
           </Stack>
         </Card>
       </div>
@@ -174,7 +172,7 @@ export default function Login({
         <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
           <ActionButton
             variant="light"
-            color="pink"
+            colorStyle="primary"
             onClick={onRegisterRequest}
             fullWidth
           >
