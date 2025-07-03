@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
 import {
-  IconCheck,
-  IconAlertCircle,
-} from "@tabler/icons-react";
-import {
   Card,
   Title,
   Text,
   TextInput,
   PasswordInput,
   Stack,
-  Group,
+  Button,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
+import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import ActionButton from "@/components/ui/ActionButton";
 
 interface Props {
@@ -140,7 +137,12 @@ export default function Login({
               placeholder="••••••••"
             />
 
-            <ActionButton onClick={handleLogin} disabled={loading} fullWidth>
+            <ActionButton
+              onClick={handleLogin}
+              disabled={loading}
+              fullWidth
+              color="pink"
+            >
               {loading ? "Вход..." : "Войти"}
             </ActionButton>
 
@@ -155,24 +157,15 @@ export default function Login({
               </ActionButton>
             )}
 
-            <Group position="right">
-              <Text
-                component="button"
-                onClick={onResetRequest}
-                size="sm"
-                fw={500}
-                className="hover:underline transition"
-                style={{
-                  all: "unset",
-                  color: "#d6336c",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                Забыли пароль?
-              </Text>
-            </Group>
+            <Button
+              onClick={onResetRequest}
+              variant="subtle"
+              size="sm"
+              color="pink"
+              fullWidth
+            >
+              Забыли пароль?
+            </Button>
           </Stack>
         </Card>
       </div>
