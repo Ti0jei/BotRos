@@ -93,19 +93,19 @@ export default function ClientSchedule({
       case "CONFIRMED":
         return (
           <Badge color="green" variant="light" radius="sm" size="sm">
-            Подтверждено
+            ПОДТВЕРЖДЕНО
           </Badge>
         );
       case "DECLINED":
         return (
           <Badge color="red" variant="light" radius="sm" size="sm">
-            Отменено
+            ОТМЕНЕНО
           </Badge>
         );
       case "PENDING":
         return (
           <Badge color="gray" variant="light" radius="sm" size="sm">
-            Ожидание
+            ОЖИДАНИЕ
           </Badge>
         );
       default:
@@ -184,6 +184,7 @@ export default function ClientSchedule({
                       <Stack spacing={6}>
                         <ActionButton
                           fullWidth
+                          variant="outline"
                           onClick={() => updateStatus(t.id, "CONFIRMED")}
                           leftIcon={<IconCheck size={16} />}
                         >
@@ -191,9 +192,10 @@ export default function ClientSchedule({
                         </ActionButton>
                         <ActionButton
                           fullWidth
+                          variant="outline"
                           onClick={() => updateStatus(t.id, "DECLINED")}
                           leftIcon={<IconX size={16} />}
-                          colorStyle="red"
+                          colorStyle="danger"
                         >
                           Не приду
                         </ActionButton>
@@ -201,7 +203,7 @@ export default function ClientSchedule({
                     ) : (
                       <ActionButton
                         fullWidth
-                        variant="light"
+                        variant="outline"
                         onClick={() => setEditingId(t.id)}
                       >
                         Изменить решение
