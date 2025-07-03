@@ -1,7 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
-import bcrypt from 'bcryptjs'; // ✅ Заменили Bun на bcryptjs
+import bcrypt from 'bcryptjs';
 import { resend } from '../utils/resend.mjs';
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.post('/request', async (req, res) => {
   try {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      console.log('⛔ Email не найден в базе:', email);
+      console.log('⛔ Email не найден:', email);
       return res.status(200).json({ ok: true }); // не раскрываем наличие
     }
 
@@ -39,23 +39,24 @@ router.post('/request', async (req, res) => {
       from: 'Krissfit Support <support@krissfit.ru>',
       to: email,
       subject: '🔐 Восстановление доступа к Krissfit',
-      text: `Вы запросили сброс пароля в системе Krissfit.\nСбросьте пароль по ссылке:\n${resetUrl}\n\nЕсли вы не запрашивали — просто проигнорируйте это письмо.`,
       html: `
-        <div style="font-family: sans-serif; padding: 20px;">
-          <h2>Сброс пароля</h2>
-          <p>Вы запросили сброс пароля на Krissfit.</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 24px; background-color: #ffffff; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
+          <h2 style="margin-bottom: 16px; color: #222;">Сброс пароля</h2>
+          <p style="font-size: 16px; color: #333;">
+            Вы запросили сброс пароля на Krissfit.
+          </p>
           <p>
-            <a href="${resetUrl}" 
-               style="background: #f06595; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none;"
-               target="_blank">
+            <a href="${resetUrl}"
+              style="display: inline-block; margin-top: 16px; background-color: #f06595; color: white; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none;">
               Сбросить пароль
             </a>
           </p>
-          <p style="margin-top: 20px; font-size: 14px; color: #555;">
-            Если это были не вы — просто проигнорируйте это письмо.
+          <p style="margin-top: 24px; font-size: 14px; color: #777;">
+            Если вы не запрашивали сброс — просто проигнорируйте это письмо.
           </p>
         </div>
       `,
+      text: `Вы запросили сброс пароля в Krissfit. Перейдите по ссылке:\n${resetUrl}\n\nЕсли вы не запрашивали — просто проигнорируйте это письмо.`,
       reply_to: 'support@krissfit.ru',
     });
 
@@ -81,17 +82,11 @@ router.post('/confirm', async (req, res) => {
     });
 
     if (!user) {
-      console.warn('⛔ Токен сброса недействителен или истёк:', token);
+      console.warn('⛔ Токен недействителен или истёк:', token);
       return res.status(400).json({ error: 'Неверный или истёкший токен' });
     }
 
-    let hashed;
-    try {
-      hashed = await bcrypt.hash(password, 10); // ✅ bcryptjs вместо Bun
-    } catch (err) {
-      console.error('❌ Ошибка хэширования пароля:', err);
-      return res.status(500).json({ error: 'Ошибка при шифровании пароля' });
-    }
+    const hashed = await bcrypt.hash(password, 10);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -105,8 +100,8 @@ router.post('/confirm', async (req, res) => {
     console.log('✅ Пароль обновлён для:', user.email);
     res.json({ ok: true });
   } catch (err) {
-    console.error('❌ Ошибка при установке нового пароля:', err);
-    res.status(500).json({ error: 'Ошибка при сбросе' });
+    console.error('❌ Ошибка при сбросе:', err);
+    res.status(500).json({ error: 'Ошибка при сбросе пароля' });
   }
 });
 
