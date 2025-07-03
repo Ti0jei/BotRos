@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
+import "dayjs/locale/ru";
 import {
   IconCalendar,
-  IconChevronLeft,
-  IconChevronRight,
   IconTrash,
   IconEdit,
   IconPlus,
@@ -25,6 +24,8 @@ import { DatePickerInput } from "@mantine/dates";
 import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
+
+dayjs.locale("ru");
 
 interface NutritionDay {
   date: string;
@@ -150,11 +151,14 @@ export default function ClientNutrition({
               setSelectedDate(val);
               setFormVisible(false);
             }}
-            maxDate={new Date()}
+            locale="ru"
+            clearable
+            dropdownType="modal"
+            placeholder="Выберите дату"
             leftSection={<IconCalendar size={16} />}
-            nextIcon={<IconChevronRight size={16} />}
-            previousIcon={<IconChevronLeft size={16} />}
+            maxDate={new Date()}
             radius="xl"
+            withAsterisk={false}
           />
 
           {selectedRecord ? (
