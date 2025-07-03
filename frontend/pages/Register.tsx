@@ -1,187 +1,211 @@
 import { useState, useEffect } from "react";
 import {
-  Card,
-  Title,
-  Text,
   TextInput,
   PasswordInput,
+  NumberInput,
+  Text,
+  Title,
   Stack,
-  Button,
+  Card,
+  Center,
 } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import ActionButton from "@/components/ui/ActionButton";
 
-interface Props {
-  onLoggedIn: (profile: any) => void;
-  onResetRequest: () => void;
-  onRegisterRequest?: () => void;
-}
-
-export default function Login({
-  onLoggedIn,
-  onResetRequest,
-  onRegisterRequest,
-}: Props) {
+export default function Register({ onRegistered }: { onRegistered: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [age, setAge] = useState<number | undefined>();
+  const [inviteCode, setInviteCode] = useState("");
+  const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showResend, setShowResend] = useState(false);
-  const [resending, setResending] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const savedEmail = sessionStorage.getItem("lastEmail");
-    if (savedEmail) setEmail(savedEmail);
+    const tgId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgId) setTelegramId(tgId.toString());
   }, []);
 
-  const notify = (title: string, message: string, color: "red" | "green") => {
-    showNotification({
-      title,
-      message,
-      color,
-      icon: color === "green" ? <IconCheck size={18} /> : <IconAlertCircle size={18} />,
-    });
-  };
+  const handleSubmit = async () => {
+    setError(null);
 
-  const handleLogin = async () => {
+    if (!inviteCode.trim()) {
+      setError("Введите код приглашения");
+      return;
+    }
+
+    if (!age || age <= 0) {
+      setError("Укажите корректный возраст");
+      return;
+    }
+
+    const body = {
+      email,
+      password,
+      name,
+      lastName,
+      age,
+      telegramId,
+      inviteCode,
+    };
+
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/auth/login`, {
+      const res = await fetch(`${API}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.reason === "email_not_verified") setShowResend(true);
-        notify("Ошибка входа", data.message || "Неверные данные", "red");
-      } else {
-        localStorage.setItem("token", data.token);
-        sessionStorage.setItem("lastEmail", email);
-
-        const profileRes = await fetch(`${API}/api/profile`, {
-          headers: { Authorization: `Bearer ${data.token}` },
-        });
-
-        if (profileRes.ok) {
-          const profile = await profileRes.json();
-          onLoggedIn(profile);
-        } else {
-          notify("Ошибка", "Не удалось загрузить профиль", "red");
-        }
-      }
-    } catch {
-      notify("Ошибка", "Сервер недоступен", "red");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResend = async () => {
-    setResending(true);
-    try {
-      const res = await fetch(`${API}/api/auth/resend`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        notify("Письмо отправлено", "Проверьте почту для подтверждения", "green");
+        sessionStorage.setItem("lastEmail", email);
+        sessionStorage.setItem("lastPassword", password);
+        setSuccess(true);
+        alert(data.message || "Проверьте почту для подтверждения");
       } else {
-        notify("Ошибка", data.message || "Не удалось отправить", "red");
+        setError(data?.error || "Ошибка при регистрации");
       }
+    } catch {
+      setError("Ошибка соединения с сервером");
     } finally {
-      setResending(false);
+      setLoading(false);
     }
   };
 
+  const handleGoToLogin = () => {
+    sessionStorage.setItem("lastEmail", email);
+    sessionStorage.setItem("lastPassword", password);
+    onRegistered();
+  };
+
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex flex-col items-center justify-center px-4 pb-24">
-        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-          <Stack spacing="lg">
-            <div>
-              <Title order={2} className="text-center mb-1" c="#d6336c">
-                Вход в аккаунт
-              </Title>
-              <Text size="sm" color="dimmed" className="text-center">
-                Введите email и пароль для авторизации
-              </Text>
-            </div>
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        shadow="xs"
+        radius="xl"
+        p="xl"
+        withBorder
+        style={{
+          width: "100%",
+          maxWidth: 460,
+          backgroundColor: "#ffffff",
+          borderColor: "#eaeaea",
+        }}
+      >
+        <Stack spacing="lg">
+          <Stack spacing={4} align="center">
+            <Title order={2} c="#1a1a1a">
+              Регистрация
+            </Title>
+            <Text size="sm" c="dimmed">
+              Заполните все поля, чтобы создать аккаунт
+            </Text>
+          </Stack>
 
-            <TextInput
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              required
-              radius="xl"
-              size="md"
-              placeholder="you@email.com"
-            />
+          {error && (
+            <Text
+              size="sm"
+              style={{
+                backgroundColor: "#ffe5e5",
+                color: "#a11a1a",
+                padding: "0.75rem 1rem",
+                borderRadius: "0.5rem",
+              }}
+            >
+              {error}
+            </Text>
+          )}
 
-            <PasswordInput
-              label="Пароль"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-              required
-              radius="xl"
-              size="md"
-              placeholder="••••••••"
-            />
+          <TextInput
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            disabled={success}
+            required
+            radius="xl"
+          />
 
+          <PasswordInput
+            label="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            disabled={success}
+            required
+            radius="xl"
+          />
+
+          <TextInput
+            label="Имя"
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
+            disabled={success}
+            required
+            radius="xl"
+          />
+
+          <TextInput
+            label="Фамилия"
+            value={lastName}
+            onChange={(e) => setLastName(e.currentTarget.value)}
+            disabled={success}
+            required
+            radius="xl"
+          />
+
+          <NumberInput
+            label="Возраст"
+            value={age}
+            onChange={setAge}
+            disabled={success}
+            required
+            min={1}
+            max={120}
+            radius="xl"
+          />
+
+          <TextInput
+            label="Инвайт-код"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.currentTarget.value)}
+            disabled={success}
+            required
+            radius="xl"
+          />
+
+          {!success ? (
             <ActionButton
-              onClick={handleLogin}
+              onClick={handleSubmit}
               disabled={loading}
               fullWidth
-              color="pink"
+              colorStyle="black"
             >
-              {loading ? "Вход..." : "Войти"}
+              {loading ? "Регистрация..." : "Зарегистрироваться"}
             </ActionButton>
-
-            {showResend && (
-              <ActionButton
-                onClick={handleResend}
-                variant="outline"
-                disabled={resending}
-                fullWidth
-              >
-                {resending ? "Отправка..." : "Отправить письмо повторно"}
-              </ActionButton>
-            )}
-
-            <Button
-              onClick={onResetRequest}
-              variant="subtle"
-              size="sm"
-              color="pink"
+          ) : (
+            <ActionButton
+              onClick={handleGoToLogin}
               fullWidth
+              variant="outline"
+              colorStyle="black"
             >
-              Забыли пароль?
-            </Button>
-          </Stack>
-        </Card>
-      </div>
-
-      {onRegisterRequest && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
-          <ActionButton
-            variant="light"
-            color="pink"
-            onClick={onRegisterRequest}
-            fullWidth
-          >
-            Зарегистрироваться
-          </ActionButton>
-        </div>
-      )}
-    </>
+              Назад ко входу
+            </ActionButton>
+          )}
+        </Stack>
+      </Card>
+    </Center>
   );
 }

@@ -5,6 +5,7 @@ import {
   Title,
   Stack,
   Card,
+  Center,
 } from "@mantine/core";
 import { IconMail } from "@tabler/icons-react";
 import ActionButton from "@/components/ui/ActionButton";
@@ -53,53 +54,66 @@ export default function RequestReset({ onBack }: Props) {
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex items-center justify-center px-4 pb-24">
-        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-          <Stack spacing="lg">
-            <div>
-              <Title order={2} className="text-center mb-1" c="#d6336c">
-                Сброс пароля
-              </Title>
-              {!sent && (
-                <Text size="sm" color="dimmed" className="text-center">
-                  Введите email, чтобы получить ссылку на сброс
-                </Text>
-              )}
-            </div>
-
-            {sent ? (
-              <Text className="text-center text-gray-600 text-sm mt-2">
-                Если такой email существует, инструкция по сбросу отправлена.
-                Проверьте свою почту.
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        shadow="xs"
+        radius="xl"
+        p="xl"
+        withBorder
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          backgroundColor: "#ffffff",
+          borderColor: "#eaeaea",
+        }}
+      >
+        <Stack spacing="lg">
+          <Stack spacing={4} align="center">
+            <Title order={2} c="#1a1a1a">
+              Сброс пароля
+            </Title>
+            {!sent && (
+              <Text size="sm" c="dimmed">
+                Введите email, чтобы получить ссылку на сброс
               </Text>
-            ) : (
-              <TextInput
-                label="Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.currentTarget.value)}
-                placeholder="Введите ваш email"
-                radius="xl"
-                required
-              />
             )}
           </Stack>
-        </Card>
-      </div>
 
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
-        <ActionButton
-          onClick={sent ? onBack : handleSubmit}
-          disabled={!sent && (!email || loading)}
-          fullWidth
-          variant={sent ? "light" : "filled"}
-          color="pink"
-          leftIcon={!sent ? <IconMail size={16} /> : undefined}
-        >
-          {sent ? "Назад" : loading ? "Отправка..." : "Сбросить пароль"}
-        </ActionButton>
-      </div>
-    </>
+          {sent ? (
+            <Text size="sm" align="center" c="dimmed">
+              Если такой email существует, инструкция по сбросу отправлена.
+              Проверьте свою почту.
+            </Text>
+          ) : (
+            <TextInput
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              placeholder="Введите ваш email"
+              radius="xl"
+              required
+            />
+          )}
+
+          <ActionButton
+            onClick={sent ? onBack : handleSubmit}
+            disabled={!sent && (!email || loading)}
+            fullWidth
+            variant={sent ? "outline" : "filled"}
+            colorStyle="black"
+            leftIcon={!sent ? <IconMail size={16} /> : undefined}
+          >
+            {sent ? "Назад" : loading ? "Отправка..." : "Сбросить пароль"}
+          </ActionButton>
+        </Stack>
+      </Card>
+    </Center>
   );
 }
