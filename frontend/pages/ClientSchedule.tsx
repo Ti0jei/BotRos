@@ -117,12 +117,12 @@ export default function ClientSchedule({
             </div>
 
             <ActionButton
-              size="xs"
+              size="sm"
               variant="outline"
               colorStyle="black"
               leftIcon={<IconPackage size={14} />}
               onClick={onOpenBlock}
-              style={{ marginTop: 4, marginRight: -4 }} // слегка левее
+              style={{ marginTop: 2 }}
             >
               Абонемент
             </ActionButton>

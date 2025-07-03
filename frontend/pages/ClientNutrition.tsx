@@ -17,7 +17,6 @@ import {
   Group,
   Loader,
   NumberInput,
-  TextInput,
   Title,
   Divider,
 } from "@mantine/core";
@@ -155,6 +154,7 @@ export default function ClientNutrition({
             leftSection={<IconCalendar size={16} />}
             nextIcon={<IconChevronRight size={16} />}
             previousIcon={<IconChevronLeft size={16} />}
+            radius="xl"
           />
 
           {selectedRecord ? (
