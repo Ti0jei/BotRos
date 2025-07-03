@@ -1,14 +1,14 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 export default defineConfig({
   root: './',
   plugins: [react()],
-  base: './',
+  base: '/', // ✅ для продакшена
   resolve: {
     alias: {
-      '@': resolve(__dirname, '.'), // ✅ указывает на корень, где лежат App.tsx и components/
+      '@': resolve(__dirname, '.'),
     },
   },
   build: {
@@ -22,4 +22,4 @@ export default defineConfig({
     port: 3000,
     host: true,
   },
-});
+})
