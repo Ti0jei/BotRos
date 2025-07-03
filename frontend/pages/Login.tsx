@@ -6,6 +6,7 @@ import {
   TextInput,
   PasswordInput,
   Stack,
+  Center,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
@@ -102,91 +103,99 @@ export default function Login({
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex flex-col items-center justify-center px-4 pb-28">
-        <Card
-          shadow="md"
-          radius="xl"
-          p="lg"
-          withBorder
-          className="w-full max-w-md bg-white"
-        >
-          <Stack spacing="lg">
-            <div>
-              <Title order={2} className="text-center mb-1" c="#d6336c">
-                Вход в аккаунт
-              </Title>
-              <Text size="sm" color="dimmed" className="text-center">
-                Введите email и пароль для авторизации
-              </Text>
-            </div>
-
-            <TextInput
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              required
-              radius="xl"
-              size="md"
-              placeholder="you@email.com"
-            />
-
-            <PasswordInput
-              label="Пароль"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-              required
-              radius="xl"
-              size="md"
-              placeholder="••••••••"
-            />
-
-            <ActionButton
-              onClick={handleLogin}
-              disabled={loading}
-              fullWidth
-              variant="filled"
-              colorStyle="primary"
-            >
-              {loading ? "Вход..." : "Войти"}
-            </ActionButton>
-
-            {showResend && (
-              <ActionButton
-                onClick={handleResend}
-                variant="outline"
-                disabled={resending}
-                fullWidth
-              >
-                {resending ? "Отправка..." : "Отправить письмо повторно"}
-              </ActionButton>
-            )}
-
-            <div className="mt-[-0.5rem]">
-              <button
-                onClick={onResetRequest}
-                className="text-sm text-[#d6336c] hover:underline font-medium"
-              >
-                Забыли пароль?
-              </button>
-            </div>
+    <Center
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom, #ffd6e0, #ff8ca3)",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        shadow="md"
+        radius="xl"
+        p="xl"
+        withBorder
+        style={{ width: "100%", maxWidth: 420, background: "white" }}
+      >
+        <Stack spacing="lg">
+          <Stack spacing={4} align="center">
+            <Title order={2} c="#d6336c">
+              Вход в аккаунт
+            </Title>
+            <Text size="sm" color="dimmed">
+              Введите email и пароль для авторизации
+            </Text>
           </Stack>
-        </Card>
-      </div>
 
-      {onRegisterRequest && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
+          <TextInput
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            required
+            radius="xl"
+            size="md"
+            placeholder="you@email.com"
+          />
+
+          <PasswordInput
+            label="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            required
+            radius="xl"
+            size="md"
+            placeholder="••••••••"
+          />
+
           <ActionButton
+            onClick={handleLogin}
+            loading={loading}
+            fullWidth
             variant="filled"
             colorStyle="primary"
-            onClick={onRegisterRequest}
-            fullWidth
           >
-            Зарегистрироваться
+            Войти
           </ActionButton>
-        </div>
-      )}
-    </>
+
+          {showResend && (
+            <ActionButton
+              onClick={handleResend}
+              variant="outline"
+              disabled={resending}
+              fullWidth
+            >
+              {resending ? "Отправка..." : "Отправить письмо повторно"}
+            </ActionButton>
+          )}
+
+          <Text
+            size="sm"
+            align="center"
+            color="#d6336c"
+            style={{ cursor: "pointer" }}
+            onClick={onResetRequest}
+          >
+            Забыли пароль?
+          </Text>
+
+          {onRegisterRequest && (
+            <Text size="sm" align="center">
+              Нет аккаунта?{" "}
+              <span
+                style={{
+                  color: "#d6336c",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+                onClick={onRegisterRequest}
+              >
+                Зарегистрироваться
+              </span>
+            </Text>
+          )}
+        </Stack>
+      </Card>
+    </Center>
   );
 }
