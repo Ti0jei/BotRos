@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
-import { IconHome, IconArrowLeft } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconArrowLeft,
+  IconCalendar,
+  IconPackage,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import {
   Card,
-  Stack,
   Center,
-  Text,
-  Loader,
-  Group,
+  Stack,
   Title,
+  Text,
+  Group,
+  Loader,
   Divider,
+  Badge,
+  Progress,
 } from "@mantine/core";
 
-import { getToken } from "../utils/auth";
 import ActionButton from "@/components/ui/ActionButton";
 import StatusBadge from "@/components/ui/StatusBadge";
 
@@ -37,7 +43,7 @@ export default function ClientBlock({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
-  const token = getToken();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const loadBlock = async () => {
@@ -62,7 +68,7 @@ export default function ClientBlock({
           setBlock(data);
         } else {
           setBlock(null);
-          setErrorMessage("У вас нет активного блока тренировок.");
+          setErrorMessage("У вас нет активного абонемента.");
         }
       } catch (error: any) {
         setBlock(null);
@@ -74,6 +80,11 @@ export default function ClientBlock({
 
     loadBlock();
   }, []);
+
+  const getProgress = () => {
+    if (!block) return 0;
+    return Math.min(100, Math.round((block.used / block.paidTrainings) * 100));
+  };
 
   return (
     <Center
@@ -91,9 +102,18 @@ export default function ClientBlock({
         style={{ width: "100%", maxWidth: 420 }}
       >
         <Stack spacing="lg">
-          <Title order={3} c="#1a1a1a">
-            📦 Абонемент
-          </Title>
+          <Group position="apart">
+            <Title order={3} c="#1a1a1a">
+              <IconPackage size={20} style={{ marginBottom: -2 }} /> Абонемент
+            </Title>
+            <Badge
+              variant="light"
+              color={block?.active ? "green" : "gray"}
+              size="sm"
+            >
+              {block?.active ? "Активен" : "Неактивен"}
+            </Badge>
+          </Group>
 
           {loading ? (
             <Center>
@@ -101,43 +121,42 @@ export default function ClientBlock({
             </Center>
           ) : !block ? (
             <Text size="sm" c="red" align="center">
-              ❌ {errorMessage || "Нет активного абонемента"}
+              ❌ {errorMessage || "Нет активного блока"}
             </Text>
           ) : (
-            <Stack
-              spacing="sm"
-              p="md"
-              style={{
-                backgroundColor: "#f9f9f9",
-                borderRadius: 12,
-                border: "1px solid #eaeaea",
-              }}
-            >
-              <Group position="apart">
-                <Text size="sm" c="dimmed">
-                  Дата оплаты
+            <Card p="md" radius="md" withBorder>
+              <Stack spacing="xs">
+                <Group position="apart">
+                  <Text size="sm" c="dimmed">
+                    Дата оплаты
+                  </Text>
+                  <Text size="sm">
+                    <IconCalendar size={14} style={{ marginBottom: -2, marginRight: 4 }} />
+                    {dayjs(block.paidAt).format("DD.MM.YYYY")}
+                  </Text>
+                </Group>
+
+                <Text size="sm">
+                  Всего тренировок: <b>{block.paidTrainings}</b>
                 </Text>
                 <Text size="sm">
-                  {dayjs(block.paidAt).format("DD.MM.YYYY")}
+                  Использовано: <b>{block.used}</b>
                 </Text>
-              </Group>
-
-              <Text size="sm">Всего тренировок: <b>{block.paidTrainings}</b></Text>
-              <Text size="sm">Использовано: <b>{block.used}</b></Text>
-              <Text size="sm">Осталось: <b>{block.paidTrainings - block.used}</b></Text>
-
-              {block.pricePerBlock !== undefined && (
+                <Text size="sm">
+                  Осталось: <b>{block.paidTrainings - block.used}</b>
+                </Text>
                 <Text size="sm">
                   Сумма абонемента: <b>{block.pricePerBlock} ₽</b>
                 </Text>
-              )}
 
-              <Divider />
+                <Divider my="xs" />
 
-              <StatusBadge status={block.active ? "active" : "inactive"}>
-                {block.active ? "Активен" : "Завершён"}
-              </StatusBadge>
-            </Stack>
+                <Progress value={getProgress()} radius="xl" size="sm" />
+                <Text size="xs" align="center" c="dimmed">
+                  {block.used} из {block.paidTrainings} тренировок
+                </Text>
+              </Stack>
+            </Card>
           )}
 
           <ActionButton
