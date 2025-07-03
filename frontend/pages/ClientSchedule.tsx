@@ -15,16 +15,16 @@ import {
   Group,
   Loader,
   Divider,
+  Badge,
 } from "@mantine/core";
 
 import ActionButton from "@/components/ui/ActionButton";
-import StatusBadge from "@/components/ui/StatusBadge";
 
 interface Training {
   id: string;
   date: string;
   hour: number;
-  status?: "PENDING" | "CONFIRMED" | "DECLINED"; // ← делаем статус опциональным
+  status?: "PENDING" | "CONFIRMED" | "DECLINED";
 }
 
 export default function ClientSchedule({
@@ -91,13 +91,29 @@ export default function ClientSchedule({
   const getStatusBadge = (status?: Training["status"]) => {
     switch (status) {
       case "CONFIRMED":
-        return <StatusBadge status="active">Подтверждено</StatusBadge>;
+        return (
+          <Badge color="green" variant="light" radius="sm" size="sm">
+            Подтверждено
+          </Badge>
+        );
       case "DECLINED":
-        return <StatusBadge status="declined">Отменено</StatusBadge>;
+        return (
+          <Badge color="red" variant="light" radius="sm" size="sm">
+            Отменено
+          </Badge>
+        );
       case "PENDING":
-        return <StatusBadge status="pending">Ожидание</StatusBadge>;
+        return (
+          <Badge color="gray" variant="light" radius="sm" size="sm">
+            Ожидание
+          </Badge>
+        );
       default:
-        return <StatusBadge status="pending">—</StatusBadge>; // если статус некорректен
+        return (
+          <Badge color="gray" variant="light" radius="sm" size="sm">
+            —
+          </Badge>
+        );
     }
   };
 
