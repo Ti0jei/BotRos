@@ -9,6 +9,7 @@ import {
   Text,
   Group,
   Loader,
+  Divider,
 } from "@mantine/core";
 
 import ActionButton from "@/components/ui/ActionButton";
@@ -92,87 +93,88 @@ export default function ClientSchedule({
         padding: "2rem 1rem",
       }}
     >
-      <Stack spacing="lg" style={{ width: "100%", maxWidth: 420 }}>
-        <Card withBorder radius="xl" p="xl" shadow="xs">
-          <Stack spacing="sm">
-            <Group position="apart">
-              <Title order={3} c="#1a1a1a">
-                Мои тренировки
-              </Title>
-              <ActionButton
-                size="xs"
-                variant="light"
-                leftIcon={<IconPackage size={16} />}
-                onClick={onOpenBlock}
-              >
-                Блок
-              </ActionButton>
-            </Group>
+      <Card withBorder radius="xl" p="xl" shadow="xs" style={{ width: "100%", maxWidth: 420 }}>
+        <Stack spacing="lg">
+          <Group position="apart">
+            <Title order={3} c="#1a1a1a">
+              Мои тренировки
+            </Title>
+            <ActionButton
+              size="xs"
+              variant="light"
+              leftIcon={<IconPackage size={16} />}
+              onClick={onOpenBlock}
+            >
+              Блок
+            </ActionButton>
+          </Group>
 
-            {loading ? (
-              <Center py="md">
-                <Loader size="sm" />
-              </Center>
-            ) : trainings.length === 0 ? (
-              <Text size="sm" align="center" c="dimmed">
-                Нет назначенных тренировок
-              </Text>
-            ) : (
-              <Stack spacing="sm">
-                {trainings.map((t) => (
-                  <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
-                    <Stack spacing={6}>
-                      <Group position="apart">
-                        <Text fw={500}>
-                          {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
-                        </Text>
-                        {getStatusBadge(t.status)}
-                      </Group>
+          {loading ? (
+            <Center py="md">
+              <Loader size="sm" />
+            </Center>
+          ) : trainings.length === 0 ? (
+            <Text size="sm" align="center" c="dimmed">
+              Нет назначенных тренировок
+            </Text>
+          ) : (
+            <Stack spacing="sm">
+              {trainings.map((t) => (
+                <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
+                  <Stack spacing={6}>
+                    <Group position="apart">
+                      <Text fw={500}>
+                        {dayjs(t.date).format("DD.MM.YYYY")} в {t.hour}:00
+                      </Text>
+                      {getStatusBadge(t.status)}
+                    </Group>
 
-                      {t.status === "PENDING" || editingId === t.id ? (
-                        <Stack spacing={6}>
-                          <ActionButton
-                            fullWidth
-                            onClick={() => updateStatus(t.id, "CONFIRMED")}
-                            leftIcon={<IconCheck size={16} />}
-                          >
-                            Приду
-                          </ActionButton>
-                          <ActionButton
-                            fullWidth
-                            onClick={() => updateStatus(t.id, "DECLINED")}
-                            leftIcon={<IconX size={16} />}
-                            colorStyle="red"
-                          >
-                            Не приду
-                          </ActionButton>
-                        </Stack>
-                      ) : (
+                    {t.status === "PENDING" || editingId === t.id ? (
+                      <Stack spacing={6}>
                         <ActionButton
                           fullWidth
-                          variant="light"
-                          onClick={() => setEditingId(t.id)}
+                          onClick={() => updateStatus(t.id, "CONFIRMED")}
+                          leftIcon={<IconCheck size={16} />}
                         >
-                          Изменить решение
+                          Приду
                         </ActionButton>
-                      )}
-                    </Stack>
-                  </Card>
-                ))}
-              </Stack>
-            )}
-          </Stack>
-        </Card>
+                        <ActionButton
+                          fullWidth
+                          onClick={() => updateStatus(t.id, "DECLINED")}
+                          leftIcon={<IconX size={16} />}
+                          colorStyle="red"
+                        >
+                          Не приду
+                        </ActionButton>
+                      </Stack>
+                    ) : (
+                      <ActionButton
+                        fullWidth
+                        variant="light"
+                        onClick={() => setEditingId(t.id)}
+                      >
+                        Изменить решение
+                      </ActionButton>
+                    )}
+                  </Stack>
+                </Card>
+              ))}
+            </Stack>
+          )}
 
-        <ActionButton
-          variant="outline"
-          fullWidth
-          leftIcon={<IconArrowBack size={16} />}
-          onClick={onBack}
-        >
-          Назад
-        </ActionButton>
-      </Stack>
+          <Divider my="sm" />
+
+          <ActionButton
+            variant="outline"
+            fullWidth
+            leftIcon={<IconArrowBack size={16} />}
+            onClick={onBack}
+            colorStyle="black"
+          >
+            Назад
+          </ActionButton>
+        </Stack>
+      </Card>
     </Center>
   );
 }

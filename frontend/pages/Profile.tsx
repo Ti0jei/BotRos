@@ -157,7 +157,6 @@ export default function Profile({
         style={{ width: "100%", maxWidth: 420 }}
       >
         <Stack spacing="lg">
-          {/* Заголовок и уведомления */}
           <Group position="apart">
             <div>
               <Title order={3} c="#1a1a1a">
@@ -177,6 +176,7 @@ export default function Profile({
                   ? "Оповещения выключены"
                   : "Оповещения включены"
               }
+              style={{ backgroundColor: user.notificationsMuted ? "#f1f1f1" : "#1a1a1a", color: "#fff" }}
             >
               {user.notificationsMuted ? (
                 <IconBellOff size={20} />
@@ -186,7 +186,6 @@ export default function Profile({
             </ActionIcon>
           </Group>
 
-          {/* Кнопки */}
           <Stack spacing="sm">
             <ActionButton
               fullWidth

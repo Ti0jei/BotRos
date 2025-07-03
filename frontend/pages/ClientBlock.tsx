@@ -92,7 +92,7 @@ export default function ClientBlock({
       >
         <Stack spacing="lg">
           <Title order={3} c="#1a1a1a">
-            📦 Блок тренировок
+            📦 Абонемент
           </Title>
 
           {loading ? (
@@ -101,13 +101,25 @@ export default function ClientBlock({
             </Center>
           ) : !block ? (
             <Text size="sm" c="red" align="center">
-              ❌ {errorMessage || "Нет активного блока"}
+              ❌ {errorMessage || "Нет активного абонемента"}
             </Text>
           ) : (
-            <Stack spacing="sm" p="sm" style={{ border: "1px solid #eee", borderRadius: 12 }}>
+            <Stack
+              spacing="sm"
+              p="md"
+              style={{
+                backgroundColor: "#f9f9f9",
+                borderRadius: 12,
+                border: "1px solid #eaeaea",
+              }}
+            >
               <Group position="apart">
-                <Text size="sm">Дата оплаты:</Text>
-                <Text size="sm">{dayjs(block.paidAt).format("DD.MM.YYYY")}</Text>
+                <Text size="sm" c="dimmed">
+                  Дата оплаты
+                </Text>
+                <Text size="sm">
+                  {dayjs(block.paidAt).format("DD.MM.YYYY")}
+                </Text>
               </Group>
 
               <Text size="sm">Всего тренировок: <b>{block.paidTrainings}</b></Text>
@@ -116,13 +128,15 @@ export default function ClientBlock({
 
               {block.pricePerBlock !== undefined && (
                 <Text size="sm">
-                  Сумма блока: <b>{block.pricePerBlock} ₽</b>
+                  Сумма абонемента: <b>{block.pricePerBlock} ₽</b>
                 </Text>
               )}
 
               <Divider />
 
-              <StatusBadge status={block.active ? "active" : "inactive"} />
+              <StatusBadge status={block.active ? "active" : "inactive"}>
+                {block.active ? "Активен" : "Завершён"}
+              </StatusBadge>
             </Stack>
           )}
 
