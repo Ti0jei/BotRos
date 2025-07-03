@@ -6,7 +6,6 @@ import {
   TextInput,
   PasswordInput,
   Stack,
-  Group,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
@@ -105,7 +104,13 @@ export default function Login({
   return (
     <>
       <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex flex-col items-center justify-center px-4 pb-28">
-        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+        <Card
+          shadow="md"
+          radius="xl"
+          p="lg"
+          withBorder
+          className="w-full max-w-md bg-white"
+        >
           <Stack spacing="lg">
             <div>
               <Title order={2} className="text-center mb-1" c="#d6336c">
@@ -158,14 +163,14 @@ export default function Login({
               </ActionButton>
             )}
 
-            <Group position="left">
+            <div className="mt-[-0.5rem]">
               <button
                 onClick={onResetRequest}
-                className="text-sm text-pink-600 hover:underline font-medium"
+                className="text-sm text-[#d6336c] hover:underline font-medium"
               >
                 Забыли пароль?
               </button>
-            </Group>
+            </div>
           </Stack>
         </Card>
       </div>
@@ -173,7 +178,7 @@ export default function Login({
       {onRegisterRequest && (
         <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
           <ActionButton
-            variant="light"
+            variant="filled"
             colorStyle="primary"
             onClick={onRegisterRequest}
             fullWidth
