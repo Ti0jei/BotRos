@@ -19,7 +19,7 @@ import ActionButton from "@/components/ui/ActionButton";
 interface Props {
   onLoggedIn: (profile: any) => void;
   onResetRequest: () => void;
-  onRegisterRequest?: () => void; // ✅ поддержка нижней кнопки регистрации
+  onRegisterRequest?: () => void;
 }
 
 export default function Login({
@@ -156,12 +156,16 @@ export default function Login({
           )}
 
           <Group position="right">
-            <button
+            <Text
+              component="button"
               onClick={onResetRequest}
-              className="text-sm text-pink hover:underline transition"
+              size="sm"
+              c="pink"
+              fw={500}
+              className="hover:underline transition"
             >
               Забыли пароль?
-            </button>
+            </Text>
           </Group>
         </Stack>
       </Card>
