@@ -106,29 +106,34 @@ export default function Login({
     <Center
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom, #ffd6e0, #ff8ca3)",
+        backgroundColor: "#f7f7f7",
         padding: "2rem 1rem",
       }}
     >
       <Card
-        shadow="md"
+        shadow="xs"
         radius="xl"
         p="xl"
         withBorder
-        style={{ width: "100%", maxWidth: 420, background: "white" }}
+        style={{
+          width: "100%",
+          maxWidth: 420,
+          backgroundColor: "#ffffff",
+          borderColor: "#eaeaea",
+        }}
       >
         <Stack spacing="lg">
           {/* Заголовок */}
           <Stack spacing={4} align="center">
-            <Title order={2} c="#d6336c">
-              Вход в аккаунт
+            <Title order={2} c="#1a1a1a">
+              Вход
             </Title>
-            <Text size="sm" color="dimmed">
-              Введите email и пароль для авторизации
+            <Text size="sm" c="dimmed">
+              Авторизуйтесь, чтобы продолжить
             </Text>
           </Stack>
 
-          {/* Поля */}
+          {/* Email */}
           <TextInput
             label="Email"
             type="email"
@@ -137,9 +142,10 @@ export default function Login({
             required
             radius="xl"
             size="md"
-            placeholder="you@email.com"
+            placeholder="you@example.com"
           />
 
+          {/* Пароль */}
           <PasswordInput
             label="Пароль"
             value={password}
@@ -150,24 +156,25 @@ export default function Login({
             placeholder="••••••••"
           />
 
-          {/* Кнопка входа */}
+          {/* Войти */}
           <ActionButton
             onClick={handleLogin}
             loading={loading}
             fullWidth
             variant="filled"
-            colorStyle="primary"
+            colorStyle="black"
           >
             Войти
           </ActionButton>
 
-          {/* Повторное письмо */}
+          {/* Повторная отправка */}
           {showResend && (
             <ActionButton
               onClick={handleResend}
               variant="outline"
               disabled={resending}
               fullWidth
+              colorStyle="black"
             >
               {resending ? "Отправка..." : "Отправить письмо повторно"}
             </ActionButton>
@@ -177,18 +184,17 @@ export default function Login({
           <Text
             size="sm"
             align="center"
-            color="#d6336c"
-            style={{ cursor: "pointer" }}
+            style={{ color: "#1a1a1a", cursor: "pointer" }}
             onClick={onResetRequest}
           >
             Забыли пароль?
           </Text>
 
-          {/* Кнопка регистрации — теперь отдельной кнопкой */}
+          {/* Зарегистрироваться */}
           {onRegisterRequest && (
             <ActionButton
               variant="outline"
-              colorStyle="primary"
+              colorStyle="black"
               onClick={onRegisterRequest}
               fullWidth
             >

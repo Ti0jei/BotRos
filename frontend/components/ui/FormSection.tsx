@@ -1,37 +1,34 @@
 import { ReactNode } from "react";
 import { Title, Text, Stack } from "@mantine/core";
-import { twMerge } from "tailwind-merge";
 
 interface FormSectionProps {
   title?: string;
   description?: string;
   children: ReactNode;
-  className?: string;
-  pinkTitle?: boolean; // 💡 позволяет розовый цвет заголовка
+  spacing?: number;
 }
 
 export default function FormSection({
   title,
   description,
   children,
-  className,
-  pinkTitle = false,
+  spacing = 8,
 }: FormSectionProps) {
   return (
-    <Stack spacing="xs" className={twMerge("w-full mb-4", className)}>
+    <Stack spacing={spacing} style={{ width: "100%", marginBottom: "1rem" }}>
       {title && (
         <Title
           order={3}
           size="h5"
           fw={600}
-          c={pinkTitle ? "#d6336c" : "dark"}
-          className="tracking-tight"
+          c="#111111"
+          style={{ letterSpacing: "-0.015em" }}
         >
           {title}
         </Title>
       )}
       {description && (
-        <Text size="sm" c="dimmed">
+        <Text size="sm" color="dimmed">
           {description}
         </Text>
       )}

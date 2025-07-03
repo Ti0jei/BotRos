@@ -8,11 +8,17 @@ interface CardBlockProps extends CardProps {
 export default function CardBlock({ children, ...rest }: CardBlockProps) {
   return (
     <Card
-      shadow="sm"
+      shadow="xs"
       radius="xl"
       p="lg"
       withBorder
-      className="bg-white text-black"
+      styles={{
+        root: {
+          backgroundColor: "#ffffff",
+          color: "#111111",
+          borderColor: "#eaeaea",
+        },
+      }}
       {...rest}
     >
       {children}

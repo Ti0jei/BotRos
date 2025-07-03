@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 interface ActionButtonProps extends ButtonProps {
   children: ReactNode;
   leftIcon?: ReactNode;
-  colorStyle?: "primary" | "danger" | "gradient";
+  colorStyle?: "black" | "gray" | "danger"; // минималистично
 }
 
 export default function ActionButton({
@@ -13,38 +13,38 @@ export default function ActionButton({
   radius = "xl",
   size = "md",
   variant = "light",
-  colorStyle = "primary",
+  colorStyle = "black",
   leftIcon,
   ...rest
 }: ActionButtonProps) {
   const stylesByColorStyle = {
-    primary: {
-      color: "#d6336c",
-      hover: "#ffe3ec",
+    black: {
+      color: "#000000",
+      text: "#ffffff",
+      hover: "#222222",
+    },
+    gray: {
+      color: "#f2f2f2",
+      text: "#111111",
+      hover: "#e6e6e6",
     },
     danger: {
       color: "#c92a2a",
-      hover: "#ffe3e3",
-    },
-    gradient: {
-      gradient: "linear-gradient(to right, #ff8ca3, #ff4d6d)",
-      hover: "linear-gradient(to right, #ff6b91, #ff1f4c)",
-      color: "white",
+      text: "#ffffff",
+      hover: "#a51111",
     },
   };
 
   const current = stylesByColorStyle[colorStyle];
 
   const getBackground = () => {
-    if (colorStyle === "gradient") return current.gradient;
     if (variant === "filled") return current.color;
-    if (variant === "light") return "white";
+    if (variant === "light") return "#ffffff";
     return "transparent";
   };
 
   const getTextColor = () => {
-    if (colorStyle === "gradient") return current.color;
-    if (variant === "filled") return "white";
+    if (variant === "filled") return current.text;
     return current.color;
   };
 
@@ -69,9 +69,9 @@ export default function ActionButton({
           fontWeight: 500,
           "&:hover": {
             background:
-              colorStyle === "gradient"
+              variant === "outline" || variant === "light"
                 ? current.hover
-                : variant === "outline" || variant === "light"
+                : variant === "filled"
                 ? current.hover
                 : undefined,
           },
