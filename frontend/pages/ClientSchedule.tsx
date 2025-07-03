@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { IconArrowBack, IconPackage, IconCheck, IconX } from "@tabler/icons-react";
+import {
+  IconArrowBack,
+  IconPackage,
+  IconCheck,
+  IconX,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import {
   Card,
@@ -93,19 +98,31 @@ export default function ClientSchedule({
         padding: "2rem 1rem",
       }}
     >
-      <Card withBorder radius="xl" p="xl" shadow="xs" style={{ width: "100%", maxWidth: 420 }}>
+      <Card
+        withBorder
+        radius="xl"
+        p="xl"
+        shadow="xs"
+        style={{ width: "100%", maxWidth: 420 }}
+      >
         <Stack spacing="lg">
           <Group position="apart">
-            <Title order={3} c="#1a1a1a">
-              Мои тренировки
-            </Title>
+            <div>
+              <Title order={3} c="#1a1a1a">
+                🏋️‍♂️ Мои тренировки
+              </Title>
+              <Text size="sm" c="dimmed">
+                Расписание ваших занятий
+              </Text>
+            </div>
+
             <ActionButton
               size="xs"
               variant="light"
               leftIcon={<IconPackage size={16} />}
               onClick={onOpenBlock}
             >
-              Блок
+              Абонемент
             </ActionButton>
           </Group>
 
@@ -114,9 +131,14 @@ export default function ClientSchedule({
               <Loader size="sm" />
             </Center>
           ) : trainings.length === 0 ? (
-            <Text size="sm" align="center" c="dimmed">
-              Нет назначенных тренировок
-            </Text>
+            <Stack spacing="xs" align="center">
+              <Text size="sm" align="center" c="dimmed">
+                У вас пока нет запланированных тренировок
+              </Text>
+              <Text size="xs" align="center" c="dimmed">
+                Если у вас есть абонемент — тренер добавит тренировки скоро.
+              </Text>
+            </Stack>
           ) : (
             <Stack spacing="sm">
               {trainings.map((t) => (
