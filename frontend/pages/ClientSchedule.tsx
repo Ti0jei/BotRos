@@ -106,7 +106,7 @@ export default function ClientSchedule({
         style={{ width: "100%", maxWidth: 420 }}
       >
         <Stack spacing="lg">
-          <Group position="apart">
+          <Group position="apart" align="flex-start">
             <div>
               <Title order={3} c="#1a1a1a">
                 🏋️‍♂️ Мои тренировки
@@ -118,9 +118,11 @@ export default function ClientSchedule({
 
             <ActionButton
               size="xs"
-              variant="light"
-              leftIcon={<IconPackage size={16} />}
+              variant="outline"
+              colorStyle="black"
+              leftIcon={<IconPackage size={14} />}
               onClick={onOpenBlock}
+              style={{ marginTop: 4, marginRight: -4 }} // слегка левее
             >
               Абонемент
             </ActionButton>
