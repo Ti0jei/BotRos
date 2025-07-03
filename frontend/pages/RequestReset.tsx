@@ -102,15 +102,26 @@ export default function RequestReset({ onBack }: Props) {
             />
           )}
 
+          {/* Кнопка отправки / назад */}
           <ActionButton
             onClick={sent ? onBack : handleSubmit}
             disabled={!sent && (!email || loading)}
             fullWidth
-            variant={sent ? "outline" : "filled"}
+            variant="filled"
             colorStyle="black"
             leftIcon={!sent ? <IconMail size={16} /> : undefined}
           >
-            {sent ? "Назад" : loading ? "Отправка..." : "Сбросить пароль"}
+            {sent ? "Готово" : loading ? "Отправка..." : "Сбросить пароль"}
+          </ActionButton>
+
+          {/* Всегда доступная кнопка "Назад" */}
+          <ActionButton
+            onClick={onBack}
+            fullWidth
+            variant="outline"
+            colorStyle="black"
+          >
+            Назад
           </ActionButton>
         </Stack>
       </Card>

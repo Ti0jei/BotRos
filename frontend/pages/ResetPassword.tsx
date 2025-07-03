@@ -77,6 +77,7 @@ export default function ResetPassword({ onBack }: Props) {
         }}
       >
         <Stack spacing="lg">
+          {/* Заголовок */}
           <Stack spacing={4} align="center">
             <Title order={2} c="#1a1a1a">
               Новый пароль
@@ -88,6 +89,7 @@ export default function ResetPassword({ onBack }: Props) {
             )}
           </Stack>
 
+          {/* Состояние после отправки */}
           {done ? (
             <Text size="sm" align="center" c="dimmed">
               Пароль успешно обновлён. Теперь вы можете войти с новым паролем.
@@ -103,27 +105,27 @@ export default function ResetPassword({ onBack }: Props) {
             />
           )}
 
-          {/* Кнопка действия */}
+          {/* Основная кнопка */}
           <ActionButton
             onClick={done ? onBack : handleSubmit}
             fullWidth
-            variant={done ? "outline" : "filled"}
+            variant="filled"
             colorStyle="black"
             disabled={!done && (loading || !password)}
           >
-            {done ? "Назад" : loading ? "Сохранение..." : "Сохранить пароль"}
+            {done ? "Готово" : loading ? "Сохранение..." : "Сохранить пароль"}
           </ActionButton>
 
-          {/* Кнопка Назад (если пользователь передумал сбрасывать) */}
+          {/* Кнопка Назад (только до завершения) */}
           {!done && (
-            <Text
-              align="center"
-              size="sm"
-              style={{ color: "#1a1a1a", cursor: "pointer" }}
+            <ActionButton
               onClick={onBack}
+              fullWidth
+              variant="outline"
+              colorStyle="black"
             >
-              Назад ко входу
-            </Text>
+              Назад
+            </ActionButton>
           )}
         </Stack>
       </Card>
