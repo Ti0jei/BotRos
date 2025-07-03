@@ -5,8 +5,6 @@ import {
   Title,
   Stack,
   Card,
-  Group,
-  Center,
 } from "@mantine/core";
 import { IconMail } from "@tabler/icons-react";
 import ActionButton from "@/components/ui/ActionButton";
@@ -55,30 +53,27 @@ export default function RequestReset({ onBack }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-pink-light flex items-center justify-center px-4">
-      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-        <Stack spacing="lg">
-          <div>
-            <Title order={2} className="text-center text-pink mb-1">Сброс пароля</Title>
-            {!sent && (
-              <Text size="sm" color="dimmed" className="text-center">
-                Введите email, чтобы получить ссылку на сброс
-              </Text>
-            )}
-          </div>
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex items-center justify-center px-4 pb-24">
+        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+          <Stack spacing="lg">
+            <div>
+              <Title order={2} className="text-center mb-1" c="#d6336c">
+                Сброс пароля
+              </Title>
+              {!sent && (
+                <Text size="sm" color="dimmed" className="text-center">
+                  Введите email, чтобы получить ссылку на сброс
+                </Text>
+              )}
+            </div>
 
-          {sent ? (
-            <Stack spacing="md">
+            {sent ? (
               <Text className="text-center text-gray-600 text-sm">
                 Если такой email существует, инструкция по сбросу отправлена.
                 Проверьте свою почту.
               </Text>
-              <ActionButton fullWidth variant="outline" onClick={onBack}>
-                Назад ко входу
-              </ActionButton>
-            </Stack>
-          ) : (
-            <Stack spacing="md">
+            ) : (
               <TextInput
                 label="Email"
                 type="email"
@@ -88,25 +83,21 @@ export default function RequestReset({ onBack }: Props) {
                 radius="xl"
                 required
               />
+            )}
+          </Stack>
+        </Card>
+      </div>
 
-              <ActionButton
-                onClick={handleSubmit}
-                disabled={!email || loading}
-                fullWidth
-                leftIcon={<IconMail size={16} />}
-              >
-                {loading ? "Отправка..." : "Сбросить пароль"}
-              </ActionButton>
-
-              <Center>
-                <ActionButton variant="outline" onClick={onBack}>
-                  Назад ко входу
-                </ActionButton>
-              </Center>
-            </Stack>
-          )}
-        </Stack>
-      </Card>
-    </div>
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
+        <ActionButton
+          onClick={sent ? onBack : handleSubmit}
+          disabled={!sent && (!email || loading)}
+          fullWidth
+          leftIcon={!sent ? <IconMail size={16} /> : undefined}
+        >
+          {sent ? "Назад ко входу" : loading ? "Отправка..." : "Сбросить пароль"}
+        </ActionButton>
+      </div>
+    </>
   );
 }

@@ -12,7 +12,7 @@ export default function CardBlock({ children, ...rest }: CardBlockProps) {
       radius="xl"
       p="lg"
       withBorder
-      className="bg-pink-light"
+      className="bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] text-black"
       {...rest}
     >
       {children}

@@ -107,11 +107,11 @@ export default function Login({
 
   return (
     <>
-      <div className="min-h-screen bg-pink-light flex flex-col items-center justify-center px-4 pb-24">
+      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex flex-col items-center justify-center px-4 pb-24">
         <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
           <Stack spacing="lg">
             <div>
-              <Title order={2} className="text-center text-pink mb-1">
+              <Title order={2} className="text-center mb-1" c="#d6336c">
                 Вход в аккаунт
               </Title>
               <Text size="sm" color="dimmed" className="text-center">

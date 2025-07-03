@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { TextInput, PasswordInput, NumberInput, Text, Title, Stack, Card } from "@mantine/core";
+import {
+  TextInput,
+  PasswordInput,
+  NumberInput,
+  Text,
+  Title,
+  Stack,
+  Card,
+} from "@mantine/core";
 import ActionButton from "@/components/ui/ActionButton";
 
 export default function Register({ onRegistered }: { onRegistered: () => void }) {
@@ -76,88 +84,100 @@ export default function Register({ onRegistered }: { onRegistered: () => void })
   };
 
   return (
-    <div className="min-h-screen bg-pink-light flex items-center justify-center p-4">
-      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-        <Stack spacing="lg">
-          <div>
-            <Title order={2} className="text-center text-pink mb-1">Регистрация</Title>
-            <Text size="sm" color="dimmed" className="text-center">
-              Заполните все поля, чтобы создать аккаунт
-            </Text>
-          </div>
-
-          {error && (
-            <div className="bg-red-100 text-red-700 px-4 py-2 rounded-md text-sm">
-              {error}
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex items-center justify-center px-4 pb-24">
+        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+          <Stack spacing="lg">
+            <div>
+              <Title order={2} className="text-center mb-1" c="#d6336c">
+                Регистрация
+              </Title>
+              <Text size="sm" color="dimmed" className="text-center">
+                Заполните все поля, чтобы создать аккаунт
+              </Text>
             </div>
-          )}
 
-          <TextInput
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            disabled={success}
-            required
-            radius="xl"
-          />
+            {error && (
+              <div className="bg-red-100 text-red-700 px-4 py-2 rounded-md text-sm">
+                {error}
+              </div>
+            )}
 
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            disabled={success}
-            required
-            radius="xl"
-          />
+            <TextInput
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              disabled={success}
+              required
+              radius="xl"
+            />
 
-          <TextInput
-            label="Имя"
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-            disabled={success}
-            required
-            radius="xl"
-          />
+            <PasswordInput
+              label="Пароль"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              disabled={success}
+              required
+              radius="xl"
+            />
 
-          <TextInput
-            label="Фамилия"
-            value={lastName}
-            onChange={(e) => setLastName(e.currentTarget.value)}
-            disabled={success}
-            required
-            radius="xl"
-          />
+            <TextInput
+              label="Имя"
+              value={name}
+              onChange={(e) => setName(e.currentTarget.value)}
+              disabled={success}
+              required
+              radius="xl"
+            />
 
-          <NumberInput
-            label="Возраст"
-            value={age}
-            onChange={setAge}
-            disabled={success}
-            required
-            min={1}
-            max={120}
-            radius="xl"
-          />
+            <TextInput
+              label="Фамилия"
+              value={lastName}
+              onChange={(e) => setLastName(e.currentTarget.value)}
+              disabled={success}
+              required
+              radius="xl"
+            />
 
-          <TextInput
-            label="Инвайт-код"
-            value={inviteCode}
-            onChange={(e) => setInviteCode(e.currentTarget.value)}
-            disabled={success}
-            required
-            radius="xl"
-          />
+            <NumberInput
+              label="Возраст"
+              value={age}
+              onChange={setAge}
+              disabled={success}
+              required
+              min={1}
+              max={120}
+              radius="xl"
+            />
 
-          {!success ? (
-            <ActionButton onClick={handleSubmit} disabled={loading}>
-              {loading ? "Регистрация..." : "Зарегистрироваться"}
-            </ActionButton>
-          ) : (
-            <ActionButton onClick={handleGoToLogin}>Перейти ко входу</ActionButton>
-          )}
-        </Stack>
-      </Card>
-    </div>
+            <TextInput
+              label="Инвайт-код"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.currentTarget.value)}
+              disabled={success}
+              required
+              radius="xl"
+            />
+          </Stack>
+        </Card>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
+        {!success ? (
+          <ActionButton
+            onClick={handleSubmit}
+            disabled={loading}
+            fullWidth
+          >
+            {loading ? "Регистрация..." : "Зарегистрироваться"}
+          </ActionButton>
+        ) : (
+          <ActionButton onClick={handleGoToLogin} fullWidth>
+            Перейти ко входу
+          </ActionButton>
+        )}
+      </div>
+    </>
   );
 }

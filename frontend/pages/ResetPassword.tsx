@@ -6,7 +6,6 @@ import {
   Title,
   Stack,
   Card,
-  Center,
 } from "@mantine/core";
 import ActionButton from "@/components/ui/ActionButton";
 
@@ -57,29 +56,26 @@ export default function ResetPassword({ onBack }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-pink-light flex items-center justify-center px-4">
-      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
-        <Stack spacing="lg">
-          <div>
-            <Title order={2} className="text-center text-pink mb-1">Новый пароль</Title>
-            {!done && (
-              <Text size="sm" color="dimmed" className="text-center">
-                Введите новый пароль и сохраните
-              </Text>
-            )}
-          </div>
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-[#ffd6e0] to-[#ff8ca3] flex items-center justify-center px-4 pb-24">
+        <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+          <Stack spacing="lg">
+            <div>
+              <Title order={2} className="text-center mb-1" c="#d6336c">
+                Новый пароль
+              </Title>
+              {!done && (
+                <Text size="sm" color="dimmed" className="text-center">
+                  Введите новый пароль и сохраните
+                </Text>
+              )}
+            </div>
 
-          {done ? (
-            <Stack spacing="md">
+            {done ? (
               <Text className="text-center text-gray-600 text-sm">
-                Пароль успешно обновлён. Теперь вы можете войти.
+                Пароль успешно обновлён. Теперь вы можете войти с новым паролем.
               </Text>
-              <ActionButton fullWidth variant="outline" onClick={onBack}>
-                Назад ко входу
-              </ActionButton>
-            </Stack>
-          ) : (
-            <Stack spacing="md">
+            ) : (
               <PasswordInput
                 label="Новый пароль"
                 value={password}
@@ -88,24 +84,25 @@ export default function ResetPassword({ onBack }: Props) {
                 radius="xl"
                 required
               />
+            )}
+          </Stack>
+        </Card>
+      </div>
 
-              <ActionButton
-                onClick={handleSubmit}
-                fullWidth
-                disabled={loading || !password}
-              >
-                {loading ? "Сохранение..." : "Сохранить пароль"}
-              </ActionButton>
-
-              <Center>
-                <ActionButton fullWidth variant="outline" onClick={onBack}>
-                  Назад ко входу
-                </ActionButton>
-              </Center>
-            </Stack>
-          )}
-        </Stack>
-      </Card>
-    </div>
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 bg-white border-t border-gray-100 z-50">
+        <ActionButton
+          onClick={onBack}
+          fullWidth
+          variant={done ? "light" : "filled"}
+          disabled={!done && (loading || !password)}
+        >
+          {done
+            ? "Назад ко входу"
+            : loading
+            ? "Сохранение..."
+            : "Сохранить пароль"}
+        </ActionButton>
+      </div>
+    </>
   );
 }

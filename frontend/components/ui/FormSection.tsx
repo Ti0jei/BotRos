@@ -7,6 +7,7 @@ interface FormSectionProps {
   description?: string;
   children: ReactNode;
   className?: string;
+  pinkTitle?: boolean; // 💡 позволяет розовый цвет заголовка
 }
 
 export default function FormSection({
@@ -14,11 +15,18 @@ export default function FormSection({
   description,
   children,
   className,
+  pinkTitle = false,
 }: FormSectionProps) {
   return (
-    <Stack spacing="xs" className={twMerge("w-full", className)}>
+    <Stack spacing="xs" className={twMerge("w-full mb-4", className)}>
       {title && (
-        <Title order={3} size="h5" fw={600} c="dark">
+        <Title
+          order={3}
+          size="h5"
+          fw={600}
+          c={pinkTitle ? "#d6336c" : "dark"}
+          className="tracking-tight"
+        >
           {title}
         </Title>
       )}
