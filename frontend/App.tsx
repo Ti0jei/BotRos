@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -13,7 +14,7 @@ import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 import ClientNutrition from './pages/ClientNutrition';
 
-import { Box, Button, Center, Loader } from '@mantine/core';
+import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 
 function App() {
@@ -41,7 +42,6 @@ function App() {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // ✅ Автоопределение Telegram ID через SDK
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (tgUserId) {
       localStorage.setItem('telegramId', tgUserId.toString());
@@ -130,8 +130,7 @@ function App() {
     <Box
       sx={{
         minHeight: '100vh',
-        height: '100vh',
-        background: '#e8b3a6',
+        background: '#f7f7f7',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -141,42 +140,30 @@ function App() {
       }}
     >
       {view === 'login' && (
-        <>
-          <Login
-            onLoggedIn={(userProfile) => {
-              setProfile(userProfile);
-              setView('profile');
-            }}
-            onResetRequest={() => setView('reset-request')}
-          />
-          <Center>
-            <Button variant="subtle" mt="sm" onClick={() => setView('register')}>
-              Зарегистрироваться
-            </Button>
-          </Center>
-        </>
+        <Login
+          onLoggedIn={(userProfile) => {
+            setProfile(userProfile);
+            setView('profile');
+          }}
+          onResetRequest={() => setView('reset-request')}
+          onRegisterRequest={() => setView('register')}
+        />
       )}
 
       {view === 'register' && (
-        <>
-          <Register
-            onRegistered={() => {
-              setView('login');
-              setTimeout(() => {
-                showNotification({
-                  title: 'Регистрация завершена',
-                  message: 'Теперь подтвердите почту и войдите',
-                  color: 'green',
-                });
-              }, 100);
-            }}
-          />
-          <Center>
-            <Button variant="subtle" mt="sm" onClick={() => setView('login')}>
-              Назад ко входу
-            </Button>
-          </Center>
-        </>
+        <Register
+          onRegistered={() => {
+            setView('login');
+            setTimeout(() => {
+              showNotification({
+                title: 'Регистрация завершена',
+                message: 'Теперь подтвердите почту и войдите',
+                color: 'green',
+              });
+            }, 100);
+          }}
+          onBackToLogin={() => setView('login')}
+        />
       )}
 
       {view === 'reset-request' && (
