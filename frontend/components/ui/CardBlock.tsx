@@ -1,9 +1,21 @@
+import { Card, CardProps } from "@mantine/core";
 import { ReactNode } from "react";
 
-export default function CardBlock({ children }: { children: ReactNode }) {
+interface CardBlockProps extends CardProps {
+  children: ReactNode;
+}
+
+export default function CardBlock({ children, ...rest }: CardBlockProps) {
   return (
-    <div className="bg-[#fff0f6] rounded-2xl shadow-md p-4 w-full">
+    <Card
+      shadow="sm"
+      radius="xl"
+      p="lg"
+      withBorder
+      className="bg-pink-light"
+      {...rest}
+    >
       {children}
-    </div>
+    </Card>
   );
 }

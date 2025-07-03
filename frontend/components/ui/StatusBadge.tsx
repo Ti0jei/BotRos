@@ -1,37 +1,27 @@
-import { twMerge } from "tailwind-merge";
+import { Badge, BadgeProps } from "@mantine/core";
 
-interface StatusBadgeProps {
+interface StatusBadgeProps extends Omit<BadgeProps, "color"> {
   status: "active" | "pending" | "declined";
-  className?: string;
 }
 
-const statusMap = {
-  active: {
-    label: "Активно",
-    classes: "bg-pink text-white",
-  },
-  pending: {
-    label: "Ожидает",
-    classes: "bg-pink-light text-pink border border-pink",
-  },
-  declined: {
-    label: "Отменено",
-    classes: "bg-gray-100 text-gray-500",
-  },
-};
+export default function StatusBadge({ status, ...rest }: StatusBadgeProps) {
+  const statusMap: Record<StatusBadgeProps["status"], { label: string; color: BadgeProps["color"]; variant?: BadgeProps["variant"] }> = {
+    active: { label: "Активно", color: "pink", variant: "filled" },
+    pending: { label: "Ожидает", color: "pink", variant: "light" },
+    declined: { label: "Отменено", color: "gray", variant: "light" },
+  };
 
-export default function StatusBadge({ status, className }: StatusBadgeProps) {
-  const { label, classes } = statusMap[status];
+  const { label, color, variant } = statusMap[status];
 
   return (
-    <span
-      className={twMerge(
-        "inline-block px-2 py-1 text-xs font-semibold rounded-xl transition",
-        classes,
-        className
-      )}
+    <Badge
+      radius="xl"
+      size="sm"
+      color={color}
+      variant={variant}
+      {...rest}
     >
       {label}
-    </span>
+    </Badge>
   );
 }

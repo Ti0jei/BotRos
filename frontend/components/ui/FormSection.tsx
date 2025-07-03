@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Title, Text, Stack } from "@mantine/core";
 import { twMerge } from "tailwind-merge";
 
 interface FormSectionProps {
@@ -15,14 +16,18 @@ export default function FormSection({
   className,
 }: FormSectionProps) {
   return (
-    <div className={twMerge("space-y-3 w-full", className)}>
+    <Stack spacing="xs" className={twMerge("w-full", className)}>
       {title && (
-        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+        <Title order={3} size="h5" fw={600} c="dark">
+          {title}
+        </Title>
       )}
       {description && (
-        <p className="text-sm text-gray-500">{description}</p>
+        <Text size="sm" c="dimmed">
+          {description}
+        </Text>
       )}
-      <div className="space-y-2">{children}</div>
-    </div>
+      <Stack spacing="sm">{children}</Stack>
+    </Stack>
   );
 }
