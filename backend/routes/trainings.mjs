@@ -33,9 +33,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // Назначить тренировку
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, hour, isSinglePaid = false } = req.body;
-  if (req.user.role !== 'ADMIN') {
-    return res.status(403).json({ error: 'Only admin can assign trainings' });
-  }
+  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can assign trainings' });
 
   const training = await prisma.training.create({
     data: {
@@ -43,7 +41,6 @@ router.post('/', authMiddleware, async (req, res) => {
       date: new Date(`${date}T00:00:00`),
       hour: parseInt(hour),
       isSinglePaid,
-      status: 'PENDING', // ✅ ЯВНО добавлен статус
     },
   });
 
@@ -146,7 +143,7 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
       where: { userId: training.userId, active: true },
     });
 
-    const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
+    const dateOnly = (d) => d.toISOString().slice(0, 10);
 
     if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
       const currentUsed = activeBlock.used || 0;
