@@ -1,16 +1,32 @@
 import { useState, useEffect } from "react";
-import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconAlertCircle,
+} from "@tabler/icons-react";
+import {
+  Card,
+  Title,
+  Text,
+  TextInput,
+  PasswordInput,
+  Stack,
+  Group,
+  Center,
+} from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import ActionButton from "@/components/ui/ActionButton";
-import { Card, Title, Text, TextInput, PasswordInput, Stack, Group } from "@mantine/core";
+
+interface Props {
+  onLoggedIn: (profile: any) => void;
+  onResetRequest: () => void;
+  onRegisterRequest?: () => void; // ✅ поддержка нижней кнопки регистрации
+}
 
 export default function Login({
   onLoggedIn,
   onResetRequest,
-}: {
-  onLoggedIn: (profile: any) => void;
-  onResetRequest: () => void;
-}) {
+  onRegisterRequest,
+}: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,11 +107,13 @@ export default function Login({
   };
 
   return (
-    <div className="min-h-screen bg-pink-light flex items-center justify-center px-4">
+    <div className="min-h-screen bg-pink-light flex flex-col items-center justify-center px-4 pb-6">
       <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
         <Stack spacing="lg">
           <div>
-            <Title order={2} className="text-center text-pink mb-1">Вход в аккаунт</Title>
+            <Title order={2} className="text-center text-pink mb-1">
+              Вход в аккаунт
+            </Title>
             <Text size="sm" color="dimmed" className="text-center">
               Введите email и пароль для авторизации
             </Text>
@@ -137,7 +155,7 @@ export default function Login({
             </ActionButton>
           )}
 
-          <Group position="right" mt="sm">
+          <Group position="right">
             <button
               onClick={onResetRequest}
               className="text-sm text-pink hover:underline transition"
@@ -147,6 +165,18 @@ export default function Login({
           </Group>
         </Stack>
       </Card>
+
+      {onRegisterRequest && (
+        <Center className="mt-6 w-full max-w-md">
+          <ActionButton
+            variant="light"
+            onClick={onRegisterRequest}
+            fullWidth
+          >
+            Зарегистрироваться
+          </ActionButton>
+        </Center>
+      )}
     </div>
   );
 }
