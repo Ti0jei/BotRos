@@ -40,23 +40,29 @@ router.post('/request', async (req, res) => {
       to: email,
       subject: '🔐 Восстановление доступа к Krissfit',
       html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 24px; background-color: #ffffff; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);">
-          <h2 style="margin-bottom: 16px; color: #222;">Сброс пароля</h2>
-          <p style="font-size: 16px; color: #333;">
-            Вы запросили сброс пароля на Krissfit.
-          </p>
-          <p>
-            <a href="${resetUrl}"
-              style="display: inline-block; margin-top: 16px; background-color: #f06595; color: white; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none;">
-              Сбросить пароль
-            </a>
-          </p>
-          <p style="margin-top: 24px; font-size: 14px; color: #777;">
-            Если вы не запрашивали сброс — просто проигнорируйте это письмо.
+        <div style="font-family: Inter, sans-serif; background-color: #f7f7f7; padding: 40px;">
+          <div style="max-width: 420px; margin: auto; background-color: white; border-radius: 16px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h2 style="margin-bottom: 16px; color: #1a1a1a; font-size: 20px;">Сброс пароля</h2>
+            <p style="font-size: 15px; color: #1a1a1a;">Вы запросили сброс пароля в Krissfit.</p>
+
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${resetUrl}" 
+                style="display: inline-block; background-color: #f06595; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600;">
+                Сбросить пароль
+              </a>
+            </div>
+
+            <p style="font-size: 14px; color: #777;">
+              Если это были не вы — просто проигнорируйте это письмо.
+            </p>
+          </div>
+
+          <p style="text-align: center; margin-top: 24px; font-size: 13px; color: #aaa;">
+            @Krissfit_bot
           </p>
         </div>
       `,
-      text: `Вы запросили сброс пароля в Krissfit. Перейдите по ссылке:\n${resetUrl}\n\nЕсли вы не запрашивали — просто проигнорируйте это письмо.`,
+      text: `Вы запросили сброс пароля в Krissfit.\nСбросьте пароль по ссылке:\n${resetUrl}\n\nЕсли вы не запрашивали — просто проигнорируйте это письмо.`,
       reply_to: 'support@krissfit.ru',
     });
 

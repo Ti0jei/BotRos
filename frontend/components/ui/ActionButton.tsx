@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 interface ActionButtonProps extends ButtonProps {
   children: ReactNode;
   leftIcon?: ReactNode;
-  colorStyle?: "black" | "gray" | "danger"; // минималистично
+  colorStyle?: "black" | "gray" | "danger";
 }
 
 export default function ActionButton({
@@ -35,7 +35,8 @@ export default function ActionButton({
     },
   };
 
-  const current = stylesByColorStyle[colorStyle];
+  // ✅ Защита от некорректного colorStyle
+  const current = stylesByColorStyle[colorStyle] ?? stylesByColorStyle.black;
 
   const getBackground = () => {
     if (variant === "filled") return current.color;
