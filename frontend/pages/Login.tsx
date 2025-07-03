@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
-import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
+import { Card, Title, Text, TextInput, PasswordInput, Stack, Group } from "@mantine/core";
 
 export default function Login({
   onLoggedIn,
@@ -91,32 +91,36 @@ export default function Login({
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto p-4">
-      <FormSection title="Вход в систему" description="Введите данные для авторизации">
-        <div className="space-y-4">
+    <div className="min-h-screen bg-pink-light flex items-center justify-center px-4">
+      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+        <Stack spacing="lg">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink"
-              placeholder="you@email.com"
-            />
+            <Title order={2} className="text-center text-pink mb-1">Вход в аккаунт</Title>
+            <Text size="sm" color="dimmed" className="text-center">
+              Введите email и пароль для авторизации
+            </Text>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Пароль</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink"
-              placeholder="••••••••"
-            />
-          </div>
+          <TextInput
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+            required
+            radius="xl"
+            size="md"
+            placeholder="you@email.com"
+          />
+
+          <PasswordInput
+            label="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            required
+            radius="xl"
+            size="md"
+            placeholder="••••••••"
+          />
 
           <ActionButton onClick={handleLogin} disabled={loading} fullWidth>
             {loading ? "Вход..." : "Войти"}
@@ -133,16 +137,16 @@ export default function Login({
             </ActionButton>
           )}
 
-          <div className="flex justify-end">
+          <Group position="right" mt="sm">
             <button
               onClick={onResetRequest}
-              className="text-sm text-pink hover:underline"
+              className="text-sm text-pink hover:underline transition"
             >
               Забыли пароль?
             </button>
-          </div>
-        </div>
-      </FormSection>
+          </Group>
+        </Stack>
+      </Card>
     </div>
   );
 }

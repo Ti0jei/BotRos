@@ -1,14 +1,22 @@
-import { useState } from 'react';
-import { IconMail } from '@tabler/icons-react';
-import ActionButton from '@/components/ui/ActionButton';
-import FormSection from '@/components/ui/FormSection';
+import { useState } from "react";
+import {
+  TextInput,
+  Text,
+  Title,
+  Stack,
+  Card,
+  Group,
+  Center,
+} from "@mantine/core";
+import { IconMail } from "@tabler/icons-react";
+import ActionButton from "@/components/ui/ActionButton";
 
 interface Props {
   onBack: () => void;
 }
 
 export default function RequestReset({ onBack }: Props) {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -20,63 +28,66 @@ export default function RequestReset({ onBack }: Props) {
 
   const handleSubmit = async () => {
     if (!email) {
-      notify('Email не указан', 'Введите email для сброса пароля');
+      notify("Email не указан", "Введите email для сброса пароля");
       return;
     }
 
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/reset-password/request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
       if (res.ok) {
         setSent(true);
-        notify('Письмо отправлено', 'Если email существует, инструкция отправлена');
+        notify("Письмо отправлено", "Если email существует, инструкция отправлена");
       } else {
         const err = await res.json();
-        notify('Ошибка', err.error || 'Не удалось отправить письмо');
+        notify("Ошибка", err.error || "Не удалось отправить письмо");
       }
     } catch {
-      notify('Ошибка сети', 'Проверьте подключение к интернету');
+      notify("Ошибка сети", "Проверьте подключение к интернету");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-pink-light p-4">
-      <div className="bg-white rounded-3xl shadow-md w-full max-w-sm p-6">
-        <FormSection
-          title="Сброс пароля"
-          description={!sent ? 'Введите email, на который придёт письмо' : undefined}
-        >
+    <div className="min-h-screen bg-pink-light flex items-center justify-center px-4">
+      <Card shadow="md" radius="xl" p="lg" withBorder className="w-full max-w-md bg-white">
+        <Stack spacing="lg">
+          <div>
+            <Title order={2} className="text-center text-pink mb-1">Сброс пароля</Title>
+            {!sent && (
+              <Text size="sm" color="dimmed" className="text-center">
+                Введите email, чтобы получить ссылку на сброс
+              </Text>
+            )}
+          </div>
+
           {sent ? (
-            <div className="text-center space-y-4 text-sm text-gray-600">
-              <p>
-                Если такой email существует, письмо с инструкцией отправлено.
-                Проверьте почту.
-              </p>
+            <Stack spacing="md">
+              <Text className="text-center text-gray-600 text-sm">
+                Если такой email существует, инструкция по сбросу отправлена.
+                Проверьте свою почту.
+              </Text>
               <ActionButton fullWidth variant="outline" onClick={onBack}>
                 Назад ко входу
               </ActionButton>
-            </div>
+            </Stack>
           ) : (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink"
-                  placeholder="Введите ваш email"
-                />
-              </div>
+            <Stack spacing="md">
+              <TextInput
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.currentTarget.value)}
+                placeholder="Введите ваш email"
+                radius="xl"
+                required
+              />
 
               <ActionButton
                 onClick={handleSubmit}
@@ -84,18 +95,18 @@ export default function RequestReset({ onBack }: Props) {
                 fullWidth
                 leftIcon={<IconMail size={16} />}
               >
-                {loading ? 'Отправка...' : 'Сбросить пароль'}
+                {loading ? "Отправка..." : "Сбросить пароль"}
               </ActionButton>
 
-              <div className="text-center">
-                <ActionButton variant="outline" fullWidth onClick={onBack}>
+              <Center>
+                <ActionButton variant="outline" onClick={onBack}>
                   Назад ко входу
                 </ActionButton>
-              </div>
-            </div>
+              </Center>
+            </Stack>
           )}
-        </FormSection>
-      </div>
+        </Stack>
+      </Card>
     </div>
   );
 }
