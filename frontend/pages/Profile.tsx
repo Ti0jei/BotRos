@@ -21,6 +21,7 @@ import {
   Divider,
   TextInput,
   NumberInput,
+  Image,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 
@@ -195,7 +196,10 @@ export default function Profile({
         style={{
           minHeight: "100vh",
           backgroundColor: "#f7f7f7",
-          padding: "2rem 1rem",
+          paddingTop: "1.5rem",
+          paddingBottom: "2rem",
+          paddingLeft: "1rem",
+          paddingRight: "1rem",
         }}
       >
         <Card
@@ -288,6 +292,21 @@ export default function Profile({
                   Панель тренера
                 </ActionButton>
               )}
+            </Stack>
+
+            {/* 🔻 Логотип Krissfit */}
+            <Stack spacing={4} align="center" mt="sm" pt="xs">
+              <Image
+                src="/logo-krissfit.png"
+                alt="@Krissfit"
+                width={50}
+                height={50}
+                fit="contain"
+                style={{ opacity: 0.6 }}
+              />
+              <Text size="xs" c="dimmed">
+                @Krissfit
+              </Text>
             </Stack>
           </Stack>
         </Card>
