@@ -21,8 +21,9 @@ import {
   Divider,
   TextInput,
   NumberInput,
-  showNotification,
 } from "@mantine/core";
+
+import { showNotification } from "@mantine/notifications";
 
 import ClientSchedule from "./ClientSchedule";
 import ClientNutrition from "./ClientNutrition";
