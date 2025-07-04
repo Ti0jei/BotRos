@@ -3,6 +3,9 @@ import {
   IconBellRinging,
   IconBellOff,
   IconLogout,
+  IconMenu2,
+  IconPencil,
+  IconRepeat,
 } from "@tabler/icons-react";
 import {
   Card,
@@ -13,6 +16,12 @@ import {
   Loader,
   Group,
   ActionIcon,
+  Drawer,
+  Button,
+  Divider,
+  TextInput,
+  NumberInput,
+  showNotification,
 } from "@mantine/core";
 
 import ClientSchedule from "./ClientSchedule";
@@ -42,6 +51,12 @@ export default function Profile({
   const [loading, setLoading] = useState(true);
   const [section, setSection] = useState<"main" | "trainings" | "nutrition">("main");
   const [showBlock, setShowBlock] = useState(false);
+  const [drawerOpened, setDrawerOpened] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editAge, setEditAge] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -103,6 +118,39 @@ export default function Profile({
     }
   };
 
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API}/api/profile`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ name: editName, age: editAge }),
+      });
+
+      if (!res.ok) throw new Error("Ошибка");
+
+      showNotification({
+        title: "Профиль обновлён",
+        message: "",
+        color: "green",
+      });
+
+      setUser((prev) =>
+        prev ? { ...prev, name: editName, age: editAge } : prev
+      );
+      setEditMode(false);
+      setDrawerOpened(false);
+    } catch {
+      showNotification({
+        title: "Не удалось сохранить",
+        message: "Попробуйте позже",
+        color: "red",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <Center h="100vh">
@@ -142,104 +190,189 @@ export default function Profile({
   }
 
   return (
-    <Center
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f7f7",
-        padding: "2rem 1rem",
-      }}
-    >
-      <Card
-        withBorder
-        radius="xl"
-        p="xl"
-        shadow="xs"
-        style={{ width: "100%", maxWidth: 420 }}
+    <>
+      <Center
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#f7f7f7",
+          padding: "2rem 1rem",
+        }}
       >
-        <Stack spacing="lg">
-          <Group position="apart">
-            <div>
-              <Title order={3} c="#1a1a1a">
-                Привет, {user.name} 👋
-              </Title>
-              <Text size="sm" c="dimmed">
-                Вы вошли как {user.email}
-              </Text>
-            </div>
+        <Card
+          withBorder
+          radius="xl"
+          p="xl"
+          shadow="xs"
+          style={{ width: "100%", maxWidth: 420 }}
+        >
+          <Stack spacing="lg">
+            <Group position="apart">
+              <div>
+                <Title order={3} c="#1a1a1a">
+                  Привет, {user.name} 👋
+                </Title>
+                <Text size="sm" c="dimmed">
+                  Вы вошли как {user.email}
+                </Text>
+              </div>
 
-            <ActionIcon
-              variant="light"
-              size="lg"
-              onClick={toggleNotifications}
-              title={
-                user.notificationsMuted
-                  ? "Оповещения выключены"
-                  : "Оповещения включены"
-              }
-              style={{ backgroundColor: user.notificationsMuted ? "#f1f1f1" : "#1a1a1a", color: "#fff" }}
-            >
-              {user.notificationsMuted ? (
-                <IconBellOff size={20} />
-              ) : (
-                <IconBellRinging size={20} />
-              )}
-            </ActionIcon>
-          </Group>
+              <Group spacing="xs">
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  onClick={toggleNotifications}
+                  title={
+                    user.notificationsMuted
+                      ? "Оповещения выключены"
+                      : "Оповещения включены"
+                  }
+                  style={{
+                    backgroundColor: user.notificationsMuted
+                      ? "#f1f1f1"
+                      : "#1a1a1a",
+                    color: "#fff",
+                  }}
+                >
+                  {user.notificationsMuted ? (
+                    <IconBellOff size={20} />
+                  ) : (
+                    <IconBellRinging size={20} />
+                  )}
+                </ActionIcon>
 
-          <Stack spacing="sm">
-            <ActionButton
-              fullWidth
-              variant="filled"
-              colorStyle="black"
-              onClick={() => setSection("trainings")}
-            >
-              Мои тренировки
-            </ActionButton>
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  onClick={() => setDrawerOpened(true)}
+                  title="Меню"
+                  style={{ backgroundColor: "#f1f1f1", color: "#1a1a1a" }}
+                >
+                  <IconMenu2 size={20} />
+                </ActionIcon>
+              </Group>
+            </Group>
 
-            <ActionButton
-              fullWidth
-              variant="filled"
-              colorStyle="black"
-              onClick={() => setSection("nutrition")}
-            >
-              Моё питание
-            </ActionButton>
-
-            <ActionButton fullWidth variant="outline" disabled>
-              Замеры (скоро)
-            </ActionButton>
-
-            <ActionButton fullWidth variant="outline" disabled>
-              Фото (скоро)
-            </ActionButton>
-
-            <ActionButton fullWidth variant="outline" disabled>
-              Материалы (скоро)
-            </ActionButton>
-
-            {user.role === "ADMIN" && (
+            <Stack spacing="sm">
               <ActionButton
                 fullWidth
-                variant="outline"
+                variant="filled"
                 colorStyle="black"
-                onClick={onOpenAdmin}
+                onClick={() => setSection("trainings")}
               >
-                Панель тренера
+                Мои тренировки
               </ActionButton>
-            )}
-          </Stack>
 
-          <ActionButton
-            fullWidth
-            variant="outline"
-            colorStyle="black"
-            onClick={handleLogout}
-            leftIcon={<IconLogout size={18} />}
-          >
-            Выйти
-          </ActionButton>
+              <ActionButton
+                fullWidth
+                variant="filled"
+                colorStyle="black"
+                onClick={() => setSection("nutrition")}
+              >
+                Моё питание
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Замеры (скоро)
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Фото (скоро)
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Материалы (скоро)
+              </ActionButton>
+
+              {user.role === "ADMIN" && (
+                <ActionButton
+                  fullWidth
+                  variant="outline"
+                  colorStyle="black"
+                  onClick={onOpenAdmin}
+                >
+                  Панель тренера
+                </ActionButton>
+              )}
+            </Stack>
+          </Stack>
+        </Card>
+      </Center>
+
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => {
+          setDrawerOpened(false);
+          setEditMode(false);
+        }}
+        title={editMode ? "Изменить профиль" : "Меню"}
+        padding="md"
+        position="right"
+        size="xs"
+        radius="md"
+      >
+        <Stack spacing="md">
+          {editMode ? (
+            <>
+              <TextInput
+                label="Имя"
+                value={editName}
+                onChange={(e) => setEditName(e.currentTarget.value)}
+                required
+              />
+              <NumberInput
+                label="Возраст"
+                value={editAge}
+                onChange={(val) => setEditAge(typeof val === "number" ? val : 0)}
+              />
+              <Group position="right" mt="sm">
+                <Button
+                  variant="default"
+                  onClick={() => setEditMode(false)}
+                >
+                  Отмена
+                </Button>
+                <Button
+                  variant="outline"
+                  color="dark"
+                  loading={saving}
+                  onClick={handleSaveProfile}
+                >
+                  Сохранить
+                </Button>
+              </Group>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="light"
+                color="dark"
+                leftIcon={<IconRepeat size={16} />}
+                onClick={handleLogout}
+              >
+                Сменить профиль
+              </Button>
+
+              <Button
+                variant="light"
+                color="dark"
+                leftIcon={<IconPencil size={16} />}
+                onClick={() => {
+                  setEditName(user.name);
+                  setEditAge(user.age);
+                  setEditMode(true);
+                }}
+              >
+                Изменить профиль
+              </Button>
+
+              <Divider />
+              <Text size="sm" c="dimmed">
+                ➕ Скоро появятся новые опции
+              </Text>
+            </>
+          )}
         </Stack>
-      </Card>
-    </Center>
+      </Drawer>
+    </>
   );
 }
