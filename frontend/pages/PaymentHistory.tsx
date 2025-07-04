@@ -12,7 +12,7 @@ import {
   Divider,
   Box,
 } from '@mantine/core';
-import BackButtonFixed from '../AdminSchedule/BackButtonFixed';
+import BackButtonFixed from './AdminSchedule/BackButtonFixed';
 
 interface Props {
   userId: string;
