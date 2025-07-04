@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react';
-import {
-  Button,
-  Container,
-  Title,
-  Paper,
-  Text,
-  Group,
-  Badge,
-  Loader,
-  Collapse,
-  Center,
-  Stack,
-  Box,
-  Divider,
-} from '@mantine/core';
-import dayjs from 'dayjs';
+import { useEffect, useState } from "react";
 import {
   IconAlarm,
   IconClock,
   IconChevronDown,
   IconChevronUp,
   IconLogout,
-} from '@tabler/icons-react';
-import { showNotification } from '@mantine/notifications';
-import { getToken } from '../utils/auth';
-import InviteCodeViewer from '../components/InviteCodeViewer';
+  IconUser,
+  IconPlus,
+} from "@tabler/icons-react";
+import {
+  Box,
+  Button,
+  Card,
+  Center,
+  Collapse,
+  Divider,
+  Group,
+  Loader,
+  Stack,
+  Text,
+  Title,
+  Badge,
+} from "@mantine/core";
+import dayjs from "dayjs";
+import InviteCodeViewer from "@/components/InviteCodeViewer";
+import { getToken } from "@/utils/auth";
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -36,7 +36,7 @@ interface CoachProfileProps {
 interface Training {
   id: string;
   hour: number;
-  status: 'PENDING' | 'CONFIRMED' | 'DECLINED';
+  status: "PENDING" | "CONFIRMED" | "DECLINED";
   user: {
     id: string;
     name: string;
@@ -61,34 +61,29 @@ export default function CoachProfile({
   useEffect(() => {
     const fetchTrainings = async () => {
       try {
-        setLoading(true);
-        const today = dayjs().format('YYYY-MM-DD');
+        const today = dayjs().format("YYYY-MM-DD");
         const res = await fetch(`${API}/api/trainings?date=${today}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!res.ok) throw new Error('Ошибка загрузки тренировок');
-
-        const data: Training[] = await res.json();
+        const data = await res.json();
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
         const filtered = data
-          .filter((t) => {
-            const timeMin = t.hour * 60;
-            return (t.status === 'PENDING' || t.status === 'CONFIRMED') && timeMin > currentMinutes;
-          })
+          .filter(
+            (t: Training) =>
+              (t.status === "PENDING" || t.status === "CONFIRMED") &&
+              t.hour * 60 > currentMinutes
+          )
           .sort((a, b) => a.hour - b.hour);
 
-        const nextHour = filtered.length > 0 ? filtered[0].hour : null;
-        setUpcomingTrainings(nextHour !== null ? filtered.filter((t) => t.hour === nextHour) : []);
+        const nextHour = filtered[0]?.hour;
+        setUpcomingTrainings(
+          nextHour !== undefined
+            ? filtered.filter((t) => t.hour === nextHour)
+            : []
+        );
       } catch (err) {
-        console.error('Ошибка при получении тренировок:', err);
-        showNotification({
-          title: 'Ошибка',
-          message: 'Не удалось загрузить ближайшие тренировки',
-          color: 'red',
-        });
+        console.error("Ошибка загрузки тренировок:", err);
       } finally {
         setLoading(false);
       }
@@ -98,171 +93,156 @@ export default function CoachProfile({
   }, []);
 
   const sendReminder = async (trainingId: string) => {
-    try {
-      const res = await fetch(`${API}/api/notifications/remind/${trainingId}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    const res = await fetch(`${API}/api/notifications/remind/${trainingId}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      if (!res.ok) throw new Error();
-
-      showNotification({
-        title: 'Напоминание отправлено',
-        message: 'Клиенту отправлено уведомление',
-        color: 'green',
-      });
-    } catch {
-      showNotification({
-        title: 'Ошибка',
-        message: 'Не удалось отправить напоминание',
-        color: 'red',
-      });
+    if (!res.ok) {
+      alert("Не удалось отправить напоминание");
+    } else {
+      alert("Напоминание отправлено");
     }
   };
 
-  const pinkButtonStyle = {
-    root: {
-      color: '#d6336c',
-      border: '1px solid #d6336c',
-      borderRadius: 8,
-      fontWeight: 500,
-      backgroundColor: 'transparent',
-      '&:hover': { backgroundColor: '#ffe3ed' },
-    },
-  };
+  const renderTrainingCard = (t: Training) => (
+    <Card key={t.id} withBorder radius="md" p="md" shadow="xs">
+      <Stack spacing="xs">
+        <Group position="apart">
+          <Text size="sm" fw={500}>
+            {t.hour}:00 — {t.user.name} {t.user.lastName ?? ""}
+            {t.user.internalTag && (
+              <Text span c="dimmed">
+                {" "}
+                ({t.user.internalTag})
+              </Text>
+            )}
+          </Text>
+          <Badge
+            size="sm"
+            color={t.status === "CONFIRMED" ? "green" : "orange"}
+            variant="light"
+          >
+            {t.status === "CONFIRMED" ? "Подтверждено" : "Ожидание"}
+          </Badge>
+        </Group>
+        {t.status === "PENDING" && (
+          <Button
+            variant="outline"
+            size="xs"
+            radius="xl"
+            onClick={() => sendReminder(t.id)}
+          >
+            Напомнить
+          </Button>
+        )}
+      </Stack>
+    </Card>
+  );
 
   return (
-    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
-      <Container size="xs" py="md">
-        <Paper
-          p="md"
-          radius="lg"
-          shadow="md"
-          withBorder
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.7)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
-          }}
-        >
-          <Stack spacing="sm">
-            <Title order={3} ta="center">
-              Привет, {profile.name} 👋
-            </Title>
-
-            <Button fullWidth onClick={onOpenClients} styles={pinkButtonStyle}>
-              Клиенты
-            </Button>
-
-            <Button fullWidth onClick={onOpenSchedule} styles={pinkButtonStyle}>
-              Назначить тренировку
-            </Button>
-
-            <Button fullWidth disabled variant="light" color="gray">
-              Питание клиентов (скоро)
-            </Button>
-
-            <Button fullWidth disabled variant="light" color="gray">
-              Материалы (скоро)
-            </Button>
+    <Center
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f7f7",
+        padding: "2rem 1rem",
+      }}
+    >
+      <Card
+        withBorder
+        radius="xl"
+        p="xl"
+        shadow="xs"
+        style={{ width: "100%", maxWidth: 420 }}
+      >
+        <Stack spacing="lg">
+          <Stack spacing={4}>
+            <Title order={3}>👤 {profile.name}</Title>
+            <Text size="sm" c="dimmed">
+              Профиль администратора
+            </Text>
           </Stack>
-        </Paper>
 
-        <Divider my="lg" />
-
-        {loading ? (
-          <Center mt="lg">
-            <Loader size="sm" />
-          </Center>
-        ) : upcomingTrainings.length > 0 ? (
-          <Paper mt="sm" p="md" radius="md" shadow="xs" withBorder>
-            <Group mb="xs">
-              <IconAlarm size={18} />
-              <Text fw={600}>Ближайшие тренировки сегодня</Text>
-            </Group>
-
-            <Stack spacing="sm">
-              {upcomingTrainings.map((t) => (
-                <Paper key={t.id} p="sm" radius="md" withBorder>
-                  <Group position="apart">
-                    <Group spacing="xs">
-                      <IconClock size={16} />
-                      <Text size="sm">
-                        {t.hour}:00 — {t.user.name} {t.user.lastName ?? ''}
-                        {t.user.internalTag && (
-                          <Text span color="dimmed"> ({t.user.internalTag})</Text>
-                        )}
-                      </Text>
-                    </Group>
-                    <Group spacing="xs">
-                      <Badge
-                        color={t.status === 'CONFIRMED' ? 'green' : 'orange'}
-                        size="sm"
-                      >
-                        {t.status === 'CONFIRMED' ? 'Подтверждено' : 'Ожидается'}
-                      </Badge>
-                      {t.status === 'PENDING' && (
-                        <Button
-                          size="xs"
-                          styles={pinkButtonStyle}
-                          onClick={() => sendReminder(t.id)}
-                        >
-                          Напомнить
-                        </Button>
-                      )}
-                    </Group>
-                  </Group>
-                </Paper>
-              ))}
-            </Stack>
-          </Paper>
-        ) : (
-          <Text mt="lg" ta="center" color="dimmed">
-            Сегодня пока нет запланированных тренировок
-          </Text>
-        )}
-
-        <Divider my="lg" />
-
-        <Button
-          fullWidth
-          onClick={() => setShowCode((p) => !p)}
-          rightIcon={showCode ? <IconChevronUp size={18} /> : <IconChevronDown size={18} />}
-          styles={pinkButtonStyle}
-        >
-          {showCode ? 'Скрыть код для регистрации' : 'Показать код для регистрации'}
-        </Button>
-
-        <Collapse in={showCode}>
-          <Paper mt="sm" p="md" radius="md" withBorder>
-            <Title order={4} mb="xs">Код для регистрации</Title>
-            <InviteCodeViewer />
-          </Paper>
-        </Collapse>
-
-        <Box
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-            zIndex: 1000,
-          }}
-        >
           <Button
-            size="sm"
-            onClick={onLogout}
+            variant="outline"
+            color="black"
+            fullWidth
+            leftIcon={<IconUser size={16} />}
+            onClick={onOpenClients}
+          >
+            Клиенты
+          </Button>
+
+          <Button
+            variant="outline"
+            color="black"
+            fullWidth
+            leftIcon={<IconPlus size={16} />}
+            onClick={onOpenSchedule}
+          >
+            Назначить тренировку
+          </Button>
+
+          <Divider />
+
+          {loading ? (
+            <Center py="md">
+              <Loader size="sm" />
+            </Center>
+          ) : upcomingTrainings.length > 0 ? (
+            <>
+              <Group spacing={6}>
+                <IconAlarm size={16} />
+                <Text size="sm" fw={500}>
+                  Ближайшие тренировки
+                </Text>
+              </Group>
+
+              <Stack spacing="sm">
+                {upcomingTrainings.map((t) => renderTrainingCard(t))}
+              </Stack>
+            </>
+          ) : (
+            <Text size="sm" c="dimmed" align="center">
+              Сегодня нет ближайших тренировок
+            </Text>
+          )}
+
+          <Divider />
+
+          <Button
+            fullWidth
+            variant="outline"
+            onClick={() => setShowCode((prev) => !prev)}
+            rightIcon={
+              showCode ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />
+            }
+          >
+            {showCode ? "Скрыть код" : "Показать код для регистрации"}
+          </Button>
+
+          <Collapse in={showCode}>
+            <Card withBorder radius="md" p="md" mt="sm">
+              <Title order={5} mb="xs">
+                Код для регистрации
+              </Title>
+              <InviteCodeViewer />
+            </Card>
+          </Collapse>
+
+          <Divider />
+
+          <Button
+            variant="outline"
+            fullWidth
             leftIcon={<IconLogout size={16} />}
-            styles={pinkButtonStyle}
+            color="black"
+            onClick={onLogout}
           >
             Выйти
           </Button>
-        </Box>
-      </Container>
-    </Box>
+        </Stack>
+      </Card>
+    </Center>
   );
 }
