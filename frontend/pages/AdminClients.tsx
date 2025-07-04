@@ -62,10 +62,10 @@ export default function AdminClients({
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
 
-  const outlineButtonStyle = {
+  const buttonStyle = {
     root: {
-      color: "#000",
-      border: "1px solid #000",
+      color: "#1a1a1a",
+      border: "1px solid #1a1a1a",
       borderRadius: 12,
       fontWeight: 500,
       backgroundColor: "#fff",
@@ -250,7 +250,7 @@ export default function AdminClients({
 
                         <Group grow mt="xs">
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             leftIcon={<IconChefHat size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
@@ -260,7 +260,7 @@ export default function AdminClients({
                             Питание
                           </Button>
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             leftIcon={<IconCash size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
@@ -273,7 +273,7 @@ export default function AdminClients({
 
                         <Group grow mt={6}>
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             leftIcon={<IconGift size={16} />}
                             onClick={() => onOpenHistory(client.id)}
                           >
@@ -283,7 +283,7 @@ export default function AdminClients({
 
                         <Group grow mt={6}>
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             leftIcon={<IconPlus size={16} />}
                             onClick={() => onOpenSchedule(client.id)}
                           >
@@ -293,14 +293,14 @@ export default function AdminClients({
 
                         <Group grow mt={6}>
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             leftIcon={<IconPencil size={16} />}
                             onClick={() => startEditing(client)}
                           >
                             Псевдоним
                           </Button>
                           <Button
-                            styles={outlineButtonStyle}
+                            styles={buttonStyle}
                             color="red"
                             leftIcon={<IconTrash size={16} />}
                             onClick={() => deleteClient(client.id)}
@@ -336,7 +336,7 @@ export default function AdminClients({
               onClick={onBack}
               variant="outline"
               fullWidth
-              styles={outlineButtonStyle}
+              styles={buttonStyle}
               leftIcon={<span style={{ fontSize: 16 }}>←</span>}
             >
               Назад к профилю
