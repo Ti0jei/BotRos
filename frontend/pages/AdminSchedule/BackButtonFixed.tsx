@@ -21,10 +21,13 @@ export default function BackButtonFixed({ onClick }: { onClick: () => void }) {
           fullWidth
           size="md"
           variant="outline"
+          color="black"
           onClick={onClick}
           leftIcon={<IconArrowLeft size={16} />}
           styles={{
             root: {
+              color: "#000",
+              border: "1px solid #000",
               borderRadius: 12,
               fontWeight: 500,
               backgroundColor: "#fff",
