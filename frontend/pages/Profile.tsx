@@ -21,7 +21,6 @@ import {
   Divider,
   TextInput,
   NumberInput,
-  Box,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 
@@ -53,6 +52,7 @@ export default function Profile({
   const [section, setSection] = useState<"main" | "trainings" | "nutrition">("main");
   const [showBlock, setShowBlock] = useState(false);
   const [drawerOpened, setDrawerOpened] = useState(false);
+
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState("");
   const [editAge, setEditAge] = useState(0);
@@ -191,121 +191,107 @@ export default function Profile({
 
   return (
     <>
-      <Box
+      <Center
         style={{
           minHeight: "100vh",
           backgroundColor: "#f7f7f7",
           padding: "2rem 1rem",
-          position: "relative",
         }}
       >
-        {/* Floating icons */}
-        <Group
-          position="right"
-          spacing="xs"
-          style={{
-            position: "absolute",
-            top: 16,
-            right: 16,
-            zIndex: 10,
-          }}
+        <Card
+          withBorder
+          radius="xl"
+          p="xl"
+          shadow="xs"
+          style={{ width: "100%", maxWidth: 420 }}
         >
-          <ActionIcon
-            variant="light"
-            size="lg"
-            onClick={toggleNotifications}
-            title={
-              user.notificationsMuted
-                ? "Оповещения выключены"
-                : "Оповещения включены"
-            }
-            style={{
-              backgroundColor: user.notificationsMuted ? "#f1f1f1" : "#1a1a1a",
-              color: user.notificationsMuted ? "#1a1a1a" : "#fff",
-            }}
-          >
-            {user.notificationsMuted ? (
-              <IconBellOff size={20} />
-            ) : (
-              <IconBellRinging size={20} />
-            )}
-          </ActionIcon>
-
-          <ActionIcon
-            variant="light"
-            size="lg"
-            onClick={() => setDrawerOpened(true)}
-            title="Меню"
-            style={{ backgroundColor: "#f1f1f1", color: "#1a1a1a" }}
-          >
-            <IconMenu2 size={20} />
-          </ActionIcon>
-        </Group>
-
-        <Center>
-          <Card
-            withBorder
-            radius="xl"
-            p="xl"
-            shadow="xs"
-            style={{ width: "100%", maxWidth: 420 }}
-          >
-            <Stack spacing="lg">
-              <div>
+          <Stack spacing="lg">
+            <Group position="apart" align="center">
+              <Stack spacing={2}>
                 <Title order={3} c="#1a1a1a">
                   Привет, {user.name} 👋
                 </Title>
                 <Text size="sm" c="dimmed">
                   Вы вошли как {user.email}
                 </Text>
-              </div>
-
-              <Stack spacing="sm">
-                <ActionButton
-                  fullWidth
-                  variant="filled"
-                  colorStyle="black"
-                  onClick={() => setSection("trainings")}
-                >
-                  Мои тренировки
-                </ActionButton>
-
-                <ActionButton
-                  fullWidth
-                  variant="filled"
-                  colorStyle="black"
-                  onClick={() => setSection("nutrition")}
-                >
-                  Моё питание
-                </ActionButton>
-
-                <ActionButton fullWidth variant="outline" disabled>
-                  Замеры (скоро)
-                </ActionButton>
-
-                <ActionButton fullWidth variant="outline" disabled>
-                  Фото (скоро)
-                </ActionButton>
-
-                <ActionButton fullWidth variant="outline" disabled>
-                  Материалы (скоро)
-                </ActionButton>
-
-                {user.role === "ADMIN" && (
-                  <ActionButton
-                    fullWidth
-                    variant="outline"
-                    colorStyle="black"
-                    onClick={onOpenAdmin}
-                  >
-                    Панель тренера
-                  </ActionButton>
-                )}
               </Stack>
+
+              <Group spacing="xs" align="center">
+                <ActionIcon
+                  variant="outline"
+                  color="dark"
+                  size="lg"
+                  onClick={toggleNotifications}
+                  title={
+                    user.notificationsMuted
+                      ? "Оповещения выключены"
+                      : "Оповещения включены"
+                  }
+                >
+                  {user.notificationsMuted ? (
+                    <IconBellOff size={20} />
+                  ) : (
+                    <IconBellRinging size={20} />
+                  )}
+                </ActionIcon>
+
+                <ActionIcon
+                  variant="outline"
+                  color="dark"
+                  size="lg"
+                  onClick={() => setDrawerOpened(true)}
+                  title="Меню"
+                >
+                  <IconMenu2 size={20} />
+                </ActionIcon>
+              </Group>
+            </Group>
+
+            <Stack spacing="sm">
+              <ActionButton
+                fullWidth
+                variant="filled"
+                colorStyle="black"
+                onClick={() => setSection("trainings")}
+              >
+                Мои тренировки
+              </ActionButton>
+
+              <ActionButton
+                fullWidth
+                variant="filled"
+                colorStyle="black"
+                onClick={() => setSection("nutrition")}
+              >
+                Моё питание
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Замеры (скоро)
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Фото (скоро)
+              </ActionButton>
+
+              <ActionButton fullWidth variant="outline" disabled>
+                Материалы (скоро)
+              </ActionButton>
+
+              {user.role === "ADMIN" && (
+                <ActionButton
+                  fullWidth
+                  variant="outline"
+                  colorStyle="black"
+                  onClick={onOpenAdmin}
+                >
+                  Панель тренера
+                </ActionButton>
+              )}
             </Stack>
-          </Card>
-        </Center>
-      </Box>
+          </Stack>
+        </Card>
+      </Center>
 
       <Drawer
         opened={drawerOpened}
@@ -334,7 +320,10 @@ export default function Profile({
                 onChange={(val) => setEditAge(typeof val === "number" ? val : 0)}
               />
               <Group position="right" mt="sm">
-                <Button variant="default" onClick={() => setEditMode(false)}>
+                <Button
+                  variant="default"
+                  onClick={() => setEditMode(false)}
+                >
                   Отмена
                 </Button>
                 <Button
