@@ -209,34 +209,47 @@ export default function Profile({
           shadow="xs"
           style={{ width: "100%", maxWidth: 420, position: "relative" }}
         >
-          {/* Иконки в углах */}
+          {/* 🔔 Notifications */}
           <ActionIcon
-            variant="light"
             size="lg"
             onClick={toggleNotifications}
             title={user.notificationsMuted ? "Оповещения выключены" : "Оповещения включены"}
-            style={{ position: "absolute", top: 16, left: 16 }}
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 56,
+              background: "transparent",
+              color: "#000",
+            }}
           >
             {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBellRinging size={20} />}
           </ActionIcon>
 
+          {/* ☰ Menu */}
           <ActionIcon
-            variant="light"
             size="lg"
             onClick={() => setDrawerOpened(true)}
             title="Меню"
-            style={{ position: "absolute", top: 16, right: 16 }}
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              background: "transparent",
+              color: "#000",
+            }}
           >
             <IconMenu2 size={24} />
           </ActionIcon>
 
-          <Stack spacing="lg" mt="lg">
-            <Title order={3} c="#1a1a1a">
-              Привет, {user.name}
-            </Title>
-            <Text size="sm" c="dimmed">
-              Вы вошли как {user.email}
-            </Text>
+          <Stack spacing="lg" pt={40}>
+            <div>
+              <Title order={3} c="#1a1a1a">
+                Привет, {user.name}
+              </Title>
+              <Text size="sm" c="dimmed">
+                Вы вошли как {user.email}
+              </Text>
+            </div>
 
             <Stack spacing="sm">
               <ActionButton
@@ -281,15 +294,15 @@ export default function Profile({
               )}
             </Stack>
 
-            {/* Увеличенный логотип */}
-            <Stack spacing={4} align="center" mt="md" pt="xs">
+            {/* 🔻 Логотип Krissfit */}
+            <Stack spacing={4} align="center" mt="sm" pt="xs">
               <Image
                 src="/logo-krissfit.png"
-                alt="Krissfit"
+                alt="@Krissfit"
                 width={70}
                 height={70}
                 fit="contain"
-                style={{ opacity: 0.9 }}
+                style={{ opacity: 0.7 }}
               />
             </Stack>
           </Stack>
