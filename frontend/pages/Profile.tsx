@@ -294,15 +294,14 @@ export default function Profile({
               )}
             </Stack>
 
-            {/* 🔻 Логотип Krissfit */}
             <Stack spacing={4} align="center" mt="sm" pt="xs">
               <Image
                 src="/logo-krissfit.png"
                 alt="@Krissfit"
-                width={50}
-                height={50}
+                width={80}
+                height={80}
                 fit="contain"
-                style={{ opacity: 0.6 }}
+                style={{ opacity: 0.7 }}
               />
               <Text size="xs" c="dimmed">
                 @Krissfit
