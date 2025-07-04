@@ -1,3 +1,5 @@
+// backend/routes/auth.ts
+
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -33,7 +35,7 @@ router.post('/register', async (req, res) => {
 
   if (telegramId) {
     const existingTg = await prisma.user.findFirst({
-      where: { telegramId: String(telegramId) },
+      where: { telegramId: BigInt(telegramId).toString() },
     });
     if (existingTg) return res.status(400).json({ error: 'Этот Telegram уже привязан' });
   }
@@ -50,7 +52,7 @@ router.post('/register', async (req, res) => {
       lastName,
       age: parseInt(age),
       role: 'USER',
-      telegramId: telegramId ? String(telegramId) : null,
+      telegramId: telegramId ? BigInt(telegramId).toString() : null,
       internalTag: null,
       emailToken,
       emailTokenExpires,
@@ -174,13 +176,13 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
   const userId = req.user?.userId;
   const { telegramId } = req.body;
 
-  if (!userId || !telegramId || typeof telegramId !== 'number') {
+  if (!userId || !telegramId) {
     return res.status(400).json({ error: 'Некорректные параметры' });
   }
 
   try {
     const existing = await prisma.user.findFirst({
-      where: { telegramId: String(telegramId), NOT: { id: userId } },
+      where: { telegramId: BigInt(telegramId).toString(), NOT: { id: userId } },
     });
 
     if (existing) {
@@ -189,7 +191,7 @@ router.post('/telegram-connect', authMiddleware, async (req, res) => {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { telegramId: String(telegramId) },
+      data: { telegramId: BigInt(telegramId).toString() },
     });
 
     res.json({ success: true });
@@ -206,7 +208,7 @@ router.post('/telegram-direct', async (req, res) => {
 
   try {
     const existing = await prisma.user.findFirst({
-      where: { telegramId: String(telegramId) },
+      where: { telegramId: BigInt(telegramId).toString() },
     });
     if (existing) return res.json({ status: 'already linked' });
 
@@ -218,7 +220,7 @@ router.post('/telegram-direct', async (req, res) => {
 
     await prisma.user.update({
       where: { id: admin.id },
-      data: { telegramId: String(telegramId) },
+      data: { telegramId: BigInt(telegramId).toString() },
     });
 
     res.json({ status: 'linked' });
@@ -238,7 +240,7 @@ router.get('/check-telegram', async (req, res) => {
 
   try {
     const user = await prisma.user.findFirst({
-      where: { telegramId: String(telegramId) },
+      where: { telegramId: BigInt(telegramId).toString() },
     });
 
     res.json({ exists: !!user });
