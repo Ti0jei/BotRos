@@ -207,49 +207,36 @@ export default function Profile({
           radius="xl"
           p="xl"
           shadow="xs"
-          style={{ width: "100%", maxWidth: 420 }}
+          style={{ width: "100%", maxWidth: 420, position: "relative" }}
         >
-          <Stack spacing="lg">
-            <Group position="apart" align="center">
-              <Stack spacing={2}>
-                <Title order={3} c="#1a1a1a">
-                  Привет, {user.name} 👋
-                </Title>
-                <Text size="sm" c="dimmed">
-                  Вы вошли как {user.email}
-                </Text>
-              </Stack>
+          {/* Иконки в углах */}
+          <ActionIcon
+            variant="light"
+            size="lg"
+            onClick={toggleNotifications}
+            title={user.notificationsMuted ? "Оповещения выключены" : "Оповещения включены"}
+            style={{ position: "absolute", top: 16, left: 16 }}
+          >
+            {user.notificationsMuted ? <IconBellOff size={20} /> : <IconBellRinging size={20} />}
+          </ActionIcon>
 
-              <Group spacing="xs" align="center">
-                <ActionIcon
-                  variant="outline"
-                  color="dark"
-                  size="lg"
-                  onClick={toggleNotifications}
-                  title={
-                    user.notificationsMuted
-                      ? "Оповещения выключены"
-                      : "Оповещения включены"
-                  }
-                >
-                  {user.notificationsMuted ? (
-                    <IconBellOff size={20} />
-                  ) : (
-                    <IconBellRinging size={20} />
-                  )}
-                </ActionIcon>
+          <ActionIcon
+            variant="light"
+            size="lg"
+            onClick={() => setDrawerOpened(true)}
+            title="Меню"
+            style={{ position: "absolute", top: 16, right: 16 }}
+          >
+            <IconMenu2 size={24} />
+          </ActionIcon>
 
-                <ActionIcon
-                  variant="outline"
-                  color="dark"
-                  size="lg"
-                  onClick={() => setDrawerOpened(true)}
-                  title="Меню"
-                >
-                  <IconMenu2 size={20} />
-                </ActionIcon>
-              </Group>
-            </Group>
+          <Stack spacing="lg" mt="lg">
+            <Title order={3} c="#1a1a1a">
+              Привет, {user.name}
+            </Title>
+            <Text size="sm" c="dimmed">
+              Вы вошли как {user.email}
+            </Text>
 
             <Stack spacing="sm">
               <ActionButton
@@ -294,18 +281,16 @@ export default function Profile({
               )}
             </Stack>
 
-            <Stack spacing={4} align="center" mt="sm" pt="xs">
+            {/* Увеличенный логотип */}
+            <Stack spacing={4} align="center" mt="md" pt="xs">
               <Image
                 src="/logo-krissfit.png"
-                alt="@Krissfit"
-                width={80}
-                height={80}
+                alt="Krissfit"
+                width={70}
+                height={70}
                 fit="contain"
-                style={{ opacity: 0.7 }}
+                style={{ opacity: 0.9 }}
               />
-              <Text size="xs" c="dimmed">
-                @Krissfit
-              </Text>
             </Stack>
           </Stack>
         </Card>
@@ -338,10 +323,7 @@ export default function Profile({
                 onChange={(val) => setEditAge(typeof val === "number" ? val : 0)}
               />
               <Group position="right" mt="sm">
-                <Button
-                  variant="default"
-                  onClick={() => setEditMode(false)}
-                >
+                <Button variant="default" onClick={() => setEditMode(false)}>
                   Отмена
                 </Button>
                 <Button
