@@ -10,7 +10,6 @@ import {
 } from "@tabler/icons-react";
 import {
   Box,
-  Button,
   Card,
   Center,
   Collapse,
@@ -25,6 +24,7 @@ import {
 import dayjs from "dayjs";
 import InviteCodeViewer from "@/components/InviteCodeViewer";
 import { getToken } from "@/utils/auth";
+import ActionButton from "@/components/ui/ActionButton";
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -68,6 +68,7 @@ export default function CoachProfile({
         const data = await res.json();
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
         const filtered = data
           .filter(
             (t: Training) =>
@@ -126,15 +127,16 @@ export default function CoachProfile({
             {t.status === "CONFIRMED" ? "Подтверждено" : "Ожидание"}
           </Badge>
         </Group>
+
         {t.status === "PENDING" && (
-          <Button
+          <ActionButton
             variant="outline"
+            colorStyle="black"
             size="xs"
-            radius="xl"
             onClick={() => sendReminder(t.id)}
           >
             Напомнить
-          </Button>
+          </ActionButton>
         )}
       </Stack>
     </Card>
@@ -163,25 +165,25 @@ export default function CoachProfile({
             </Text>
           </Stack>
 
-          <Button
+          <ActionButton
             variant="outline"
-            color="black"
+            colorStyle="black"
             fullWidth
             leftIcon={<IconUser size={16} />}
             onClick={onOpenClients}
           >
             Клиенты
-          </Button>
+          </ActionButton>
 
-          <Button
+          <ActionButton
             variant="outline"
-            color="black"
+            colorStyle="black"
             fullWidth
             leftIcon={<IconPlus size={16} />}
             onClick={onOpenSchedule}
           >
             Назначить тренировку
-          </Button>
+          </ActionButton>
 
           <Divider />
 
@@ -210,37 +212,35 @@ export default function CoachProfile({
 
           <Divider />
 
-          <Button
+          <ActionButton
             fullWidth
             variant="outline"
+            colorStyle="black"
             onClick={() => setShowCode((prev) => !prev)}
             rightIcon={
               showCode ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />
             }
           >
             {showCode ? "Скрыть код" : "Показать код для регистрации"}
-          </Button>
+          </ActionButton>
 
           <Collapse in={showCode}>
             <Card withBorder radius="md" p="md" mt="sm">
-              <Title order={5} mb="xs">
-                Код для регистрации
-              </Title>
               <InviteCodeViewer />
             </Card>
           </Collapse>
 
           <Divider />
 
-          <Button
+          <ActionButton
             variant="outline"
             fullWidth
             leftIcon={<IconLogout size={16} />}
-            color="black"
+            colorStyle="black"
             onClick={onLogout}
           >
             Выйти
-          </Button>
+          </ActionButton>
         </Stack>
       </Card>
     </Center>

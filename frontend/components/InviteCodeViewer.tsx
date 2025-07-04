@@ -1,14 +1,20 @@
+// components/InviteCodeViewer.tsx
 import { useEffect, useState } from 'react';
 import {
-  Button,
   Text,
-  Paper,
+  Card,
   Group,
   Loader,
   CopyButton,
   Tooltip,
+  Button,
+  Stack,
 } from '@mantine/core';
-import { IconRefresh, IconCheck, IconCopy } from '@tabler/icons-react';
+import {
+  IconRefresh,
+  IconCheck,
+  IconCopy,
+} from '@tabler/icons-react';
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -43,44 +49,68 @@ export default function InviteCodeViewer() {
     fetchInviteCode();
   }, []);
 
+  const outlineButtonStyle = {
+    root: {
+      border: '1px solid #1a1a1a',
+      color: '#1a1a1a',
+      backgroundColor: 'white',
+      fontWeight: 500,
+      '&:hover': {
+        backgroundColor: '#f0f0f0',
+      },
+    },
+  };
+
   return (
-    <Paper withBorder p="md" shadow="xs" mt="md">
-      <Group position="apart" mb="xs">
-        <Text weight={500}>Код для регистрации</Text>
-        <Button
-          variant="light"
-          size="xs"
-          onClick={() => fetchInviteCode(true)} // 💡 вызываем с `force=true`
-          leftIcon={<IconRefresh size={14} />}
-        >
-          Обновить
-        </Button>
-      </Group>
-
-      {loading && <Loader size="sm" />}
-      {error && <Text color="red">{error}</Text>}
-
-      {code && (
+    <Card withBorder shadow="xs" radius="md" p="md">
+      <Stack spacing="sm">
         <Group position="apart">
-          <Group spacing="xs">
-            <Text size="xl" weight={700}>{code}</Text>
-            <CopyButton value={code}>
-              {({ copied, copy }) => (
-                <Tooltip label={copied ? 'Скопировано' : 'Скопировать'}>
-                  <Button size="xs" variant="default" onClick={copy}>
-                    {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
-                  </Button>
-                </Tooltip>
-              )}
-            </CopyButton>
-          </Group>
-          {expires && (
-            <Text size="xs" color="dimmed">
-              Действует до: {new Date(expires).toLocaleTimeString()}
-            </Text>
-          )}
+          <Text fw={600} size="sm" c="#222">
+            Код для регистрации
+          </Text>
+          <Button
+            size="xs"
+            variant="outline"
+            leftIcon={<IconRefresh size={14} />}
+            onClick={() => fetchInviteCode(true)}
+            styles={outlineButtonStyle}
+          >
+            Обновить
+          </Button>
         </Group>
-      )}
-    </Paper>
+
+        {loading && <Loader size="sm" />}
+        {error && <Text color="red">{error}</Text>}
+
+        {code && (
+          <Group position="apart" noWrap>
+            <Group spacing="xs" align="center">
+              <Text size="xl" fw={700}>
+                {code}
+              </Text>
+              <CopyButton value={code}>
+                {({ copied, copy }) => (
+                  <Tooltip label={copied ? 'Скопировано' : 'Скопировать'}>
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      onClick={copy}
+                      styles={outlineButtonStyle}
+                    >
+                      {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                    </Button>
+                  </Tooltip>
+                )}
+              </CopyButton>
+            </Group>
+            {expires && (
+              <Text size="xs" color="dimmed">
+                До {new Date(expires).toLocaleTimeString()}
+              </Text>
+            )}
+          </Group>
+        )}
+      </Stack>
+    </Card>
   );
 }
