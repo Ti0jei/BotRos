@@ -1,4 +1,4 @@
-import { Box, Group, Text, Button } from "@mantine/core";
+import { Box, Group, Text, Button, Stack } from "@mantine/core";
 import { Training, PaymentBlock } from "./types";
 import TrainingCard from "./TrainingCard";
 import dayjs from "dayjs";
@@ -39,14 +39,15 @@ export default function TrainingHourBlock({
   return (
     <Box
       style={{
-        border: isCurrentHour ? "2px solid #000" : "1px solid #ddd",
+        border: isCurrentHour ? "2px solid #1a1a1a" : "1px solid #e6e6e6",
         borderRadius: 16,
         padding: 12,
-        backgroundColor: isCurrentHour ? "#fff" : "#fcfcfc",
+        backgroundColor: "#fff",
+        boxShadow: isCurrentHour ? "0 0 0 3px #f0f0f0" : "none",
       }}
     >
-      <Group position="apart" mb={6}>
-        <Text fw={600} size="md" c="#1a1a1a">
+      <Group position="apart" mb={8}>
+        <Text fw={700} size="md" c="#1a1a1a">
           {hour}:00 {isCurrentHour && "⏰"}
         </Text>
         <Button size="xs" styles={outlineButtonStyle} onClick={onOpenAssign}>
@@ -54,15 +55,17 @@ export default function TrainingHourBlock({
         </Button>
       </Group>
 
-      {trainings.map((t) => (
-        <TrainingCard
-          key={t.id}
-          training={t}
-          block={blocks[t.userId] ?? null}
-          onDelete={() => onDelete(t.id)}
-          onAttend={(val) => onAttend(t.id, val)}
-        />
-      ))}
+      <Stack spacing="sm" mt={6}>
+        {trainings.map((t) => (
+          <TrainingCard
+            key={t.id}
+            training={t}
+            block={blocks[t.userId] ?? null}
+            onDelete={() => onDelete(t.id)}
+            onAttend={(val) => onAttend(t.id, val)}
+          />
+        ))}
+      </Stack>
     </Box>
   );
 }

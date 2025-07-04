@@ -32,30 +32,35 @@ export default function TrainingCard({
     });
   };
 
-  const outlineStyle = {
+  const baseButton = {
     root: {
-      color: "#000",
-      border: "1px solid #000",
-      borderRadius: 12,
-      backgroundColor: "#fff",
       fontWeight: 500,
+      borderRadius: 12,
       transition: "background 0.2s",
-      "&:hover": { backgroundColor: "#f2f2f2" },
     },
   };
 
   const attendanceStyle = (active: boolean, color: string) => ({
     root: {
+      ...baseButton.root,
       color: active ? "#fff" : color,
       backgroundColor: active ? color : "#fff",
       border: `1px solid ${color}`,
-      borderRadius: 12,
-      fontWeight: 500,
       "&:hover": {
         backgroundColor: active ? color : "#f2f2f2",
       },
     },
   });
+
+  const outlineStyle = {
+    root: {
+      ...baseButton.root,
+      color: "#000",
+      border: "1px solid #000",
+      backgroundColor: "#fff",
+      "&:hover": { backgroundColor: "#f2f2f2" },
+    },
+  };
 
   return (
     <Paper withBorder radius="xl" p="md" shadow="xs">
@@ -71,6 +76,7 @@ export default function TrainingCard({
         </Text>
 
         <Badge
+          size="sm"
           color={
             training.status === "CONFIRMED"
               ? "green"

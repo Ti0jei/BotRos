@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Button, Group } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/ru";
 
 export default function ScheduleHeader({
   date,
@@ -10,6 +12,10 @@ export default function ScheduleHeader({
   date: Dayjs;
   setDate: (d: Dayjs) => void;
 }) {
+  useEffect(() => {
+    dayjs.locale("ru"); // ✅ русская локаль
+  }, []);
+
   const outlineStyle = {
     root: {
       color: "#000",
@@ -35,12 +41,14 @@ export default function ScheduleHeader({
       </Button>
 
       <DatePickerInput
+        locale="ru" // ✅ локализация
         value={date.toDate()}
         onChange={(val) => val && setDate(dayjs(val))}
-        clearable={false}
-        dropdownType="popover"
+        clearable
+        clearButtonLabel="Очистить"
         size="xs"
-        hideWeekdays
+        dropdownType="popover"
+        hideWeekdays={false}
         nextIcon={<IconChevronRight size={14} />}
         previousIcon={<IconChevronLeft size={14} />}
         popoverProps={{ withinPortal: true, shadow: "md", radius: "md" }}
@@ -50,7 +58,7 @@ export default function ScheduleHeader({
             borderRadius: 12,
             fontWeight: 600,
             border: "1px solid #000",
-            minWidth: 120,
+            minWidth: 130,
           },
         }}
       />

@@ -10,7 +10,9 @@ import {
   Divider,
   Title,
   Box,
+  Group,
 } from "@mantine/core";
+import { IconClock } from "@tabler/icons-react";
 import { PaymentBlock, User } from "./types";
 
 interface AssignModalProps {
@@ -61,14 +63,16 @@ export default function AssignModal({
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
         <Stack spacing="md">
-          <Box>
+          <Group spacing="xs">
+            <IconClock size={20} stroke={1.5} />
             <Title order={4} c="#1a1a1a">
               Назначить тренировку
             </Title>
-            <Text size="sm" c="dimmed">
-              Время: {selectedHour}:00
-            </Text>
-          </Box>
+          </Group>
+
+          <Text size="sm" c="dimmed" mb={-4}>
+            Время: <strong>{selectedHour}:00</strong>
+          </Text>
 
           <Divider />
 
@@ -77,7 +81,9 @@ export default function AssignModal({
             placeholder="Выберите клиента"
             data={clients.map((c) => ({
               value: c.id,
-              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+              label: `${c.name} ${c.lastName ?? ""}${
+                c.internalTag ? ` (${c.internalTag})` : ""
+              }`,
             }))}
             value={selectedUser}
             onChange={setSelectedUser}
@@ -105,17 +111,21 @@ export default function AssignModal({
                 border: "1px solid #f3c0c0",
               }}
             >
-              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
+              У клиента нет активного блока. Чтобы продолжить, выберите «Разовая оплата».
             </Text>
           )}
 
           <Button
             fullWidth
             radius="xl"
-            color="dark"
             size="md"
+            variant="outline"
+            color="dark"
             onClick={onAssign}
-            style={{ fontWeight: 600 }}
+            style={{
+              fontWeight: 600,
+              transition: "all 0.2s ease",
+            }}
           >
             Назначить
           </Button>
