@@ -12,6 +12,7 @@ import {
   Divider,
   Box,
 } from '@mantine/core';
+import BackButtonFixed from '../AdminSchedule/BackButtonFixed';
 
 interface Props {
   userId: string;
@@ -91,17 +92,6 @@ export default function PaymentHistory({ userId, onBack }: Props) {
     }
   };
 
-  const pinkButtonSx = {
-    backgroundColor: 'transparent',
-    color: '#d6336c',
-    fontWeight: 500,
-    border: '1px solid #d6336c',
-    borderRadius: 8,
-    '&:hover': {
-      backgroundColor: '#ffe3ed',
-    },
-  };
-
   const cardStyle = {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -110,9 +100,9 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Title order={3} mb="md" style={{ color: '#222' }}>
+        <Title order={3} mb="md" c="#1a1a1a">
           История оплат
         </Title>
 
@@ -120,6 +110,12 @@ export default function PaymentHistory({ userId, onBack }: Props) {
           <Loader />
         ) : (
           <Stack spacing="md">
+            {blocks.length === 0 && singleTrainings.length === 0 && (
+              <Text size="sm" c="dimmed">
+                Пока нет данных об оплатах
+              </Text>
+            )}
+
             {blocks.map((block) => (
               <Paper key={block.id} style={cardStyle}>
                 <Group position="apart" mb="xs">
@@ -131,7 +127,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                   </Badge>
                 </Group>
 
-                <Text size="sm" color="dimmed">
+                <Text size="sm" c="dimmed">
                   {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
                 </Text>
 
@@ -142,6 +138,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                     fullWidth
                     mt="sm"
                     onClick={() => markInactive(block.id)}
+                    radius="md"
                   >
                     Завершить блок
                   </Button>
@@ -157,7 +154,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
-                        <Text size="sm" color="dimmed">{t.hour}:00</Text>
+                        <Text size="sm" c="dimmed">{t.hour}:00</Text>
                       </Group>
                     </Paper>
                   ))}
@@ -167,29 +164,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
           </Stack>
         )}
 
-        <Box
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
-            zIndex: 1000,
-          }}
-        >
-          <Button
-            variant="subtle"
-            sx={pinkButtonSx}
-            size="sm"
-            onClick={onBack}
-            leftIcon={<span style={{ fontSize: 16 }}>←</span>}
-          >
-            Назад к профилю
-          </Button>
-        </Box>
+        <BackButtonFixed onClick={onBack} />
       </Container>
     </Box>
   );
