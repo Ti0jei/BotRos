@@ -1,5 +1,4 @@
-// frontend/pages/AdminClients.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Container,
   Title,
@@ -12,16 +11,19 @@ import {
   Badge,
   TextInput,
   Box,
-} from '@mantine/core';
+  Divider,
+  Center,
+} from "@mantine/core";
 import {
   IconCash,
   IconChefHat,
   IconGift,
   IconPencil,
   IconTrash,
-} from '@tabler/icons-react';
-import ClientPayments from './ClientPayments';
-import ClientNutrition from './ClientNutrition';
+} from "@tabler/icons-react";
+
+import ClientPayments from "./ClientPayments";
+import ClientNutrition from "./ClientNutrition";
 
 interface Client {
   id: string;
@@ -49,33 +51,35 @@ export default function AdminClients({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [view, setView] = useState<'payments' | 'nutrition' | null>(null);
+  const [view, setView] = useState<"payments" | "nutrition" | null>(null);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [internalTagValue, setInternalTagValue] = useState<string>('');
+  const [internalTagValue, setInternalTagValue] = useState<string>("");
+
   const API = import.meta.env.VITE_API_BASE_URL;
+
+  const token = localStorage.getItem("token");
 
   const pinkButtonStyle = {
     root: {
-      color: '#d6336c',
-      border: '1px solid #d6336c',
-      borderRadius: 8,
+      color: "#d6336c",
+      border: "1px solid #d6336c",
+      borderRadius: 12,
       fontWeight: 500,
-      backgroundColor: 'transparent',
-      whiteSpace: 'nowrap',
-      '&:hover': { backgroundColor: '#ffe3ed' },
+      backgroundColor: "transparent",
+      transition: "background 0.2s",
+      "&:hover": { backgroundColor: "#ffe3ed" },
     },
   };
 
   const loadClients = async () => {
-    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API}/api/clients`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (!Array.isArray(data)) {
-        setError('Ошибка доступа или авторизации');
+        setError("Ошибка доступа или авторизации");
         setClients([]);
         setLoading(false);
         return;
@@ -84,14 +88,13 @@ export default function AdminClients({
       setLoading(false);
       for (const client of data) loadBlock(client.id);
     } catch (err) {
-      console.error('Ошибка запроса:', err);
-      setError('Сервер недоступен');
+      console.error("Ошибка запроса:", err);
+      setError("Сервер недоступен");
       setLoading(false);
     }
   };
 
   const loadBlock = async (userId: string) => {
-    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -104,10 +107,9 @@ export default function AdminClients({
   };
 
   const deleteClient = async (id: string) => {
-    if (!window.confirm('Вы точно хотите удалить клиента?')) return;
-    const token = localStorage.getItem('token');
+    if (!window.confirm("Вы точно хотите удалить клиента?")) return;
     await fetch(`${API}/api/clients/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
     loadClients();
@@ -115,21 +117,20 @@ export default function AdminClients({
 
   const startEditing = (client: Client) => {
     setEditingId(client.id);
-    setInternalTagValue(client.internalTag ?? '');
+    setInternalTagValue(client.internalTag ?? "");
   };
 
   const cancelEditing = () => {
     setEditingId(null);
-    setInternalTagValue('');
+    setInternalTagValue("");
   };
 
   const saveInternalTag = async (id: string) => {
-    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API}/api/clients/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ internalTag: internalTagValue }),
@@ -138,10 +139,10 @@ export default function AdminClients({
         loadClients();
         cancelEditing();
       } else {
-        alert('Ошибка при сохранении');
+        alert("Ошибка при сохранении");
       }
     } catch (err) {
-      console.error('Ошибка при PATCH /clients/:id', err);
+      console.error("Ошибка при PATCH /clients/:id", err);
     }
   };
 
@@ -149,57 +150,77 @@ export default function AdminClients({
     loadClients();
   }, []);
 
-  if (selectedClient && view === 'payments') {
-    return <ClientPayments client={selectedClient} onBack={() => {
-      setSelectedClient(null);
-      setView(null);
-    }} />;
+  if (selectedClient && view === "payments") {
+    return (
+      <ClientPayments
+        client={selectedClient}
+        onBack={() => {
+          setSelectedClient(null);
+          setView(null);
+        }}
+      />
+    );
   }
 
-  if (selectedClient && view === 'nutrition') {
-    return <ClientNutrition userId={selectedClient.id} isAdmin={true} onBack={() => {
-      setSelectedClient(null);
-      setView(null);
-    }} />;
+  if (selectedClient && view === "nutrition") {
+    return (
+      <ClientNutrition
+        userId={selectedClient.id}
+        isAdmin={true}
+        onBack={() => {
+          setSelectedClient(null);
+          setView(null);
+        }}
+      />
+    );
   }
 
   return (
-    <Box style={{ backgroundColor: '#f5d4ca', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: "#f7f7f7", minHeight: "100vh", paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Title order={2} mb="md" style={{ color: '#222' }}>Клиенты</Title>
+        <Title order={3} c="#1a1a1a" mb="md">
+          Клиенты
+        </Title>
 
         {loading ? (
-          <Loader />
+          <Center my="lg">
+            <Loader size="sm" />
+          </Center>
         ) : error ? (
           <Text color="red">{error}</Text>
         ) : (
-          <Stack>
+          <Stack spacing="md">
             {clients.map((client) => {
               const block = blockMap[client.id];
               const remaining = block ? block.paidTrainings - block.used : 0;
               const isEditing = editingId === client.id;
 
               return (
-                <Card key={client.id} withBorder radius="md" p="md" shadow="sm">
+                <Card key={client.id} withBorder radius="xl" p="md" shadow="xs">
                   <Stack spacing="xs">
                     <Group position="apart">
                       <Text fw={600}>
-                        {client.name} {client.lastName ?? ''}{' '}
+                        {client.name} {client.lastName ?? ""}
                         {client.internalTag && (
-                          <Text span color="dimmed">({client.internalTag})</Text>
+                          <Text span c="dimmed">
+                            {" "}
+                            ({client.internalTag})
+                          </Text>
                         )}
                       </Text>
-                      <div
+                      <Box
                         style={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: '50%',
-                          backgroundColor: block ? 'green' : 'red',
+                          width: 10,
+                          height: 10,
+                          borderRadius: "50%",
+                          backgroundColor: block ? "green" : "red",
                         }}
                       />
                     </Group>
 
-                    <Text size="sm" color="dimmed">{client.age} лет</Text>
+                    <Text size="sm" c="dimmed">
+                      {client.age} лет
+                    </Text>
 
                     {isEditing ? (
                       <Group grow>
@@ -208,19 +229,21 @@ export default function AdminClients({
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
                         />
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>Сохранить</Button>
-                        <Button color="gray" onClick={cancelEditing}>Отмена</Button>
+                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
+                          Сохранить
+                        </Button>
+                        <Button variant="light" onClick={cancelEditing}>
+                          Отмена
+                        </Button>
                       </Group>
                     ) : (
                       <>
                         {block && (
                           <Group spacing="xs">
-                            <Badge color={remaining === 0 ? 'red' : 'green'}>
+                            <Badge color={remaining === 0 ? "red" : "green"}>
                               Осталось: {remaining}
                             </Badge>
-                            <Badge color="teal">
-                              Цена: {block.pricePerTraining} ₽
-                            </Badge>
+                            <Badge color="gray">Цена: {block.pricePerTraining} ₽</Badge>
                           </Group>
                         )}
 
@@ -230,18 +253,17 @@ export default function AdminClients({
                             leftIcon={<IconChefHat size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
-                              setView('nutrition');
+                              setView("nutrition");
                             }}
                           >
                             Питание
                           </Button>
-
                           <Button
                             styles={pinkButtonStyle}
                             leftIcon={<IconCash size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
-                              setView('payments');
+                              setView("payments");
                             }}
                           >
                             Оплата
@@ -261,7 +283,6 @@ export default function AdminClients({
                         <Group grow mt={6}>
                           <Button
                             styles={pinkButtonStyle}
-                            color="orange"
                             leftIcon={<IconPencil size={16} />}
                             onClick={() => startEditing(client)}
                           >
@@ -285,28 +306,31 @@ export default function AdminClients({
           </Stack>
         )}
 
+        <Divider my="lg" />
+
         <Box
           style={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 0,
             left: 0,
-            width: '100%',
-            background: 'white',
-            padding: '10px 0',
-            textAlign: 'center',
-            boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
+            width: "100%",
+            background: "white",
+            padding: "10px 16px",
+            boxShadow: "0 -2px 6px rgba(0,0,0,0.05)",
             zIndex: 1000,
           }}
         >
-          <Button
-            variant="subtle"
-            color="pink"
-            size="sm"
-            onClick={onBack}
-            leftIcon={<span style={{ fontSize: 16 }}>←</span>}
-          >
-            Назад к профилю
-          </Button>
+          <Box style={{ maxWidth: 420, margin: "0 auto" }}>
+            <Button
+              onClick={onBack}
+              variant="outline"
+              fullWidth
+              styles={pinkButtonStyle}
+              leftIcon={<span style={{ fontSize: 16 }}>←</span>}
+            >
+              Назад к профилю
+            </Button>
+          </Box>
         </Box>
       </Container>
     </Box>
