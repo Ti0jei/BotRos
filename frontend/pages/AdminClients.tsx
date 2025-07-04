@@ -20,6 +20,7 @@ import {
   IconGift,
   IconPencil,
   IconTrash,
+  IconPlus,
 } from "@tabler/icons-react";
 
 import ClientPayments from "./ClientPayments";
@@ -43,9 +44,11 @@ interface PaymentBlock {
 export default function AdminClients({
   onBack,
   onOpenHistory,
+  onOpenSchedule,
 }: {
   onBack: () => void;
   onOpenHistory: (userId: string) => void;
+  onOpenSchedule: (userId: string) => void;
 }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,18 +60,17 @@ export default function AdminClients({
   const [internalTagValue, setInternalTagValue] = useState<string>("");
 
   const API = import.meta.env.VITE_API_BASE_URL;
-
   const token = localStorage.getItem("token");
 
-  const pinkButtonStyle = {
+  const outlineButtonStyle = {
     root: {
-      color: "#d6336c",
-      border: "1px solid #d6336c",
+      color: "#000",
+      border: "1px solid #000",
       borderRadius: 12,
       fontWeight: 500,
-      backgroundColor: "transparent",
+      backgroundColor: "#fff",
       transition: "background 0.2s",
-      "&:hover": { backgroundColor: "#ffe3ed" },
+      "&:hover": { backgroundColor: "#f2f2f2" },
     },
   };
 
@@ -203,8 +205,7 @@ export default function AdminClients({
                         {client.name} {client.lastName ?? ""}
                         {client.internalTag && (
                           <Text span c="dimmed">
-                            {" "}
-                            ({client.internalTag})
+                            {" "}({client.internalTag})
                           </Text>
                         )}
                       </Text>
@@ -213,7 +214,7 @@ export default function AdminClients({
                           width: 10,
                           height: 10,
                           borderRadius: "50%",
-                          backgroundColor: block ? "green" : "red",
+                          backgroundColor: block ? "green" : "#999",
                         }}
                       />
                     </Group>
@@ -249,7 +250,7 @@ export default function AdminClients({
 
                         <Group grow mt="xs">
                           <Button
-                            styles={pinkButtonStyle}
+                            styles={outlineButtonStyle}
                             leftIcon={<IconChefHat size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
@@ -259,7 +260,7 @@ export default function AdminClients({
                             Питание
                           </Button>
                           <Button
-                            styles={pinkButtonStyle}
+                            styles={outlineButtonStyle}
                             leftIcon={<IconCash size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
@@ -272,7 +273,7 @@ export default function AdminClients({
 
                         <Group grow mt={6}>
                           <Button
-                            styles={pinkButtonStyle}
+                            styles={outlineButtonStyle}
                             leftIcon={<IconGift size={16} />}
                             onClick={() => onOpenHistory(client.id)}
                           >
@@ -282,14 +283,24 @@ export default function AdminClients({
 
                         <Group grow mt={6}>
                           <Button
-                            styles={pinkButtonStyle}
+                            styles={outlineButtonStyle}
+                            leftIcon={<IconPlus size={16} />}
+                            onClick={() => onOpenSchedule(client.id)}
+                          >
+                            Записать на тренировку
+                          </Button>
+                        </Group>
+
+                        <Group grow mt={6}>
+                          <Button
+                            styles={outlineButtonStyle}
                             leftIcon={<IconPencil size={16} />}
                             onClick={() => startEditing(client)}
                           >
                             Псевдоним
                           </Button>
                           <Button
-                            styles={pinkButtonStyle}
+                            styles={outlineButtonStyle}
                             color="red"
                             leftIcon={<IconTrash size={16} />}
                             onClick={() => deleteClient(client.id)}
@@ -325,7 +336,7 @@ export default function AdminClients({
               onClick={onBack}
               variant="outline"
               fullWidth
-              styles={pinkButtonStyle}
+              styles={outlineButtonStyle}
               leftIcon={<span style={{ fontSize: 16 }}>←</span>}
             >
               Назад к профилю
