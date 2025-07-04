@@ -11,6 +11,7 @@ import {
   Title,
   Box,
   Group,
+  Badge,
 } from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
 import { PaymentBlock, User } from "./types";
@@ -50,6 +51,9 @@ export default function AssignModal({
     setShowWarning(!hasBlock && !isSinglePaid);
   }, [selectedUser, blocks, isSinglePaid]);
 
+  const block = selectedUser ? blocks[selectedUser] : null;
+  const remaining = block ? block.paidTrainings - block.used : null;
+
   return (
     <Modal
       opened={opened}
@@ -63,15 +67,12 @@ export default function AssignModal({
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
         <Stack spacing="md">
-          <Group spacing="xs">
-            <IconClock size={20} stroke={1.5} />
-            <Title order={4} c="#1a1a1a">
-              Назначить тренировку
-            </Title>
+          <Group spacing={8}>
+            <IconClock size={20} />
+            <Title order={4}>Назначить тренировку</Title>
           </Group>
-
-          <Text size="sm" c="dimmed" mb={-4}>
-            Время: <strong>{selectedHour}:00</strong>
+          <Text size="sm" c="dimmed">
+            Время: <b>{selectedHour}:00</b>
           </Text>
 
           <Divider />
@@ -81,9 +82,7 @@ export default function AssignModal({
             placeholder="Выберите клиента"
             data={clients.map((c) => ({
               value: c.id,
-              label: `${c.name} ${c.lastName ?? ""}${
-                c.internalTag ? ` (${c.internalTag})` : ""
-              }`,
+              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
             }))}
             value={selectedUser}
             onChange={setSelectedUser}
@@ -91,6 +90,12 @@ export default function AssignModal({
             size="md"
             withinPortal
           />
+
+          {remaining !== null && !isSinglePaid && (
+            <Badge color={remaining > 0 ? "green" : "red"} size="sm">
+              Осталось тренировок: {remaining}
+            </Badge>
+          )}
 
           <Checkbox
             label="Разовая оплата"
@@ -111,21 +116,17 @@ export default function AssignModal({
                 border: "1px solid #f3c0c0",
               }}
             >
-              У клиента нет активного блока. Чтобы продолжить, выберите «Разовая оплата».
+              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
             </Text>
           )}
 
           <Button
             fullWidth
             radius="xl"
-            size="md"
-            variant="outline"
             color="dark"
+            size="md"
             onClick={onAssign}
-            style={{
-              fontWeight: 600,
-              transition: "all 0.2s ease",
-            }}
+            style={{ fontWeight: 600 }}
           >
             Назначить
           </Button>
