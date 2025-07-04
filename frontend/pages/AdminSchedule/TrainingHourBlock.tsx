@@ -1,7 +1,7 @@
-import { Box, Group, Text, Button } from '@mantine/core';
-import { Training, PaymentBlock } from './types';
-import TrainingCard from './TrainingCard';
-import dayjs from 'dayjs';
+import { Box, Group, Text, Button } from "@mantine/core";
+import { Training, PaymentBlock } from "./types";
+import TrainingCard from "./TrainingCard";
+import dayjs from "dayjs";
 
 interface Props {
   hour: number;
@@ -22,23 +22,34 @@ export default function TrainingHourBlock({
   onDelete,
   onAttend,
 }: Props) {
-  const highlight = date.isToday() && hour === dayjs().hour();
+  const isCurrentHour = date.isToday() && hour === dayjs().hour();
+
+  const outlineButtonStyle = {
+    root: {
+      color: "#000",
+      border: "1px solid #000",
+      borderRadius: 12,
+      backgroundColor: "#fff",
+      fontWeight: 500,
+      transition: "background 0.2s",
+      "&:hover": { backgroundColor: "#f2f2f2" },
+    },
+  };
 
   return (
     <Box
       style={{
-        backgroundColor: highlight ? '#fff3bf' : 'transparent', // более насыщенный желтый
-        border: highlight ? '2px solid #fab005' : undefined,    // оранжевая рамка
-        borderRadius: 8,
-        padding: 6,
-        boxShadow: highlight ? '0 0 8px rgba(255, 165, 0, 0.4)' : undefined,
+        border: isCurrentHour ? "2px solid #000" : "1px solid #ddd",
+        borderRadius: 16,
+        padding: 12,
+        backgroundColor: isCurrentHour ? "#fff" : "#fcfcfc",
       }}
     >
-      <Group position="apart" mb={4}>
-        <Text fw={600} size="md" style={{ minWidth: 60 }}>
-          {hour}:00 {highlight && '⏰'}
+      <Group position="apart" mb={6}>
+        <Text fw={600} size="md" c="#1a1a1a">
+          {hour}:00 {isCurrentHour && "⏰"}
         </Text>
-        <Button size="xs" color="blue" variant="light" onClick={onOpenAssign}>
+        <Button size="xs" styles={outlineButtonStyle} onClick={onOpenAssign}>
           Назначить
         </Button>
       </Group>

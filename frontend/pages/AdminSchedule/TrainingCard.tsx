@@ -1,7 +1,7 @@
-import { Paper, Text, Badge, Group, Button } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import dayjs from 'dayjs';
-import { Training, PaymentBlock } from './types';
+import { Paper, Text, Badge, Group, Button } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import dayjs from "dayjs";
+import { Training, PaymentBlock } from "./types";
 
 export default function TrainingCard({
   training,
@@ -14,80 +14,93 @@ export default function TrainingCard({
   onDelete: () => void;
   onAttend: (attended: boolean) => void;
 }) {
-  const getCardColor = (status: string) => {
-    if (status === 'CONFIRMED') return '#e6ffec';
-    if (status === 'DECLINED') return '#ffe6e6';
-    return '#f1f3f5';
-  };
-
   const getUserIcon = () => {
-    if (training.isSinglePaid) return '💸';
-    if (!block) return '📛';
-    return '🧍';
+    if (training.isSinglePaid) return "💸";
+    if (!block) return "📛";
+    return "🧍";
   };
 
   const handleDeleteWithConfirm = () => {
     modals.openConfirmModal({
-      title: 'Подтверждение',
+      title: "Подтверждение",
       children: (
         <Text size="sm">Вы точно хотите отменить эту тренировку?</Text>
       ),
-      labels: { confirm: 'Да, отменить', cancel: 'Нет' },
-      confirmProps: { color: 'red' },
+      labels: { confirm: "Да, отменить", cancel: "Нет" },
+      confirmProps: { color: "red" },
       onConfirm: onDelete,
     });
   };
 
+  const outlineStyle = {
+    root: {
+      color: "#000",
+      border: "1px solid #000",
+      borderRadius: 12,
+      backgroundColor: "#fff",
+      fontWeight: 500,
+      transition: "background 0.2s",
+      "&:hover": { backgroundColor: "#f2f2f2" },
+    },
+  };
+
+  const attendanceStyle = (active: boolean, color: string) => ({
+    root: {
+      color: active ? "#fff" : color,
+      backgroundColor: active ? color : "#fff",
+      border: `1px solid ${color}`,
+      borderRadius: 12,
+      fontWeight: 500,
+      "&:hover": {
+        backgroundColor: active ? color : "#f2f2f2",
+      },
+    },
+  });
+
   return (
-    <Paper
-      withBorder
-      shadow="xs"
-      radius="md"
-      p="sm"
-      mb="xs"
-      style={{ backgroundColor: getCardColor(training.status) }}
-    >
+    <Paper withBorder radius="xl" p="md" shadow="xs">
       <Group position="apart" mb="xs">
-        <Text fw={500}>
-          {getUserIcon()} {training.user.name} {training.user.lastName ?? ''}{' '}
+        <Text fw={600}>
+          {getUserIcon()} {training.user.name} {training.user.lastName ?? ""}
           {training.user.internalTag && (
-            <Text span color="dimmed">
+            <Text span c="dimmed">
+              {" "}
               ({training.user.internalTag})
             </Text>
           )}
         </Text>
+
         <Badge
           color={
-            training.status === 'CONFIRMED'
-              ? 'green'
-              : training.status === 'DECLINED'
-              ? 'red'
-              : 'gray'
+            training.status === "CONFIRMED"
+              ? "green"
+              : training.status === "DECLINED"
+              ? "red"
+              : "gray"
           }
+          variant="light"
         >
-          {training.status === 'CONFIRMED'
-            ? 'Придёт'
-            : training.status === 'DECLINED'
-            ? 'Не придёт'
-            : 'Ожидается'}
+          {training.status === "CONFIRMED"
+            ? "Придёт"
+            : training.status === "DECLINED"
+            ? "Не придёт"
+            : "Ожидается"}
         </Badge>
       </Group>
 
       <Group grow spacing="xs">
-        {dayjs(training.date).isSameOrBefore(dayjs(), 'day') && (
+        {dayjs(training.date).isSameOrBefore(dayjs(), "day") && (
           <>
             <Button
               size="xs"
-              color="green"
-              variant={training.attended === true ? 'filled' : 'light'}
+              styles={attendanceStyle(training.attended === true, "#2f9e44")}
               onClick={() => onAttend(true)}
             >
               Был
             </Button>
             <Button
               size="xs"
-              color="red"
-              variant={training.attended === false ? 'filled' : 'light'}
+              styles={attendanceStyle(training.attended === false, "#c92a2a")}
               onClick={() => onAttend(false)}
             >
               Прогул
@@ -96,8 +109,7 @@ export default function TrainingCard({
         )}
         <Button
           size="xs"
-          color="gray"
-          variant="light"
+          styles={outlineStyle}
           onClick={handleDeleteWithConfirm}
         >
           Отмена
