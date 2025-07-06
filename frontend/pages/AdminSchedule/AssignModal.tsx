@@ -9,7 +9,6 @@ import {
   Card,
   Divider,
   Title,
-  Box,
   Group,
   Badge,
 } from "@mantine/core";
@@ -26,7 +25,7 @@ interface AssignModalProps {
   isSinglePaid: boolean;
   setIsSinglePaid: (v: boolean) => void;
   selectedHour: number | null;
-  setSelectedHour: (hour: number) => void; // ✅ ДОБАВЛЕНО
+  setSelectedHour: (hour: number) => void;
   blocks: Record<string, PaymentBlock | null>;
 }
 
@@ -40,7 +39,7 @@ export default function AssignModal({
   isSinglePaid,
   setIsSinglePaid,
   selectedHour,
-  setSelectedHour, // ✅ ПРИНИМАЕМ
+  setSelectedHour,
   blocks,
 }: AssignModalProps) {
   const [showWarning, setShowWarning] = useState(false);
@@ -58,7 +57,7 @@ export default function AssignModal({
   const isClientPreselected = !!selectedUser;
   const isSinglePaidForced = isSinglePaid && isClientPreselected;
 
-  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]; // ⏰ Варианты времени
+  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
   return (
     <Modal
@@ -90,12 +89,10 @@ export default function AssignModal({
               placeholder="Выберите клиента"
               data={clients.map((c) => ({
                 value: c.id,
-                label: `${c.name} ${c.lastName ?? ""}${
-                  c.internalTag ? ` (${c.internalTag})` : ""
-                }`,
+                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
               }))}
               value={selectedUser}
-              onChange={setSelectedUser}
+              onChange={(val) => setSelectedUser(val || null)} // ✅ безопасный обработчик
               radius="md"
               size="md"
               withinPortal
@@ -111,7 +108,7 @@ export default function AssignModal({
           <Checkbox
             label="Разовая оплата"
             checked={isSinglePaid}
-            onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
+            onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
             radius="md"
             size="md"
             disabled={isSinglePaidForced}
