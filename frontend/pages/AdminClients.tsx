@@ -45,11 +45,9 @@ interface PaymentBlock {
 export default function AdminClients({
   onBack,
   onOpenHistory,
-  onOpenSchedule,
 }: {
   onBack: () => void;
   onOpenHistory: (userId: string) => void;
-  onOpenSchedule: (userId: string) => void;
 }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +58,7 @@ export default function AdminClients({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [internalTagValue, setInternalTagValue] = useState<string>("");
 
-  const navigate = useNavigate(); // ✅ Добавлено
+  const navigate = useNavigate(); // ✅ Используется
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
