@@ -33,29 +33,59 @@ router.get('/', authMiddleware, async (req, res) => {
 // Назначить тренировку
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, hour, isSinglePaid = false } = req.body;
-  if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only admin can assign trainings' });
 
-  const training = await prisma.training.create({
-    data: {
-      userId,
-      date: new Date(`${date}T00:00:00`),
-      hour: parseInt(hour),
-      isSinglePaid,
-    },
-  });
-
-  const now = new Date();
-  const trainingDateTime = new Date(`${date}T${hour.toString().padStart(2, '0')}:00:00`);
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (user?.telegramId && trainingDateTime > now && shouldNotifyUser(user.telegramId)) {
-    await notifyTelegram(
-      user.telegramId,
-      `📅 Вам назначена тренировка на ${new Date(date).toLocaleDateString()} в ${hour}:00\nПодтвердите участие в приложении ✅❌`
-    );
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Only admin can assign trainings' });
   }
 
-  res.json(training);
+  if (!userId || !date || hour === undefined) {
+    return res.status(400).json({ error: 'Недостаточно данных' });
+  }
+
+  const parsedHour = parseInt(hour);
+  if (isNaN(parsedHour)) {
+    return res.status(400).json({ error: 'Неверный формат часа' });
+  }
+
+  const trainingDate = new Date(`${date}T00:00:00`);
+  if (isNaN(trainingDate.getTime())) {
+    return res.status(400).json({ error: 'Неверная дата' });
+  }
+
+  try {
+    const training = await prisma.training.create({
+      data: {
+        userId,
+        date: trainingDate,
+        hour: parsedHour,
+        isSinglePaid,
+      },
+    });
+
+    try {
+      const now = new Date();
+      const trainingDateTime = new Date(`${date}T${parsedHour.toString().padStart(2, '0')}:00:00`);
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+
+      if (
+        user?.telegramId &&
+        trainingDateTime > now &&
+        shouldNotifyUser(user.telegramId)
+      ) {
+        await notifyTelegram(
+          user.telegramId,
+          `📅 Вам назначена тренировка на ${trainingDate.toLocaleDateString()} в ${parsedHour}:00\nПодтвердите участие в приложении ✅❌`
+        );
+      }
+    } catch (notifErr) {
+      console.warn('⚠️ Уведомление не отправлено:', notifErr.message);
+    }
+
+    res.json({ success: true, training });
+  } catch (err) {
+    console.error('❌ Ошибка при создании тренировки:', err);
+    res.status(500).json({ error: 'Не удалось создать тренировку' });
+  }
 });
 
 // Удалить тренировку

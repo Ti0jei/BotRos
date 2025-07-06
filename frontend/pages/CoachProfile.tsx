@@ -22,9 +22,11 @@ import {
   Badge,
 } from "@mantine/core";
 import dayjs from "dayjs";
+import { useSearchParams } from "react-router-dom"; // ✅ добавлено
 import InviteCodeViewer from "@/components/InviteCodeViewer";
 import { getToken } from "@/utils/auth";
 import ActionButton from "@/components/ui/ActionButton";
+import AssignModal from "@/components/AssignModal"; // ✅ добавлено
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -57,6 +59,11 @@ export default function CoachProfile({
 
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
+
+  // ✅ читаем параметры userId и singlePaid
+  const [params] = useSearchParams();
+  const preselectedUserId = params.get("userId");
+  const preselectedSinglePaid = params.get("singlePaid") === "true";
 
   useEffect(() => {
     const fetchTrainings = async () => {
@@ -243,6 +250,20 @@ export default function CoachProfile({
           </ActionButton>
         </Stack>
       </Card>
+
+      {/* 👉 Вставить модалку назначения с выбранным клиентом, если надо */}
+      {/* <AssignModal
+        opened={...}
+        onClose={...}
+        clients={...}
+        selectedUser={preselectedUserId}
+        setSelectedUser={...}
+        isSinglePaid={preselectedSinglePaid}
+        setIsSinglePaid={...}
+        selectedHour={...}
+        blocks={...}
+        onAssign={...}
+      /> */}
     </Center>
   );
 }

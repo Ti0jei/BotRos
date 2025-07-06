@@ -30,6 +30,31 @@ router.get('/', async (req, res) => {
   res.json(user);
 });
 
+// ✏️ Обновить профиль текущего пользователя
+router.patch('/', async (req, res) => {
+  const userId = req.user?.id;
+  const { name, age } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Неавторизован' });
+  }
+
+  try {
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name,
+        age: typeof age === 'number' ? age : undefined,
+      },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Ошибка при обновлении профиля:', err);
+    res.status(500).json({ error: 'Не удалось обновить профиль' });
+  }
+});
+
 // 👥 Получить всех клиентов (только для ADMIN)
 router.get('/all', async (req, res) => {
   if (req.user.role !== 'ADMIN') {

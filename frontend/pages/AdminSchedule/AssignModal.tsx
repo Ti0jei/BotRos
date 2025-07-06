@@ -54,6 +54,9 @@ export default function AssignModal({
   const block = selectedUser ? blocks[selectedUser] : null;
   const remaining = block ? block.paidTrainings - block.used : null;
 
+  const isClientPreselected = !!selectedUser;
+  const isSinglePaidForced = isSinglePaid && isClientPreselected;
+
   return (
     <Modal
       opened={opened}
@@ -71,25 +74,30 @@ export default function AssignModal({
             <IconClock size={20} />
             <Title order={4}>Назначить тренировку</Title>
           </Group>
+
           <Text size="sm" c="dimmed">
             Время: <b>{selectedHour}:00</b>
           </Text>
 
           <Divider />
 
-          <Select
-            label="Клиент"
-            placeholder="Выберите клиента"
-            data={clients.map((c) => ({
-              value: c.id,
-              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-            }))}
-            value={selectedUser}
-            onChange={setSelectedUser}
-            radius="md"
-            size="md"
-            withinPortal
-          />
+          {!isClientPreselected && (
+            <Select
+              label="Клиент"
+              placeholder="Выберите клиента"
+              data={clients.map((c) => ({
+                value: c.id,
+                label: `${c.name} ${c.lastName ?? ""}${
+                  c.internalTag ? ` (${c.internalTag})` : ""
+                }`,
+              }))}
+              value={selectedUser}
+              onChange={setSelectedUser}
+              radius="md"
+              size="md"
+              withinPortal
+            />
+          )}
 
           {remaining !== null && !isSinglePaid && (
             <Badge color={remaining > 0 ? "green" : "red"} size="sm">
@@ -103,6 +111,7 @@ export default function AssignModal({
             onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
             radius="md"
             size="md"
+            disabled={isSinglePaidForced} // 🔒 блокируем, если принудительно установлено
           />
 
           {showWarning && (

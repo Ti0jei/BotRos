@@ -25,6 +25,7 @@ import {
 
 import ClientPayments from "./ClientPayments";
 import ClientNutrition from "./ClientNutrition";
+import { useNavigate } from "react-router-dom"; // ✅ Добавлено
 
 interface Client {
   id: string;
@@ -58,6 +59,8 @@ export default function AdminClients({
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [internalTagValue, setInternalTagValue] = useState<string>("");
+
+  const navigate = useNavigate(); // ✅ Добавлено
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -204,9 +207,7 @@ export default function AdminClients({
                       <Text fw={600}>
                         {client.name} {client.lastName ?? ""}
                         {client.internalTag && (
-                          <Text span c="dimmed">
-                            {" "}({client.internalTag})
-                          </Text>
+                          <Text span c="dimmed"> ({client.internalTag}) </Text>
                         )}
                       </Text>
                       <Box
@@ -285,7 +286,11 @@ export default function AdminClients({
                           <Button
                             styles={buttonStyle}
                             leftIcon={<IconPlus size={16} />}
-                            onClick={() => onOpenSchedule(client.id)}
+                            onClick={() =>
+                              navigate(
+                                `/admin/assign-training?userId=${client.id}&singlePaid=${!block}`
+                              )
+                            }
                           >
                             Записать на тренировку
                           </Button>
