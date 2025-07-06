@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import AssignModal from "./AssignModal";
+import AssignModal from "./AdminSchedule/AssignModal";
 import { User, PaymentBlock } from "./types";
 
 export default function AssignTrainingPage() {
