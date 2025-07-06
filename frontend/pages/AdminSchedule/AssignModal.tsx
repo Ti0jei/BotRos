@@ -26,6 +26,7 @@ interface AssignModalProps {
   isSinglePaid: boolean;
   setIsSinglePaid: (v: boolean) => void;
   selectedHour: number | null;
+  setSelectedHour: (hour: number) => void; // ✅ ДОБАВЛЕНО
   blocks: Record<string, PaymentBlock | null>;
 }
 
@@ -39,13 +40,13 @@ export default function AssignModal({
   isSinglePaid,
   setIsSinglePaid,
   selectedHour,
+  setSelectedHour, // ✅ ПРИНИМАЕМ
   blocks,
 }: AssignModalProps) {
   const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     if (!selectedUser) return;
-
     const block = blocks[selectedUser];
     const hasBlock = block && block.paidTrainings > block.used;
     setShowWarning(!hasBlock && !isSinglePaid);
@@ -56,6 +57,8 @@ export default function AssignModal({
 
   const isClientPreselected = !!selectedUser;
   const isSinglePaidForced = isSinglePaid && isClientPreselected;
+
+  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]; // ⏰ Варианты времени
 
   return (
     <Modal
@@ -76,7 +79,7 @@ export default function AssignModal({
           </Group>
 
           <Text size="sm" c="dimmed">
-            Время: <b>{selectedHour}:00</b>
+            Время: <b>{selectedHour !== null ? `${selectedHour}:00` : "не выбрано"}</b>
           </Text>
 
           <Divider />
@@ -111,7 +114,7 @@ export default function AssignModal({
             onChange={(event) => setIsSinglePaid(event.currentTarget.checked)}
             radius="md"
             size="md"
-            disabled={isSinglePaidForced} // 🔒 блокируем, если принудительно установлено
+            disabled={isSinglePaidForced}
           />
 
           {showWarning && (
@@ -129,6 +132,27 @@ export default function AssignModal({
             </Text>
           )}
 
+          <Divider />
+
+          <Text size="sm" fw={500}>
+            Выберите время:
+          </Text>
+
+          <Group spacing="xs" wrap="wrap">
+            {hours.map((h) => (
+              <Button
+                key={h}
+                variant={selectedHour === h ? "filled" : "outline"}
+                color="dark"
+                size="xs"
+                radius="xl"
+                onClick={() => setSelectedHour(h)}
+              >
+                {h}:00
+              </Button>
+            ))}
+          </Group>
+
           <Button
             fullWidth
             radius="xl"
@@ -136,6 +160,7 @@ export default function AssignModal({
             size="md"
             onClick={onAssign}
             style={{ fontWeight: 600 }}
+            disabled={!selectedUser || selectedHour === null}
           >
             Назначить
           </Button>

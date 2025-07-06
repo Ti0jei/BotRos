@@ -94,8 +94,8 @@ export default function AssignTrainingPage() {
       isSinglePaid={isSinglePaid}
       setIsSinglePaid={setIsSinglePaid}
       selectedHour={selectedHour}
+      setSelectedHour={setSelectedHour} // ✅ вот это было нужно
       blocks={blocks}
     />
   );
 }
-Ы
