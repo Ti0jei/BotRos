@@ -13,6 +13,7 @@ import PaymentHistory from './pages/PaymentHistory';
 import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 import ClientNutrition from './pages/ClientNutrition';
+import AssignTrainingPage from './pages/AssignTrainingPage'; // ✅ новый импорт
 
 import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
@@ -30,6 +31,7 @@ function App() {
     | 'reset-request'
     | 'reset-confirm'
     | 'nutrition'
+    | 'assign-training' // ✅ добавлен
   >('login');
 
   const [profile, setProfile] = useState<any>(null);
@@ -166,13 +168,8 @@ function App() {
         />
       )}
 
-      {view === 'reset-request' && (
-        <RequestReset onBack={() => setView('login')} />
-      )}
-
-      {view === 'reset-confirm' && (
-        <ResetPassword onBack={() => setView('login')} />
-      )}
+      {view === 'reset-request' && <RequestReset onBack={() => setView('login')} />}
+      {view === 'reset-confirm' && <ResetPassword onBack={() => setView('login')} />}
 
       {view === 'profile' && profile && (
         <>
@@ -195,17 +192,11 @@ function App() {
       )}
 
       {view === 'client-calendar' && profile?.role === 'USER' && (
-        <ClientSchedule
-          onBack={() => setView('profile')}
-          onOpenBlock={() => setView('client-block')}
-        />
+        <ClientSchedule onBack={() => setView('profile')} onOpenBlock={() => setView('client-block')} />
       )}
 
       {view === 'client-block' && profile?.role === 'USER' && (
-        <ClientBlock
-          onBack={() => setView('client-calendar')}
-          onToProfile={() => setView('profile')}
-        />
+        <ClientBlock onBack={() => setView('client-calendar')} onToProfile={() => setView('profile')} />
       )}
 
       {view === 'nutrition' && profile?.role === 'USER' && (
@@ -228,6 +219,10 @@ function App() {
 
       {view === 'history' && selectedClientId && (
         <PaymentHistory userId={selectedClientId} onBack={() => setView('clients')} />
+      )}
+
+      {view === 'assign-training' && profile?.role === 'ADMIN' && (
+        <AssignTrainingPage /> // ✅ теперь страница назначения тренировки отображается
       )}
     </Box>
   );
