@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AssignModal from "./AdminSchedule/AssignModal";
-import { User, PaymentBlock } from "./types";
+import { User, PaymentBlock } from "./AdminSchedule/types";
 
 export default function AssignTrainingPage() {
   const [searchParams] = useSearchParams();
