@@ -1,0 +1,30 @@
+{
+  "name": "telegram-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "backend/bot.mjs",
+  "scripts": {
+    "dev": "node backend/bot.mjs",
+    "start": "node backend/bot.mjs",
+    "api": "node backend/index.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "data-uri-to-buffer": "^4.0.1",
+    "dayjs": "^1.11.13",
+    "dotenv": "^17.0.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.0",
+    "node-cron": "^4.1.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.7.0",
+    "resend": "^4.6.0",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "prisma": "^6.10.0"
+  }
+}
