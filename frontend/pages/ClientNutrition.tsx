@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import {
-  IconCalendar,
   IconTrash,
   IconEdit,
   IconPlus,
@@ -19,12 +18,11 @@ import {
   Title,
   Divider,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
-import "@mantine/dates/styles.css";
 
 import CardBlock from "@/components/ui/CardBlock";
 import FormSection from "@/components/ui/FormSection";
 import ActionButton from "@/components/ui/ActionButton";
+import CustomModalDatePicker from "@/components/ui/CustomModalDatePicker";
 
 interface NutritionDay {
   date: string;
@@ -174,25 +172,11 @@ export default function ClientNutrition({
           </Title>
 
           {/* Календарь */}
-          <DatePickerInput
-            value={selectedDate}
-            onChange={(val) => {
-              setSelectedDate(val);
+          <CustomModalDatePicker
+            date={dayjs(selectedDate)}
+            setDate={(d) => {
+              setSelectedDate(d.toDate());
               setFormVisible(false);
-            }}
-            locale="ru"
-            clearable
-            maxDate={new Date()}
-            valueFormat="DD.MM.YYYY"
-            leftSection={<IconCalendar size={16} />}
-            radius="xl"
-            size="md"
-            placeholder="Выберите дату"
-            dropdownType="modal"
-            popoverProps={{
-              withinPortal: true,
-              shadow: "md",
-              position: "bottom-start",
             }}
           />
 

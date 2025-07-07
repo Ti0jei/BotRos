@@ -92,7 +92,7 @@ export default function AssignModal({
   return (
     <Modal
       opened={opened}
-      onClose={onClose} // ✅ теперь управляется извне
+      onClose={onClose}
       withCloseButton={false}
       centered
       padding={0}
@@ -108,7 +108,7 @@ export default function AssignModal({
               <Title order={4}>Назначить тренировку</Title>
             </Group>
             <Button
-              onClick={onClose} // ✅ крестик закрывает модалку
+              onClick={onClose}
               variant="subtle"
               color="dark"
               px={0}
@@ -196,18 +196,27 @@ export default function AssignModal({
                   .join(", ");
 
                 return (
-                  <Group key={h} spacing={6} align="flex-start">
+                  <Group key={h} spacing="xs" align="center" noWrap>
                     <Button
                       variant={selectedHour === h ? "filled" : "outline"}
                       color="dark"
                       size="xs"
                       radius="xl"
                       onClick={() => setSelectedHour(h)}
+                      style={{ minWidth: 60 }}
                     >
                       {h}:00
                     </Button>
                     {usersAtThisHour && (
-                      <Text size="xs" c="dimmed">
+                      <Text
+                        size="xs"
+                        c="dimmed"
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {usersAtThisHour}
                       </Text>
                     )}

@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { Button, Group } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
+
+import CustomModalDatePicker from "@/components/ui/CustomModalDatePicker";
 
 export default function ScheduleHeader({
   date,
@@ -13,7 +14,7 @@ export default function ScheduleHeader({
   setDate: (d: Dayjs) => void;
 }) {
   useEffect(() => {
-    dayjs.locale("ru"); // ✅ русская локаль
+    dayjs.locale("ru");
   }, []);
 
   const outlineStyle = {
@@ -40,28 +41,7 @@ export default function ScheduleHeader({
         Назад
       </Button>
 
-      <DatePickerInput
-        locale="ru" // ✅ локализация
-        value={date.toDate()}
-        onChange={(val) => val && setDate(dayjs(val))}
-        clearable
-        clearButtonLabel="Очистить"
-        size="xs"
-        dropdownType="popover"
-        hideWeekdays={false}
-        nextIcon={<IconChevronRight size={14} />}
-        previousIcon={<IconChevronLeft size={14} />}
-        popoverProps={{ withinPortal: true, shadow: "md", radius: "md" }}
-        styles={{
-          input: {
-            textAlign: "center",
-            borderRadius: 12,
-            fontWeight: 600,
-            border: "1px solid #000",
-            minWidth: 130,
-          },
-        }}
-      />
+      <CustomModalDatePicker date={date} setDate={setDate} />
 
       <Button
         size="xs"
