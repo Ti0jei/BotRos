@@ -13,7 +13,7 @@ import PaymentHistory from './pages/PaymentHistory';
 import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 import ClientNutrition from './pages/ClientNutrition';
-import AssignTrainingPage from './pages/AssignTrainingPage'; // ✅ новый импорт
+import AssignTrainingPage from './pages/AssignTrainingPage';
 
 import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
@@ -31,7 +31,7 @@ function App() {
     | 'reset-request'
     | 'reset-confirm'
     | 'nutrition'
-    | 'assign-training' // ✅ добавлен
+    | 'assign-training'
   >('login');
 
   const [profile, setProfile] = useState<any>(null);
@@ -214,6 +214,7 @@ function App() {
             setSelectedClientId(userId);
             setView('history');
           }}
+          setView={setView} // ✅ ВАЖНО: добавлен проп
         />
       )}
 
@@ -222,7 +223,7 @@ function App() {
       )}
 
       {view === 'assign-training' && profile?.role === 'ADMIN' && (
-        <AssignTrainingPage /> // ✅ теперь страница назначения тренировки отображается
+        <AssignTrainingPage />
       )}
     </Box>
   );

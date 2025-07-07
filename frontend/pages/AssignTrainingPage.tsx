@@ -48,7 +48,7 @@ export default function AssignTrainingPage() {
     if (sp === "true") setIsSinglePaid(true);
     if (sp === "false") setIsSinglePaid(false);
 
-    // Очистим, чтобы не использовать в следующий раз
+    // Очистим localStorage
     localStorage.removeItem("assignUserId");
     localStorage.removeItem("assignSinglePaid");
   }, []);
@@ -76,7 +76,7 @@ export default function AssignTrainingPage() {
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        navigate(-1); // назад
+        navigate(-1);
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
