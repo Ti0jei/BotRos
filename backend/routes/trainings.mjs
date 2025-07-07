@@ -30,7 +30,7 @@ router.get('/', authMiddleware, async (req, res) => {
   res.json(trainings);
 });
 
-// Получить тренировки на конкретную дату (для отображения занятых слотов)
+// ✅ Получить тренировки на конкретную дату
 router.get('/date/:date', authMiddleware, async (req, res) => {
   const { date } = req.params;
 
@@ -196,13 +196,13 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     data: { attended, wasCounted: true },
   });
 
+  const dateOnly = (d) => d.toISOString().slice(0, 10);
+
   if ((attended === true || attended === false) && training.wasCounted !== true) {
     const trainingDate = new Date(training.date);
     const activeBlock = await prisma.paymentBlock.findFirst({
       where: { userId: training.userId, active: true },
     });
-
-    const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
 
     if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
       const currentUsed = activeBlock.used || 0;
