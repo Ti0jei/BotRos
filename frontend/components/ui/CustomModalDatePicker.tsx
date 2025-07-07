@@ -31,7 +31,7 @@ export default function CustomModalDatePicker({
 
   return (
     <>
-      <Group position="center" spacing="xs">
+      <Group position="center" spacing="xs" mt="sm">
         <Button
           size="xs"
           variant="outline"
@@ -74,7 +74,7 @@ export default function CustomModalDatePicker({
           onChange={(selected) => {
             if (selected) {
               setDate(dayjs(selected));
-              setOpened(false);
+              setOpened(false); // <-- сразу закрываем модалку при выборе
             }
           }}
           size="md"
@@ -82,9 +82,7 @@ export default function CustomModalDatePicker({
           styles={{
             day: { fontWeight: 500 },
             weekday: { fontWeight: 600 },
-            calendarHeaderControl: {
-              color: "#1a1a1a",
-            },
+            calendarHeaderControl: { color: "#1a1a1a" },
           }}
         />
       </Modal>
