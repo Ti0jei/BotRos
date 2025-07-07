@@ -97,7 +97,7 @@ export default function AssignModal({
       centered
       padding={0}
       radius="xl"
-      size="sm"
+      size="auto" // 🛠️ ВАЖНО: убрали sm, чтобы не резало ширину календаря
       overlayProps={{ blur: 4 }}
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
