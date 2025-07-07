@@ -80,7 +80,7 @@ export default function CustomModalDatePicker({
               }
             }}
             size="md"
-            style={{ width: 500 }} // 👈 вот это реально работает
+            style={{ width: 340 }} // 👈 вот это реально работает
             styles={{
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
