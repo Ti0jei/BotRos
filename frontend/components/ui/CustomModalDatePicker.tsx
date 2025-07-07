@@ -80,6 +80,11 @@ export default function CustomModalDatePicker({
           size="md"
           fullWidth
           styles={{
+            root: { width: "100%" },
+            calendar: { width: "100%" },
+            calendarBase: { width: "100%" },
+            day: { fontWeight: 500 },
+            weekday: { fontWeight: 600 },
             calendarHeaderControl: {
               color: "#1a1a1a",
               width: 32,
@@ -96,8 +101,6 @@ export default function CustomModalDatePicker({
                 boxShadow: "none",
               },
             },
-            day: { fontWeight: 500 },
-            weekday: { fontWeight: 600 },
           }}
         />
       </Modal>

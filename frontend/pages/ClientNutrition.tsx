@@ -189,7 +189,7 @@ export default function ClientNutrition({
             >
               <Group position="apart">
                 <Text size="sm">
-                  {dayjs(selectedRecord.date).format("DD MMM YYYY")}
+                  {dayjs(selectedRecord.date).locale("ru").format("D MMMM YYYY")}
                 </Text>
                 <Text size="xs" c="pink">
                   {selectedRecord.calories} ККАЛ
