@@ -68,7 +68,6 @@ export default function CustomModalDatePicker({
         withCloseButton={false}
         overlayProps={{ blur: 4 }}
         size="auto"
-        style={{ width: 320 }}
       >
         <Stack>
           <DatePicker
@@ -81,11 +80,10 @@ export default function CustomModalDatePicker({
               }
             }}
             size="md"
-            fullWidth
             styles={{
               root: { width: "100%" },
-              calendar: { width: "100%" },
-              calendarBase: { width: "100%" },
+              calendar: { width: 320 },       // 💥 это фикс
+              calendarBase: { width: 320 },   // 💥 и это
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
               calendarHeaderControl: {
