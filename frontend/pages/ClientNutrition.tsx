@@ -53,7 +53,7 @@ export default function ClientNutrition({
   const [weekly, setWeekly] = useState<Summary | null>(null);
   const [monthly, setMonthly] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [formVisible, setFormVisible] = useState(false);
   const [calories, setCalories] = useState<number | "">("");
   const [protein, setProtein] = useState<number | "">("");
@@ -173,9 +173,9 @@ export default function ClientNutrition({
 
           {/* Календарь */}
           <CustomModalDatePicker
-            date={dayjs(selectedDate)}
+            date={dayjs(selectedDate ?? new Date())}
             setDate={(d) => {
-              setSelectedDate(d.toDate());
+              setSelectedDate(d?.toDate() ?? new Date());
               setFormVisible(false);
             }}
           />

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import {
   IconAlarm,
-  IconClock,
   IconChevronDown,
   IconChevronUp,
-  IconLogout,
   IconUser,
   IconPlus,
+  IconDotsVertical,
+  IconPencil,
+  IconLogout,
 } from "@tabler/icons-react";
 import {
   Box,
@@ -20,13 +21,14 @@ import {
   Text,
   Title,
   Badge,
+  Menu,
+  ActionIcon,
 } from "@mantine/core";
 import dayjs from "dayjs";
-import { useSearchParams } from "react-router-dom"; // ✅ добавлено
+import { useSearchParams } from "react-router-dom";
 import InviteCodeViewer from "@/components/InviteCodeViewer";
 import { getToken } from "@/utils/auth";
 import ActionButton from "@/components/ui/ActionButton";
-import AssignModal from "@/components/AssignModal"; // ✅ добавлено
 
 interface CoachProfileProps {
   profile: { name: string };
@@ -56,12 +58,10 @@ export default function CoachProfile({
   const [upcomingTrainings, setUpcomingTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCode, setShowCode] = useState(false);
-
+  const [params] = useSearchParams();
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  // ✅ читаем параметры userId и singlePaid
-  const [params] = useSearchParams();
   const preselectedUserId = params.get("userId");
   const preselectedSinglePaid = params.get("singlePaid") === "true";
 
@@ -162,8 +162,28 @@ export default function CoachProfile({
         radius="xl"
         p="xl"
         shadow="xs"
-        style={{ width: "100%", maxWidth: 420 }}
+        style={{ width: "100%", maxWidth: 420, position: "relative" }}
       >
+        {/* Бургер-меню */}
+        <Menu shadow="md" width={200} position="bottom-end">
+          <Menu.Target>
+            <ActionIcon
+              variant="subtle"
+              style={{ position: "absolute", top: 12, right: 12 }}
+            >
+              <IconDotsVertical size={18} />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item icon={<IconPencil size={16} />}>
+              Редактировать профиль
+            </Menu.Item>
+            <Menu.Item icon={<IconLogout size={16} />} color="red" onClick={onLogout}>
+              Выйти
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+
         <Stack spacing="lg">
           <Stack spacing={4}>
             <Title order={3}>👤 {profile.name}</Title>
@@ -236,34 +256,8 @@ export default function CoachProfile({
               <InviteCodeViewer />
             </Card>
           </Collapse>
-
-          <Divider />
-
-          <ActionButton
-            variant="outline"
-            fullWidth
-            leftIcon={<IconLogout size={16} />}
-            colorStyle="black"
-            onClick={onLogout}
-          >
-            Выйти
-          </ActionButton>
         </Stack>
       </Card>
-
-      {/* 👉 Вставить модалку назначения с выбранным клиентом, если надо */}
-      {/* <AssignModal
-        opened={...}
-        onClose={...}
-        clients={...}
-        selectedUser={preselectedUserId}
-        setSelectedUser={...}
-        isSinglePaid={preselectedSinglePaid}
-        setIsSinglePaid={...}
-        selectedHour={...}
-        blocks={...}
-        onAssign={...}
-      /> */}
     </Center>
   );
 }
