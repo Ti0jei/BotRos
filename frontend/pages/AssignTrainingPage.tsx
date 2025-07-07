@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AssignModal from "./AdminSchedule/AssignModal";
-import { User, PaymentBlock } from "./AdminSchedule/types";
+import { useEffect, useState } from 'react';
+import AssignModal from './AdminSchedule/AssignModal';
+import { User, PaymentBlock } from './AdminSchedule/types';
 
-export default function AssignTrainingPage() {
+export default function AssignTrainingPage({ setView }: { setView: (v: string) => void }) {
   const [clients, setClients] = useState<User[]>([]);
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
 
-  const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -74,7 +72,7 @@ export default function AssignTrainingPage() {
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        navigate("/clients"); // ← всегда работает
+        setView("clients"); // ✅ назад к клиентам
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
@@ -90,7 +88,7 @@ export default function AssignTrainingPage() {
       opened={true}
       onClose={() => {
         console.log("Закрытие модалки через крестик");
-        navigate("/adminclients"); // ← работает даже при прямом заходе
+        setView("clients"); // ✅ назад к клиентам
       }}
       onAssign={assignTraining}
       clients={clients}

@@ -1,3 +1,4 @@
+// импортов не меняем
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
@@ -214,7 +215,7 @@ function App() {
             setSelectedClientId(userId);
             setView('history');
           }}
-          setView={setView} // ✅ ВАЖНО: добавлен проп
+          setView={setView}
         />
       )}
 
@@ -223,7 +224,7 @@ function App() {
       )}
 
       {view === 'assign-training' && profile?.role === 'ADMIN' && (
-        <AssignTrainingPage />
+        <AssignTrainingPage setView={setView} /> // ✅ ← вот ключевая правка
       )}
     </Box>
   );
