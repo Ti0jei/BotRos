@@ -53,7 +53,7 @@ export default function ClientNutrition({
   const [weekly, setWeekly] = useState<Summary | null>(null);
   const [monthly, setMonthly] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState(dayjs());
   const [formVisible, setFormVisible] = useState(false);
   const [calories, setCalories] = useState<number | "">("");
   const [protein, setProtein] = useState<number | "">("");
@@ -96,7 +96,7 @@ export default function ClientNutrition({
   const selectedRecord = data.find(
     (d) =>
       dayjs(d.date).format("YYYY-MM-DD") ===
-      dayjs(selectedDate).format("YYYY-MM-DD")
+      selectedDate.format("YYYY-MM-DD")
   );
 
   const handleSave = async () => {
@@ -116,7 +116,7 @@ export default function ClientNutrition({
       headers,
       body: JSON.stringify({
         userId,
-        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        date: selectedDate.format("YYYY-MM-DD"),
         calories,
         protein,
         fat,
@@ -140,7 +140,7 @@ export default function ClientNutrition({
     if (!confirmed) return;
 
     const res = await fetch(
-      `${API}/api/nutrition/${userId}/${dayjs(selectedDate).format("YYYY-MM-DD")}`,
+      `${API}/api/nutrition/${userId}/${selectedDate.format("YYYY-MM-DD")}`,
       {
         method: "DELETE",
         headers,
@@ -171,16 +171,14 @@ export default function ClientNutrition({
             {isAdmin ? "Питание клиента" : "Моё питание"}
           </Title>
 
-          {/* Календарь */}
           <CustomModalDatePicker
-            date={dayjs(selectedDate ?? new Date())}
+            date={selectedDate}
             setDate={(d) => {
-              setSelectedDate(d?.toDate() ?? new Date());
+              setSelectedDate(d);
               setFormVisible(false);
             }}
           />
 
-          {/* Просмотр КБЖУ */}
           <Divider label="Выбранный день" labelPosition="center" />
 
           {selectedRecord ? (
@@ -239,7 +237,6 @@ export default function ClientNutrition({
             </Text>
           )}
 
-          {/* Ввод КБЖУ */}
           {!isAdmin && !formVisible && (
             <ActionButton
               fullWidth
@@ -302,7 +299,6 @@ export default function ClientNutrition({
             </Stack>
           )}
 
-          {/* Статистика */}
           <Divider label="Статистика" labelPosition="center" />
 
           {loading ? (
