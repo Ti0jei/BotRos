@@ -80,10 +80,8 @@ export default function CustomModalDatePicker({
               }
             }}
             size="md"
+            style={{ width: 500 }} // 👈 вот это реально работает
             styles={{
-              root: { width: "100%" },
-              calendar: { width: 320 },       // 💥 это фикс
-              calendarBase: { width: 320 },   // 💥 и это
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
               calendarHeaderControl: {
