@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Group, Stack } from "@mantine/core";
+import { Button, Modal, Stack, Group } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -12,6 +12,7 @@ export default function CustomModalDatePicker({
   setDate: (d: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
+  const [tempDate, setTempDate] = useState<Date | null>(date.toDate());
 
   useEffect(() => {
     dayjs.locale("ru");
@@ -45,7 +46,10 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           styles={buttonStyle}
-          onClick={() => setOpened(true)}
+          onClick={() => {
+            setTempDate(date.toDate());
+            setOpened(true);
+          }}
         >
           {date.format("DD.MM.YYYY")}
         </Button>
@@ -72,15 +76,16 @@ export default function CustomModalDatePicker({
         <Stack>
           <DatePicker
             locale="ru"
-            value={date.toDate()}
-            onChange={(selected) => {
-              if (selected) {
-                setDate(dayjs(selected));
+            value={tempDate}
+            onChange={(d) => {
+              if (d) {
+                setTempDate(d);
+                setDate(dayjs(d));
                 setOpened(false);
               }
             }}
             size="md"
-            style={{ width: 340 }} // 👈 вот это реально работает
+            style={{ width: 340 }}
             styles={{
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
