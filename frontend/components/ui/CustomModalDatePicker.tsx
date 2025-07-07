@@ -74,15 +74,30 @@ export default function CustomModalDatePicker({
           onChange={(selected) => {
             if (selected) {
               setDate(dayjs(selected));
-              setOpened(false); // <-- сразу закрываем модалку при выборе
+              setOpened(false);
             }
           }}
           size="md"
           fullWidth
           styles={{
+            calendarHeaderControl: {
+              color: "#1a1a1a",
+              width: 32,
+              height: 32,
+              minHeight: 32,
+              minWidth: 32,
+              padding: 0,
+              svg: {
+                width: 20,
+                height: 20,
+              },
+              "&:focus": {
+                outline: "none",
+                boxShadow: "none",
+              },
+            },
             day: { fontWeight: 500 },
             weekday: { fontWeight: 600 },
-            calendarHeaderControl: { color: "#1a1a1a" },
           }}
         />
       </Modal>
