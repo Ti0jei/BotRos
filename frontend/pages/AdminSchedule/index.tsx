@@ -192,7 +192,12 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
 
       <AssignModal
         opened={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedUser(null);
+          setSelectedHour(null);
+          onBack(); // возвращаемся к экрану клиентов
+        }}
         onAssign={assignTraining}
         clients={clients}
         selectedUser={selectedUser}
