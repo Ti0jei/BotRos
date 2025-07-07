@@ -14,6 +14,7 @@ import {
   NumberInput,
   Loader,
   Divider,
+  Group, // ✅ добавлено сюда
 } from "@mantine/core";
 
 import ActionButton from "@/components/ui/ActionButton";
