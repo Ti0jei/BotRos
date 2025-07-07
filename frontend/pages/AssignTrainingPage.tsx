@@ -14,7 +14,7 @@ export default function AssignTrainingPage() {
   const token = localStorage.getItem("token");
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  // Подгрузка клиентов
+  // Загрузка клиентов
   useEffect(() => {
     fetch(`${API}/api/clients`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -26,7 +26,7 @@ export default function AssignTrainingPage() {
       });
   }, []);
 
-  // Подгрузка блоков
+  // Загрузка блоков
   const loadBlock = async (userId: string) => {
     try {
       const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
@@ -39,7 +39,7 @@ export default function AssignTrainingPage() {
     }
   };
 
-  // Чтение userId и singlePaid из localStorage
+  // Подхватываем данные из localStorage
   useEffect(() => {
     const uid = localStorage.getItem("assignUserId");
     const sp = localStorage.getItem("assignSinglePaid");
@@ -48,12 +48,11 @@ export default function AssignTrainingPage() {
     if (sp === "true") setIsSinglePaid(true);
     if (sp === "false") setIsSinglePaid(false);
 
-    // Очистим localStorage
     localStorage.removeItem("assignUserId");
     localStorage.removeItem("assignSinglePaid");
   }, []);
 
-  // Назначение тренировки
+  // Назначение
   const assignTraining = async () => {
     if (!selectedUser || selectedHour === null) return;
 
@@ -64,8 +63,7 @@ export default function AssignTrainingPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           userId: selectedUser,
           date: today,
@@ -76,7 +74,7 @@ export default function AssignTrainingPage() {
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        navigate(-1);
+        navigate(-1); // ← назад
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
@@ -90,7 +88,7 @@ export default function AssignTrainingPage() {
   return (
     <AssignModal
       opened={true}
-      onClose={() => navigate(-1)}
+      onClose={() => navigate(-1)} // 👈 крестик и backdrop срабатывают
       onAssign={assignTraining}
       clients={clients}
       selectedUser={selectedUser}

@@ -1,7 +1,5 @@
-// components/ui/CustomModalDatePicker.tsx
-
 import { useEffect, useState } from "react";
-import { Button, Modal, Stack, Group } from "@mantine/core";
+import { Button, Modal, Group } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -14,24 +12,10 @@ export default function CustomModalDatePicker({
   setDate: (d: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
-  const [tempDate, setTempDate] = useState<Date | null>(date.toDate());
 
   useEffect(() => {
     dayjs.locale("ru");
   }, []);
-
-  const handleApply = () => {
-    if (tempDate) {
-      setDate(dayjs(tempDate));
-    }
-    setOpened(false);
-  };
-
-  const handleClear = () => {
-    setTempDate(null);
-    setDate(dayjs());
-    setOpened(false);
-  };
 
   const buttonStyle = {
     root: {
@@ -84,34 +68,25 @@ export default function CustomModalDatePicker({
         withCloseButton={false}
         overlayProps={{ blur: 4 }}
       >
-        <Stack>
-          <DatePicker
-            locale="ru"
-            value={tempDate}
-            onChange={setTempDate}
-            size="md"
-            fullWidth
-            styles={{
-              day: { fontWeight: 500 },
-              weekday: { fontWeight: 600 },
-              calendarHeaderControl: {
-                color: "#1a1a1a",
-              },
-            }}
-          />
-
-          <Group position="apart" mt="md">
-            <Button variant="outline" color="red" styles={buttonStyle} onClick={handleClear}>
-              Удалить
-            </Button>
-            <Button variant="outline" styles={buttonStyle} onClick={() => setOpened(false)}>
-              Отмена
-            </Button>
-            <Button styles={buttonStyle} onClick={handleApply}>
-              Установить
-            </Button>
-          </Group>
-        </Stack>
+        <DatePicker
+          locale="ru"
+          value={date.toDate()}
+          onChange={(selected) => {
+            if (selected) {
+              setDate(dayjs(selected));
+              setOpened(false);
+            }
+          }}
+          size="md"
+          fullWidth
+          styles={{
+            day: { fontWeight: 500 },
+            weekday: { fontWeight: 600 },
+            calendarHeaderControl: {
+              color: "#1a1a1a",
+            },
+          }}
+        />
       </Modal>
     </>
   );
