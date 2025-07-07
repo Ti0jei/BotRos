@@ -1,9 +1,6 @@
-// components/ui/CustomModalDatePicker.tsx
-
-import { useEffect } from "react";
-import { Button, Group } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { Button, Modal, Stack, Group, Text } from "@mantine/core";
+import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 
@@ -14,66 +11,82 @@ export default function CustomModalDatePicker({
   date: Dayjs;
   setDate: (d: Dayjs) => void;
 }) {
+  const [opened, setOpened] = useState(false);
+  const [tempDate, setTempDate] = useState<Date | null>(date.toDate());
+
   useEffect(() => {
     dayjs.locale("ru");
   }, []);
 
-  const outlineStyle = {
-    root: {
-      color: "#000",
-      border: "1px solid #000",
-      borderRadius: 12,
-      backgroundColor: "#fff",
-      fontWeight: 500,
-      transition: "background 0.2s",
-      "&:hover": { backgroundColor: "#f2f2f2" },
-    },
+  const handleApply = () => {
+    if (tempDate) {
+      setDate(dayjs(tempDate));
+    }
+    setOpened(false);
+  };
+
+  const handleClear = () => {
+    setTempDate(null);
+    setDate(dayjs()); // Можно сбросить в today или null, если логика позволяет
+    setOpened(false);
   };
 
   return (
-    <Group position="center" spacing="xs" mb="sm">
-      <Button
-        size="xs"
-        leftIcon={<IconChevronLeft size={14} />}
-        onClick={() => setDate(date.subtract(1, "day"))}
-        variant="outline"
-        styles={outlineStyle}
-      >
-        Назад
-      </Button>
+    <>
+      <Group position="center" spacing="xs">
+        <Button
+          size="xs"
+          variant="outline"
+          onClick={() => setDate(date.subtract(1, "day"))}
+        >
+          Назад
+        </Button>
 
-      <DatePickerInput
-        locale="ru"
-        value={date.toDate()}
-        onChange={(val) => val && setDate(dayjs(val))}
-        clearable
-        clearButtonLabel="Очистить"
-        size="xs"
-        dropdownType="popover"
-        hideWeekdays={false}
-        nextIcon={<IconChevronRight size={14} />}
-        previousIcon={<IconChevronLeft size={14} />}
-        popoverProps={{ withinPortal: true, shadow: "md", radius: "md" }}
-        styles={{
-          input: {
-            textAlign: "center",
-            borderRadius: 12,
-            fontWeight: 600,
-            border: "1px solid #000",
-            minWidth: 130,
-          },
-        }}
-      />
+        <Button
+          size="xs"
+          variant="outline"
+          onClick={() => setOpened(true)}
+        >
+          {date.format("D MMMM, YYYY")}
+        </Button>
 
-      <Button
-        size="xs"
-        rightIcon={<IconChevronRight size={14} />}
-        onClick={() => setDate(date.add(1, "day"))}
-        variant="outline"
-        styles={outlineStyle}
+        <Button
+          size="xs"
+          variant="outline"
+          onClick={() => setDate(date.add(1, "day"))}
+        >
+          Вперёд
+        </Button>
+      </Group>
+
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        centered
+        radius="md"
+        withCloseButton={false}
+        overlayProps={{ blur: 4 }}
       >
-        Вперёд
-      </Button>
-    </Group>
+        <Stack>
+          <DatePicker
+            locale="ru"
+            value={tempDate}
+            onChange={setTempDate}
+            size="md"
+            fullWidth
+          />
+
+          <Group position="apart" mt="md">
+            <Button variant="subtle" color="red" onClick={handleClear}>
+              Удалить
+            </Button>
+            <Button variant="default" onClick={() => setOpened(false)}>
+              Отмена
+            </Button>
+            <Button onClick={handleApply}>Установить</Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </>
   );
 }
