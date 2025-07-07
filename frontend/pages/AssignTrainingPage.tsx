@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AssignModal from "./AdminSchedule/AssignModal";
 import { User, PaymentBlock } from "./AdminSchedule/types";
 
 export default function AssignTrainingPage() {
-  const [searchParams] = useSearchParams();
   const [clients, setClients] = useState<User[]>([]);
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -40,14 +39,18 @@ export default function AssignTrainingPage() {
     }
   };
 
-  // Парсинг userId и singlePaid из URL
+  // Чтение userId и singlePaid из localStorage
   useEffect(() => {
-    const uid = searchParams.get("userId");
-    const sp = searchParams.get("singlePaid");
+    const uid = localStorage.getItem("assignUserId");
+    const sp = localStorage.getItem("assignSinglePaid");
 
     if (uid) setSelectedUser(uid);
     if (sp === "true") setIsSinglePaid(true);
     if (sp === "false") setIsSinglePaid(false);
+
+    // Очистим, чтобы не использовать в следующий раз
+    localStorage.removeItem("assignUserId");
+    localStorage.removeItem("assignSinglePaid");
   }, []);
 
   // Назначение тренировки

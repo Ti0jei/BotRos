@@ -25,7 +25,6 @@ import {
 
 import ClientPayments from "./ClientPayments";
 import ClientNutrition from "./ClientNutrition";
-import { useNavigate } from "react-router-dom";
 
 interface Client {
   id: string;
@@ -45,20 +44,20 @@ interface PaymentBlock {
 export default function AdminClients({
   onBack,
   onOpenHistory,
+  setView,
 }: {
   onBack: () => void;
   onOpenHistory: (userId: string) => void;
+  setView: (v: string) => void;
 }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [view, setView] = useState<"payments" | "nutrition" | null>(null);
+  const [view, internalViewSet] = useState<"payments" | "nutrition" | null>(null);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [internalTagValue, setInternalTagValue] = useState<string>("");
-
-  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -159,7 +158,7 @@ export default function AdminClients({
         client={selectedClient}
         onBack={() => {
           setSelectedClient(null);
-          setView(null);
+          internalViewSet(null);
         }}
       />
     );
@@ -172,7 +171,7 @@ export default function AdminClients({
         isAdmin={true}
         onBack={() => {
           setSelectedClient(null);
-          setView(null);
+          internalViewSet(null);
         }}
       />
     );
@@ -253,7 +252,7 @@ export default function AdminClients({
                             leftIcon={<IconChefHat size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
-                              setView("nutrition");
+                              internalViewSet("nutrition");
                             }}
                           >
                             Питание
@@ -263,7 +262,7 @@ export default function AdminClients({
                             leftIcon={<IconCash size={16} />}
                             onClick={() => {
                               setSelectedClient(client);
-                              setView("payments");
+                              internalViewSet("payments");
                             }}
                           >
                             Оплата
@@ -285,15 +284,9 @@ export default function AdminClients({
                             styles={buttonStyle}
                             leftIcon={<IconPlus size={16} />}
                             onClick={() => {
-                              console.log("📦 Запись на тренировку:", {
-                                clientId: client.id,
-                                hasBlock: !!block,
-                                singlePaid: !block,
-                              });
-
-                              navigate(
-                                `/admin/assign-training?userId=${client.id}&singlePaid=${!block}`
-                              );
+                              localStorage.setItem("assignUserId", client.id);
+                              localStorage.setItem("assignSinglePaid", (!block).toString());
+                              setView("assign-training");
                             }}
                           >
                             Записать на тренировку
