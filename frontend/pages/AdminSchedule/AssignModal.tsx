@@ -1,3 +1,5 @@
+// AssignModal.tsx
+
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -11,6 +13,7 @@ import {
   Title,
   Group,
   Badge,
+  ScrollArea,
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
@@ -64,7 +67,7 @@ export default function AssignModal({
   const block = selectedUser ? blocks[selectedUser] : null;
   const remaining = block ? block.paidTrainings - block.used : null;
   const isClientPreselected = !!selectedUser;
-  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  const hours = Array.from({ length: 15 }, (_, i) => i + 8); // 8–22
 
   useEffect(() => {
     dayjs.locale("ru");
@@ -74,22 +77,18 @@ export default function AssignModal({
     if (!selectedUser) return;
     const hasBlock = block && block.paidTrainings > block.used;
     setShowWarning(!hasBlock && !isSinglePaid);
-    if (!hasBlock) setIsSinglePaid(true);
-    else setIsSinglePaid(false);
+    setIsSinglePaid(!hasBlock);
   }, [selectedUser, blocks]);
 
-  // Подгружаем назначенных клиентов на дату
   useEffect(() => {
     const loadAssigned = async () => {
       const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setAssignedClients(data); // data: Array<{ user: { name, lastName }, hour }>
+      setAssignedClients(data);
     };
-    if (opened) {
-      loadAssigned();
-    }
+    if (opened) loadAssigned();
   }, [date, opened]);
 
   return (
@@ -105,7 +104,7 @@ export default function AssignModal({
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
         <Stack spacing="md">
-          <Group position="apart" align="center">
+          <Group position="apart">
             <Group spacing={8}>
               <IconClock size={20} />
               <Title order={4}>Назначить тренировку</Title>
@@ -190,33 +189,35 @@ export default function AssignModal({
             Выберите время:
           </Text>
 
-          <Stack spacing={6}>
-            {hours.map((h) => {
-              const usersAtThisHour = assignedClients
-                .filter((a) => a.hour === h)
-                .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
-                .join(", ");
+          <ScrollArea h={200} offsetScrollbars>
+            <Stack spacing={6}>
+              {hours.map((h) => {
+                const usersAtThisHour = assignedClients
+                  .filter((a) => a.hour === h)
+                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                  .join(", ");
 
-              return (
-                <Group key={h} spacing={6} align="flex-start">
-                  <Button
-                    variant={selectedHour === h ? "filled" : "outline"}
-                    color="dark"
-                    size="xs"
-                    radius="xl"
-                    onClick={() => setSelectedHour(h)}
-                  >
-                    {h}:00
-                  </Button>
-                  {usersAtThisHour && (
-                    <Text size="xs" c="dimmed">
-                      {usersAtThisHour}
-                    </Text>
-                  )}
-                </Group>
-              );
-            })}
-          </Stack>
+                return (
+                  <Group key={h} spacing={6} align="flex-start">
+                    <Button
+                      variant={selectedHour === h ? "filled" : "outline"}
+                      color="dark"
+                      size="xs"
+                      radius="xl"
+                      onClick={() => setSelectedHour(h)}
+                    >
+                      {h}:00
+                    </Button>
+                    {usersAtThisHour && (
+                      <Text size="xs" c="dimmed">
+                        {usersAtThisHour}
+                      </Text>
+                    )}
+                  </Group>
+                );
+              })}
+            </Stack>
+          </ScrollArea>
 
           <Button
             fullWidth
