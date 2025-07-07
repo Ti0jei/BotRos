@@ -90,7 +90,7 @@ export default function AssignTrainingPage() {
       opened={true}
       onClose={() => {
         console.log("Закрытие модалки через крестик");
-        navigate("/AdminClients"); // ← работает даже при прямом заходе
+        navigate("/adminclients"); // ← работает даже при прямом заходе
       }}
       onAssign={assignTraining}
       clients={clients}
