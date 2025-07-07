@@ -30,6 +30,35 @@ router.get('/', authMiddleware, async (req, res) => {
   res.json(trainings);
 });
 
+// Получить тренировки на конкретную дату (для отображения занятых слотов)
+router.get('/date/:date', authMiddleware, async (req, res) => {
+  const { date } = req.params;
+
+  try {
+    const trainings = await prisma.training.findMany({
+      where: {
+        date: new Date(`${date}T00:00:00`),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            internalTag: true,
+          },
+        },
+      },
+      orderBy: { hour: 'asc' },
+    });
+
+    res.json(trainings);
+  } catch (err) {
+    console.error("Ошибка при получении тренировок по дате:", err);
+    res.status(500).json({ error: "Ошибка сервера" });
+  }
+});
+
 // Назначить тренировку
 router.post('/', authMiddleware, async (req, res) => {
   const { userId, date, hour, isSinglePaid = false } = req.body;
@@ -173,7 +202,7 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
       where: { userId: training.userId, active: true },
     });
 
-    const dateOnly = (d) => d.toISOString().slice(0, 10);
+    const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
 
     if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
       const currentUsed = activeBlock.used || 0;

@@ -33,6 +33,15 @@ interface AssignModalProps {
   blocks: Record<string, PaymentBlock | null>;
 }
 
+interface AssignedClient {
+  user: {
+    id: string;
+    name: string;
+    lastName?: string;
+  };
+  hour: number;
+}
+
 export default function AssignModal({
   opened,
   onClose,
@@ -48,6 +57,14 @@ export default function AssignModal({
 }: AssignModalProps) {
   const [date, setDate] = useState<Dayjs>(dayjs());
   const [showWarning, setShowWarning] = useState(false);
+  const [assignedClients, setAssignedClients] = useState<AssignedClient[]>([]);
+
+  const token = localStorage.getItem("token");
+  const API = import.meta.env.VITE_API_BASE_URL;
+  const block = selectedUser ? blocks[selectedUser] : null;
+  const remaining = block ? block.paidTrainings - block.used : null;
+  const isClientPreselected = !!selectedUser;
+  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
   useEffect(() => {
     dayjs.locale("ru");
@@ -55,18 +72,25 @@ export default function AssignModal({
 
   useEffect(() => {
     if (!selectedUser) return;
-    const block = blocks[selectedUser];
     const hasBlock = block && block.paidTrainings > block.used;
     setShowWarning(!hasBlock && !isSinglePaid);
     if (!hasBlock) setIsSinglePaid(true);
-    else setIsSinglePaid(false); // если блок есть — по умолчанию не разовая
+    else setIsSinglePaid(false);
   }, [selectedUser, blocks]);
 
-  const block = selectedUser ? blocks[selectedUser] : null;
-  const remaining = block ? block.paidTrainings - block.used : null;
-
-  const isClientPreselected = !!selectedUser;
-  const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  // Подгружаем назначенных клиентов на дату
+  useEffect(() => {
+    const loadAssigned = async () => {
+      const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setAssignedClients(data); // data: Array<{ user: { name, lastName }, hour }>
+    };
+    if (opened) {
+      loadAssigned();
+    }
+  }, [date, opened]);
 
   return (
     <Modal
@@ -81,21 +105,31 @@ export default function AssignModal({
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
         <Stack spacing="md">
-          {/* Заголовок и кнопка закрытия */}
-          <Group position="apart">
+          <Group position="apart" align="center">
             <Group spacing={8}>
               <IconClock size={20} />
               <Title order={4}>Назначить тренировку</Title>
             </Group>
-            <Button variant="subtle" color="gray" onClick={onClose}>
+            <Button
+              onClick={onClose}
+              variant="subtle"
+              color="dark"
+              px={0}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <IconX size={18} />
             </Button>
           </Group>
 
-          {/* Календарь */}
           <CustomModalDatePicker date={date} setDate={setDate} />
 
-          {/* Клиент */}
           {!isClientPreselected ? (
             <Select
               label="Клиент"
@@ -120,24 +154,21 @@ export default function AssignModal({
             </Text>
           )}
 
-          {/* Информация по блоку */}
           {remaining !== null && !isSinglePaid && (
             <Badge color={remaining > 0 ? "green" : "red"} size="sm">
               Осталось тренировок: {remaining}
             </Badge>
           )}
 
-          {/* Чекбокс оплаты */}
           <Checkbox
             label="Разовая оплата"
             checked={isSinglePaid}
             onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
             radius="md"
             size="md"
-            disabled={!block} // если блока нет — нельзя трогать
+            disabled={!block}
           />
 
-          {/* Предупреждение */}
           {showWarning && (
             <Text
               size="sm"
@@ -155,27 +186,38 @@ export default function AssignModal({
 
           <Divider />
 
-          {/* Выбор времени */}
           <Text size="sm" fw={500}>
             Выберите время:
           </Text>
 
-          <Group spacing="xs" wrap="wrap">
-            {hours.map((h) => (
-              <Button
-                key={h}
-                variant={selectedHour === h ? "filled" : "outline"}
-                color="dark"
-                size="xs"
-                radius="xl"
-                onClick={() => setSelectedHour(h)}
-              >
-                {h}:00
-              </Button>
-            ))}
-          </Group>
+          <Stack spacing={6}>
+            {hours.map((h) => {
+              const usersAtThisHour = assignedClients
+                .filter((a) => a.hour === h)
+                .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                .join(", ");
 
-          {/* Назначить */}
+              return (
+                <Group key={h} spacing={6} align="flex-start">
+                  <Button
+                    variant={selectedHour === h ? "filled" : "outline"}
+                    color="dark"
+                    size="xs"
+                    radius="xl"
+                    onClick={() => setSelectedHour(h)}
+                  >
+                    {h}:00
+                  </Button>
+                  {usersAtThisHour && (
+                    <Text size="xs" c="dimmed">
+                      {usersAtThisHour}
+                    </Text>
+                  )}
+                </Group>
+              );
+            })}
+          </Stack>
+
           <Button
             fullWidth
             radius="xl"
