@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Group } from "@mantine/core";
+import { Button, Modal, Group, Stack } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -67,8 +67,10 @@ export default function CustomModalDatePicker({
         radius="xl"
         withCloseButton={false}
         overlayProps={{ blur: 4 }}
+        size="auto"
+        style={{ width: 320 }}
       >
-        <div style={{ width: 320 }}>
+        <Stack>
           <DatePicker
             locale="ru"
             value={date.toDate()}
@@ -81,30 +83,21 @@ export default function CustomModalDatePicker({
             size="md"
             fullWidth
             styles={{
-              root: { width: "100%" },
-              calendar: { width: "100%" },
-              calendarBase: { width: "100%" },
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
+              calendar: { width: "100%" },
+              calendarBase: { width: "100%" },
               calendarHeaderControl: {
                 color: "#1a1a1a",
                 width: 32,
                 height: 32,
-                minHeight: 32,
-                minWidth: 32,
                 padding: 0,
-                svg: {
-                  width: 20,
-                  height: 20,
-                },
-                "&:focus": {
-                  outline: "none",
-                  boxShadow: "none",
-                },
+                svg: { width: 20, height: 20 },
+                "&:focus": { outline: "none", boxShadow: "none" },
               },
             }}
           />
-        </div>
+        </Stack>
       </Modal>
     </>
   );
