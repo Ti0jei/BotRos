@@ -83,7 +83,7 @@ export default function AssignModal({
 
           <Divider />
 
-          {!isClientPreselected && (
+          {!isClientPreselected ? (
             <Select
               label="Клиент"
               placeholder="Выберите клиента"
@@ -92,11 +92,19 @@ export default function AssignModal({
                 label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
               }))}
               value={selectedUser}
-              onChange={(val) => setSelectedUser(val || null)} // ✅ безопасный обработчик
+              onChange={(val) => setSelectedUser(val || null)}
               radius="md"
               size="md"
               withinPortal
             />
+          ) : (
+            <Text size="sm">
+              Клиент:{" "}
+              <b>
+                {clients.find((c) => c.id === selectedUser)?.name}{" "}
+                {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}
+              </b>
+            </Text>
           )}
 
           {remaining !== null && !isSinglePaid && (

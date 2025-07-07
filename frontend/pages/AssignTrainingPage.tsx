@@ -40,14 +40,15 @@ export default function AssignTrainingPage() {
     }
   };
 
-  // Парсинг параметров userId и singlePaid
+  // Парсинг userId и singlePaid из URL
   useEffect(() => {
     const uid = searchParams.get("userId");
     const sp = searchParams.get("singlePaid");
 
     if (uid) setSelectedUser(uid);
     if (sp === "true") setIsSinglePaid(true);
-  }, [searchParams]);
+    if (sp === "false") setIsSinglePaid(false);
+  }, []);
 
   // Назначение тренировки
   const assignTraining = async () => {
@@ -72,7 +73,7 @@ export default function AssignTrainingPage() {
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        navigate(-1); // назад к профилю
+        navigate(-1); // назад
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
@@ -94,7 +95,7 @@ export default function AssignTrainingPage() {
       isSinglePaid={isSinglePaid}
       setIsSinglePaid={setIsSinglePaid}
       selectedHour={selectedHour}
-      setSelectedHour={setSelectedHour} // ✅ вот это было нужно
+      setSelectedHour={setSelectedHour}
       blocks={blocks}
     />
   );
