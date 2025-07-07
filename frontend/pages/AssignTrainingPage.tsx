@@ -74,7 +74,7 @@ export default function AssignTrainingPage() {
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        navigate(-1); // ← назад
+        navigate("/clients"); // ← всегда работает
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
@@ -88,7 +88,10 @@ export default function AssignTrainingPage() {
   return (
     <AssignModal
       opened={true}
-      onClose={() => navigate(-1)} // 👈 крестик и backdrop срабатывают
+      onClose={() => {
+        console.log("Закрытие модалки через крестик");
+        navigate("/AdminClients"); // ← работает даже при прямом заходе
+      }}
       onAssign={assignTraining}
       clients={clients}
       selectedUser={selectedUser}
