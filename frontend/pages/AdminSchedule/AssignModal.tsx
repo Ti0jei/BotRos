@@ -34,6 +34,7 @@ interface AssignModalProps {
   selectedHour: number | null;
   setSelectedHour: (hour: number) => void;
   blocks: Record<string, PaymentBlock | null>;
+  setView: (v: string) => void; // ← добавлено
 }
 
 interface AssignedClient {
@@ -57,6 +58,7 @@ export default function AssignModal({
   selectedHour,
   setSelectedHour,
   blocks,
+  setView, // ← передаётся
 }: AssignModalProps) {
   const [date, setDate] = useState<Dayjs>(dayjs());
   const [showWarning, setShowWarning] = useState(false);
@@ -94,7 +96,7 @@ export default function AssignModal({
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={() => setView("clients")}
       withCloseButton={false}
       centered
       padding={0}
@@ -110,7 +112,7 @@ export default function AssignModal({
               <Title order={4}>Назначить тренировку</Title>
             </Group>
             <Button
-              onClick={onClose}
+              onClick={() => setView("clients")}
               variant="subtle"
               color="dark"
               px={0}
