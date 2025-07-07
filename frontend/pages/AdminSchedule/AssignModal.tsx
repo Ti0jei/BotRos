@@ -12,11 +12,12 @@ import {
   Group,
   Badge,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
-import { IconClock, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
+
 import { PaymentBlock, User } from "./types";
+import CustomModalDatePicker from "../components/ui/CustomModalDatePicker";
 
 interface AssignModalProps {
   opened: boolean;
@@ -45,8 +46,8 @@ export default function AssignModal({
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
-  const [showWarning, setShowWarning] = useState(false);
   const [date, setDate] = useState<Dayjs>(dayjs());
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     dayjs.locale("ru");
@@ -57,9 +58,8 @@ export default function AssignModal({
     const block = blocks[selectedUser];
     const hasBlock = block && block.paidTrainings > block.used;
     setShowWarning(!hasBlock && !isSinglePaid);
-    if (!hasBlock) {
-      setIsSinglePaid(true);
-    }
+    if (!hasBlock) setIsSinglePaid(true);
+    else setIsSinglePaid(false); // если блок есть — по умолчанию не разовая
   }, [selectedUser, blocks]);
 
   const block = selectedUser ? blocks[selectedUser] : null;
@@ -81,60 +81,21 @@ export default function AssignModal({
     >
       <Card radius="xl" p="lg" withBorder shadow="xs">
         <Stack spacing="md">
-          <Group spacing={8}>
-            <IconClock size={20} />
-            <Title order={4}>Назначить тренировку</Title>
-          </Group>
-
-          <Group position="center" spacing="xs">
-            <Button
-              size="xs"
-              leftIcon={<IconChevronLeft size={14} />}
-              variant="outline"
-              onClick={() => setDate(date.subtract(1, "day"))}
-            >
-              Назад
-            </Button>
-
-            <DatePickerInput
-              locale="ru"
-              value={date.toDate()}
-              onChange={(val) => val && setDate(dayjs(val))}
-              clearable
-              clearButtonLabel="Очистить"
-              size="xs"
-              dropdownType="popover"
-              hideWeekdays={false}
-              nextIcon={<IconChevronRight size={14} />}
-              previousIcon={<IconChevronLeft size={14} />}
-              popoverProps={{ withinPortal: true, shadow: "md", radius: "md" }}
-              styles={{
-                input: {
-                  textAlign: "center",
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  border: "1px solid #000",
-                  minWidth: 130,
-                },
-              }}
-            />
-
-            <Button
-              size="xs"
-              rightIcon={<IconChevronRight size={14} />}
-              variant="outline"
-              onClick={() => setDate(date.add(1, "day"))}
-            >
-              Вперёд
+          {/* Заголовок и кнопка закрытия */}
+          <Group position="apart">
+            <Group spacing={8}>
+              <IconClock size={20} />
+              <Title order={4}>Назначить тренировку</Title>
+            </Group>
+            <Button variant="subtle" color="gray" onClick={onClose}>
+              <IconX size={18} />
             </Button>
           </Group>
 
-          <Text size="sm" c="dimmed">
-            Дата: <b>{date.format("DD.MM.YYYY")}</b>
-          </Text>
+          {/* Календарь */}
+          <CustomModalDatePicker date={date} setDate={setDate} />
 
-          <Divider />
-
+          {/* Клиент */}
           {!isClientPreselected ? (
             <Select
               label="Клиент"
@@ -159,21 +120,24 @@ export default function AssignModal({
             </Text>
           )}
 
+          {/* Информация по блоку */}
           {remaining !== null && !isSinglePaid && (
             <Badge color={remaining > 0 ? "green" : "red"} size="sm">
               Осталось тренировок: {remaining}
             </Badge>
           )}
 
+          {/* Чекбокс оплаты */}
           <Checkbox
             label="Разовая оплата"
             checked={isSinglePaid}
             onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
             radius="md"
             size="md"
-            disabled={!block} // ✅ Чекбокс нельзя снимать, если блока нет
+            disabled={!block} // если блока нет — нельзя трогать
           />
 
+          {/* Предупреждение */}
           {showWarning && (
             <Text
               size="sm"
@@ -185,12 +149,13 @@ export default function AssignModal({
                 border: "1px solid #f3c0c0",
               }}
             >
-              У клиента нет активного блока. Чтобы продолжить, оставьте "Разовая оплата".
+              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
             </Text>
           )}
 
           <Divider />
 
+          {/* Выбор времени */}
           <Text size="sm" fw={500}>
             Выберите время:
           </Text>
@@ -210,6 +175,7 @@ export default function AssignModal({
             ))}
           </Group>
 
+          {/* Назначить */}
           <Button
             fullWidth
             radius="xl"
