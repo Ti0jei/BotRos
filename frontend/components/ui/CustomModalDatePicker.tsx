@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Stack, Group } from "@mantine/core";
+import { Button, Modal, Stack, Group, Box } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -71,9 +71,9 @@ export default function CustomModalDatePicker({
         radius="xl"
         withCloseButton={false}
         overlayProps={{ blur: 4 }}
-        size="auto"
+        size={360} // 👈 фиксированная ширина модалки
       >
-        <Stack>
+        <Box style={{ minWidth: 340 }}> {/* 👈 обёртка с нужной шириной */}
           <DatePicker
             locale="ru"
             value={tempDate}
@@ -85,7 +85,6 @@ export default function CustomModalDatePicker({
               }
             }}
             size="md"
-            style={{ width: 340 }}
             styles={{
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
@@ -99,7 +98,7 @@ export default function CustomModalDatePicker({
               },
             }}
           />
-        </Stack>
+        </Box>
       </Modal>
     </>
   );
