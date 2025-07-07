@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Stack, Group, Box } from "@mantine/core";
+import { Button, Modal, Group, Stack } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -12,7 +12,6 @@ export default function CustomModalDatePicker({
   setDate: (d: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
-  const [tempDate, setTempDate] = useState<Date | null>(date.toDate());
 
   useEffect(() => {
     dayjs.locale("ru");
@@ -46,10 +45,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           styles={buttonStyle}
-          onClick={() => {
-            setTempDate(date.toDate());
-            setOpened(true);
-          }}
+          onClick={() => setOpened(true)}
         >
           {date.format("DD.MM.YYYY")}
         </Button>
@@ -71,21 +67,31 @@ export default function CustomModalDatePicker({
         radius="xl"
         withCloseButton={false}
         overlayProps={{ blur: 4 }}
-        size={360} // 👈 фиксированная ширина модалки
+        size="auto"
+        styles={{
+          content: {
+            padding: 0,
+            minWidth: 340,
+            width: "fit-content",
+          },
+        }}
       >
-        <Box style={{ minWidth: 340 }}> {/* 👈 обёртка с нужной шириной */}
+        <Stack p="md" style={{ width: "100%" }}>
           <DatePicker
             locale="ru"
-            value={tempDate}
-            onChange={(d) => {
-              if (d) {
-                setTempDate(d);
-                setDate(dayjs(d));
+            value={date.toDate()}
+            onChange={(selected) => {
+              if (selected) {
+                setDate(dayjs(selected));
                 setOpened(false);
               }
             }}
             size="md"
             styles={{
+              calendar: {
+                width: "100%",
+                minWidth: 320,
+              },
               day: { fontWeight: 500 },
               weekday: { fontWeight: 600 },
               calendarHeaderControl: {
@@ -98,7 +104,7 @@ export default function CustomModalDatePicker({
               },
             }}
           />
-        </Box>
+        </Stack>
       </Modal>
     </>
   );
