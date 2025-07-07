@@ -17,7 +17,7 @@ import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 
 import { PaymentBlock, User } from "./types";
-import CustomModalDatePicker from "../components/ui/CustomModalDatePicker";
+import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
 
 interface AssignModalProps {
   opened: boolean;
