@@ -21,11 +21,7 @@ export default function CustomModalDatePicker({
   return (
     <>
       <Group position="center" spacing="xs" mt="sm">
-        <Button
-          size="xs"
-          variant="outline"
-          onClick={() => setDate(date.subtract(1, "day"))}
-        >
+        <Button size="xs" variant="outline" onClick={() => setDate(date.subtract(1, "day"))}>
           Назад
         </Button>
 
@@ -33,11 +29,7 @@ export default function CustomModalDatePicker({
           {date.format("DD.MM.YYYY")}
         </Button>
 
-        <Button
-          size="xs"
-          variant="outline"
-          onClick={() => setDate(date.add(1, "day"))}
-        >
+        <Button size="xs" variant="outline" onClick={() => setDate(date.add(1, "day"))}>
           Вперёд
         </Button>
       </Group>
@@ -68,39 +60,10 @@ export default function CustomModalDatePicker({
             }
           }}
           size="md"
-          styles={{
-            calendarHeader: {
-              justifyContent: "center",
-              fontWeight: 600,
-              fontSize: 16,
-              paddingBottom: 8,
-            },
-            weekday: {
-              fontWeight: 600,
-              fontSize: 13,
-              color: "#333",
-            },
-            day: (theme, _date, modifiers) => ({
-              backgroundColor: modifiers.selected
-                ? "#1a1a1a"
-                : modifiers.today
-                ? "#f2f2f2"
-                : "transparent",
-              color: modifiers.selected ? "#fff" : "#000",
-              borderRadius: "8px !important",
-              fontWeight: 500,
-              height: 36,
-              width: 36,
-              lineHeight: "36px",
-              transition: "all 0.15s ease",
-              border:
-                modifiers.selected || modifiers.today
-                  ? "1px solid #1a1a1a"
-                  : "1px solid transparent",
-              "&:hover": {
-                backgroundColor: "#eaeaea !important",
-              },
-            }),
+          classNames={{
+            day: "custom-day",
+            weekday: "custom-weekday",
+            calendarHeader: "custom-header",
           }}
         />
       </Modal>

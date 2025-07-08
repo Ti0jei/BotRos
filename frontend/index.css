@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .custom-day {
+    border-radius: 8px !important;
+    height: 36px !important;
+    width: 36px !important;
+    line-height: 36px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .custom-day:hover {
+    background-color: #eaeaea !important;
+  }
+
+  .custom-day[data-selected] {
+    background-color: #1a1a1a !important;
+    color: white !important;
+    border: 1px solid #1a1a1a !important;
+  }
+
+  .custom-day[data-today]:not([data-selected]) {
+    background-color: #f2f2f2 !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .custom-weekday {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+  }
+
+  .custom-header {
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    padding-bottom: 8px;
+  }
+}
