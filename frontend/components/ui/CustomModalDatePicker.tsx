@@ -22,15 +22,30 @@ export default function CustomModalDatePicker({
   return (
     <>
       <Group position="center" spacing="xs" mt="sm">
-        <Button size="xs" variant="outline" onClick={() => setDate(date.subtract(1, "day"))}>
+        <Button
+          size="xs"
+          variant="outline"
+          color="dark"
+          onClick={() => setDate(date.subtract(1, "day"))}
+        >
           Назад
         </Button>
 
-        <Button size="xs" variant="outline" onClick={() => setOpened(true)}>
+        <Button
+          size="xs"
+          variant="outline"
+          color="dark"
+          onClick={() => setOpened(true)}
+        >
           {date.format("DD.MM.YYYY")}
         </Button>
 
-        <Button size="xs" variant="outline" onClick={() => setDate(date.add(1, "day"))}>
+        <Button
+          size="xs"
+          variant="outline"
+          color="dark"
+          onClick={() => setDate(date.add(1, "day"))}
+        >
           Вперёд
         </Button>
       </Group>

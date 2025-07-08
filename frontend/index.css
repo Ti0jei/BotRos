@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
+@@layer components {
   .custom-day {
     @apply w-9 h-9 rounded-md font-medium transition-all text-black dark:text-white;
     line-height: 36px;
@@ -28,3 +28,4 @@
     @apply justify-center text-base font-semibold pb-2 dark:text-white;
   }
 }
+
