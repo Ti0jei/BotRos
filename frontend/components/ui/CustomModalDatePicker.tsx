@@ -59,10 +59,12 @@ export default function CustomModalDatePicker({
         styles={{
           content: {
             backgroundColor: "#ffffff",
-            borderRadius: 16,
-            padding: 24,
-            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
-            width: "fit-content",
+            borderRadius: 20,
+            padding: 28,
+            boxShadow: "0 12px 32px rgba(0, 0, 0, 0.25)",
+            width: "100%",
+            maxWidth: 360, // 👈 увеличена ширина
+            margin: "0 auto",
           },
         }}
       >
@@ -75,7 +77,7 @@ export default function CustomModalDatePicker({
               setOpened(false);
             }
           }}
-          size="xl" // Увеличен
+          size="xl"
           nextIcon={<IconChevronRight size={28} />}
           previousIcon={<IconChevronLeft size={28} />}
           classNames={{

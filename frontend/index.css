@@ -6,6 +6,9 @@
   .custom-day {
     @apply w-12 h-12 text-lg rounded-xl font-semibold transition-all text-black dark:text-white;
     line-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .custom-day:hover {
@@ -21,10 +24,10 @@
   }
 
   .custom-weekday {
-    @apply text-base font-bold text-gray-700 dark:text-gray-300;
+    @apply text-base font-bold text-gray-700 dark:text-gray-300 text-center;
   }
 
   .custom-header {
-    @apply text-xl font-semibold pb-2 dark:text-white;
+    @apply text-xl font-semibold pb-4 dark:text-white text-center;
   }
 }
