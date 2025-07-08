@@ -99,7 +99,7 @@ export default function CustomModalDatePicker({
           },
         }}
       >
-        <Group position="apart" mb="sm">
+        <Group position="center" align="center" gap="sm" mb="sm" noWrap>
           <Button
             variant="subtle"
             color="dark"
@@ -108,9 +108,11 @@ export default function CustomModalDatePicker({
           >
             <IconChevronLeft size={20} />
           </Button>
-          <Text fw={600} size="lg">
+
+          <Text fw={600} size="lg" style={{ minWidth: 140, textAlign: "center" }}>
             {viewMonth.format("MMMM YYYY")}
           </Text>
+
           <Button
             variant="subtle"
             color="dark"
