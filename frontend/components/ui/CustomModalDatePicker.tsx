@@ -1,9 +1,27 @@
 import { useEffect, useState } from "react";
-import { Modal, Group, Button } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import {
+  Modal,
+  Group,
+  Button,
+  Grid,
+  Text,
+  Center,
+  Box,
+} from "@mantine/core";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+} from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
+import weekday from "dayjs/plugin/weekday";
+import isoWeek from "dayjs/plugin/isoWeek";
+
+dayjs.extend(weekday);
+dayjs.extend(isoWeek);
+dayjs.locale("ru");
+
+const weekDays = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
 export default function CustomModalDatePicker({
   date,
@@ -13,11 +31,24 @@ export default function CustomModalDatePicker({
   setDate: (d: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
+  const [viewMonth, setViewMonth] = useState(date.startOf("month"));
 
   useEffect(() => {
-    console.log("✅ CustomModalDatePicker: загружен и работает");
-    dayjs.locale("ru");
-  }, []);
+    setViewMonth(date.startOf("month"));
+  }, [date]);
+
+  const startDay = viewMonth.startOf("week");
+  const endDay = viewMonth.endOf("month").endOf("week");
+
+  const dayList = [];
+  let day = startDay.clone();
+  while (day.isBefore(endDay, "day")) {
+    dayList.push(day);
+    day = day.add(1, "day");
+  }
+
+  const isSameDay = (a: Dayjs, b: Dayjs) =>
+    a.format("YYYY-MM-DD") === b.format("YYYY-MM-DD");
 
   return (
     <>
@@ -60,53 +91,90 @@ export default function CustomModalDatePicker({
           content: {
             backgroundColor: "#ffffff",
             borderRadius: 20,
-            padding: 28,
-            boxShadow: "0 12px 32px rgba(0, 0, 0, 0.25)",
+            padding: 24,
+            boxShadow: "0 12px 32px rgba(0, 0, 0, 0.2)",
             width: "100%",
-            maxWidth: 380,
+            maxWidth: 400,
             margin: "0 auto",
           },
         }}
       >
-        <DatePicker
-          locale="ru"
-          value={date.toDate()}
-          onChange={(selected) => {
-            if (selected) {
-              setDate(dayjs(selected));
-              setOpened(false);
-            }
-          }}
-          size="xl"
-          nextIcon={<IconChevronRight size={28} />}
-          previousIcon={<IconChevronLeft size={28} />}
-          styles={{
-            calendar: {
-              width: "100%",
-              maxWidth: "100%",
-              boxSizing: "border-box",   // ✅ фиксы
-              overflowX: "hidden",
-            },
-            calendarHeader: {
-              justifyContent: "center",
-              fontSize: 20,
-              fontWeight: 600,
-              paddingBottom: 12,
-            },
-            weekday: {
-              fontSize: 16,
-              fontWeight: 600,
-              textAlign: "center",
-            },
-            day: {
-              width: 48,
-              height: 48,
-              lineHeight: "48px",
-              fontSize: 16,
-              fontWeight: 600,
-            },
-          }}
-        />
+        <Group position="apart" mb="sm">
+          <Button
+            variant="subtle"
+            color="dark"
+            onClick={() => setViewMonth(viewMonth.subtract(1, "month"))}
+            compact
+          >
+            <IconChevronLeft size={20} />
+          </Button>
+          <Text fw={600} size="lg">
+            {viewMonth.format("MMMM YYYY")}
+          </Text>
+          <Button
+            variant="subtle"
+            color="dark"
+            onClick={() => setViewMonth(viewMonth.add(1, "month"))}
+            compact
+          >
+            <IconChevronRight size={20} />
+          </Button>
+        </Group>
+
+        <Grid gutter="xs" grow>
+          {weekDays.map((dayName) => (
+            <Grid.Col span={1} key={dayName}>
+              <Center>
+                <Text fw={600} size="sm">
+                  {dayName}
+                </Text>
+              </Center>
+            </Grid.Col>
+          ))}
+        </Grid>
+
+        <Grid gutter="xs" grow mt="xs">
+          {dayList.map((d) => {
+            const isCurrentMonth = d.month() === viewMonth.month();
+            const selected = isSameDay(d, date);
+
+            return (
+              <Grid.Col span={1} key={d.toString()}>
+                <Center>
+                  <Box
+                    onClick={() => {
+                      setDate(d);
+                      setOpened(false);
+                    }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 8,
+                      backgroundColor: selected
+                        ? "#1a1a1a"
+                        : !isCurrentMonth
+                        ? "#f0f0f0"
+                        : "transparent",
+                      color: selected
+                        ? "#fff"
+                        : isCurrentMonth
+                        ? "#000"
+                        : "#999",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {d.date()}
+                  </Box>
+                </Center>
+              </Grid.Col>
+            );
+          })}
+        </Grid>
       </Modal>
     </>
   );
