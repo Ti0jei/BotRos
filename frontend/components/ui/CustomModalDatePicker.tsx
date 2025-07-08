@@ -14,6 +14,7 @@ export default function CustomModalDatePicker({
   const [opened, setOpened] = useState(false);
 
   useEffect(() => {
+    console.log("✅ CustomModalDatePicker: загружен и работает");
     dayjs.locale("ru");
   }, []);
 
@@ -86,7 +87,7 @@ export default function CustomModalDatePicker({
                 ? "#f2f2f2"
                 : "transparent",
               color: modifiers.selected ? "#fff" : "#000",
-              borderRadius: 8,
+              borderRadius: "8px !important",
               fontWeight: 500,
               height: 36,
               width: 36,
@@ -97,7 +98,7 @@ export default function CustomModalDatePicker({
                   ? "1px solid #1a1a1a"
                   : "1px solid transparent",
               "&:hover": {
-                backgroundColor: "#eaeaea",
+                backgroundColor: "#eaeaea !important",
               },
             }),
           }}
