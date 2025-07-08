@@ -68,27 +68,43 @@ export default function CustomModalDatePicker({
           },
         }}
       >
-        <div className="w-full">
-          <DatePicker
-            locale="ru"
-            value={date.toDate()}
-            onChange={(selected) => {
-              if (selected) {
-                setDate(dayjs(selected));
-                setOpened(false);
-              }
-            }}
-            size="xl"
-            nextIcon={<IconChevronRight size={28} />}
-            previousIcon={<IconChevronLeft size={28} />}
-            className="w-full"
-            classNames={{
-              day: "custom-day",
-              weekday: "custom-weekday",
-              calendarHeader: "custom-header flex justify-center gap-2",
-            }}
-          />
-        </div>
+        <DatePicker
+          locale="ru"
+          value={date.toDate()}
+          onChange={(selected) => {
+            if (selected) {
+              setDate(dayjs(selected));
+              setOpened(false);
+            }
+          }}
+          size="xl"
+          nextIcon={<IconChevronRight size={28} />}
+          previousIcon={<IconChevronLeft size={28} />}
+          styles={{
+            calendar: {
+              width: "100%",
+              maxWidth: "100%",
+            },
+            calendarHeader: {
+              justifyContent: "center",
+              fontSize: 20,
+              fontWeight: 600,
+              paddingBottom: 12,
+            },
+            weekday: {
+              fontSize: 16,
+              fontWeight: 600,
+              textAlign: "center",
+            },
+            day: {
+              width: 48,
+              height: 48,
+              lineHeight: "48px",
+              fontSize: 16,
+              fontWeight: 600,
+            },
+          }}
+        />
       </Modal>
     </>
   );
