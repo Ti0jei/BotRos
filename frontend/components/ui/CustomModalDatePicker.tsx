@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Group } from "@mantine/core";
+import { Modal, Group, Button } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 
@@ -60,6 +61,8 @@ export default function CustomModalDatePicker({
             }
           }}
           size="md"
+          nextIcon={<IconChevronRight size={16} />}
+          previousIcon={<IconChevronLeft size={16} />}
           classNames={{
             day: "custom-day",
             weekday: "custom-weekday",

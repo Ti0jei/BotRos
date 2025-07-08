@@ -4,39 +4,27 @@
 
 @layer components {
   .custom-day {
-    border-radius: 8px !important;
-    height: 36px !important;
-    width: 36px !important;
-    line-height: 36px !important;
-    font-weight: 500 !important;
-    transition: all 0.2s ease !important;
+    @apply w-9 h-9 rounded-md font-medium transition-all text-black dark:text-white;
+    line-height: 36px;
   }
 
   .custom-day:hover {
-    background-color: #eaeaea !important;
+    @apply bg-gray-200 dark:bg-gray-700;
   }
 
   .custom-day[data-selected] {
-    background-color: #1a1a1a !important;
-    color: white !important;
-    border: 1px solid #1a1a1a !important;
+    @apply bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white;
   }
 
   .custom-day[data-today]:not([data-selected]) {
-    background-color: #f2f2f2 !important;
-    border: 1px solid #ccc !important;
+    @apply bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600;
   }
 
   .custom-weekday {
-    font-weight: 600;
-    font-size: 13px;
-    color: #333;
+    @apply text-sm font-semibold text-gray-700 dark:text-gray-300;
   }
 
   .custom-header {
-    justify-content: center;
-    font-weight: 600;
-    font-size: 16px;
-    padding-bottom: 8px;
+    @apply justify-center text-base font-semibold pb-2 dark:text-white;
   }
 }
