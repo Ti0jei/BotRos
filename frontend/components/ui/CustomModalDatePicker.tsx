@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Modal, Group, Stack } from "@mantine/core";
+import { Button, Modal, Group } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
@@ -17,43 +17,24 @@ export default function CustomModalDatePicker({
     dayjs.locale("ru");
   }, []);
 
-  const buttonStyle = {
-    root: {
-      color: "#1a1a1a",
-      border: "1px solid #1a1a1a",
-      borderRadius: 12,
-      backgroundColor: "#fff",
-      fontWeight: 500,
-      transition: "background 0.2s",
-      "&:hover": { backgroundColor: "#f2f2f2" },
-    },
-  };
-
   return (
     <>
       <Group position="center" spacing="xs" mt="sm">
         <Button
           size="xs"
           variant="outline"
-          styles={buttonStyle}
           onClick={() => setDate(date.subtract(1, "day"))}
         >
           Назад
         </Button>
 
-        <Button
-          size="xs"
-          variant="outline"
-          styles={buttonStyle}
-          onClick={() => setOpened(true)}
-        >
+        <Button size="xs" variant="outline" onClick={() => setOpened(true)}>
           {date.format("DD.MM.YYYY")}
         </Button>
 
         <Button
           size="xs"
           variant="outline"
-          styles={buttonStyle}
           onClick={() => setDate(date.add(1, "day"))}
         >
           Вперёд
@@ -64,53 +45,63 @@ export default function CustomModalDatePicker({
         opened={opened}
         onClose={() => setOpened(false)}
         centered
-        radius="xl"
         withCloseButton={false}
-        overlayProps={{ blur: 4 }}
         size="auto"
         styles={{
           content: {
-            padding: 0,
-            minWidth: 340,
+            backgroundColor: "#ffffff",
+            borderRadius: 16,
+            padding: 16,
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
             width: "fit-content",
-            borderRadius: 20,
-            overflow: "hidden",
           },
         }}
       >
-        <Stack p="md" style={{ width: "100%" }}>
-          <DatePicker
-            locale="ru"
-            value={date.toDate()}
-            onChange={(selected) => {
-              if (selected) {
-                setDate(dayjs(selected));
-                setOpened(false); // <<< Автоматическое закрытие
-              }
-            }}
-            size="md"
-            styles={{
-              day: (theme, date, modifiers) => ({
-                backgroundColor: modifiers.selected
-                  ? "#1976d2"
-                  : modifiers.today
-                  ? "#e3f2fd"
-                  : "transparent",
-                color: modifiers.selected ? "#fff" : "#000",
-                borderRadius: 8,
-                fontWeight: 500,
-                transition: "all 0.15s ease",
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                },
-              }),
-              calendarHeader: {
-                justifyContent: "center",
-                fontWeight: 600,
+        <DatePicker
+          locale="ru"
+          value={date.toDate()}
+          onChange={(selected) => {
+            if (selected) {
+              setDate(dayjs(selected));
+              setOpened(false);
+            }
+          }}
+          size="md"
+          styles={{
+            calendarHeader: {
+              justifyContent: "center",
+              fontWeight: 600,
+              fontSize: 16,
+              paddingBottom: 8,
+            },
+            weekday: {
+              fontWeight: 600,
+              fontSize: 13,
+              color: "#333",
+            },
+            day: (theme, _date, modifiers) => ({
+              backgroundColor: modifiers.selected
+                ? "#1a1a1a"
+                : modifiers.today
+                ? "#f2f2f2"
+                : "transparent",
+              color: modifiers.selected ? "#fff" : "#000",
+              borderRadius: 8,
+              fontWeight: 500,
+              height: 36,
+              width: 36,
+              lineHeight: "36px",
+              transition: "all 0.15s ease",
+              border:
+                modifiers.selected || modifiers.today
+                  ? "1px solid #1a1a1a"
+                  : "1px solid transparent",
+              "&:hover": {
+                backgroundColor: "#eaeaea",
               },
-            }}
-          />
-        </Stack>
+            }),
+          }}
+        />
       </Modal>
     </>
   );
