@@ -60,7 +60,7 @@ export default function CustomModalDatePicker({
           content: {
             backgroundColor: "#ffffff",
             borderRadius: 16,
-            padding: 20,
+            padding: 24,
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
             width: "fit-content",
           },
@@ -75,13 +75,13 @@ export default function CustomModalDatePicker({
               setOpened(false);
             }
           }}
-          size="lg" // ⬅ увеличен размер
-          nextIcon={<IconChevronRight size={20} />}
-          previousIcon={<IconChevronLeft size={20} />}
+          size="xl" // ⬅ увеличено
+          nextIcon={<IconChevronRight size={24} />}
+          previousIcon={<IconChevronLeft size={24} />}
           classNames={{
             day: "custom-day",
             weekday: "custom-weekday",
-            calendarHeader: "custom-header flex justify-center gap-2", // ⬅ центрирование
+            calendarHeader: "custom-header flex justify-center gap-2",
           }}
         />
       </Modal>
