@@ -40,7 +40,7 @@ export default function CustomModalDatePicker({
   const startDay = viewMonth.startOf("week");
   const endDay = viewMonth.endOf("month").endOf("week");
 
-  const dayList = [];
+  const dayList: Dayjs[] = [];
   let day = startDay.clone();
   while (day.isBefore(endDay, "day")) {
     dayList.push(day);
@@ -99,7 +99,7 @@ export default function CustomModalDatePicker({
           },
         }}
       >
-        <Group position="center" align="center" gap="sm" mb="sm" noWrap>
+        <Group position="apart" align="center" mb="sm" noWrap>
           <Button
             variant="subtle"
             color="dark"
@@ -109,7 +109,11 @@ export default function CustomModalDatePicker({
             <IconChevronLeft size={20} />
           </Button>
 
-          <Text fw={600} size="lg" style={{ minWidth: 140, textAlign: "center" }}>
+          <Text
+            fw={600}
+            size="lg"
+            style={{ flex: 1, textAlign: "center", textTransform: "capitalize" }}
+          >
             {viewMonth.format("MMMM YYYY")}
           </Text>
 
