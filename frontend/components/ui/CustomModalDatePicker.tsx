@@ -75,9 +75,9 @@ export default function CustomModalDatePicker({
               setOpened(false);
             }
           }}
-          size="xl" // ⬅ увеличено
-          nextIcon={<IconChevronRight size={24} />}
-          previousIcon={<IconChevronLeft size={24} />}
+          size="xl" // Увеличен
+          nextIcon={<IconChevronRight size={28} />}
+          previousIcon={<IconChevronLeft size={28} />}
           classNames={{
             day: "custom-day",
             weekday: "custom-weekday",

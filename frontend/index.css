@@ -4,8 +4,8 @@
 
 @layer components {
   .custom-day {
-    @apply w-11 h-11 text-base rounded-lg font-medium transition-all text-black dark:text-white;
-    line-height: 44px;
+    @apply w-12 h-12 text-lg rounded-xl font-semibold transition-all text-black dark:text-white;
+    line-height: 48px;
   }
 
   .custom-day:hover {
@@ -21,12 +21,10 @@
   }
 
   .custom-weekday {
-    @apply text-base font-semibold text-gray-700 dark:text-gray-300;
+    @apply text-base font-bold text-gray-700 dark:text-gray-300;
   }
 
   .custom-header {
-    @apply text-lg font-semibold pb-2 dark:text-white;
+    @apply text-xl font-semibold pb-2 dark:text-white;
   }
 }
-
-
