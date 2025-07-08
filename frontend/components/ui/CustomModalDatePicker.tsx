@@ -84,6 +84,8 @@ export default function CustomModalDatePicker({
             calendar: {
               width: "100%",
               maxWidth: "100%",
+              boxSizing: "border-box",   // ✅ фиксы
+              overflowX: "hidden",
             },
             calendarHeader: {
               justifyContent: "center",
