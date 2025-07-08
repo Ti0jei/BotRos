@@ -73,6 +73,8 @@ export default function CustomModalDatePicker({
             padding: 0,
             minWidth: 340,
             width: "fit-content",
+            borderRadius: 20,
+            overflow: "hidden",
           },
         }}
       >
@@ -83,24 +85,28 @@ export default function CustomModalDatePicker({
             onChange={(selected) => {
               if (selected) {
                 setDate(dayjs(selected));
-                setOpened(false);
+                setOpened(false); // <<< Автоматическое закрытие
               }
             }}
             size="md"
             styles={{
-              calendar: {
-                width: "100%",
-                minWidth: 320,
-              },
-              day: { fontWeight: 500 },
-              weekday: { fontWeight: 600 },
-              calendarHeaderControl: {
-                color: "#1a1a1a",
-                width: 32,
-                height: 32,
-                padding: 0,
-                svg: { width: 20, height: 20 },
-                "&:focus": { outline: "none", boxShadow: "none" },
+              day: (theme, date, modifiers) => ({
+                backgroundColor: modifiers.selected
+                  ? "#1976d2"
+                  : modifiers.today
+                  ? "#e3f2fd"
+                  : "transparent",
+                color: modifiers.selected ? "#fff" : "#000",
+                borderRadius: 8,
+                fontWeight: 500,
+                transition: "all 0.15s ease",
+                "&:hover": {
+                  backgroundColor: "#f0f0f0",
+                },
+              }),
+              calendarHeader: {
+                justifyContent: "center",
+                fontWeight: 600,
               },
             }}
           />
