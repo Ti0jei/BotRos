@@ -260,10 +260,7 @@ export default function AdminClients({
                           radius="xl"
                         />
                         <Group grow mt="xs">
-                          <Button
-                            onClick={() => saveInternalTag(client.id)}
-                            styles={buttonStyle}
-                          >
+                          <Button onClick={() => saveInternalTag(client.id)} styles={buttonStyle}>
                             Сохранить
                           </Button>
                           <Button
