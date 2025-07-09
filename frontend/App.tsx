@@ -1,4 +1,3 @@
-// импортов не меняем
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
@@ -15,6 +14,9 @@ import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 import ClientNutrition from './pages/ClientNutrition';
 import AssignTrainingPage from './pages/AssignTrainingPage';
+
+import WorkoutTemplatesPage from './admin/workouts'; // ✅
+import CreateWorkoutTemplate from './admin/create'; // ✅
 
 import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
@@ -33,6 +35,8 @@ function App() {
     | 'reset-confirm'
     | 'nutrition'
     | 'assign-training'
+    | 'workouts' // ✅ новый view
+    | 'create-workout' // ✅ ещё один view
   >('login');
 
   const [profile, setProfile] = useState<any>(null);
@@ -224,7 +228,15 @@ function App() {
       )}
 
       {view === 'assign-training' && profile?.role === 'ADMIN' && (
-        <AssignTrainingPage setView={setView} /> // ✅ ← вот ключевая правка
+        <AssignTrainingPage setView={setView} />
+      )}
+
+      {view === 'workouts' && (
+        <WorkoutTemplatesPage />
+      )}
+
+      {view === 'create-workout' && (
+        <CreateWorkoutTemplate />
       )}
     </Box>
   );
