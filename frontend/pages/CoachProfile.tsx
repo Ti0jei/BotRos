@@ -5,9 +5,9 @@ import {
   IconChevronUp,
   IconUser,
   IconPlus,
-  IconDotsVertical,
+  IconMenu2,
   IconPencil,
-  IconLogout,
+  IconRepeat,
 } from "@tabler/icons-react";
 import {
   Box,
@@ -21,8 +21,11 @@ import {
   Text,
   Title,
   Badge,
-  Menu,
   ActionIcon,
+  Drawer,
+  Button,
+  TextInput,
+  NumberInput,
 } from "@mantine/core";
 import dayjs from "dayjs";
 import { useSearchParams } from "react-router-dom";
@@ -31,7 +34,7 @@ import { getToken } from "@/utils/auth";
 import ActionButton from "@/components/ui/ActionButton";
 
 interface CoachProfileProps {
-  profile: { name: string };
+  profile: { name: string; age?: number };
   onLogout: () => void;
   onOpenSchedule: () => void;
   onOpenClients?: () => void;
@@ -58,6 +61,11 @@ export default function CoachProfile({
   const [upcomingTrainings, setUpcomingTrainings] = useState<Training[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCode, setShowCode] = useState(false);
+  const [drawerOpened, setDrawerOpened] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editName, setEditName] = useState(profile.name);
+  const [editAge, setEditAge] = useState(profile.age || 0);
+
   const [params] = useSearchParams();
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -164,25 +172,22 @@ export default function CoachProfile({
         shadow="xs"
         style={{ width: "100%", maxWidth: 420, position: "relative" }}
       >
-        {/* Бургер-меню */}
-        <Menu shadow="md" width={200} position="bottom-end">
-          <Menu.Target>
-            <ActionIcon
-              variant="subtle"
-              style={{ position: "absolute", top: 12, right: 12 }}
-            >
-              <IconDotsVertical size={18} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item icon={<IconPencil size={16} />}>
-              Редактировать профиль
-            </Menu.Item>
-            <Menu.Item icon={<IconLogout size={16} />} color="red" onClick={onLogout}>
-              Выйти
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+        {/* ☰ Бургер-меню */}
+        <ActionIcon
+          size="lg"
+          onClick={() => setDrawerOpened(true)}
+          title="Меню"
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            background: "transparent",
+            color: "#000",
+            zIndex: 100,
+          }}
+        >
+          <IconMenu2 size={24} />
+        </ActionIcon>
 
         <Stack spacing="lg">
           <Stack spacing={4}>
@@ -258,6 +263,84 @@ export default function CoachProfile({
           </Collapse>
         </Stack>
       </Card>
+
+      {/* 🧾 Drawer */}
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => {
+          setDrawerOpened(false);
+          setEditMode(false);
+        }}
+        title={editMode ? "Изменить профиль" : "Меню"}
+        padding="md"
+        position="right"
+        size="xs"
+        radius="md"
+      >
+        <Stack spacing="md">
+          {editMode ? (
+            <>
+              <TextInput
+                label="Имя"
+                value={editName}
+                onChange={(e) => setEditName(e.currentTarget.value)}
+                required
+              />
+              <NumberInput
+                label="Возраст"
+                value={editAge}
+                onChange={(val) => setEditAge(typeof val === "number" ? val : 0)}
+              />
+              <Group position="right" mt="sm">
+                <Button variant="default" onClick={() => setEditMode(false)}>
+                  Отмена
+                </Button>
+                <Button
+                  variant="outline"
+                  color="dark"
+                  onClick={() => {
+                    // Имитация сохранения (если у тебя есть API — подключи)
+                    console.log("Saved:", editName, editAge);
+                    setDrawerOpened(false);
+                    setEditMode(false);
+                  }}
+                >
+                  Сохранить
+                </Button>
+              </Group>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="light"
+                color="dark"
+                leftIcon={<IconRepeat size={16} />}
+                onClick={onLogout}
+              >
+                Сменить профиль
+              </Button>
+
+              <Button
+                variant="light"
+                color="dark"
+                leftIcon={<IconPencil size={16} />}
+                onClick={() => {
+                  setEditName(profile.name);
+                  setEditAge(profile.age || 0);
+                  setEditMode(true);
+                }}
+              >
+                Изменить профиль
+              </Button>
+
+              <Divider />
+              <Text size="sm" c="dimmed">
+                ➕ Скоро появятся новые опции
+              </Text>
+            </>
+          )}
+        </Stack>
+      </Drawer>
     </Center>
   );
 }
