@@ -12,7 +12,7 @@ import {
   Badge,
   Box,
 } from "@mantine/core";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 interface WorkoutTemplate {
   id: string;
@@ -26,6 +26,7 @@ export default function WorkoutTemplatesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -36,7 +37,7 @@ export default function WorkoutTemplatesPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API}/api/workout-templates?clientId=${clientId ?? """}`,
+          `${API}/api/workout-templates?clientId=${clientId ?? ""}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -77,6 +78,15 @@ export default function WorkoutTemplatesPage() {
                   {tpl.isGlobal ? "Общий" : "Личный"}
                 </Badge>
               </Group>
+              <Button
+                variant="outline"
+                size="xs"
+                fullWidth
+                mt="sm"
+                onClick={() => navigate(`/admin/workouts/edit/${tpl.id}`)}
+              >
+                Редактировать
+              </Button>
             </Card>
           ))}
         </Stack>
