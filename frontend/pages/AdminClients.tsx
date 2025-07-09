@@ -13,6 +13,8 @@ import {
   Box,
   Divider,
   Center,
+  Drawer,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconCash,
@@ -22,6 +24,7 @@ import {
   IconTrash,
   IconPlus,
 } from "@tabler/icons-react";
+import { Dumbbell } from "lucide-react";
 
 import ClientPayments from "./ClientPayments";
 import ClientNutrition from "./ClientNutrition";
@@ -58,6 +61,7 @@ export default function AdminClients({
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [internalTagValue, setInternalTagValue] = useState<string>("");
+  const [drawerOpened, setDrawerOpened] = useState<string | null>(null);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -198,7 +202,31 @@ export default function AdminClients({
               const isEditing = editingId === client.id;
 
               return (
-                <Card key={client.id} withBorder radius="xl" p="md" shadow="xs">
+                <Card
+                  key={client.id}
+                  withBorder
+                  radius="xl"
+                  p="md"
+                  shadow="xs"
+                  style={{ position: "relative" }}
+                >
+                  <ActionIcon
+                    variant="light"
+                    onClick={() => setDrawerOpened(client.id)}
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      background: "white",
+                      border: "1px solid #1a1a1a",
+                      borderRadius: 12,
+                      width: 32,
+                      height: 32,
+                    }}
+                  >
+                    <Dumbbell size={18} />
+                  </ActionIcon>
+
                   <Stack spacing="xs">
                     <Group position="apart">
                       <Text fw={600}>
@@ -356,6 +384,16 @@ export default function AdminClients({
             </Button>
           </Box>
         </Box>
+
+        <Drawer
+          opened={drawerOpened !== null}
+          onClose={() => setDrawerOpened(null)}
+          title="Тренировки клиента"
+          padding="md"
+          size="md"
+        >
+          <Text>Здесь будет управление тренировками: шаблоны, история, отметка.</Text>
+        </Drawer>
       </Container>
     </Box>
   );
