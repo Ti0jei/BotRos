@@ -25,6 +25,7 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import { Dumbbell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import ClientPayments from "./ClientPayments";
 import ClientNutrition from "./ClientNutrition";
@@ -65,6 +66,7 @@ export default function AdminClients({
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   const buttonStyle = {
     root: {
@@ -211,13 +213,13 @@ export default function AdminClients({
                   style={{ position: "relative" }}
                 >
                   <ActionIcon
-                    variant="light"
                     onClick={() => setDrawerOpened(client.id)}
                     style={{
                       position: "absolute",
                       top: 10,
                       right: 10,
-                      background: "white",
+                      background: "#fff",
+                      color: "#1a1a1a",
                       border: "1px solid #1a1a1a",
                       borderRadius: 12,
                       width: 32,
@@ -392,7 +394,20 @@ export default function AdminClients({
           padding="md"
           size="md"
         >
-          <Text>Здесь будет управление тренировками: шаблоны, история, отметка.</Text>
+          <Stack>
+            <Button
+              styles={buttonStyle}
+              onClick={() => navigate(`/admin/workouts?clientId=${drawerOpened}`)}
+            >
+              Упражнения
+            </Button>
+            <Button
+              styles={buttonStyle}
+              onClick={() => navigate(`/admin/workouts/create?clientId=${drawerOpened}`)}
+            >
+              Создать шаблон
+            </Button>
+          </Stack>
         </Drawer>
       </Container>
     </Box>
