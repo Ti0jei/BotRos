@@ -10,15 +10,15 @@ import {
   Stack,
   Card,
   Center,
-  TextInput,
   NumberInput,
   Loader,
   Divider,
-  Group, // ✅ добавлено сюда
+  Group,
 } from "@mantine/core";
 
 import ActionButton from "@/components/ui/ActionButton";
 import StatusBadge from "@/components/ui/StatusBadge";
+import CustomModalDatePicker from "@/components/ui/CustomModalDatePicker";
 
 interface Client {
   id: string;
@@ -168,7 +168,16 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
 
               {editMode ? (
                 <Stack spacing="sm">
-                  <TextInput label="Дата оплаты" value={date} onChange={(e) => setDate(e.currentTarget.value)} type="date" radius="xl" />
+                  <Stack spacing="xs">
+                    <Text size="sm" fw={500}>
+                      Дата оплаты
+                    </Text>
+                    <CustomModalDatePicker
+                      date={dayjs(date)}
+                      setDate={(d) => setDate(d.format("YYYY-MM-DD"))}
+                    />
+                  </Stack>
+
                   <NumberInput label="Кол-во тренировок" value={paidTrainings} onChange={syncFromTrainings} min={1} radius="xl" />
                   <NumberInput label="Цена за тренировку" value={pricePerTraining} onChange={syncFromTraining} min={1} radius="xl" />
                   <NumberInput label="Цена за блок" value={pricePerBlock} onChange={syncFromBlock} min={1} radius="xl" />
@@ -199,7 +208,16 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 Блок не найден
               </Text>
 
-              <TextInput label="Дата оплаты" value={date} onChange={(e) => setDate(e.currentTarget.value)} type="date" radius="xl" />
+              <Stack spacing="xs">
+                <Text size="sm" fw={500}>
+                  Дата оплаты
+                </Text>
+                <CustomModalDatePicker
+                  date={dayjs(date)}
+                  setDate={(d) => setDate(d.format("YYYY-MM-DD"))}
+                />
+              </Stack>
+
               <NumberInput label="Кол-во тренировок" value={paidTrainings} onChange={syncFromTrainings} min={1} radius="xl" />
               <NumberInput label="Цена за тренировку" value={pricePerTraining} onChange={syncFromTraining} min={1} radius="xl" />
               <NumberInput label="Цена за блок" value={pricePerBlock} onChange={syncFromBlock} min={1} radius="xl" />
