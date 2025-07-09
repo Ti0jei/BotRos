@@ -26,9 +26,11 @@ model User {
   notificationsMuted  Boolean?       @default(false)
   resetToken          String?        @unique
   resetTokenExpires   DateTime?      @db.Timestamp(6)
+
   nutrition           Nutrition[]
   payments            PaymentBlock[]
   trainings           Training[]
+  workoutTemplates    WorkoutTemplate[]  // 👈 добавлено
 }
 
 model Training {
@@ -74,6 +76,28 @@ model Nutrition {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, date], map: "Nutrition_userId_date_unique")
+}
+
+model WorkoutTemplate {
+  id        String    @id @default(uuid())
+  title     String
+  isGlobal  Boolean   @default(false)
+  userId    String?   // null если шаблон общий
+  user      User?     @relation(fields: [userId], references: [id])
+  exercises Exercise[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Exercise {
+  id          String   @id @default(uuid())
+  name        String
+  weight      Float?
+  reps        Int?
+  sets        Int?
+  comment     String?
+  templateId  String
+  template    WorkoutTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
 }
 
 enum Status {
