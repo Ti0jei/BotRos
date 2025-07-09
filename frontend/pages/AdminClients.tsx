@@ -222,19 +222,30 @@ export default function AdminClients({
                     </Text>
 
                     {isEditing ? (
-                      <Group grow>
+                      <Stack spacing="xs">
                         <TextInput
                           value={internalTagValue}
                           onChange={(e) => setInternalTagValue(e.currentTarget.value)}
                           placeholder="Доп. имя"
+                          radius="xl"
                         />
-                        <Button color="green" onClick={() => saveInternalTag(client.id)}>
-                          Сохранить
-                        </Button>
-                        <Button variant="light" onClick={cancelEditing}>
-                          Отмена
-                        </Button>
-                      </Group>
+                        <Group grow mt="xs">
+                          <Button
+                            onClick={() => saveInternalTag(client.id)}
+                            styles={buttonStyle}
+                          >
+                            Сохранить
+                          </Button>
+                          <Button
+                            variant="outline"
+                            color="gray"
+                            onClick={cancelEditing}
+                            styles={buttonStyle}
+                          >
+                            Отмена
+                          </Button>
+                        </Group>
+                      </Stack>
                     ) : (
                       <>
                         {block && (
