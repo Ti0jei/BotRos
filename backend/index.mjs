@@ -18,6 +18,7 @@ import notificationRoutes from './routes/notifications.mjs';
 import inviteCodeRoutes from './routes/invite-code.mjs';
 import nutritionRoutes from './routes/nutrition.mjs';
 import resetPasswordRoutes from './routes/reset-password.mjs';
+import workoutRoutes from './routes/workoutTemplates.mjs'; // 👈 ДОБАВИЛ ЭТО
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
@@ -65,6 +66,7 @@ app.use('/api/notifications', authMiddleware, notificationRoutes);
 app.use('/api/invite-code', inviteCodeRoutes);
 app.use('/api/nutrition', authMiddleware, nutritionRoutes);
 app.use('/api/reset-password', resetPasswordRoutes);
+app.use('/api/workout-templates', authMiddleware, workoutRoutes); // 👈 ПОДКЛЮЧЕНО
 
 // -------------------- IP --------------------
 app.get('/ip', async (req, res) => {
@@ -121,7 +123,7 @@ app.listen(PORT, () => {
   console.log(`✅ Сервер запущен на http://localhost:${PORT}`);
 });
 
-// -------------------- Безопасный запуск Telegram-бота --------------------
+// -------------------- Telegram бот --------------------
 (async () => {
   const botPath = path.join(__dirname, './bot.mjs');
   if (fs.existsSync(botPath)) {
