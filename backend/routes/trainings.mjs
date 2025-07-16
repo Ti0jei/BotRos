@@ -348,21 +348,12 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
       date: true,
       hour: true,
       isSinglePaid: true,
-      blockId: true, // настоящее поле в базе
+      paymentBlockId: true, // ✅ финально правильно
     },
     orderBy: [{ date: 'desc' }, { hour: 'desc' }],
   });
 
-  // Переименовываем blockId → paymentBlockId для frontend
-  const response = trainings.map(t => ({
-    id: t.id,
-    date: t.date,
-    hour: t.hour,
-    isSinglePaid: t.isSinglePaid,
-    paymentBlockId: t.blockId ?? null,
-  }));
-
-  res.json(response);
+  res.json(trainings);
 });
 
 // Ближайшая тренировка
