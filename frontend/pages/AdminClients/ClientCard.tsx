@@ -118,9 +118,9 @@ export default function ClientCard({
           {client.age} лет
         </Text>
 
-        {/* Бейджи и стрелка в одной строке */}
-        <Group spacing={8} mt={4} position="apart" align="center">
-          <Group spacing={8}>
+        {/* Бейджи + стрелка в нижней строке */}
+        <Group spacing={8} mt={4} align="center" position="apart">
+          <Group spacing={8} align="center">
             <Box
               style={{
                 width: 6,
@@ -147,6 +147,7 @@ export default function ClientCard({
             color="dark"
             radius="xl"
             size="sm"
+            style={{ alignSelf: "center" }}
           >
             {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
           </ActionIcon>
