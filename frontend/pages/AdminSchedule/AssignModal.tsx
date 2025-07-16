@@ -80,35 +80,45 @@ export default function AssignModal({
     dayjs.locale("ru");
   }, []);
 
-  // Загружаем шаблоны и последний шаблон при появлении selectedUser
+  // Загружаем шаблоны, когда selectedUser появляется
   useEffect(() => {
     if (!selectedUser) return;
 
-    const fetchData = async () => {
+    const fetchTemplates = async () => {
       try {
-        const [resLast, resList] = await Promise.all([
-          fetch(`${API}/api/trainings/last/${selectedUser}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${API}/api/workout-templates/user/${selectedUser}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        const last = resLast.ok ? await resLast.json() : null;
-        const list = resList.ok ? await resList.json() : [];
-
-        setLastTemplate(last?.template ?? null);
+        const res = await fetch(`${API}/api/workout-templates/user/${selectedUser}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const list = res.ok ? await res.json() : [];
         setTemplates(Array.isArray(list) ? list : []);
       } catch (e) {
-        console.error("Ошибка загрузки данных:", e);
+        console.error("Ошибка загрузки шаблонов:", e);
       }
     };
 
-    fetchData();
+    fetchTemplates();
   }, [selectedUser]);
 
-  // Обновляем режим оплаты при наличии блока
+  // Загружаем последний шаблон при открытии модалки
+  useEffect(() => {
+    if (!selectedUser || !opened) return;
+
+    const fetchLastTemplate = async () => {
+      try {
+        const res = await fetch(`${API}/api/trainings/last/${selectedUser}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const last = res.ok ? await res.json() : null;
+        setLastTemplate(last?.template ?? null);
+      } catch (e) {
+        console.error("Ошибка загрузки последнего шаблона:", e);
+      }
+    };
+
+    fetchLastTemplate();
+  }, [opened]);
+
+  // Определяем необходимость ручной оплаты
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -118,7 +128,7 @@ export default function AssignModal({
     setIsSinglePaid(!hasBlock);
   }, [selectedUser, blocks]);
 
-  // Загружаем список назначенных клиентов по дате
+  // Загружаем назначения по дате
   useEffect(() => {
     const loadAssigned = async () => {
       try {
