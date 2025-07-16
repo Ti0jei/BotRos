@@ -8,6 +8,7 @@ import {
   Stack,
   Box,
   TextInput,
+  ScrollArea,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
@@ -123,9 +124,10 @@ export default function AssignModalFromCalendar({
 
     const fetchTemplates = async () => {
       try {
-        const resLast = await fetch(`${API}/api/trainings/last/${selectedUser}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resLast = await fetch(
+          `${API}/api/workout-templates/last-template?userId=${selectedUser}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         const resList = await fetch(`${API}/api/workout-templates/user/${selectedUser}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -153,104 +155,106 @@ export default function AssignModalFromCalendar({
       styles={{
         title: { fontWeight: 700, fontSize: 20 },
         header: { borderBottom: "1px solid #ddd" },
-        body: { paddingTop: 16 },
+        body: { paddingTop: 0, paddingBottom: 0 },
       }}
     >
-      <Stack spacing="md">
-        <Box>
-          <Text fw={600} mb={4}>
-            Клиент
-          </Text>
-          <Select
-            data={clients.map((c) => ({
-              label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-              value: c.id,
-            }))}
-            placeholder="Выберите клиента"
-            value={selectedUser}
-            onChange={setSelectedUser}
-            searchable
-            nothingFound="Не найдено"
-          />
-        </Box>
-
-        {selectedUser && lastTemplate && (
-          <Text size="sm" c="dimmed">
-            Прошлая тренировка: <b>{lastTemplate.title}</b>
-          </Text>
-        )}
-
-        {selectedUser && (
-          <Select
-            label="Следующая программа тренировок"
-            placeholder="По очереди или выбрать вручную"
-            data={templates.map((t) => ({
-              label: t.title,
-              value: t.id,
-            }))}
-            value={selectedTemplateId}
-            onChange={(val) => setSelectedTemplateId(val)}
-            clearable
-          />
-        )}
-
-        {selectedUser && !hasActiveBlock && (
-          <Text color="red" size="sm">
-            У клиента нет активного блока — доступна только разовая оплата
-          </Text>
-        )}
-
-        <Checkbox
-          label="Разовая оплата"
-          checked={isSinglePaid}
-          onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={!selectedUser || !hasActiveBlock}
-        />
-
-        {isSinglePaid && (
-          <>
-            <TextInput
-              label="Сумма (₽)"
-              placeholder="Введите сумму"
-              type="number"
-              value={singlePrice}
-              onChange={(e) => setSinglePrice(e.currentTarget.value)}
-              required
-            />
+      <ScrollArea h="70vh" offsetScrollbars>
+        <Stack spacing="md" p="md">
+          <Box>
+            <Text fw={600} mb={4}>
+              Клиент
+            </Text>
             <Select
-              label="Способ оплаты"
-              placeholder="Выберите способ"
-              data={[
-                { value: "cash", label: "Наличные" },
-                { value: "online", label: "Онлайн" },
-              ]}
-              value={singlePaymentMethod}
-              onChange={(val) =>
-                setSinglePaymentMethod(val as "cash" | "online" | "")
-              }
-              required
+              data={clients.map((c) => ({
+                label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+                value: c.id,
+              }))}
+              placeholder="Выберите клиента"
+              value={selectedUser}
+              onChange={setSelectedUser}
+              searchable
+              nothingFound="Не найдено"
             />
-          </>
-        )}
+          </Box>
 
-        <Group position="right" mt="md">
-          <Button
-            onClick={handleAssign}
-            variant="outline"
-            style={{
-              borderRadius: 12,
-              fontWeight: 500,
-              paddingLeft: 20,
-              paddingRight: 20,
-              color: "#1a1a1a",
-              border: "1px solid #1a1a1a",
-              backgroundColor: "#fff",
-            }}
-          >
-            Назначить
-          </Button>
-        </Group>
-      </Stack>
+          {selectedUser && lastTemplate && (
+            <Text size="sm" c="dimmed">
+              Прошлая тренировка: <b>{lastTemplate.title}</b>
+            </Text>
+          )}
+
+          {selectedUser && (
+            <Select
+              label="Следующая программа тренировок"
+              placeholder="По очереди или выбрать вручную"
+              data={templates.map((t) => ({
+                label: t.title,
+                value: t.id,
+              }))}
+              value={selectedTemplateId}
+              onChange={(val) => setSelectedTemplateId(val)}
+              clearable
+            />
+          )}
+
+          {selectedUser && !hasActiveBlock && (
+            <Text color="red" size="sm">
+              У клиента нет активного блока — доступна только разовая оплата
+            </Text>
+          )}
+
+          <Checkbox
+            label="Разовая оплата"
+            checked={isSinglePaid}
+            onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
+            disabled={!selectedUser || !hasActiveBlock}
+          />
+
+          {isSinglePaid && (
+            <>
+              <TextInput
+                label="Сумма (₽)"
+                placeholder="Введите сумму"
+                type="number"
+                value={singlePrice}
+                onChange={(e) => setSinglePrice(e.currentTarget.value)}
+                required
+              />
+              <Select
+                label="Способ оплаты"
+                placeholder="Выберите способ"
+                data={[
+                  { value: "cash", label: "Наличные" },
+                  { value: "online", label: "Онлайн" },
+                ]}
+                value={singlePaymentMethod}
+                onChange={(val) =>
+                  setSinglePaymentMethod(val as "cash" | "online" | "")
+                }
+                required
+              />
+            </>
+          )}
+
+          <Group position="right" mt="md">
+            <Button
+              onClick={handleAssign}
+              variant="outline"
+              style={{
+                borderRadius: 12,
+                fontWeight: 500,
+                paddingLeft: 20,
+                paddingRight: 20,
+                color: "#1a1a1a",
+                border: "1px solid #1a1a1a",
+                backgroundColor: "#fff",
+              }}
+            >
+              Назначить
+            </Button>
+          </Group>
+        </Stack>
+      </ScrollArea>
     </Modal>
   );
 }
