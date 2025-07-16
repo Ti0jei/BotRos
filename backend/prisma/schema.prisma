@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String         @id @default(cuid())
+  email               String         @unique
+  password            String
+  name                String
+  age                 Int
+  role                String         @default("USER")
+  createdAt           DateTime?      @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime?      @default(now()) @updatedAt @db.Timestamp(6)
+  telegramId          String?        @unique
+  internalTag         String?        @db.VarChar
+  lastName            String?        @db.VarChar
+  emailVerified       Boolean?       @default(false)
+  emailToken          String?        @unique
+  emailTokenExpires   DateTime?      @db.Timestamp(6)
+  notifications_muted Boolean?       @default(false)
+  notificationsMuted  Boolean?       @default(false)
+  resetToken          String?        @unique
+  resetTokenExpires   DateTime?      @db.Timestamp(6)
+
+  nutrition           Nutrition[]
+  payments            PaymentBlock[]
+  trainings           Training[]
+  workoutTemplates    WorkoutTemplate[]
+}
+
+model Training {
+  id           String   @id @default(cuid())
+  date         DateTime @db.Timestamp(6)
+  hour         Int
+  userId       String
+  templateId   String?   // foreign key (UUID)
+  status       Status    @default(PENDING)
+  createdAt    DateTime? @default(now()) @db.Timestamp(6)
+  attended     Boolean?
+  wasCounted   Boolean?  @default(false)
+  isSinglePaid Boolean?  @default(false)
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+  template WorkoutTemplate? @relation(fields: [templateId], references: [id])  // ✅ прямая связь
+}
+
+model PaymentBlock {
+  id               String   @id @default(cuid())
+  userId           String
+  paidTrainings    Int
+  pricePerTraining Int
+  paidAt           DateTime @default(now()) @db.Timestamp(6)
+  active           Boolean  @default(true)
+  used             Int?     @default(0)
+  pricePerBlock    Int?     @default(0)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_payment_user")
+}
+
+model InviteCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  expiresAt DateTime  @db.Timestamp(6)
+}
+
+model Nutrition {
+  id       String   @id @default(dbgenerated("md5((random())::text)"))
+  userId   String
+  date     DateTime @db.Date
+  calories Int
+  protein  Int
+  fat      Int
+  carbs    Int
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, date], map: "Nutrition_userId_date_unique")
+}
+
+model WorkoutTemplate {
+  id             String     @id @default(uuid())
+  title          String
+  isGlobal       Boolean    @default(false)
+  userId         String?
+  user           User?      @relation(fields: [userId], references: [id])
+  exercises      Exercise[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  sequenceNumber Int?       @default(1)
+  isActive       Boolean?   @default(true)
+
+  trainings      Training[]  // ✅ обратная связь
+}
+
+model ExerciseDefinition {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  category  String
+  createdAt DateTime  @default(now())
+
+  usedIn    Exercise[] @relation("ExerciseToDefinition")
+}
+
+model Exercise {
+  id            String   @id @default(uuid())
+  templateId    String
+  exerciseId    String
+  weight        Float?
+  reps          Int?
+  sets          Int?
+  comment       String?
+
+  template      WorkoutTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  definition    ExerciseDefinition  @relation("ExerciseToDefinition", fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseId])
+}
+
+enum Status {
+  PENDING
+  CONFIRMED
+  DECLINED
+}
