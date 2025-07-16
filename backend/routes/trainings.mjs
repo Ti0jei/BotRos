@@ -334,7 +334,7 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   });
 });
 
-// Разовые тренировки + блоковые посещения
+// 🔧 Исправленный роут: тренировки с attended === true
 router.get('/single/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
@@ -348,12 +348,21 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
       date: true,
       hour: true,
       isSinglePaid: true,
-      paymentBlockId: true,
+      blockId: true, // настоящее поле в базе
     },
     orderBy: [{ date: 'desc' }, { hour: 'desc' }],
   });
 
-  res.json(trainings);
+  // Переименовываем blockId → paymentBlockId для frontend
+  const response = trainings.map(t => ({
+    id: t.id,
+    date: t.date,
+    hour: t.hour,
+    isSinglePaid: t.isSinglePaid,
+    paymentBlockId: t.blockId ?? null,
+  }));
+
+  res.json(response);
 });
 
 // Ближайшая тренировка
