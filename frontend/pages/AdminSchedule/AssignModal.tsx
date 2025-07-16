@@ -6,12 +6,14 @@ import {
   Select,
   Checkbox,
   Button,
+  Card,
   Divider,
   Title,
   Group,
   Badge,
   NumberInput,
   Box,
+  ScrollArea,
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
@@ -147,184 +149,187 @@ export default function AssignModal({
       withCloseButton={false}
       centered
       radius="xl"
-      fullScreen
+      size="md"
       scrollAreaComponent="div"
       styles={{
-        body: { padding: "1rem", paddingBottom: 80 },
+        body: {
+          padding: 0,
+        },
       }}
     >
-      <Stack spacing="md">
-        <Group position="apart">
-          <Group spacing={8}>
-            <IconClock size={20} />
-            <Title order={4}>Назначить тренировку</Title>
+      <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
+        <Stack spacing="md">
+          <Group position="apart">
+            <Group spacing={8}>
+              <IconClock size={20} />
+              <Title order={4}>Назначить тренировку</Title>
+            </Group>
+            <Button
+              onClick={onClose}
+              variant="subtle"
+              color="dark"
+              px={0}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconX size={18} />
+            </Button>
           </Group>
-          <Button
-            onClick={onClose}
-            variant="subtle"
-            color="dark"
-            px={0}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <IconX size={18} />
-          </Button>
-        </Group>
 
-        <CustomModalDatePicker date={date} setDate={setDate} />
+          <CustomModalDatePicker date={date} setDate={setDate} />
 
-        {!isClientPreselected ? (
-          <Select
-            label="Клиент"
-            placeholder="Выберите клиента"
-            data={clients.map((c) => ({
-              value: c.id,
-              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-            }))}
-            value={selectedUser}
-            onChange={(val) => setSelectedUser(val || null)}
-            radius="md"
-            size="md"
-            withinPortal
-          />
-        ) : (
-          <Text size="sm">
-            Клиент: <b>{clients.find((c) => c.id === selectedUser)?.name} {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}</b>
-          </Text>
-        )}
-
-        {selectedUser && lastTemplate && (
-          <Text size="sm" c="dimmed" mt="xs">
-            Прошлая тренировка:{" "}
-            <Text span fw={500} c="dark">
-              {lastTemplate.title}
-            </Text>
-          </Text>
-        )}
-
-        {templates.length > 0 && (
-          <Select
-            label="Программа тренировки"
-            placeholder="Авто (ротация) или выберите вручную"
-            data={templates.map((t) => ({ label: t.title, value: t.id }))}
-            value={selectedTemplateId}
-            onChange={setSelectedTemplateId}
-            clearable
-          />
-        )}
-
-        {remaining !== null && !isSinglePaid && (
-          <Badge color={remaining > 0 ? "green" : "red"} size="sm">
-            Осталось тренировок: {remaining}
-          </Badge>
-        )}
-
-        <Checkbox
-          label="Разовая оплата"
-          checked={isSinglePaid}
-          onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          radius="md"
-          size="md"
-          disabled={!block}
-        />
-
-        {isSinglePaid && (
-          <>
-            <NumberInput
-              label="Стоимость"
-              placeholder="Введите сумму"
-              value={singlePrice}
-              onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-              min={0}
-            />
+          {!isClientPreselected ? (
             <Select
-              label="Способ оплаты"
-              placeholder="Выберите"
-              data={[
-                { label: "Наличные", value: "cash" },
-                { label: "Онлайн", value: "online" },
-              ]}
-              value={singlePaymentMethod}
-              onChange={(val) => setSinglePaymentMethod(val)}
+              label="Клиент"
+              placeholder="Выберите клиента"
+              data={clients.map((c) => ({
+                value: c.id,
+                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+              }))}
+              value={selectedUser}
+              onChange={(val) => setSelectedUser(val || null)}
+              radius="md"
+              size="md"
+              withinPortal
+            />
+          ) : (
+            <Text size="sm">
+              Клиент: <b>{clients.find((c) => c.id === selectedUser)?.name} {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}</b>
+            </Text>
+          )}
+
+          {selectedUser && lastTemplate && (
+            <Text size="sm" c="dimmed" mt="xs">
+              Прошлая тренировка: <Text span fw={500} c="dark">{lastTemplate.title}</Text>
+            </Text>
+          )}
+
+          {templates.length > 0 && (
+            <Select
+              label="Программа тренировки"
+              placeholder="Авто (ротация) или выберите вручную"
+              data={templates.map((t) => ({ label: t.title, value: t.id }))}
+              value={selectedTemplateId}
+              onChange={setSelectedTemplateId}
               clearable
             />
-          </>
-        )}
+          )}
 
-        {showWarning && (
-          <Text
-            size="sm"
-            style={{
-              backgroundColor: "#fff4f4",
-              padding: "8px 12px",
-              borderRadius: 8,
-              color: "#c92a2a",
-              border: "1px solid #f3c0c0",
-            }}
+          {remaining !== null && !isSinglePaid && (
+            <Badge color={remaining > 0 ? "green" : "red"} size="sm">
+              Осталось тренировок: {remaining}
+            </Badge>
+          )}
+
+          <Checkbox
+            label="Разовая оплата"
+            checked={isSinglePaid}
+            onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
+            radius="md"
+            size="md"
+            disabled={!block}
+          />
+
+          {isSinglePaid && (
+            <>
+              <NumberInput
+                label="Стоимость"
+                placeholder="Введите сумму"
+                value={singlePrice}
+                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                min={0}
+              />
+              <Select
+                label="Способ оплаты"
+                placeholder="Выберите"
+                data={[
+                  { label: "Наличные", value: "cash" },
+                  { label: "Онлайн", value: "online" },
+                ]}
+                value={singlePaymentMethod}
+                onChange={(val) => setSinglePaymentMethod(val)}
+                clearable
+              />
+            </>
+          )}
+
+          {showWarning && (
+            <Text
+              size="sm"
+              style={{
+                backgroundColor: "#fff4f4",
+                padding: "8px 12px",
+                borderRadius: 8,
+                color: "#c92a2a",
+                border: "1px solid #f3c0c0",
+              }}
+            >
+              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
+            </Text>
+          )}
+
+          <Divider />
+
+          <Text size="sm" fw={500}>Выберите время:</Text>
+
+          <ScrollArea h={200} offsetScrollbars>
+            <Stack spacing={6}>
+              {hours.map((h) => {
+                const usersAtThisHour = assignedClients
+                  .filter((a) => a.hour === h)
+                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                  .join(", ");
+
+                return (
+                  <Group key={h} spacing="xs" align="center" noWrap>
+                    <Button
+                      variant={selectedHour === h ? "filled" : "outline"}
+                      color="dark"
+                      size="xs"
+                      radius="xl"
+                      onClick={() => setSelectedHour(h)}
+                      style={{ minWidth: 60 }}
+                    >
+                      {h}:00
+                    </Button>
+                    {usersAtThisHour && (
+                      <Text
+                        size="xs"
+                        c="dimmed"
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {usersAtThisHour}
+                      </Text>
+                    )}
+                  </Group>
+                );
+              })}
+            </Stack>
+          </ScrollArea>
+
+          <Button
+            fullWidth
+            radius="xl"
+            color="dark"
+            size="md"
+            onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
+            style={{ fontWeight: 600 }}
+            disabled={!selectedUser || selectedHour === null}
           >
-            У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
-          </Text>
-        )}
-
-        <Divider />
-
-        <Text size="sm" fw={500}>Выберите время:</Text>
-
-        <Stack spacing={6}>
-          {hours.map((h) => {
-            const usersAtThisHour = assignedClients
-              .filter((a) => a.hour === h)
-              .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
-              .join(", ");
-
-            return (
-              <Group key={h} spacing="xs" align="center" noWrap>
-                <Button
-                  variant={selectedHour === h ? "filled" : "outline"}
-                  color="dark"
-                  size="xs"
-                  radius="xl"
-                  onClick={() => setSelectedHour(h)}
-                  style={{ minWidth: 60 }}
-                >
-                  {h}:00
-                </Button>
-                {usersAtThisHour && (
-                  <Text
-                    size="xs"
-                    c="dimmed"
-                    style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {usersAtThisHour}
-                  </Text>
-                )}
-              </Group>
-            );
-          })}
+            Назначить
+          </Button>
         </Stack>
-
-        <Button
-          fullWidth
-          radius="xl"
-          color="dark"
-          size="md"
-          onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
-          style={{ fontWeight: 600 }}
-          disabled={!selectedUser || selectedHour === null}
-        >
-          Назначить
-        </Button>
-      </Stack>
+      </Card>
     </Modal>
   );
 }
