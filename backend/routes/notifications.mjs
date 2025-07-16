@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 // ✅ Получить статус оповещений
 router.get('/', async (req, res) => {
-  const userId = req.user?.id; // ← исправлено!
+  const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: 'Нет доступа' });
 
   try {
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
 // ✅ Обновить статус оповещений
 router.patch('/', async (req, res) => {
-  const userId = req.user?.id; // ← исправлено!
+  const userId = req.user?.id;
   if (!userId) return res.status(401).json({ error: 'Нет доступа' });
 
   const { muted } = req.body;
@@ -75,7 +75,8 @@ router.post('/remind/:trainingId', async (req, res) => {
 
     const message = `⏰ Напоминание!\nВам назначена тренировка на ${dateStr} в ${timeStr}.\nПожалуйста, подтвердите участие в приложении ✅❌`;
 
-    await notifyTelegram(training.user.telegramId, message);
+    // ✅ передаём training.id, чтобы кнопки появились
+    await notifyTelegram(training.user.telegramId, message, training.id);
 
     res.json({ success: true });
   } catch (err) {

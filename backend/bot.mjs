@@ -222,26 +222,38 @@ bot.hears(/^(.{1,300})$/, onlyRegistered, async (ctx) => {
   }
 });
 
-bot.action(/^attend:(.+)$/, async (ctx) => {
-  const trainingId = ctx.match[1];
-  await ctx.answerCbQuery('✅ Вы подтвердили участие.');
-  await ctx.editMessageText('✅ Участие подтверждено.');
+bot.on('callback_query', async (ctx) => {
+  const data = ctx.callbackQuery?.data;
+  const telegramId = ctx.from?.id;
 
-  try {
-    await fetch(`${API_URL}/api/trainings/${trainingId}/attended`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attended: true, wasCounted: true })
-    });
-  } catch (err) {
-    console.warn('❌ Ошибка при PATCH attended:', err.message);
+  if (!data || !telegramId) return;
+
+  if (data.startsWith('attend:')) {
+    const trainingId = data.split(':')[1];
+
+    try {
+      await fetch(`${API_URL}/api/trainings/${trainingId}/attended`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attended: true, wasCounted: true })
+      });
+
+      await ctx.answerCbQuery('✅ Участие подтверждено');
+      await ctx.editMessageText('✅ Вы подтвердили участие в тренировке');
+    } catch (err) {
+      console.error('Ошибка подтверждения участия:', err);
+      await ctx.answerCbQuery('⚠️ Ошибка сервера');
+    }
+  } else if (data.startsWith('decline:')) {
+    const trainingId = data.split(':')[1];
+
+    try {
+      await ctx.answerCbQuery('❌ Вы отказались от участия');
+      await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
+    } catch (err) {
+      console.error('Ошибка при отмене участия:', err);
+    }
   }
-});
-
-bot.action(/^decline:(.+)$/, async (ctx) => {
-  const trainingId = ctx.match[1];
-  await ctx.answerCbQuery('❌ Вы отказались от участия.');
-  await ctx.editMessageText('❌ Участие отменено.');
 });
 
 setInterval(() => {
