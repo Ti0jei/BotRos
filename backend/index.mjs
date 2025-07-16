@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.mjs';
 import profileRoutes from './routes/profile.mjs';
 import clientsRoutes from './routes/clients.mjs';
-import trainingsRoutes from './routes/trainings.mjs';
+import trainingsRoutes from './routes/trainings/index.mjs';
 import usersRoute from './routes/users.mjs';
 import paymentBlocksRoutes from './routes/payment-blocks.mjs';
 import notificationRoutes from './routes/notifications.mjs';
