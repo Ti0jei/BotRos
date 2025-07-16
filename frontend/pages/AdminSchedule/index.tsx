@@ -35,6 +35,8 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   const [confirmModal, setConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [confirmMessage, setConfirmMessage] = useState("");
+  const [singlePrice, setSinglePrice] = useState<string>("");
+  const [singlePaymentMethod, setSinglePaymentMethod] = useState<string>("");
 
   const token = getToken();
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -158,6 +160,10 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         selectedHour={selectedHour}
         selectedDate={date.format("YYYY-MM-DD")}
         onSuccess={loadTrainings}
+        singlePrice={singlePrice}
+        setSinglePrice={setSinglePrice}
+        singlePaymentMethod={singlePaymentMethod}
+        setSinglePaymentMethod={setSinglePaymentMethod}
       />
 
       <ConfirmModal
