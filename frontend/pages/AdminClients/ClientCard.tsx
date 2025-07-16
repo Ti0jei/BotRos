@@ -71,7 +71,7 @@ export default function ClientCard({
       radius="xl"
       p="md"
       shadow="xs"
-      style={{ position: "relative", paddingBottom: 0 }}
+      style={{ position: "relative", paddingBottom: 10 }}
     >
       {/* Иконки */}
       <Box style={{ position: "absolute", top: 12, right: 12 }}>
@@ -118,27 +118,38 @@ export default function ClientCard({
           {client.age} лет
         </Text>
 
-        {/* Бейджи */}
-        <Group spacing={8} mt={4}>
-          <Box
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              backgroundColor: block ? "green" : "#999",
-              marginRight: 4,
-            }}
-          />
-          {block && (
-            <>
-              <Badge size="xs" color={remaining === 0 ? "red" : "green"}>
-                Осталось: {remaining}
-              </Badge>
-              <Badge size="xs" color="gray">
-                Цена: {block.pricePerTraining} ₽
-              </Badge>
-            </>
-          )}
+        {/* Бейджи и стрелка в одной строке */}
+        <Group spacing={8} mt={4} position="apart" align="center">
+          <Group spacing={8}>
+            <Box
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                backgroundColor: block ? "green" : "#999",
+              }}
+            />
+            {block && (
+              <>
+                <Badge size="xs" color={remaining === 0 ? "red" : "green"}>
+                  Осталось: {remaining}
+                </Badge>
+                <Badge size="xs" color="gray">
+                  Цена: {block.pricePerTraining} ₽
+                </Badge>
+              </>
+            )}
+          </Group>
+
+          <ActionIcon
+            onClick={onToggleExpand}
+            variant="light"
+            color="dark"
+            radius="xl"
+            size="sm"
+          >
+            {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+          </ActionIcon>
         </Group>
       </Stack>
 
@@ -218,19 +229,6 @@ export default function ClientCard({
           )}
         </Stack>
       </Collapse>
-
-      {/* Кнопка раскрытия */}
-      <Box style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
-        <ActionIcon
-          onClick={onToggleExpand}
-          variant="light"
-          color="dark"
-          radius="xl"
-          size="sm"
-        >
-          {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
-        </ActionIcon>
-      </Box>
     </Card>
   );
 }
