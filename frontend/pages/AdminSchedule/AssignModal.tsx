@@ -92,7 +92,7 @@ export default function AssignModal({
         const list = res.ok ? await res.json() : [];
         setTemplates(Array.isArray(list) ? list : []);
       } catch (e) {
-        console.error("Ошибка загрузки шаблонов:", e);
+        console.error("Ошибка загрузки программы тренировок:", e);
       }
     };
 
@@ -111,7 +111,7 @@ export default function AssignModal({
         const data = await res.json();
         setLastTemplate(data ?? null);
       } catch (e) {
-        console.error("Ошибка загрузки последнего шаблона:", e);
+        console.error("Ошибка загрузки последней программы тренировок:", e);
       }
     };
 
@@ -204,7 +204,7 @@ export default function AssignModal({
 
           {selectedUser && lastTemplate && (
             <Text size="sm" c="dimmed" mt="xs">
-              Последний шаблон:{" "}
+              Прошлая тренировка:{" "}
               <Text span fw={500} c="dark">
                 {lastTemplate.title}
               </Text>
@@ -213,7 +213,7 @@ export default function AssignModal({
 
           {templates.length > 0 && (
             <Select
-              label="Шаблон тренировки"
+              label="Программа тренировки"
               placeholder="Авто (ротация) или выберите вручную"
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}

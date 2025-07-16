@@ -118,7 +118,7 @@ export default function AssignModalFromCalendar({
         setLastTemplate(last || null);
         setTemplates(list || []);
       } catch (e) {
-        console.error("Ошибка загрузки шаблонов:", e);
+        console.error("Ошибка загрузки программы тренировки:", e);
       }
     };
 
@@ -158,13 +158,13 @@ export default function AssignModalFromCalendar({
 
         {selectedUser && lastTemplate && (
           <Text size="sm" c="dimmed">
-            Последний шаблон: <b>{lastTemplate.title}</b>
+            Прошлая тренировка: <b>{lastTemplate.title}</b>
           </Text>
         )}
 
         {selectedUser && (
           <Select
-            label="Следующий шаблон"
+            label="Следующая программа тренировок"
             placeholder="По очереди или выбрать вручную"
             data={templates.map((t) => ({
               label: t.title,
