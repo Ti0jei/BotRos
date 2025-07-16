@@ -52,6 +52,39 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
+// 🔹 GET /api/workout-templates/last-template?userId=...
+router.get('/last-template', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (typeof userId !== 'string') {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    const lastTraining = await prisma.training.findFirst({
+      where: {
+        userId,
+        templateId: { not: null },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+      include: {
+        template: true,
+      },
+    });
+
+    if (!lastTraining?.template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    res.json(lastTraining.template);
+  } catch (err) {
+    console.error('GET /workout-templates/last-template error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // 🔹 GET /api/workout-templates/:id
 router.get('/:id', async (req, res) => {
   try {

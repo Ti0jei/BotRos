@@ -99,13 +99,13 @@ export default function AssignModal({
     fetchTemplates();
   }, [selectedUser]);
 
-  // Загружаем последний шаблон через корректный API
+  // ✅ Исправленный URL для загрузки последнего шаблона
   useEffect(() => {
     if (!selectedUser || !opened) return;
 
     const fetchLastTemplate = async () => {
       try {
-        const res = await fetch(`${API}/api/workouts/last-template?userId=${selectedUser}`, {
+        const res = await fetch(`${API}/api/workout-templates/last-template?userId=${selectedUser}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
