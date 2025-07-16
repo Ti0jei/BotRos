@@ -1,3 +1,5 @@
+// (файл полностью идентичен твоему, за исключением финальной полировки — типизация, fallback, обработка ошибок)
+
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -46,7 +48,7 @@ interface AssignedClient {
 
 interface WorkoutTemplate {
   id: string;
-  title: string;
+  title: string; // или name — зависит от API
 }
 
 export default function AssignModal({
@@ -101,8 +103,8 @@ export default function AssignModal({
         const last = resLast.ok ? await resLast.json() : null;
         const list = resList.ok ? await resList.json() : [];
 
-        setLastTemplate(last?.template || null);
-        setTemplates(list || []);
+        setLastTemplate(last?.template ?? null);
+        setTemplates(Array.isArray(list) ? list : []);
       } catch (e) {
         console.error("Ошибка загрузки данных:", e);
       }
@@ -113,11 +115,15 @@ export default function AssignModal({
 
   useEffect(() => {
     const loadAssigned = async () => {
-      const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setAssignedClients(data);
+      try {
+        const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setAssignedClients(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("Ошибка загрузки клиентов по дате:", e);
+      }
     };
     if (opened) loadAssigned();
   }, [date, opened]);
