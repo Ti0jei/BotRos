@@ -31,7 +31,8 @@ export default async function deleteTraining(req, res) {
   if (training.user?.telegramId && trainingDate >= new Date(today.toDateString())) {
     await notifyTelegram(
       training.user.telegramId,
-      `❌ Ваша тренировка на ${trainingDate.toLocaleDateString()} в ${training.hour}:00 была отменена`
+      `❌ Ваша тренировка на ${trainingDate.toLocaleDateString()} в ${training.hour}:00 была отменена`,
+      null // 🔧 чтобы не показывались кнопки
     );
   }
 

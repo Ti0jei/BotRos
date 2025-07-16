@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { notifyTelegramTraining } from '../../utils/notifyTelegramTraining.mjs';
+import { notifyTelegram } from '../../utils/telegram.mjs';
 import { shouldNotifyUser } from '../../lib/antiSpam.mjs';
 
 const prisma = new PrismaClient();
@@ -81,11 +81,10 @@ export default async function createTraining(req, res) {
         trainingDateTime > now &&
         shouldNotifyUser(user.telegramId)
       ) {
-        await notifyTelegramTraining(
+        await notifyTelegram(
           user.telegramId,
-          training.id,
-          date,
-          parsedHour
+          `📅 Вам назначена тренировка на ${date} в ${parsedHour}:00\nПодтвердите участие:`,
+          training.id
         );
       }
     } catch (e) {
