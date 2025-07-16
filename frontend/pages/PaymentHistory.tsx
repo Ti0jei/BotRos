@@ -143,11 +143,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             )}
 
             {blocks.map((block) => {
-              const usedTrainings = singleTrainings.filter(
-                (t) => t.blockId === block.id
-              );
-
-              const hasUsed = block.used > 0 && usedTrainings.length > 0;
+              const usedTrainings = singleTrainings.filter((t) => t.blockId === block.id);
               const expanded = expandedBlocks[block.id] ?? false;
 
               return (
@@ -166,29 +162,31 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                       {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
                     </Text>
 
-                    {hasUsed && (
-                      <ActionIcon
-                        variant="light"
-                        color="dark"
-                        radius="xl"
-                        onClick={() => toggleExpand(block.id)}
-                      >
-                        {expanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
-                      </ActionIcon>
-                    )}
+                    <ActionIcon
+                      variant="light"
+                      color="dark"
+                      radius="xl"
+                      onClick={() => toggleExpand(block.id)}
+                    >
+                      {expanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+                    </ActionIcon>
                   </Group>
 
-                  {hasUsed && (
-                    <Collapse in={expanded}>
-                      <Stack spacing={4} mt="xs">
-                        {usedTrainings.map((t) => (
+                  <Collapse in={expanded}>
+                    <Stack spacing={4} mt="xs">
+                      {usedTrainings.length > 0 ? (
+                        usedTrainings.map((t) => (
                           <Text key={t.id} size="xs" c="dimmed">
                             {new Date(t.date).toLocaleDateString()} — {t.hour}:00
                           </Text>
-                        ))}
-                      </Stack>
-                    </Collapse>
-                  )}
+                        ))
+                      ) : (
+                        <Text size="xs" c="dimmed">
+                          Пока нет посещений
+                        </Text>
+                      )}
+                    </Stack>
+                  </Collapse>
 
                   {block.active && (
                     <Button
@@ -225,7 +223,6 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         )}
       </Container>
 
-      {/* Кнопка "Назад к профилю" */}
       <Box
         style={{
           position: "fixed",
