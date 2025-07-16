@@ -276,41 +276,44 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.json(updated);
   }
 
-  const updated = await prisma.training.update({
-    where: { id },
-    data: { attended, wasCounted: true },
+  const dateOnly = (d) => d.toISOString().slice(0, 10);
+  const trainingDate = new Date(training.date);
+  const activeBlock = await prisma.paymentBlock.findFirst({
+    where: { userId: training.userId, active: true },
   });
 
-  const dateOnly = (d) => d.toISOString().slice(0, 10);
+  if (!activeBlock || dateOnly(trainingDate) < dateOnly(activeBlock.paidAt)) {
+    return res.status(400).json({ error: 'Нет подходящего активного блока для списания' });
+  }
 
-  if ((attended === true || attended === false) && training.wasCounted !== true) {
-    const trainingDate = new Date(training.date);
-    const activeBlock = await prisma.paymentBlock.findFirst({
-      where: { userId: training.userId, active: true },
+  const nextUsed = (activeBlock.used || 0) + 1;
+
+  const updated = await prisma.training.update({
+    where: { id },
+    data: {
+      attended,
+      wasCounted: true,
+      blockId: activeBlock.id,
+    },
+  });
+
+  await prisma.paymentBlock.update({
+    where: { id: activeBlock.id },
+    data: { used: nextUsed },
+  });
+
+  if (nextUsed >= activeBlock.paidTrainings) {
+    await prisma.paymentBlock.update({
+      where: { id: activeBlock.id },
+      data: { active: false },
     });
 
-    if (activeBlock && dateOnly(trainingDate) >= dateOnly(activeBlock.paidAt)) {
-      const nextUsed = (activeBlock.used || 0) + 1;
-
-      await prisma.paymentBlock.update({
-        where: { id: activeBlock.id },
-        data: { used: nextUsed },
-      });
-
-      if (nextUsed >= activeBlock.paidTrainings) {
-        await prisma.paymentBlock.update({
-          where: { id: activeBlock.id },
-          data: { active: false },
-        });
-
-        const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-        if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
-          await notifyTelegram(
-            trainer.telegramId,
-            `❗ У клиента ${training.user.name} закончился блок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему об оплате.`
-          );
-        }
-      }
+    const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
+      await notifyTelegram(
+        trainer.telegramId,
+        `❗ У клиента ${training.user.name} закончился блок (${nextUsed} из ${activeBlock.paidTrainings}). Напомните ему об оплате.`
+      );
     }
   }
 
@@ -334,7 +337,7 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   });
 });
 
-// ✅ Исправленный /single/:userId
+// Получить посещённые тренировки
 router.get('/single/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
@@ -348,7 +351,7 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
       date: true,
       hour: true,
       isSinglePaid: true,
-      blockId: true, // ← имя поля в Prisma
+      blockId: true,
     },
     orderBy: [{ date: 'desc' }, { hour: 'desc' }],
   });
@@ -358,7 +361,7 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
     date: t.date,
     hour: t.hour,
     isSinglePaid: t.isSinglePaid,
-    paymentBlockId: t.blockId ?? null, // ← фронту возвращаем под нужным именем
+    paymentBlockId: t.blockId ?? null,
   }));
 
   res.json(response);
