@@ -8,12 +8,13 @@ import {
   Stack,
   Box,
   TextInput,
-  ScrollArea,
+  ModalBody,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
 import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
+import { ScrollArea } from "@mantine/core";
 
 interface Props {
   opened: boolean;
@@ -152,14 +153,16 @@ export default function AssignModalFromCalendar({
       title="Назначить тренировку"
       centered
       size="sm"
+      radius="xl"
+      scrollAreaComponent={ScrollArea.Autosize}
       styles={{
         title: { fontWeight: 700, fontSize: 20 },
         header: { borderBottom: "1px solid #ddd" },
-        body: { paddingTop: 0, paddingBottom: 0 },
+        body: { padding: 0 },
       }}
     >
-      <ScrollArea h="70vh" offsetScrollbars>
-        <Stack spacing="md" p="md">
+      <ScrollArea style={{ maxHeight: "70vh", padding: 16 }}>
+        <Stack spacing="md">
           <Box>
             <Text fw={600} mb={4}>
               Клиент
@@ -228,9 +231,7 @@ export default function AssignModalFromCalendar({
                   { value: "online", label: "Онлайн" },
                 ]}
                 value={singlePaymentMethod}
-                onChange={(val) =>
-                  setSinglePaymentMethod(val as "cash" | "online" | "")
-                }
+                onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
                 required
               />
             </>
