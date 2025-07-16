@@ -1,9 +1,10 @@
-import dotenv from 'dotenv';
+""import dotenv from 'dotenv';
 dotenv.config();
 
 import { Telegraf, Markup } from 'telegraf';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
+import { notifyTelegramTraining } from './utils/notifyTelegramTraining.mjs';
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = process.env.WEB_APP_URL;
@@ -21,6 +22,8 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const greetingSent = new Set();
 const dailyLimits = new Map();
 const aiContexts = new Map();
+
+export { bot }; // Экспорт для использования в других модулях, например notifyTelegramTraining
 
 function autoDelete(ctx, message, delay = 3000) {
   setTimeout(() => {
