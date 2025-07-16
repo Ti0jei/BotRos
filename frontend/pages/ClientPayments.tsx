@@ -14,6 +14,7 @@ import {
   Loader,
   Divider,
   Group,
+  Select,
 } from "@mantine/core";
 
 import ActionButton from "@/components/ui/ActionButton";
@@ -33,6 +34,7 @@ interface PaymentBlock {
   pricePerTraining: number;
   pricePerBlock?: number;
   active: boolean;
+  paymentMethod?: "cash" | "online";
 }
 
 export default function ClientPayments({ client, onBack }: { client: Client; onBack: () => void }) {
@@ -49,6 +51,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   const [pricePerTraining, setPricePerTraining] = useState<number>(600);
   const [pricePerBlock, setPricePerBlock] = useState<number>(4800);
   const [used, setUsed] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "online" | "">("");
 
   const syncFromTraining = (val: number) => {
     setPricePerTraining(val);
@@ -79,6 +82,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       setPricePerTraining(data.pricePerTraining);
       setPricePerBlock(data.pricePerBlock || data.pricePerTraining * data.paidTrainings);
       setUsed(data.used);
+      setPaymentMethod(data.paymentMethod ?? "");
     } else {
       setBlock(null);
     }
@@ -98,6 +102,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         paidTrainings,
         pricePerTraining,
         pricePerBlock,
+        paymentMethod,
       }),
     });
 
@@ -121,6 +126,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
         pricePerTraining,
         pricePerBlock,
         used,
+        paymentMethod,
       }),
     });
 
@@ -183,6 +189,18 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                   <NumberInput label="Цена за блок" value={pricePerBlock} onChange={syncFromBlock} min={1} radius="xl" />
                   <NumberInput label="Использовано" value={used} onChange={setUsed} min={0} max={paidTrainings} radius="xl" />
 
+                  <Select
+                    label="Способ оплаты"
+                    value={paymentMethod}
+                    onChange={(val) => setPaymentMethod(val as "cash" | "online")}
+                    data={[
+                      { value: "cash", label: "Наличные" },
+                      { value: "online", label: "Онлайн" },
+                    ]}
+                    required
+                    radius="xl"
+                  />
+
                   <ActionButton onClick={updateBlock} fullWidth>
                     💾 Сохранить
                   </ActionButton>
@@ -194,6 +212,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                   <Text size="sm">Всего: {block.paidTrainings}</Text>
                   <Text size="sm">Использовано: {block.used}</Text>
                   <Text size="sm">Осталось: {block.paidTrainings - block.used}</Text>
+                  <Text size="sm">Способ оплаты: {block.paymentMethod === "cash" ? "Наличные" : "Онлайн"}</Text>
                   <Text size="sm" fw={500}>Сумма: {block.pricePerBlock || pricePerBlock}₽</Text>
 
                   <ActionButton variant="outline" onClick={() => setEditMode(true)} leftIcon={<IconEdit size={16} />} fullWidth>
@@ -221,6 +240,18 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
               <NumberInput label="Кол-во тренировок" value={paidTrainings} onChange={syncFromTrainings} min={1} radius="xl" />
               <NumberInput label="Цена за тренировку" value={pricePerTraining} onChange={syncFromTraining} min={1} radius="xl" />
               <NumberInput label="Цена за блок" value={pricePerBlock} onChange={syncFromBlock} min={1} radius="xl" />
+
+              <Select
+                label="Способ оплаты"
+                value={paymentMethod}
+                onChange={(val) => setPaymentMethod(val as "cash" | "online")}
+                data={[
+                  { value: "cash", label: "Наличные" },
+                  { value: "online", label: "Онлайн" },
+                ]}
+                required
+                radius="xl"
+              />
 
               <Divider my="sm" />
               <Text size="sm" c="dimmed">
