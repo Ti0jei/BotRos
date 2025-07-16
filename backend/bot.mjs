@@ -1,4 +1,4 @@
-""import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 dotenv.config();
 
 import { Telegraf, Markup } from 'telegraf';
@@ -19,11 +19,11 @@ if (!TOKEN || !WEB_APP_URL || !API_URL || !OPENAI_API_KEY) {
 const bot = new Telegraf(TOKEN);
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+export { bot }; // экспортируем для внешнего использования
+
 const greetingSent = new Set();
 const dailyLimits = new Map();
 const aiContexts = new Map();
-
-export { bot }; // Экспорт для использования в других модулях, например notifyTelegramTraining
 
 function autoDelete(ctx, message, delay = 3000) {
   setTimeout(() => {
@@ -215,6 +215,28 @@ bot.hears(/^(.{1,300})$/, onlyRegistered, async (ctx) => {
     const fail = await ctx.reply('❌ Ошибка при обращении к ИИ. Попробуй позже.');
     autoDelete(ctx, fail);
   }
+});
+
+bot.action(/^attend:(.+)$/, async (ctx) => {
+  const trainingId = ctx.match[1];
+  await ctx.answerCbQuery('✅ Вы отметились как "Буду"');
+  await ctx.editMessageText('✅ Вы подтвердили участие в тренировке.');
+
+  try {
+    await fetch(`${API_URL}/api/trainings/${trainingId}/attended`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attended: true, wasCounted: true })
+    });
+  } catch (e) {
+    console.warn('❌ Ошибка при подтверждении участия:', e.message);
+  }
+});
+
+bot.action(/^decline:(.+)$/, async (ctx) => {
+  const trainingId = ctx.match[1];
+  await ctx.answerCbQuery('❌ Вы отказались от участия');
+  await ctx.editMessageText('❌ Вы отказались от участия в тренировке.');
 });
 
 setInterval(() => {
