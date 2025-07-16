@@ -1,5 +1,3 @@
-// (файл полностью идентичен твоему, за исключением финальной полировки — типизация, fallback, обработка ошибок)
-
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -48,7 +46,7 @@ interface AssignedClient {
 
 interface WorkoutTemplate {
   id: string;
-  title: string; // или name — зависит от API
+  title: string;
 }
 
 export default function AssignModal({
@@ -82,12 +80,9 @@ export default function AssignModal({
     dayjs.locale("ru");
   }, []);
 
+  // Загружаем шаблоны и последний шаблон при появлении selectedUser
   useEffect(() => {
-    if (!selectedUser || !opened) return;
-
-    const hasBlock = block && block.paidTrainings > block.used;
-    setShowWarning(!hasBlock && !isSinglePaid);
-    setIsSinglePaid(!hasBlock);
+    if (!selectedUser) return;
 
     const fetchData = async () => {
       try {
@@ -111,8 +106,19 @@ export default function AssignModal({
     };
 
     fetchData();
-  }, [selectedUser, blocks, opened]);
+  }, [selectedUser]);
 
+  // Обновляем режим оплаты при наличии блока
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    const block = blocks[selectedUser];
+    const hasBlock = block && block.paidTrainings > block.used;
+    setShowWarning(!hasBlock && !isSinglePaid);
+    setIsSinglePaid(!hasBlock);
+  }, [selectedUser, blocks]);
+
+  // Загружаем список назначенных клиентов по дате
   useEffect(() => {
     const loadAssigned = async () => {
       try {
