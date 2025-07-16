@@ -13,15 +13,15 @@ import getNextTraining from './getNextTraining.mjs';
 
 const router = express.Router();
 
-router.use(getTrainings);
-router.use(getTrainingsByDate);
-router.use(getLastTemplate);
-router.use(createTraining);
-router.use(deleteTraining);
-router.use(updateStatus);
-router.use(markAttendance);
-router.use(getStats);
-router.use(getVisited);
-router.use(getNextTraining);
+router.get('/', getTrainings);
+router.get('/date/:date', getTrainingsByDate); // или router.get('/', ...) если query-параметры
+router.get('/last/:userId', getLastTemplate);
+router.post('/', createTraining);
+router.delete('/:id', deleteTraining);
+router.patch('/:id/status', updateStatus);
+router.patch('/:id/attended', markAttendance);
+router.get('/stats/:userId', getStats);
+router.get('/visited/:userId', getVisited);
+router.get('/next/:userId', getNextTraining);
 
 export default router;
