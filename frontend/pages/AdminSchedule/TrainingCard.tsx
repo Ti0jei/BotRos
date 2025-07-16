@@ -21,6 +21,18 @@ export default function TrainingCard({
   };
 
   const handleDeleteWithConfirm = () => {
+    if (training.blockId) {
+      modals.open({
+        title: "Удаление невозможно",
+        children: (
+          <Text size="sm">
+            Эта тренировка уже учтена в блоке оплат и не может быть удалена.
+          </Text>
+        ),
+      });
+      return;
+    }
+
     modals.openConfirmModal({
       title: "Подтверждение",
       children: (

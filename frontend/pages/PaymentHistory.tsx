@@ -11,7 +11,10 @@ import {
   Loader,
   Divider,
   Box,
+  Collapse,
+  ActionIcon,
 } from '@mantine/core';
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 
 interface Props {
   userId: string;
@@ -31,12 +34,14 @@ interface SingleTraining {
   id: string;
   date: string;
   hour: number;
+  blockId?: string;
 }
 
 export default function PaymentHistory({ userId, onBack }: Props) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
   const [singleTrainings, setSingleTrainings] = useState<SingleTraining[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
@@ -91,6 +96,13 @@ export default function PaymentHistory({ userId, onBack }: Props) {
     }
   };
 
+  const toggleExpand = (blockId: string) => {
+    setExpandedBlocks((prev) => ({
+      ...prev,
+      [blockId]: !prev[blockId],
+    }));
+  };
+
   const cardStyle = {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -130,35 +142,69 @@ export default function PaymentHistory({ userId, onBack }: Props) {
               </Text>
             )}
 
-            {blocks.map((block) => (
-              <Paper key={block.id} style={cardStyle}>
-                <Group position="apart" mb="xs">
-                  <Text fw={600} size="sm">
-                    Оплата от {new Date(block.paidAt).toLocaleDateString()}
-                  </Text>
-                  <Badge color={block.active ? 'green' : 'gray'}>
-                    {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
-                  </Badge>
-                </Group>
+            {blocks.map((block) => {
+              const usedTrainings = singleTrainings.filter(
+                (t) => t.blockId === block.id
+              );
 
-                <Text size="sm" c="dimmed">
-                  {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
-                </Text>
+              const hasUsed = block.used > 0 && usedTrainings.length > 0;
+              const expanded = expandedBlocks[block.id] ?? false;
 
-                {block.active && (
-                  <Button
-                    size="xs"
-                    color="red"
-                    fullWidth
-                    mt="sm"
-                    onClick={() => markInactive(block.id)}
-                    radius="md"
-                  >
-                    Завершить блок
-                  </Button>
-                )}
-              </Paper>
-            ))}
+              return (
+                <Paper key={block.id} style={cardStyle}>
+                  <Group position="apart" mb="xs">
+                    <Text fw={600} size="sm">
+                      Оплата от {new Date(block.paidAt).toLocaleDateString()}
+                    </Text>
+                    <Badge color={block.active ? 'green' : 'gray'}>
+                      {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
+                    </Badge>
+                  </Group>
+
+                  <Group position="apart" align="center">
+                    <Text size="sm" c="dimmed">
+                      {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
+                    </Text>
+
+                    {hasUsed && (
+                      <ActionIcon
+                        variant="light"
+                        color="dark"
+                        radius="xl"
+                        onClick={() => toggleExpand(block.id)}
+                      >
+                        {expanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+                      </ActionIcon>
+                    )}
+                  </Group>
+
+                  {hasUsed && (
+                    <Collapse in={expanded}>
+                      <Stack spacing={4} mt="xs">
+                        {usedTrainings.map((t) => (
+                          <Text key={t.id} size="xs" c="dimmed">
+                            {new Date(t.date).toLocaleDateString()} — {t.hour}:00
+                          </Text>
+                        ))}
+                      </Stack>
+                    </Collapse>
+                  )}
+
+                  {block.active && (
+                    <Button
+                      size="xs"
+                      color="red"
+                      fullWidth
+                      mt="sm"
+                      onClick={() => markInactive(block.id)}
+                      radius="md"
+                    >
+                      Завершить блок
+                    </Button>
+                  )}
+                </Paper>
+              );
+            })}
 
             {singleTrainings.length > 0 && (
               <>
@@ -179,7 +225,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         )}
       </Container>
 
-      {/* Унифицированная кнопка "Назад к профилю" */}
+      {/* Кнопка "Назад к профилю" */}
       <Box
         style={{
           position: "fixed",
