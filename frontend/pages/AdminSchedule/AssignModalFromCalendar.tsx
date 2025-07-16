@@ -1,6 +1,5 @@
 import {
   Modal,
-  ModalBody,
   Button,
   Select,
   Checkbox,
@@ -9,7 +8,6 @@ import {
   Stack,
   Box,
   TextInput,
-  ScrollArea,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
@@ -154,111 +152,116 @@ export default function AssignModalFromCalendar({
       centered
       size="sm"
       radius="xl"
+      scrollAreaComponent="div"
       styles={{
         title: { fontWeight: 700, fontSize: 20 },
         header: { borderBottom: "1px solid #ddd" },
-        body: { padding: 0 },
+        body: {
+          padding: 16,
+          maxHeight: "75vh",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch", // fix scroll freeze on iOS
+        },
       }}
     >
-      <ModalBody p={0}>
-        <ScrollArea style={{ maxHeight: "70vh", padding: 16 }}>
-          <Stack spacing="md">
-            <Box>
-              <Text fw={600} mb={4}>
-                Клиент
-              </Text>
-              <Select
-                data={clients.map((c) => ({
-                  label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-                  value: c.id,
-                }))}
-                placeholder="Выберите клиента"
-                value={selectedUser}
-                onChange={setSelectedUser}
-                searchable
-                nothingFound="Не найдено"
-              />
-            </Box>
+      <Stack spacing="md">
+        <Box>
+          <Text fw={600} mb={4}>
+            Клиент
+          </Text>
+          <Select
+            data={clients.map((c) => ({
+              label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+              value: c.id,
+            }))}
+            placeholder="Выберите клиента"
+            value={selectedUser}
+            onChange={setSelectedUser}
+            searchable
+            nothingFound="Не найдено"
+          />
+        </Box>
 
-            {selectedUser && lastTemplate && (
-              <Text size="sm" c="dimmed">
-                Прошлая тренировка: <b>{lastTemplate.title}</b>
-              </Text>
-            )}
+        {selectedUser && lastTemplate && (
+          <Text size="sm" c="dimmed">
+            Прошлая тренировка: <b>{lastTemplate.title}</b>
+          </Text>
+        )}
 
-            {selectedUser && (
-              <Select
-                label="Следующая программа тренировок"
-                placeholder="По очереди или выбрать вручную"
-                data={templates.map((t) => ({
-                  label: t.title,
-                  value: t.id,
-                }))}
-                value={selectedTemplateId}
-                onChange={(val) => setSelectedTemplateId(val)}
-                clearable
-              />
-            )}
+        {selectedUser && (
+          <Select
+            label="Следующая программа тренировок"
+            placeholder="По очереди или выбрать вручную"
+            data={templates.map((t) => ({
+              label: t.title,
+              value: t.id,
+            }))}
+            value={selectedTemplateId}
+            onChange={(val) => setSelectedTemplateId(val)}
+            clearable
+          />
+        )}
 
-            {selectedUser && !hasActiveBlock && (
-              <Text color="red" size="sm">
-                У клиента нет активного блока — доступна только разовая оплата
-              </Text>
-            )}
+        {selectedUser && !hasActiveBlock && (
+          <Text color="red" size="sm">
+            У клиента нет активного блока — доступна только разовая оплата
+          </Text>
+        )}
 
-            <Checkbox
-              label="Разовая оплата"
-              checked={isSinglePaid}
-              onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-              disabled={!selectedUser || !hasActiveBlock}
+        <Checkbox
+          label="Разовая оплата"
+          checked={isSinglePaid}
+          onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
+          disabled={!selectedUser || !hasActiveBlock}
+        />
+
+        {isSinglePaid && (
+          <>
+            <TextInput
+              label="Сумма (₽)"
+              placeholder="Введите сумму"
+              type="number"
+              value={singlePrice}
+              onChange={(e) => setSinglePrice(e.currentTarget.value)}
+              required
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onBlur={() => window.scrollTo({ top: 0 })} // решает проблему залипания
             />
+            <Select
+              label="Способ оплаты"
+              placeholder="Выберите способ"
+              data={[
+                { value: "cash", label: "Наличные" },
+                { value: "online", label: "Онлайн" },
+              ]}
+              value={singlePaymentMethod}
+              onChange={(val) =>
+                setSinglePaymentMethod(val as "cash" | "online" | "")
+              }
+              required
+            />
+          </>
+        )}
 
-            {isSinglePaid && (
-              <>
-                <TextInput
-                  label="Сумма (₽)"
-                  placeholder="Введите сумму"
-                  type="number"
-                  value={singlePrice}
-                  onChange={(e) => setSinglePrice(e.currentTarget.value)}
-                  required
-                />
-                <Select
-                  label="Способ оплаты"
-                  placeholder="Выберите способ"
-                  data={[
-                    { value: "cash", label: "Наличные" },
-                    { value: "online", label: "Онлайн" },
-                  ]}
-                  value={singlePaymentMethod}
-                  onChange={(val) =>
-                    setSinglePaymentMethod(val as "cash" | "online" | "")
-                  }
-                  required
-                />
-              </>
-            )}
-
-            <Group position="right" mt="md">
-              <Button
-                onClick={handleAssign}
-                variant="outline"
-                style={{
-                  borderRadius: 12,
-                  fontWeight: 500,
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                  color: "#1a1a1a",
-                  border: "1px solid #1a1a1a",
-                  backgroundColor: "#fff",
-                }}
-              >
-                Назначить
-              </Button>
-            </Group>
-          </Stack>
-        </ScrollArea>
-      </ModalBody>
+        <Group position="right" mt="md">
+          <Button
+            onClick={handleAssign}
+            variant="outline"
+            style={{
+              borderRadius: 12,
+              fontWeight: 500,
+              paddingLeft: 20,
+              paddingRight: 20,
+              color: "#1a1a1a",
+              border: "1px solid #1a1a1a",
+              backgroundColor: "#fff",
+            }}
+          >
+            Назначить
+          </Button>
+        </Group>
+      </Stack>
     </Modal>
   );
 }
