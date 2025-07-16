@@ -334,7 +334,7 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   });
 });
 
-// 🔧 Исправленный роут: тренировки с attended === true
+// ✅ Исправленный /single/:userId
 router.get('/single/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
@@ -348,12 +348,20 @@ router.get('/single/:userId', authMiddleware, async (req, res) => {
       date: true,
       hour: true,
       isSinglePaid: true,
-      paymentBlockId: true, // ✅ финально правильно
+      blockId: true, // ← имя поля в Prisma
     },
     orderBy: [{ date: 'desc' }, { hour: 'desc' }],
   });
 
-  res.json(trainings);
+  const response = trainings.map(t => ({
+    id: t.id,
+    date: t.date,
+    hour: t.hour,
+    isSinglePaid: t.isSinglePaid,
+    paymentBlockId: t.blockId ?? null, // ← фронту возвращаем под нужным именем
+  }));
+
+  res.json(response);
 });
 
 // Ближайшая тренировка
