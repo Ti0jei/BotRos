@@ -30,7 +30,7 @@ interface PaymentBlock {
   active: boolean;
 }
 
-interface SingleTraining {
+interface TrainingRecord {
   id: string;
   date: string;
   hour: number;
@@ -39,7 +39,8 @@ interface SingleTraining {
 
 export default function PaymentHistory({ userId, onBack }: Props) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
-  const [singleTrainings, setSingleTrainings] = useState<SingleTraining[]>([]);
+  const [blockTrainings, setBlockTrainings] = useState<TrainingRecord[]>([]);
+  const [singleTrainings, setSingleTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
 
@@ -53,7 +54,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [blocksRes, singlesRes] = await Promise.all([
+      const [blocksRes, trainingsRes] = await Promise.all([
         fetch(`${API}/api/payment-blocks/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
@@ -67,9 +68,10 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         setBlocks(blockData);
       }
 
-      if (singlesRes.ok) {
-        const singles = await singlesRes.json();
-        setSingleTrainings(singles);
+      if (trainingsRes.ok) {
+        const all = await trainingsRes.json();
+        setBlockTrainings(all.filter((t: TrainingRecord) => t.blockId));
+        setSingleTrainings(all.filter((t: TrainingRecord) => !t.blockId));
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
@@ -143,7 +145,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             )}
 
             {blocks.map((block) => {
-              const usedTrainings = singleTrainings.filter((t) => t.blockId === block.id);
+              const usedTrainings = blockTrainings.filter((t) => t.blockId === block.id);
               const expanded = expandedBlocks[block.id] ?? false;
 
               return (

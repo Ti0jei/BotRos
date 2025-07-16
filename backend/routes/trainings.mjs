@@ -203,6 +203,10 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   const training = await prisma.training.findUnique({ where: { id }, include: { user: true } });
   if (!training) return res.status(404).json({ error: 'Not found' });
 
+  if (training.wasCounted) {
+    return res.status(400).json({ error: 'Нельзя удалить посещённую тренировку' });
+  }
+
   await prisma.training.delete({ where: { id } });
 
   const today = new Date();
@@ -330,12 +334,22 @@ router.get('/user/:userId/stats', authMiddleware, async (req, res) => {
   });
 });
 
-// Разовые тренировки
+// Разовые тренировки + блоковые посещения
 router.get('/single/:userId', authMiddleware, async (req, res) => {
   const { userId } = req.params;
 
   const trainings = await prisma.training.findMany({
-    where: { userId, isSinglePaid: true },
+    where: {
+      userId,
+      attended: true,
+    },
+    select: {
+      id: true,
+      date: true,
+      hour: true,
+      isSinglePaid: true,
+      paymentBlockId: true,
+    },
     orderBy: [{ date: 'desc' }, { hour: 'desc' }],
   });
 
