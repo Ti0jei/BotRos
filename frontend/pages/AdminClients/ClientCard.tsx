@@ -66,9 +66,9 @@ export default function ClientCard({
   const remaining = block ? block.paidTrainings - block.used : 0;
 
   return (
-    <Card withBorder radius="xl" p="md" shadow="xs" style={{ minHeight: 100 }}>
-      <Stack spacing={8}>
-        {/* Верхняя строка — Имя + иконки */}
+    <Card withBorder radius="xl" p="md" shadow="xs">
+      <Stack spacing={6}>
+        {/* Верхняя строка: имя + иконки */}
         <Group position="apart" align="center">
           <Text fw={600} size="sm">
             {client.name} {client.lastName ?? ""}
@@ -103,15 +103,6 @@ export default function ClientCard({
                 <Dumbbell size={14} />
               </ActionIcon>
             </Tooltip>
-            <ActionIcon
-              onClick={onToggleExpand}
-              variant="light"
-              color="dark"
-              radius="xl"
-              size="sm"
-            >
-              {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
-            </ActionIcon>
           </Group>
         </Group>
 
@@ -141,6 +132,19 @@ export default function ClientCard({
             </>
           )}
         </Group>
+
+        {/* Стрелка справа снизу */}
+        <Box mt={4} style={{ display: "flex", justifyContent: "flex-end" }}>
+          <ActionIcon
+            onClick={onToggleExpand}
+            variant="light"
+            color="dark"
+            radius="xl"
+            size="sm"
+          >
+            {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+          </ActionIcon>
+        </Box>
 
         {/* Раскрывающийся блок */}
         <Collapse in={isOpen}>
