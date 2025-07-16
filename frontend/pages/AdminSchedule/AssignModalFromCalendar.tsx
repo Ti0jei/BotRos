@@ -7,6 +7,7 @@ import {
   Text,
   Stack,
   Box,
+  TextInput,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
@@ -34,6 +35,8 @@ export default function AssignModalFromCalendar({
 }: Props) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
+  const [singlePrice, setSinglePrice] = useState<string>("");
+  const [singlePaymentMethod, setSinglePaymentMethod] = useState<"cash" | "online" | "">("");
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
@@ -56,6 +59,15 @@ export default function AssignModalFromCalendar({
       return;
     }
 
+    if (isSinglePaid && (!singlePrice || !singlePaymentMethod)) {
+      showNotification({
+        title: "Укажите данные оплаты",
+        message: "Нужно ввести сумму и способ оплаты",
+        color: "red",
+      });
+      return;
+    }
+
     const res = await fetch(`${API}/api/trainings`, {
       method: "POST",
       headers: {
@@ -67,6 +79,8 @@ export default function AssignModalFromCalendar({
         hour: selectedHour,
         date: selectedDate,
         isSinglePaid,
+        singlePrice: isSinglePaid ? parseInt(singlePrice) : undefined,
+        singlePaymentMethod: isSinglePaid ? singlePaymentMethod : undefined,
         templateId: selectedTemplateId || undefined,
       }),
     });
@@ -82,6 +96,8 @@ export default function AssignModalFromCalendar({
       onClose();
       setSelectedUser(null);
       setIsSinglePaid(false);
+      setSinglePrice("");
+      setSinglePaymentMethod("");
       setSelectedTemplateId(null);
     } else {
       showNotification({
@@ -95,6 +111,8 @@ export default function AssignModalFromCalendar({
   useEffect(() => {
     setSelectedUser(null);
     setIsSinglePaid(false);
+    setSinglePrice("");
+    setSinglePaymentMethod("");
     setSelectedTemplateId(null);
     setLastTemplate(null);
     setTemplates([]);
@@ -188,6 +206,32 @@ export default function AssignModalFromCalendar({
           onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
           disabled={!selectedUser || !hasActiveBlock}
         />
+
+        {isSinglePaid && (
+          <>
+            <TextInput
+              label="Сумма (₽)"
+              placeholder="Введите сумму"
+              type="number"
+              value={singlePrice}
+              onChange={(e) => setSinglePrice(e.currentTarget.value)}
+              required
+            />
+            <Select
+              label="Способ оплаты"
+              placeholder="Выберите способ"
+              data={[
+                { value: "cash", label: "Наличные" },
+                { value: "online", label: "Онлайн" },
+              ]}
+              value={singlePaymentMethod}
+              onChange={(val) =>
+                setSinglePaymentMethod(val as "cash" | "online" | "")
+              }
+              required
+            />
+          </>
+        )}
 
         <Group position="right" mt="md">
           <Button

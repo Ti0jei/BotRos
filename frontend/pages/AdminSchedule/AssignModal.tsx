@@ -13,6 +13,7 @@ import {
   Badge,
   ScrollArea,
   Box,
+  NumberInput,
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
@@ -24,7 +25,11 @@ import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
 interface AssignModalProps {
   opened: boolean;
   onClose: () => void;
-  onAssign: (templateId: string | null) => void;
+  onAssign: (
+    templateId: string | null,
+    singlePrice?: number | null,
+    singlePaymentMethod?: string | null
+  ) => void;
   clients: User[];
   selectedUser: string | null;
   setSelectedUser: (id: string | null) => void;
@@ -68,6 +73,8 @@ export default function AssignModal({
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
+  const [singlePrice, setSinglePrice] = useState<number | null>(null);
+  const [singlePaymentMethod, setSinglePaymentMethod] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -80,7 +87,6 @@ export default function AssignModal({
     dayjs.locale("ru");
   }, []);
 
-  // Загружаем шаблоны при selectedUser
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -99,7 +105,6 @@ export default function AssignModal({
     fetchTemplates();
   }, [selectedUser]);
 
-  // ✅ Исправленный URL для загрузки последнего шаблона
   useEffect(() => {
     if (!selectedUser || !opened) return;
 
@@ -118,7 +123,6 @@ export default function AssignModal({
     fetchLastTemplate();
   }, [selectedUser, opened]);
 
-  // Проверка блоков оплаты
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -128,7 +132,6 @@ export default function AssignModal({
     setIsSinglePaid(!hasBlock);
   }, [selectedUser, blocks]);
 
-  // Загрузка назначенных тренировок
   useEffect(() => {
     const loadAssigned = async () => {
       try {
@@ -237,6 +240,30 @@ export default function AssignModal({
             disabled={!block}
           />
 
+          {isSinglePaid && (
+            <>
+              <NumberInput
+                label="Стоимость"
+                placeholder="Введите сумму"
+                value={singlePrice}
+                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                min={0}
+              />
+              <Select
+                label="Способ оплаты"
+                placeholder="Выберите"
+                data={[
+                  { label: "Наличные", value: "cash" },
+                  { label: "Перевод", value: "transfer" },
+                  { label: "Другое", value: "other" },
+                ]}
+                value={singlePaymentMethod}
+                onChange={(val) => setSinglePaymentMethod(val)}
+                clearable
+              />
+            </>
+          )}
+
           {showWarning && (
             <Text
               size="sm"
@@ -300,7 +327,7 @@ export default function AssignModal({
             radius="xl"
             color="dark"
             size="md"
-            onClick={() => onAssign(selectedTemplateId)}
+            onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
             style={{ fontWeight: 600 }}
             disabled={!selectedUser || selectedHour === null}
           >
