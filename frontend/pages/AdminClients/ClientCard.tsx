@@ -69,24 +69,20 @@ export default function ClientCard({
     <Card
       withBorder
       radius="xl"
-      p={10}
+      p="md"
       shadow="xs"
-      style={{ position: "relative", paddingTop: 18, paddingBottom: 0 }}
+      style={{ position: "relative", paddingBottom: 0 }}
     >
       {/* Иконки */}
-      <Box style={{ position: "absolute", top: 8, right: 8 }}>
-        <Group spacing={4}>
+      <Box style={{ position: "absolute", top: 12, right: 12 }}>
+        <Group spacing={6}>
           <Tooltip label="Питание">
             <ActionIcon
               onClick={onOpenNutrition}
-              style={{
-                background: "#fff",
-                color: "#1a1a1a",
-                border: "1px solid #1a1a1a",
-                borderRadius: 10,
-                width: 24,
-                height: 24,
-              }}
+              variant="light"
+              color="dark"
+              radius="xl"
+              size="sm"
             >
               <IconChefHat size={14} />
             </ActionIcon>
@@ -94,14 +90,10 @@ export default function ClientCard({
           <Tooltip label="Тренировки">
             <ActionIcon
               onClick={onOpenDrawer}
-              style={{
-                background: "#fff",
-                color: "#1a1a1a",
-                border: "1px solid #1a1a1a",
-                borderRadius: 10,
-                width: 24,
-                height: 24,
-              }}
+              variant="light"
+              color="dark"
+              radius="xl"
+              size="sm"
             >
               <Dumbbell size={14} />
             </ActionIcon>
@@ -109,8 +101,9 @@ export default function ClientCard({
         </Group>
       </Box>
 
-      <Stack spacing={0}>
-        <Text fw={600} size="xs">
+      <Stack spacing={6} pr={36}>
+        {/* Имя + тег */}
+        <Text fw={600} size="sm">
           {client.name} {client.lastName ?? ""}
           {client.internalTag && (
             <Text span c="dimmed" size="xs">
@@ -120,17 +113,20 @@ export default function ClientCard({
           )}
         </Text>
 
+        {/* Возраст */}
         <Text size="xs" c="dimmed">
           {client.age} лет
         </Text>
 
-        <Group spacing={4} mb={isOpen ? 0 : 4}>
+        {/* Бейджи */}
+        <Group spacing={8} mt={4}>
           <Box
             style={{
               width: 6,
               height: 6,
               borderRadius: "50%",
               backgroundColor: block ? "green" : "#999",
+              marginRight: 4,
             }}
           />
           {block && (
@@ -146,9 +142,9 @@ export default function ClientCard({
         </Group>
       </Stack>
 
-      {/* Скрываемая часть */}
-      <Collapse in={isOpen} style={{ marginTop: 6 }}>
-        <Stack spacing={4}>
+      {/* Скрытая часть */}
+      <Collapse in={isOpen} mt="sm">
+        <Stack spacing={6}>
           {isEditing ? (
             <>
               <TextInput
@@ -223,18 +219,14 @@ export default function ClientCard({
         </Stack>
       </Collapse>
 
-      {/* Стрелка */}
-      <Box style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+      {/* Кнопка раскрытия */}
+      <Box style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
         <ActionIcon
           onClick={onToggleExpand}
-          style={{
-            background: "#fff",
-            border: "1px solid #1a1a1a",
-            borderRadius: 10,
-            width: 24,
-            height: 24,
-            color: "#1a1a1a",
-          }}
+          variant="light"
+          color="dark"
+          radius="xl"
+          size="sm"
         >
           {isOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
         </ActionIcon>
