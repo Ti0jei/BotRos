@@ -34,7 +34,8 @@ interface TrainingRecord {
   id: string;
   date: string;
   hour: number;
-  blockId?: string;
+  isSinglePaid: boolean;
+  paymentBlockId?: string;
 }
 
 export default function PaymentHistory({ userId, onBack }: Props) {
@@ -70,13 +71,14 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
       if (trainingsRes.ok) {
         const all = await trainingsRes.json();
-        setBlockTrainings(all.filter((t: TrainingRecord) => t.blockId));
-        setSingleTrainings(all.filter((t: TrainingRecord) => !t.blockId));
+        setBlockTrainings(all.filter((t: TrainingRecord) => t.paymentBlockId));
+        setSingleTrainings(all.filter((t: TrainingRecord) => !t.paymentBlockId));
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const markInactive = async (blockId: string) => {
@@ -145,7 +147,9 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             )}
 
             {blocks.map((block) => {
-              const usedTrainings = blockTrainings.filter((t) => t.blockId === block.id);
+              const usedTrainings = blockTrainings.filter(
+                (t) => t.paymentBlockId === block.id
+              );
               const expanded = expandedBlocks[block.id] ?? false;
 
               return (
