@@ -80,7 +80,7 @@ export default function AssignModal({
     dayjs.locale("ru");
   }, []);
 
-  // Загружаем шаблоны, когда selectedUser появляется
+  // Загружаем шаблоны при selectedUser
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -99,26 +99,26 @@ export default function AssignModal({
     fetchTemplates();
   }, [selectedUser]);
 
-  // Загружаем последний шаблон при открытии модалки
+  // Загружаем последний шаблон через корректный API
   useEffect(() => {
     if (!selectedUser || !opened) return;
 
     const fetchLastTemplate = async () => {
       try {
-        const res = await fetch(`${API}/api/trainings/last/${selectedUser}`, {
+        const res = await fetch(`${API}/api/workouts/last-template?userId=${selectedUser}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const last = res.ok ? await res.json() : null;
-        setLastTemplate(last?.template ?? null);
+        const data = await res.json();
+        setLastTemplate(data ?? null);
       } catch (e) {
         console.error("Ошибка загрузки последнего шаблона:", e);
       }
     };
 
     fetchLastTemplate();
-  }, [opened]);
+  }, [selectedUser, opened]);
 
-  // Определяем необходимость ручной оплаты
+  // Проверка блоков оплаты
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -128,7 +128,7 @@ export default function AssignModal({
     setIsSinglePaid(!hasBlock);
   }, [selectedUser, blocks]);
 
-  // Загружаем назначения по дате
+  // Загрузка назначенных тренировок
   useEffect(() => {
     const loadAssigned = async () => {
       try {
@@ -203,8 +203,11 @@ export default function AssignModal({
           )}
 
           {selectedUser && lastTemplate && (
-            <Text size="sm" c="dimmed">
-              Последняя тренировка: <b>{lastTemplate.title}</b>
+            <Text size="sm" c="dimmed" mt="xs">
+              Последний шаблон:{" "}
+              <Text span fw={500} c="dark">
+                {lastTemplate.title}
+              </Text>
             </Text>
           )}
 
