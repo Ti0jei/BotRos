@@ -254,8 +254,7 @@ export default function AssignModal({
                 placeholder="Выберите"
                 data={[
                   { label: "Наличные", value: "cash" },
-                  { label: "Перевод", value: "transfer" },
-                  { label: "Другое", value: "other" },
+                  { label: "Онлайн", value: "online" },
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
