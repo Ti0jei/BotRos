@@ -19,7 +19,7 @@ if (!TOKEN || !WEB_APP_URL || !API_URL || !OPENAI_API_KEY) {
 const bot = new Telegraf(TOKEN);
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-export { bot }; // экспортируем для внешнего использования
+export { bot }; // экспортируем для использования в других модулях
 
 const greetingSent = new Set();
 const dailyLimits = new Map();
@@ -42,7 +42,9 @@ async function onlyRegistered(ctx, next) {
     if (!exists) {
       const msg = await ctx.reply('❌ У вас нет доступа. Зарегистрируйтесь через приложение.', {
         reply_markup: {
-          inline_keyboard: [[{ text: '📱 Открыть приложение', web_app: { url: `${WEB_APP_URL}?tid=${telegramId}` } }]]
+          inline_keyboard: [[
+            { text: '📱 Открыть приложение', web_app: { url: `${WEB_APP_URL}?tid=${telegramId}` } }
+          ]]
         }
       });
       autoDelete(ctx, msg, 3000);
@@ -91,9 +93,12 @@ bot.start(async (ctx) => {
 
       const msg = await ctx.reply('❌ У вас нет доступа. Зарегистрируйтесь через приложение.', {
         reply_markup: {
-          inline_keyboard: [[{ text: '📱 Открыть приложение', web_app: { url: `${WEB_APP_URL}?tid=${telegramId}` } }]]
+          inline_keyboard: [[
+            { text: '📱 Открыть приложение', web_app: { url: `${WEB_APP_URL}?tid=${telegramId}` } }
+          ]]
         }
       });
+
       if (startMessageId) ctx.telegram.deleteMessage(ctx.chat.id, startMessageId).catch(() => {});
       autoDelete(ctx, msg, 3000);
       return;
@@ -156,7 +161,7 @@ bot.action('ai_nutrition', onlyRegistered, async (ctx) => {
   aiContexts.set(telegramId, {
     messages: [{
       role: 'system',
-      content: 'Ты — диетолог и консультант по питанию. Отвечай на вопросы о продуктах, составе и здоровом питании. Игнорируй нееду.'
+      content: 'Ты — диетолог. Отвечай на вопросы о питании, здоровье и продуктах. Игнорируй несвязанные запросы.'
     }],
     lastUsed: Date.now(),
   });
@@ -212,15 +217,15 @@ bot.hears(/^(.{1,300})$/, onlyRegistered, async (ctx) => {
       aiContexts.delete(telegramId);
     }, 180000);
   } catch (err) {
-    const fail = await ctx.reply('❌ Ошибка при обращении к ИИ. Попробуй позже.');
+    const fail = await ctx.reply('❌ Ошибка при обращении к ИИ.');
     autoDelete(ctx, fail);
   }
 });
 
 bot.action(/^attend:(.+)$/, async (ctx) => {
   const trainingId = ctx.match[1];
-  await ctx.answerCbQuery('✅ Вы отметились как "Буду"');
-  await ctx.editMessageText('✅ Вы подтвердили участие в тренировке.');
+  await ctx.answerCbQuery('✅ Вы подтвердили участие.');
+  await ctx.editMessageText('✅ Участие подтверждено.');
 
   try {
     await fetch(`${API_URL}/api/trainings/${trainingId}/attended`, {
@@ -228,15 +233,15 @@ bot.action(/^attend:(.+)$/, async (ctx) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ attended: true, wasCounted: true })
     });
-  } catch (e) {
-    console.warn('❌ Ошибка при подтверждении участия:', e.message);
+  } catch (err) {
+    console.warn('❌ Ошибка при PATCH attended:', err.message);
   }
 });
 
 bot.action(/^decline:(.+)$/, async (ctx) => {
   const trainingId = ctx.match[1];
-  await ctx.answerCbQuery('❌ Вы отказались от участия');
-  await ctx.editMessageText('❌ Вы отказались от участия в тренировке.');
+  await ctx.answerCbQuery('❌ Вы отказались от участия.');
+  await ctx.editMessageText('❌ Участие отменено.');
 });
 
 setInterval(() => {
