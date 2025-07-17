@@ -217,7 +217,7 @@ export default function AssignModalFromCalendar({
           label="Разовая оплата"
           checked={isSinglePaid}
           onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={!selectedUser || !hasActiveBlock}
+          disabled={!selectedUser}
         />
 
         {isSinglePaid && (
