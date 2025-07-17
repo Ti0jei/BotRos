@@ -2,7 +2,7 @@
 
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyAllUsers } from './notifications.mjs'; // ✅ Исправлен путь
+import { notifyBroadcast } from './notifications.mjs'; // 🔁 Исправлено: правильная функция
 
 const notifyStates = new Map();
 
@@ -53,7 +53,8 @@ export function setupNewsNotification(bot) {
     await ctx.reply('🚀 Рассылаю...');
 
     try {
-      const result = await notifyAllUsers(state.text);
+      // 🔁 Используем notifyBroadcast вместо notifyAllUsers
+      const result = await notifyBroadcast(state.text);
       notifyStates.delete(telegramId);
       await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} пользователям.`);
     } catch (err) {
