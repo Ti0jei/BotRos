@@ -27,14 +27,14 @@ export default function CustomModalDatePicker({
   date,
   setDate,
 }: {
-  date: Dayjs;
-  setDate: (d: Dayjs) => void;
+  date: string; // 🔧 теперь строка
+  setDate: (d: string) => void; // 🔧 передаём строку
 }) {
   const [opened, setOpened] = useState(false);
-  const [viewMonth, setViewMonth] = useState(date.startOf("month"));
+  const [viewMonth, setViewMonth] = useState(dayjs(date).startOf("month"));
 
   useEffect(() => {
-    setViewMonth(date.startOf("month"));
+    setViewMonth(dayjs(date).startOf("month"));
   }, [date]);
 
   const startDay = viewMonth.startOf("week");
@@ -47,8 +47,8 @@ export default function CustomModalDatePicker({
     day = day.add(1, "day");
   }
 
-  const isSameDay = (a: Dayjs, b: Dayjs) =>
-    a.format("YYYY-MM-DD") === b.format("YYYY-MM-DD");
+  const isSameDay = (a: Dayjs, b: string) =>
+    a.format("YYYY-MM-DD") === b;
 
   return (
     <>
@@ -57,7 +57,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.subtract(1, "day"))}
+          onClick={() => setDate(dayjs(date).subtract(1, "day").format("YYYY-MM-DD"))}
         >
           Назад
         </Button>
@@ -68,14 +68,14 @@ export default function CustomModalDatePicker({
           color="dark"
           onClick={() => setOpened(true)}
         >
-          {date.format("DD.MM.YYYY")}
+          {dayjs(date).format("DD.MM.YYYY")}
         </Button>
 
         <Button
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.add(1, "day"))}
+          onClick={() => setDate(dayjs(date).add(1, "day").format("YYYY-MM-DD"))}
         >
           Вперёд
         </Button>
@@ -149,7 +149,7 @@ export default function CustomModalDatePicker({
                 <Center>
                   <Box
                     onClick={() => {
-                      setDate(d);
+                      setDate(d.format("YYYY-MM-DD")); // ✅ форматируем перед сохранением
                       setOpened(false);
                     }}
                     style={{

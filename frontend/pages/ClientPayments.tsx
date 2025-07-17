@@ -77,7 +77,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     if (res.ok) {
       const data = await res.json();
       setBlock(data);
-      setDate(dayjs(data.date).format("YYYY-MM-DD"));
+      setDate(dayjs(data.paidAt || data.date).format("YYYY-MM-DD"));
       setPaidTrainings(data.paidTrainings);
       setPricePerTraining(data.pricePerTraining);
       setPricePerBlock(data.pricePerBlock || data.pricePerTraining * data.paidTrainings);
@@ -179,8 +179,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                       Дата оплаты
                     </Text>
                     <CustomModalDatePicker
-                      date={dayjs(date)}
-                      setDate={(d) => setDate(d.format("YYYY-MM-DD"))}
+                      date={date}
+                      setDate={(d) => setDate(d)}
                     />
                   </Stack>
 
@@ -207,7 +207,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 </Stack>
               ) : (
                 <Stack spacing={4}>
-                  <Text size="sm">Дата оплаты: {dayjs(block.date).format("DD.MM.YYYY")}</Text>
+                  <Text size="sm">Дата оплаты: {dayjs(block.paidAt || block.date).format("DD.MM.YYYY")}</Text>
                   <Text size="sm">Цена за тренировку: {block.pricePerTraining}₽</Text>
                   <Text size="sm">Всего: {block.paidTrainings}</Text>
                   <Text size="sm">Использовано: {block.used}</Text>
@@ -232,8 +232,8 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                   Дата оплаты
                 </Text>
                 <CustomModalDatePicker
-                  date={dayjs(date)}
-                  setDate={(d) => setDate(d.format("YYYY-MM-DD"))}
+                  date={date}
+                  setDate={(d) => setDate(d)}
                 />
               </Stack>
 

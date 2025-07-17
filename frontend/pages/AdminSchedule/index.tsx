@@ -154,6 +154,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         onClose={() => {
           setModalOpen(false);
           setSelectedHour(null);
+          onBack(); // 👈 ДОБАВЛЕНО: возврат к профилю
         }}
         clients={clients}
         blocks={blocks}

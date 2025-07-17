@@ -41,9 +41,27 @@ router.patch('/:id', async (req, res) => {
     return res.status(403).json({ error: 'Доступ запрещён' });
   }
 
+  const dataToUpdate = {
+    status,
+    attended: status === 'CONFIRMED',
+    wasCounted: status === 'CONFIRMED',
+  };
+
+  // Откат использования блока при отказе (если нужно)
+  if (status === 'DECLINED' && training.blockId && training.wasCounted) {
+    await prisma.paymentBlock.update({
+      where: { id: training.blockId },
+      data: {
+        used: { decrement: 1 },
+      },
+    });
+    dataToUpdate.wasCounted = false;
+    dataToUpdate.attended = false;
+  }
+
   const updated = await prisma.training.update({
     where: { id },
-    data: { status },
+    data: dataToUpdate,
   });
 
   // Уведомление пользователя
