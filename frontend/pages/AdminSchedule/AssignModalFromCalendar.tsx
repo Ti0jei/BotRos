@@ -175,11 +175,12 @@ export default function AssignModalFromCalendar({
           padding: 16,
           maxHeight: "75vh",
           overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
+          display: "flex",
+          flexDirection: "column",
         },
       }}
     >
-      <Stack spacing="md">
+      <Stack spacing="md" style={{ flexGrow: 1, minHeight: 0 }}>
         <Box>
           <Text fw={600} mb={4}>
             Клиент
