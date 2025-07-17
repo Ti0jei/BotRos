@@ -88,6 +88,17 @@ export default function AssignModal({
   }, []);
 
   useEffect(() => {
+    if (!selectedUser && opened) {
+      const savedUser = localStorage.getItem("assignUserId");
+      const savedPaid = localStorage.getItem("assignSinglePaid") === "true";
+      if (savedUser) {
+        setSelectedUser(savedUser);
+        setIsSinglePaid(savedPaid);
+      }
+    }
+  }, [opened]);
+
+  useEffect(() => {
     if (!selectedUser) return;
     const fetchTemplates = async () => {
       try {
@@ -142,20 +153,22 @@ export default function AssignModal({
     if (opened) loadAssigned();
   }, [date, opened]);
 
+  const handleClose = () => {
+    localStorage.removeItem("assignUserId");
+    localStorage.removeItem("assignSinglePaid");
+    onClose();
+  };
+
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       withCloseButton={false}
       centered
       radius="xl"
       size="md"
       scrollAreaComponent="div"
-      styles={{
-        body: {
-          padding: 0,
-        },
-      }}
+      styles={{ body: { padding: 0 } }}
     >
       <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Stack spacing="md">
@@ -165,7 +178,7 @@ export default function AssignModal({
               <Title order={4}>Назначить тренировку</Title>
             </Group>
             <Button
-              onClick={onClose}
+              onClick={handleClose}
               variant="subtle"
               color="dark"
               px={0}

@@ -109,8 +109,13 @@ export default function AssignModalFromCalendar({
   };
 
   useEffect(() => {
-    setSelectedUser(null);
-    setIsSinglePaid(false);
+    if (!opened) return;
+
+    const assignUserId = localStorage.getItem("assignUserId");
+    const assignSinglePaid = localStorage.getItem("assignSinglePaid") === "true";
+
+    setSelectedUser(assignUserId || null);
+    setIsSinglePaid(assignSinglePaid);
     setSinglePrice("");
     setSinglePaymentMethod("");
     setSelectedTemplateId(null);
@@ -160,7 +165,7 @@ export default function AssignModalFromCalendar({
           padding: 16,
           maxHeight: "75vh",
           overflowY: "auto",
-          WebkitOverflowScrolling: "touch", // fix scroll freeze on iOS
+          WebkitOverflowScrolling: "touch",
         },
       }}
     >
@@ -226,7 +231,7 @@ export default function AssignModalFromCalendar({
               required
               inputMode="numeric"
               pattern="[0-9]*"
-              onBlur={() => window.scrollTo({ top: 0 })} // решает проблему залипания
+              onBlur={() => window.scrollTo({ top: 0 })}
             />
             <Select
               label="Способ оплаты"
@@ -236,9 +241,7 @@ export default function AssignModalFromCalendar({
                 { value: "online", label: "Онлайн" },
               ]}
               value={singlePaymentMethod}
-              onChange={(val) =>
-                setSinglePaymentMethod(val as "cash" | "online" | "")
-              }
+              onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
               required
             />
           </>
