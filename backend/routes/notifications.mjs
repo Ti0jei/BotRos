@@ -1,7 +1,9 @@
+// backend/routes/notifications.mjs
+
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth.mjs';
-import { notifyTelegram } from '../../bot/notifications.mjs';;
+import { notifyTelegram } from '../bot/notifications.mjs'; // ✅ исправленный путь
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -75,7 +77,6 @@ router.post('/remind/:trainingId', async (req, res) => {
 
     const message = `⏰ Напоминание!\nВам назначена тренировка на ${dateStr} в ${timeStr}.\nПожалуйста, подтвердите участие в приложении ✅❌`;
 
-    // ✅ передаём training.id, чтобы кнопки появились
     await notifyTelegram(training.user.telegramId, message, training.id);
 
     res.json({ success: true });
