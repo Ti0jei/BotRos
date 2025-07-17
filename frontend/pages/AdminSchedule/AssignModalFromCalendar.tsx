@@ -20,7 +20,7 @@ interface Props {
   clients: User[];
   blocks: Record<string, PaymentBlock | null>;
   selectedHour: number | null;
-  selectedDate: string; // YYYY-MM-DD
+  selectedDate: string;
   onSuccess: () => void;
 }
 
@@ -112,15 +112,17 @@ export default function AssignModalFromCalendar({
     if (!opened) return;
 
     const assignUserId = localStorage.getItem("assignUserId");
-    const assignSinglePaid = localStorage.getItem("assignSinglePaid") === "true";
 
     setSelectedUser(assignUserId || null);
-    setIsSinglePaid(assignSinglePaid);
     setSinglePrice("");
     setSinglePaymentMethod("");
     setSelectedTemplateId(null);
     setLastTemplate(null);
     setTemplates([]);
+
+    const block = assignUserId ? blocks[assignUserId] : null;
+    const hasActiveBlock = block && block.paidTrainings > (block.used ?? 0);
+    setIsSinglePaid(!hasActiveBlock); // ✅ автоустановка чекбокса
   }, [opened]);
 
   useEffect(() => {
