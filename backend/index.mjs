@@ -19,7 +19,7 @@ import inviteCodeRoutes from './routes/invite-code.mjs';
 import nutritionRoutes from './routes/nutrition.mjs';
 import resetPasswordRoutes from './routes/reset-password.mjs';
 import workoutRoutes from './routes/workoutTemplates.mjs';
-import exercisesRoutes from './routes/exercises.mjs'; // ✅ ДОБАВЛЕНО
+import exercisesRoutes from './routes/exercises.mjs';
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
@@ -68,7 +68,7 @@ app.use('/api/invite-code', inviteCodeRoutes);
 app.use('/api/nutrition', authMiddleware, nutritionRoutes);
 app.use('/api/reset-password', resetPasswordRoutes);
 app.use('/api/workout-templates', authMiddleware, workoutRoutes);
-app.use('/api/exercises', authMiddleware, exercisesRoutes); // ✅ ПОДКЛЮЧЕНО
+app.use('/api/exercises', authMiddleware, exercisesRoutes);
 
 // -------------------- IP --------------------
 app.get('/ip', async (req, res) => {
@@ -127,7 +127,7 @@ app.listen(PORT, () => {
 
 // -------------------- Telegram бот --------------------
 (async () => {
-  const botPath = path.join(__dirname, './bot.mjs');
+  const botPath = path.join(__dirname, './bot/index.mjs');
   if (fs.existsSync(botPath)) {
     try {
       await import(botPath);
@@ -136,6 +136,6 @@ app.listen(PORT, () => {
       console.error('❌ Ошибка при запуске Telegram-бота:', err.message);
     }
   } else {
-    console.log('⚠️ Файл bot.mjs не найден — бот не запущен');
+    console.log('⚠️ Бот не найден — запуск пропущен');
   }
 })();
