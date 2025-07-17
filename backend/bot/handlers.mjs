@@ -1,7 +1,10 @@
+// bot/handlers.mjs
+
 import { Markup } from 'telegraf';
 import { WEB_APP_URL } from './index.mjs';
 import { aiContexts } from './ai.mjs';
 import { clearSession } from './context.mjs';
+import { isRegistered } from './middleware.mjs';
 
 export async function showMainMenu(ctx) {
   const telegramId = ctx.from?.id;
@@ -29,17 +32,30 @@ export async function showMainMenu(ctx) {
 }
 
 export function setupHandlers(bot) {
-  bot.hears('📋 Меню', async (ctx) => {
+  // Главное меню
+  bot.command('menu', isRegistered, showMainMenu);
+
+  bot.hears('📋 Меню', isRegistered, async (ctx) => {
     try {
       await ctx.deleteMessage(ctx.message.message_id);
     } catch (_) {}
     await showMainMenu(ctx);
   });
 
-  bot.command('menu', async (ctx) => {
-    await showMainMenu(ctx);
+  // Кнопки подтверждения участия
+  bot.action(/^attend:(.+)$/, isRegistered, async (ctx) => {
+    const trainingId = ctx.match[1];
+    await ctx.answerCbQuery('✅ Вы подтвердили участие');
+    await ctx.reply(`🟢 Отлично! Вы придёте на тренировку (ID: ${trainingId})`);
   });
 
+  bot.action(/^decline:(.+)$/, isRegistered, async (ctx) => {
+    const trainingId = ctx.match[1];
+    await ctx.answerCbQuery('❌ Вы отказались от участия');
+    await ctx.reply(`🔴 Окей! Мы учтём, что вы не придёте (ID: ${trainingId})`);
+  });
+
+  // Сообщения вне контекста AI
   bot.on('message', async (ctx) => {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;

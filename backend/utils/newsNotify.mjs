@@ -1,47 +1,63 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { Markup } from 'telegraf';
+import { isRegistered } from './middleware.mjs';
+import { notifyAllUsers } from '../utils/newsNotify.mjs';
 
-import dotenv from 'dotenv';
-dotenv.config();
+const notifyStates = new Map();
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+export function setupNewsNotification(bot) {
+  bot.action('notify_start', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    if (!telegramId) return;
 
-/**
- * Универсальная функция рассылки
- * @param {Object} options
- * @param {string[]} [options.roles] - ['ADMIN', 'USER']
- * @param {string[]} [options.telegramIds] - массив id пользователей Telegram
- * @param {string} options.message - текст рассылки
- */
-export async function notifyUsers({ roles = [], telegramIds = [], message }) {
-  if (!TOKEN || !message) {
-    console.warn('❌ notifyUsers: Отсутствует токен или сообщение');
-    return;
-  }
+    notifyStates.set(telegramId, { step: 'awaiting_text' });
+    await ctx.answerCbQuery('✅');
+    await ctx.reply('📝 Введите текст новости, которую хотите разослать всем пользователям.');
+  });
 
-  let targets = [];
+  bot.on('text', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    if (!telegramId || !notifyStates.has(telegramId)) return;
 
-  if (telegramIds.length) {
-    targets = telegramIds;
-  } else if (roles.length) {
-    const users = await prisma.user.findMany({
-      where: { role: { in: roles }, telegramId: { not: null } },
-      select: { telegramId: true },
-    });
-    targets = users.map((u) => u.telegramId);
-  }
+    const state = notifyStates.get(telegramId);
+    if (state.step !== 'awaiting_text') return;
 
-  for (const id of targets) {
-    try {
-      await fetch(TELEGRAM_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: id, text: message }),
-      });
-      console.log(`✅ Уведомление отправлено: ${id}`);
-    } catch (e) {
-      console.warn(`❌ Ошибка отправки для ${id}:`, e.message);
+    const message = ctx.message.text.trim();
+    if (message.length < 10) {
+      return ctx.reply('⚠️ Текст слишком короткий. Введите минимум 10 символов.');
     }
-  }
+
+    state.text = message;
+    state.step = 'awaiting_confirm';
+
+    await ctx.reply(`📨 Вот что вы хотите отправить:\n\n${state.text}`, Markup.inlineKeyboard([
+      Markup.button.callback('✅ Подтвердить', 'notify_confirm'),
+      Markup.button.callback('❌ Отменить', 'notify_cancel'),
+    ]));
+  });
+
+  bot.action('notify_confirm', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    const state = notifyStates.get(telegramId);
+    if (!state?.text) return;
+
+    await ctx.answerCbQuery('🚀');
+    await ctx.reply('🚀 Рассылаю...');
+
+    try {
+      const result = await notifyAllUsers(state.text);
+      notifyStates.delete(telegramId);
+      await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} пользователям.`);
+    } catch (err) {
+      console.error('❌ Ошибка при рассылке:', err);
+      notifyStates.delete(telegramId);
+      await ctx.reply('❌ Произошла ошибка при рассылке.');
+    }
+  });
+
+  bot.action('notify_cancel', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    notifyStates.delete(telegramId);
+    await ctx.answerCbQuery('❌');
+    await ctx.reply('❌ Рассылка отменена.');
+  });
 }

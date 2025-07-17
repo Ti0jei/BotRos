@@ -1,5 +1,3 @@
-// bot/ai.mjs
-
 import { Markup } from 'telegraf';
 import { OpenAI } from 'openai';
 import { isRegistered } from './middleware.mjs';
@@ -57,9 +55,9 @@ export function setupAiFeatures(bot) {
     context.lastUsed = Date.now();
     context.messages.push({ role: 'user', content: msg });
 
-    await ctx.reply('⌛ Думаю...');
-
     try {
+      await ctx.reply('⌛ Думаю...');
+
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: context.messages,
@@ -74,6 +72,7 @@ export function setupAiFeatures(bot) {
 
       setTimeout(() => aiContexts.delete(telegramId), 180000);
     } catch (err) {
+      console.error('❌ Ошибка от OpenAI:', err);
       await ctx.reply('❌ Ошибка при обращении к ИИ.');
     }
   });
@@ -88,4 +87,4 @@ export function setupAiFeatures(bot) {
   }, 60000);
 }
 
-export { aiContexts };
+export { aiContexts, dailyLimits };

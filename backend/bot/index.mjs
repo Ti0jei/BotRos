@@ -3,11 +3,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Telegraf, Markup } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import { OpenAI } from 'openai';
-import fetch from 'node-fetch';
 
-import { setupHandlers } from './handlers.mjs';
+import { setupCommands } from './commands.mjs';         // ✅ Подключаем команды
+import { setupAiFeatures } from './ai.mjs';              // 🤖 ИИ-питание
+import { setupNewsNotification } from './newsNotify.mjs';// 📰 Рассылка
 
 export const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const API_URL = process.env.API_BASE_URL;
@@ -22,16 +23,21 @@ if (!TOKEN || !API_URL || !WEB_APP_URL || !OPENAI_API_KEY) {
 export const bot = new Telegraf(TOKEN);
 export const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-// Основной запуск
-setupHandlers(bot);
+// Основные фичи
+setupCommands(bot);              // 📋 Главное меню и команды
+setupAiFeatures(bot);           // 🤖 ИИ-питание
+setupNewsNotification(bot);     // 📰 Новостная рассылка
 
+// Ловим необработанные ошибки
 bot.catch((err, ctx) => {
   console.error('❌ Unhandled error for update', ctx.update, err);
 });
 
+// Выход по сигналам
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
+// Старт
 bot.launch().then(() => {
   console.log('🤖 Бот успешно запущен');
 });
