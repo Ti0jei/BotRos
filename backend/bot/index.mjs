@@ -1,14 +1,13 @@
-// bot/index.mjs
-
 import dotenv from 'dotenv';
 dotenv.config();
 
 import { Telegraf } from 'telegraf';
 import { OpenAI } from 'openai';
 
-import { setupCommands } from './commands.mjs';         // ✅ Подключаем команды
-import { setupAiFeatures } from './ai.mjs';              // 🤖 ИИ-питание
-import { setupNewsNotification } from './newsNotify.mjs';// 📰 Рассылка
+import { setupCommands } from './commands.mjs';           // 📋 Главное меню и команды
+import { setupAiFeatures } from './ai.mjs';                // 🤖 ИИ-питание
+import { setupNewsNotification } from './newsNotify.mjs';  // 📰 Новостная рассылка
+import { setupHandlers } from './handlers.mjs';            // ✅ Обработчики кнопок (attend / decline)
 
 export const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const API_URL = process.env.API_BASE_URL;
@@ -27,6 +26,7 @@ export const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 setupCommands(bot);              // 📋 Главное меню и команды
 setupAiFeatures(bot);           // 🤖 ИИ-питание
 setupNewsNotification(bot);     // 📰 Новостная рассылка
+setupHandlers(bot);             // ✅ Важно: подключаем обработку inline-кнопок
 
 // Ловим необработанные ошибки
 bot.catch((err, ctx) => {
