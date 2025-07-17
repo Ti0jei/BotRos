@@ -227,46 +227,34 @@ bot.on('callback_query', async (ctx) => {
 
   if (!data || !telegramId) return;
 
-  const deleteAfter = 60 * 1000;
+  const deleteAfter = 60000;
+
+  const updateStatus = async (trainingId, status) => {
+    try {
+      await fetch(`${API_URL}/api/trainings/${trainingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+    } catch (e) {
+      console.error(`Ошибка обновления статуса ${status}:`, e);
+    }
+  };
 
   if (data.startsWith('attend:')) {
     const trainingId = data.split(':')[1];
+    await updateStatus(trainingId, 'CONFIRMED');
+    await ctx.answerCbQuery('✅ Участие подтверждено');
+    const edited = await ctx.editMessageText('✅ Вы подтвердили участие в тренировке');
+    setTimeout(() => ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {}), deleteAfter);
+  }
 
-    try {
-      await fetch(`${API_URL}/api/trainings/${trainingId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'CONFIRMED' })
-      });
-
-      await ctx.answerCbQuery('✅ Участие подтверждено');
-      const edited = await ctx.editMessageText('✅ Вы подтвердили участие в тренировке');
-      setTimeout(() => {
-        ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {});
-      }, deleteAfter);
-    } catch (err) {
-      console.error('Ошибка подтверждения участия:', err);
-      await ctx.answerCbQuery('⚠️ Ошибка сервера');
-    }
-
-  } else if (data.startsWith('decline:')) {
+  if (data.startsWith('decline:')) {
     const trainingId = data.split(':')[1];
-
-    try {
-      await fetch(`${API_URL}/api/trainings/${trainingId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'DECLINED' })
-      });
-
-      await ctx.answerCbQuery('❌ Вы отказались от участия');
-      const edited = await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
-      setTimeout(() => {
-        ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {});
-      }, deleteAfter);
-    } catch (err) {
-      console.error('Ошибка при отмене участия:', err);
-    }
+    await updateStatus(trainingId, 'DECLINED');
+    await ctx.answerCbQuery('❌ Вы отказались от участия');
+    const edited = await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
+    setTimeout(() => ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {}), deleteAfter);
   }
 });
 
