@@ -21,7 +21,7 @@ import ClientNutrition from "../ClientNutrition";
 import ExercisesPage from "../../admin/ExercisesPage";
 import WorkoutTemplatesPage from "../../admin/workout-templates";
 import CreateWorkoutTemplate from "../../admin/create";
-import EditWorkoutTemplate from "../../admin/id"; // ✅ добавлено
+import EditWorkoutTemplate from "../../admin/id";
 
 export default function AdminClientsPage({
   onBack,
@@ -234,7 +234,9 @@ export default function AdminClientsPage({
                 onOpenHistory={() => onOpenHistory(client.id)}
                 onAssign={() => {
                   localStorage.setItem("assignUserId", client.id);
-                  localStorage.setItem("assignSinglePaid", (!blockMap[client.id]).toString());
+                  const block = blockMap[client.id];
+                  const isSinglePaid = !block || block.paidTrainings <= block.used;
+                  localStorage.setItem("assignSinglePaid", String(isSinglePaid));
                   setView("assign-training");
                 }}
                 onToggleExpand={() => toggleExpanded(client.id)}
