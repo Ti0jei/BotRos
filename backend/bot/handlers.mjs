@@ -1,5 +1,3 @@
-// bot/handlers.mjs
-
 import { Markup } from 'telegraf';
 import { WEB_APP_URL } from './index.mjs';
 import { aiContexts } from './ai.mjs';
@@ -27,5 +25,27 @@ export async function showMainMenu(ctx) {
 
   await ctx.reply(`👋 ${name}, выбери действие ниже:`, {
     reply_markup: { inline_keyboard: keyboard },
+  });
+}
+
+export function setupHandlers(bot) {
+  bot.hears('📋 Меню', async (ctx) => {
+    try {
+      await ctx.deleteMessage(ctx.message.message_id);
+    } catch (_) {}
+    await showMainMenu(ctx);
+  });
+
+  bot.command('menu', async (ctx) => {
+    await showMainMenu(ctx);
+  });
+
+  bot.on('message', async (ctx) => {
+    const telegramId = ctx.from?.id;
+    if (!telegramId) return;
+
+    if (!aiContexts.has(telegramId)) {
+      await ctx.reply('📋 Меню доступно снизу ⬇️', Markup.keyboard([['📋 Меню']]).resize());
+    }
   });
 }
