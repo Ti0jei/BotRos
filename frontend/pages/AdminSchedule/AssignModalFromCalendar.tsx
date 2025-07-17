@@ -206,7 +206,11 @@ export default function AssignModalFromCalendar({
         {selectedUser && (
           <Select
             label="Следующая программа тренировок"
-            placeholder="По очереди или выбрать вручную"
+            placeholder={
+              !hasActiveBlock
+                ? "Нет активного блока — недоступно"
+                : "По очереди или выбрать вручную"
+            }
             data={templates.map((t) => ({
               label: t.title,
               value: t.id,
@@ -214,6 +218,7 @@ export default function AssignModalFromCalendar({
             value={selectedTemplateId}
             onChange={(val) => setSelectedTemplateId(val)}
             clearable
+            disabled={!hasActiveBlock}
           />
         )}
 
@@ -241,7 +246,6 @@ export default function AssignModalFromCalendar({
               required
               inputMode="numeric"
               pattern="[0-9]*"
-              onBlur={() => window.scrollTo({ top: 0 })}
             />
             <Select
               label="Способ оплаты"
