@@ -2,6 +2,12 @@
 
 import { bot } from './index.mjs';
 
+/**
+ * Отправка персонального уведомления пользователю
+ * @param {number|string} telegramId - Telegram ID пользователя
+ * @param {string} text - Текст уведомления
+ * @param {string|null} trainingId - ID тренировки для добавления кнопок
+ */
 export async function notifyTelegram(telegramId, text, trainingId = null) {
   if (!telegramId) {
     console.warn('❗ notifyTelegram: не указан telegramId');
@@ -13,14 +19,13 @@ export async function notifyTelegram(telegramId, text, trainingId = null) {
     text,
   };
 
+  // Добавляем inline-кнопки при наличии trainingId
   if (trainingId) {
     payload.reply_markup = {
-      inline_keyboard: [
-        [
-          { text: '✅ Буду', callback_data: `attend:${trainingId}` },
-          { text: '❌ Не буду', callback_data: `decline:${trainingId}` }
-        ]
-      ]
+      inline_keyboard: [[
+        { text: '✅ Буду', callback_data: `attend:${trainingId}` },
+        { text: '❌ Не буду', callback_data: `decline:${trainingId}` }
+      ]]
     };
   }
 
@@ -42,6 +47,13 @@ export async function notifyTelegram(telegramId, text, trainingId = null) {
   }
 }
 
+/**
+ * Рассылка уведомлений пользователям (по ролям)
+ * @param {Object} options - Опции рассылки
+ * @param {string} options.text - Текст рассылки
+ * @param {string} options.to - 'ALL' или 'ADMINS'
+ * @param {Array} users - Список всех пользователей [{ telegramId, role }]
+ */
 export async function notifyBroadcast({ text, to = 'ALL' }, users) {
   const targets =
     to === 'ADMINS'
@@ -49,6 +61,10 @@ export async function notifyBroadcast({ text, to = 'ALL' }, users) {
       : users.filter((u) => u.telegramId);
 
   for (const user of targets) {
-    await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
+    try {
+      await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
+    } catch (err) {
+      console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
+    }
   }
 }

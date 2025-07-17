@@ -8,7 +8,7 @@ import { OpenAI } from 'openai';
 
 import { setupCommands } from './commands.mjs';         // ✅ Подключаем команды
 import { setupAiFeatures } from './ai.mjs';              // 🤖 ИИ-питание
-import { setupNewsNotification } from '../utils/newsNotify.mjs';// 📰 Рассылка
+import { setupNewsNotification } from './newsNotify.mjs';// 📰 Рассылка
 
 export const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const API_URL = process.env.API_BASE_URL;

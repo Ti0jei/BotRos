@@ -1,10 +1,17 @@
+// bot/newsNotify.mjs
+
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyAllUsers } from '../utils/newsNotify.mjs';
+import { notifyAllUsers } from './notifications.mjs'; // ✅ Исправлен путь
 
 const notifyStates = new Map();
 
+/**
+ * Настройка механизма новостной рассылки для админов
+ * @param {Telegraf} bot
+ */
 export function setupNewsNotification(bot) {
+  // Старт рассылки
   bot.action('notify_start', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
@@ -14,6 +21,7 @@ export function setupNewsNotification(bot) {
     await ctx.reply('📝 Введите текст новости, которую хотите разослать всем пользователям.');
   });
 
+  // Ввод текста
   bot.on('text', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     if (!telegramId || !notifyStates.has(telegramId)) return;
@@ -35,6 +43,7 @@ export function setupNewsNotification(bot) {
     ]));
   });
 
+  // Подтверждение рассылки
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     const state = notifyStates.get(telegramId);
@@ -54,6 +63,7 @@ export function setupNewsNotification(bot) {
     }
   });
 
+  // Отмена рассылки
   bot.action('notify_cancel', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     notifyStates.delete(telegramId);
