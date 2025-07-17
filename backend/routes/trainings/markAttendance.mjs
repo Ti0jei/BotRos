@@ -28,16 +28,21 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.status(200).json(training);
   }
 
+  // ✅ Разовая тренировка: проставляем wasCounted = true
   if (training.isSinglePaid) {
     const updated = await prisma.training.update({
       where: { id },
-      data: { attended },
+      data: {
+        attended,
+        wasCounted: true,
+      },
     });
     return res.json(updated);
   }
 
   const dateOnly = (d) => d.toISOString().slice(0, 10);
   const trainingDate = new Date(training.date);
+
   const activeBlock = await prisma.paymentBlock.findFirst({
     where: { userId: training.userId, active: true },
   });

@@ -18,7 +18,7 @@ if (!TOKEN || !WEB_APP_URL || !API_URL || !OPENAI_API_KEY) {
 const bot = new Telegraf(TOKEN);
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-export { bot }; // экспортируем для использования в других модулях
+export { bot };
 
 const greetingSent = new Set();
 const dailyLimits = new Map();
@@ -227,6 +227,8 @@ bot.on('callback_query', async (ctx) => {
 
   if (!data || !telegramId) return;
 
+  const deleteAfter = 60 * 1000;
+
   if (data.startsWith('attend:')) {
     const trainingId = data.split(':')[1];
 
@@ -238,17 +240,24 @@ bot.on('callback_query', async (ctx) => {
       });
 
       await ctx.answerCbQuery('✅ Участие подтверждено');
-      await ctx.editMessageText('✅ Вы подтвердили участие в тренировке');
+      const edited = await ctx.editMessageText('✅ Вы подтвердили участие в тренировке');
+      setTimeout(() => {
+        ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {});
+      }, deleteAfter);
     } catch (err) {
       console.error('Ошибка подтверждения участия:', err);
       await ctx.answerCbQuery('⚠️ Ошибка сервера');
     }
+
   } else if (data.startsWith('decline:')) {
     const trainingId = data.split(':')[1];
 
     try {
       await ctx.answerCbQuery('❌ Вы отказались от участия');
-      await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
+      const edited = await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
+      setTimeout(() => {
+        ctx.telegram.deleteMessage(ctx.chat.id, edited.message_id).catch(() => {});
+      }, deleteAfter);
     } catch (err) {
       console.error('Ошибка при отмене участия:', err);
     }
