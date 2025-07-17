@@ -35,7 +35,6 @@ export default function AssignModalFromCalendar({
 }: Props) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
-  const [isSinglePaidDisabled, setIsSinglePaidDisabled] = useState(false);
   const [singlePrice, setSinglePrice] = useState<string>("");
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<"cash" | "online" | "">("");
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
@@ -123,14 +122,7 @@ export default function AssignModalFromCalendar({
 
     const block = assignUserId ? blocks[assignUserId] : null;
     const hasActiveBlock = block && block.paidTrainings > (block.used ?? 0);
-
-    if (!hasActiveBlock) {
-      setIsSinglePaid(true);
-      setIsSinglePaidDisabled(true);
-    } else {
-      setIsSinglePaid(false);
-      setIsSinglePaidDisabled(false);
-    }
+    setIsSinglePaid(!hasActiveBlock); // ✅ автоустановка чекбокса
   }, [opened]);
 
   useEffect(() => {
@@ -227,7 +219,7 @@ export default function AssignModalFromCalendar({
           label="Разовая оплата"
           checked={isSinglePaid}
           onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={isSinglePaidDisabled || !selectedUser}
+          disabled={!selectedUser}
         />
 
         {isSinglePaid && (
