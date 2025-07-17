@@ -147,6 +147,11 @@ export default function AssignModalFromCalendar({
     };
 
     fetchTemplates();
+
+    // 🧠 Автоматически активируем и блокируем "Разовая оплата", если нет блока
+    if (selectedUser && !hasActiveBlock) {
+      setIsSinglePaid(true);
+    }
   }, [selectedUser]);
 
   return (
@@ -217,7 +222,7 @@ export default function AssignModalFromCalendar({
           label="Разовая оплата"
           checked={isSinglePaid}
           onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={!selectedUser || !hasActiveBlock}
+          disabled={!hasActiveBlock} // 🔒 Блокируем если нет блока
         />
 
         {isSinglePaid && (
