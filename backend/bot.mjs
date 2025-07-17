@@ -4,7 +4,6 @@ dotenv.config();
 import { Telegraf, Markup } from 'telegraf';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
-import { notifyTelegramTraining } from './utils/notifyTelegramTraining.mjs';
 
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const WEB_APP_URL = process.env.WEB_APP_URL;
