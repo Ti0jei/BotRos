@@ -14,11 +14,11 @@ import getNextTraining from './getNextTraining.mjs';
 const router = express.Router();
 
 router.get('/', getTrainings);
-router.get('/date/:date', getTrainingsByDate); // или router.get('/', ...) если query-параметры
+router.get('/date/:date', getTrainingsByDate);
 router.get('/last/:userId', getLastTemplate);
 router.post('/', createTraining);
 router.delete('/:id', deleteTraining);
-router.patch('/:id/status', updateStatus);
+router.patch('/:id', updateStatus); // ✅ исправлено
 router.patch('/:id/attended', markAttendance);
 router.get('/stats/:userId', getStats);
 router.get('/visited/:userId', getVisited);
