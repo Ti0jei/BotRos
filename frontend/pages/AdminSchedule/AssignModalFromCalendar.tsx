@@ -20,7 +20,7 @@ interface Props {
   clients: User[];
   blocks: Record<string, PaymentBlock | null>;
   selectedHour: number | null;
-  selectedDate: string;
+  selectedDate: string; // YYYY-MM-DD
   onSuccess: () => void;
 }
 
@@ -35,7 +35,6 @@ export default function AssignModalFromCalendar({
 }: Props) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isSinglePaid, setIsSinglePaid] = useState(false);
-  const [isSinglePaidDisabled, setIsSinglePaidDisabled] = useState(false);
   const [singlePrice, setSinglePrice] = useState<string>("");
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<"cash" | "online" | "">("");
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
@@ -113,24 +112,15 @@ export default function AssignModalFromCalendar({
     if (!opened) return;
 
     const assignUserId = localStorage.getItem("assignUserId");
+    const assignSinglePaid = localStorage.getItem("assignSinglePaid") === "true";
 
     setSelectedUser(assignUserId || null);
+    setIsSinglePaid(assignSinglePaid);
     setSinglePrice("");
     setSinglePaymentMethod("");
     setSelectedTemplateId(null);
     setLastTemplate(null);
     setTemplates([]);
-
-    const block = assignUserId ? blocks[assignUserId] : null;
-    const hasActiveBlock = block && block.paidTrainings > (block.used ?? 0);
-
-    if (!hasActiveBlock) {
-      setIsSinglePaid(true);
-      setIsSinglePaidDisabled(true);
-    } else {
-      setIsSinglePaid(false);
-      setIsSinglePaidDisabled(false);
-    }
   }, [opened]);
 
   useEffect(() => {
@@ -168,19 +158,18 @@ export default function AssignModalFromCalendar({
       size="sm"
       radius="xl"
       scrollAreaComponent="div"
-      scrollAreaProps={{
-        style: {
-          maxHeight: '75vh',
-          overflowY: 'auto',
-          padding: 16,
-        },
-      }}
       styles={{
         title: { fontWeight: 700, fontSize: 20 },
         header: { borderBottom: "1px solid #ddd" },
+        body: {
+          padding: 16,
+          maxHeight: "75vh",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+        },
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Stack spacing="md">
         <Box>
           <Text fw={600} mb={4}>
             Клиент
@@ -228,7 +217,7 @@ export default function AssignModalFromCalendar({
           label="Разовая оплата"
           checked={isSinglePaid}
           onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={isSinglePaidDisabled || !selectedUser}
+          disabled={!selectedUser || !hasActiveBlock}
         />
 
         {isSinglePaid && (
@@ -242,6 +231,7 @@ export default function AssignModalFromCalendar({
               required
               inputMode="numeric"
               pattern="[0-9]*"
+              onBlur={() => window.scrollTo({ top: 0 })}
             />
             <Select
               label="Способ оплаты"
@@ -274,7 +264,7 @@ export default function AssignModalFromCalendar({
             Назначить
           </Button>
         </Group>
-      </div>
+      </Stack>
     </Modal>
   );
 }
