@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .custom-day {
+    @apply w-12 h-12 text-lg rounded-xl font-semibold transition-all text-black dark:text-white;
+    line-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .custom-day:hover {
+    @apply bg-gray-200 dark:bg-gray-700;
+  }
+
+  .custom-day[data-selected] {
+    @apply bg-black text-white border border-black dark:bg-white dark:text-black dark:border-white;
+  }
+
+  .custom-day[data-today]:not([data-selected]) {
+    @apply bg-gray-100 border border-gray-300 dark:bg-gray-800 dark:border-gray-600;
+  }
+
+  .custom-weekday {
+    @apply text-base font-bold text-gray-700 dark:text-gray-300 text-center;
+  }
+
+  .custom-header {
+    @apply text-xl font-semibold pb-4 dark:text-white text-center;
+  }
+}
