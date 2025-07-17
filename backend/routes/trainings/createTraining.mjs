@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { notifyTelegram } from '../../utils/telegram.mjs';
+import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser } from '../../lib/antiSpam.mjs';
 
 const prisma = new PrismaClient();
