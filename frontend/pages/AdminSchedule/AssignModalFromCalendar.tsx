@@ -168,19 +168,21 @@ export default function AssignModalFromCalendar({
       size="sm"
       radius="xl"
       scrollAreaComponent="div"
+      scrollAreaProps={{
+        style: {
+          maxHeight: '75vh',
+          overflowY: 'auto',
+          padding: 16,
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      }}
       styles={{
         title: { fontWeight: 700, fontSize: 20 },
         header: { borderBottom: "1px solid #ddd" },
-        body: {
-          padding: 16,
-          maxHeight: "75vh",
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-        },
       }}
     >
-      <Stack spacing="md" style={{ flexGrow: 1, minHeight: 0 }}>
+      <Stack spacing="md" style={{ flex: 1 }}>
         <Box>
           <Text fw={600} mb={4}>
             Клиент
