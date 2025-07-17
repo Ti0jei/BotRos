@@ -233,10 +233,10 @@ bot.on('callback_query', async (ctx) => {
     const trainingId = data.split(':')[1];
 
     try {
-      await fetch(`${API_URL}/api/trainings/${trainingId}/attended`, {
+      await fetch(`${API_URL}/api/trainings/${trainingId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ attended: true, wasCounted: true })
+        body: JSON.stringify({ status: 'CONFIRMED' })
       });
 
       await ctx.answerCbQuery('✅ Участие подтверждено');
@@ -253,6 +253,12 @@ bot.on('callback_query', async (ctx) => {
     const trainingId = data.split(':')[1];
 
     try {
+      await fetch(`${API_URL}/api/trainings/${trainingId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'DECLINED' })
+      });
+
       await ctx.answerCbQuery('❌ Вы отказались от участия');
       const edited = await ctx.editMessageText('❌ Вы отказались от участия в тренировке');
       setTimeout(() => {
