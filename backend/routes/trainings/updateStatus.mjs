@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { notifyTelegram } from '../../utils/telegram.mjs';
+import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser, shouldNotifyTrainer } from '../../lib/antiSpam.mjs';
 import jwt from 'jsonwebtoken';
 
