@@ -87,3 +87,5 @@ export function setupAiFeatures(bot) {
     }
   }, 60000);
 }
+
+export { aiContexts };
