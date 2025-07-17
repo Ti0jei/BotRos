@@ -173,8 +173,6 @@ export default function AssignModalFromCalendar({
           maxHeight: '75vh',
           overflowY: 'auto',
           padding: 16,
-          display: 'flex',
-          flexDirection: 'column',
         },
       }}
       styles={{
@@ -182,7 +180,7 @@ export default function AssignModalFromCalendar({
         header: { borderBottom: "1px solid #ddd" },
       }}
     >
-      <Stack spacing="md" style={{ flex: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <Box>
           <Text fw={600} mb={4}>
             Клиент
@@ -209,11 +207,7 @@ export default function AssignModalFromCalendar({
         {selectedUser && (
           <Select
             label="Следующая программа тренировок"
-            placeholder={
-              !hasActiveBlock
-                ? "Нет активного блока — недоступно"
-                : "По очереди или выбрать вручную"
-            }
+            placeholder="По очереди или выбрать вручную"
             data={templates.map((t) => ({
               label: t.title,
               value: t.id,
@@ -221,7 +215,6 @@ export default function AssignModalFromCalendar({
             value={selectedTemplateId}
             onChange={(val) => setSelectedTemplateId(val)}
             clearable
-            disabled={!hasActiveBlock}
           />
         )}
 
@@ -281,7 +274,7 @@ export default function AssignModalFromCalendar({
             Назначить
           </Button>
         </Group>
-      </Stack>
+      </div>
     </Modal>
   );
 }
