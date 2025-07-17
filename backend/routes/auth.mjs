@@ -1,5 +1,3 @@
-// backend/routes/auth.ts
-
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -230,7 +228,7 @@ router.post('/telegram-direct', async (req, res) => {
   }
 });
 
-// ✅ Проверка Telegram ID
+// ✅ Проверка Telegram ID с user и token
 router.get('/check-telegram', async (req, res) => {
   const { telegramId } = req.query;
 
@@ -243,7 +241,23 @@ router.get('/check-telegram', async (req, res) => {
       where: { telegramId: BigInt(telegramId).toString() },
     });
 
-    res.json({ exists: !!user });
+    if (!user) return res.json({ exists: false });
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      exists: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+      },
+      token,
+    });
   } catch (err) {
     console.error('❌ Ошибка при check-telegram:', err);
     res.status(500).json({ error: 'Ошибка сервера' });

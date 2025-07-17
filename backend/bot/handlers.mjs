@@ -1,10 +1,9 @@
-// bot/handlers.mjs
-
 import { Markup } from 'telegraf';
-import { WEB_APP_URL } from './index.mjs';
+import { WEB_APP_URL, API_URL } from './index.mjs';
 import { aiContexts } from './ai.mjs';
 import { clearSession } from './context.mjs';
 import { isRegistered } from './middleware.mjs';
+import fetch from 'node-fetch';
 
 export async function showMainMenu(ctx) {
   const telegramId = ctx.from?.id;
@@ -42,17 +41,52 @@ export function setupHandlers(bot) {
     await showMainMenu(ctx);
   });
 
-  // Кнопки подтверждения участия
+  // Кнопка "✅ Буду"
   bot.action(/^attend:(.+)$/, isRegistered, async (ctx) => {
     const trainingId = ctx.match[1];
-    await ctx.answerCbQuery('✅ Вы подтвердили участие');
-    await ctx.reply(`🟢 Отлично! Вы придёте на тренировку (ID: ${trainingId})`);
+    const token = ctx.state?.token;
+
+    try {
+      await fetch(`${API_URL}/api/trainings/${trainingId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'CONFIRMED' }),
+      });
+
+      await ctx.answerCbQuery('✅ Статус обновлён');
+      await ctx.reply('🟢 Отлично! Вы придёте на тренировку');
+    } catch (err) {
+      console.error('❌ Ошибка обновления статуса:', err.message);
+      await ctx.answerCbQuery('⚠️ Ошибка');
+      await ctx.reply('⚠️ Не удалось обновить статус. Попробуйте позже.');
+    }
   });
 
+  // Кнопка "❌ Не буду"
   bot.action(/^decline:(.+)$/, isRegistered, async (ctx) => {
     const trainingId = ctx.match[1];
-    await ctx.answerCbQuery('❌ Вы отказались от участия');
-    await ctx.reply(`🔴 Окей! Мы учтём, что вы не придёте (ID: ${trainingId})`);
+    const token = ctx.state?.token;
+
+    try {
+      await fetch(`${API_URL}/api/trainings/${trainingId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'DECLINED' }),
+      });
+
+      await ctx.answerCbQuery('❌ Статус обновлён');
+      await ctx.reply('🔴 Окей! Мы учтём, что вы не придёте');
+    } catch (err) {
+      console.error('❌ Ошибка обновления статуса:', err.message);
+      await ctx.answerCbQuery('⚠️ Ошибка');
+      await ctx.reply('⚠️ Не удалось обновить статус. Попробуйте позже.');
+    }
   });
 
   // Сообщения вне контекста AI
