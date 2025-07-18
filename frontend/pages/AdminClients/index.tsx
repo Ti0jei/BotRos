@@ -37,7 +37,13 @@ export default function AdminClientsPage({
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [view, setInternalView] = useState<
-    "payments" | "nutrition" | "exercise-admin" | "workouts" | "create-workout" | "edit-workout" | null
+    | "payments"
+    | "nutrition"
+    | "exercise-admin"
+    | "workouts"
+    | "create-workout"
+    | "edit-workout"
+    | null
   >(null);
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
@@ -238,8 +244,9 @@ export default function AdminClientsPage({
                   const isSinglePaid = !block || block.paidTrainings <= block.used;
                   localStorage.setItem("assignSinglePaid", String(isSinglePaid));
 
-                  // ✅ fix — сохраняем дату
-                  localStorage.setItem("assignDate", new Date().toISOString());
+                  // ✅ фиксированное сохранение выбранной даты
+                  const selectedDate = new Date().toISOString(); // замените, если есть другой источник
+                  localStorage.setItem("assignDate", selectedDate);
 
                   setView("assign-training");
                 }}
