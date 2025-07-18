@@ -350,7 +350,6 @@ export default function AssignModal({
               onAssign(
                 selectedTemplateId,
                 date.format("YYYY-MM-DD"),
-                selectedHour, // ✅ добавлено
                 singlePrice,
                 singlePaymentMethod
               )
