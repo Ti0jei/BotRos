@@ -1,5 +1,4 @@
 // bot/admin.mjs
-
 import { Markup } from 'telegraf';
 import { isAdmin } from './middleware.mjs';
 import { notifyAllClients, notifyAllAdmins } from './notifications.mjs';
@@ -18,12 +17,16 @@ export function setupAdminCommands(bot) {
   });
 
   bot.action('notify_all', isAdmin, async (ctx) => {
-    ctx.session = { notifyTarget: 'all' };
+    await ctx.answerCbQuery();
+    ctx.session ??= {};
+    ctx.session.notifyTarget = 'all';
     await ctx.editMessageText('✏️ Напиши текст рассылки для всех пользователей:');
   });
 
   bot.action('notify_admins', isAdmin, async (ctx) => {
-    ctx.session = { notifyTarget: 'admins' };
+    await ctx.answerCbQuery();
+    ctx.session ??= {};
+    ctx.session.notifyTarget = 'admins';
     await ctx.editMessageText('✏️ Напиши текст рассылки только для админов:');
   });
 
@@ -31,17 +34,14 @@ export function setupAdminCommands(bot) {
     const target = ctx.session?.notifyTarget;
     if (!target) return next();
 
-    const text = ctx.message.text;
-    if (!text || text.length < 3) {
-      return ctx.reply('⚠️ Текст слишком короткий.');
-    }
+    const text = ctx.message.text.trim();
+    if (!text) return ctx.reply('⚠️ Пустое сообщение. Введите текст.');
+    if (text.length < 3) return ctx.reply('⚠️ Текст слишком короткий.');
 
     if (target === 'all') {
       await notifyAllClients(text);
       await ctx.reply('✅ Рассылка отправлена всем пользователям.');
-    }
-
-    if (target === 'admins') {
+    } else if (target === 'admins') {
       await notifyAllAdmins(text);
       await ctx.reply('✅ Рассылка отправлена только админам.');
     }

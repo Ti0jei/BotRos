@@ -1,6 +1,5 @@
-// bot/notifications.mjs
-
 import { bot } from './index.mjs';
+import prisma from '../prisma/index.mjs'; // ← импорт Prisma клиента
 
 /**
  * Отправка персонального уведомления пользователю
@@ -36,32 +35,43 @@ export async function notifyTelegram(telegramId, text, trainingId = null) {
 }
 
 /**
- * Массовая рассылка уведомлений пользователям (по ролям)
- * @param {Object} options - Опции рассылки
- * @param {string} options.text - Текст рассылки
- * @param {string} [options.to='ALL'] - 'ALL' или 'ADMINS'
- * @param {Array<{telegramId: string, role: string}>} users - Список пользователей
+ * Массовая рассылка уведомлений по роли
+ * @param {string} text - Текст уведомления
+ * @param {'USER' | 'ADMIN'} role - Целевая роль
+ * @returns {{ success: number, total: number }}
  */
-export async function notifyBroadcast({ text, to = 'ALL' }, users) {
-  if (!text || !Array.isArray(users)) {
-    console.warn('❗ notifyBroadcast: некорректные входные параметры');
-    return;
+export async function notifyBroadcast(text, role = 'USER') {
+  if (!text || !role) {
+    console.warn('❗ notifyBroadcast: отсутствуют параметры');
+    return { success: 0, total: 0 };
   }
 
-  const filtered = to === 'ADMINS'
-    ? users.filter((u) => u.role === 'ADMIN' && u.telegramId)
-    : users.filter((u) => u.telegramId);
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        role,
+        telegramId: { not: null },
+      },
+      select: {
+        telegramId: true,
+      },
+    });
 
-  let success = 0;
+    let success = 0;
 
-  for (const user of filtered) {
-    try {
-      await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
-      success++;
-    } catch (err) {
-      console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
+    for (const user of users) {
+      try {
+        await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
+        success++;
+      } catch (err) {
+        console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
+      }
     }
-  }
 
-  console.log(`📢 Рассылка завершена: ${success}/${filtered.length} успешно.`);
+    console.log(`📢 Рассылка завершена: ${success}/${users.length} успешно.`);
+    return { success, total: users.length };
+  } catch (err) {
+    console.error('❌ Ошибка notifyBroadcast:', err.message);
+    return { success: 0, total: 0 };
+  }
 }

@@ -19,6 +19,7 @@ export function setupCommands(bot) {
         await ctx.deleteMessage(ctx.message.message_id).catch(() => {});
       }
     } catch (_) {}
+
     await showMainMenu(ctx);
   });
 
@@ -27,6 +28,12 @@ export function setupCommands(bot) {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
 
+    // 💡 Если пользователь сейчас в процессе рассылки — не мешаем
+    if (ctx.session?.notifyState?.step === 'awaiting_text') {
+      return next?.();
+    }
+
+    // AI-мод — не мешаем
     const { aiContexts } = await import('./ai.mjs');
     const inAiMode = aiContexts.has(telegramId);
 

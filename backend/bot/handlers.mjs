@@ -1,7 +1,6 @@
 import { Markup } from 'telegraf';
 import { WEB_APP_URL, API_URL } from './index.mjs';
 import { aiContexts } from './ai.mjs';
-import { clearSession } from './context.mjs';
 import { isRegistered } from './middleware.mjs';
 import fetch from 'node-fetch';
 
@@ -10,7 +9,7 @@ export async function showMainMenu(ctx) {
   const name = ctx.from?.first_name || 'Гость';
 
   aiContexts.delete(telegramId);
-  clearSession(telegramId);
+  delete ctx.session; // 🔥 удалили вручную session, больше не нужно context.mjs
 
   const role = ctx.state?.user?.role;
 
