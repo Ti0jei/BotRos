@@ -68,7 +68,10 @@ export default function AssignModal({
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
-  const [date, setDate] = useState<Dayjs>(dayjs());
+  const [date, setDate] = useState<Dayjs>(() => {
+    const savedDate = localStorage.getItem("assignDate");
+    return savedDate ? dayjs(savedDate) : dayjs();
+  });
   const [showWarning, setShowWarning] = useState(false);
   const [assignedClients, setAssignedClients] = useState<AssignedClient[]>([]);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
