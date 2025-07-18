@@ -1,3 +1,5 @@
+// bot/newsNotification.mjs
+
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
 import { notifyBroadcast } from '../utils/broadcast.mjs';
@@ -9,7 +11,7 @@ import { notifyBroadcast } from '../utils/broadcast.mjs';
 export function setupNewsNotification(bot) {
   // 🟢 Шаг 1: Запуск рассылки
   bot.action('notify_start', isRegistered, async (ctx) => {
-    ctx.session ??= {}; // ← на всякий случай
+    ctx.session ??= {};
     ctx.session.notifyState = { step: 'choose_role' };
 
     await ctx.answerCbQuery('✅');
@@ -49,7 +51,7 @@ export function setupNewsNotification(bot) {
   // 📝 Шаг 3: Ввод текста рассылки
   bot.on('text', isRegistered, async (ctx, next) => {
     const state = ctx.session?.notifyState;
-    if (!state || state.step !== 'awaiting_text') return next(); // передаём другим хендлерам
+    if (!state || state.step !== 'awaiting_text') return next?.();
 
     const message = ctx.message.text.trim();
 
@@ -88,12 +90,13 @@ export function setupNewsNotification(bot) {
       await ctx.reply('❌ Произошла ошибка при рассылке. Попробуйте позже.');
     }
 
-    delete ctx.session.notifyState;
+    // ❗ Важно: НЕ delete! — session это прокси
+    ctx.session.notifyState = undefined;
   });
 
   // ❌ Отмена рассылки
   bot.action('notify_cancel', isRegistered, async (ctx) => {
-    delete ctx.session.notifyState;
+    ctx.session.notifyState = undefined;
 
     await ctx.answerCbQuery('❌');
     await ctx.reply('❌ Рассылка отменена.');
