@@ -14,6 +14,7 @@ import { User, PaymentBlock, WorkoutTemplate } from "./types";
 import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import { Dayjs } from "dayjs";
+import { blurActiveElement } from "@/utils/blurActiveElement"; // ✅ добавлен импорт
 
 interface Props {
   opened: boolean;
@@ -21,7 +22,7 @@ interface Props {
   clients: User[];
   blocks: Record<string, PaymentBlock | null>;
   selectedHour: number | null;
-  selectedDate: Dayjs; // ✅ Dayjs вместо string
+  selectedDate: Dayjs;
   onSuccess: () => void;
 }
 
@@ -81,7 +82,7 @@ export default function AssignModalFromCalendar({
       body: JSON.stringify({
         userId: selectedUser,
         hour: selectedHour,
-        date: selectedDate.format("YYYY-MM-DD"), // ✅ формируем строку
+        date: selectedDate.format("YYYY-MM-DD"),
         isSinglePaid,
         singlePrice: isSinglePaid ? parseInt(singlePrice) : undefined,
         singlePaymentMethod: isSinglePaid ? singlePaymentMethod : undefined,
@@ -127,7 +128,7 @@ export default function AssignModalFromCalendar({
     setTemplates([]);
 
     if (selectedDate) {
-      localStorage.setItem("calendarSelectedDate", selectedDate.format("YYYY-MM-DD")); // ✅
+      localStorage.setItem("calendarSelectedDate", selectedDate.format("YYYY-MM-DD"));
     }
   }, [opened]);
 
@@ -206,7 +207,10 @@ export default function AssignModalFromCalendar({
               }))}
               placeholder="Выберите клиента"
               value={selectedUser}
-              onChange={setSelectedUser}
+              onChange={(val) => {
+                blurActiveElement(); // ✅ добавлено
+                setSelectedUser(val);
+              }}
               searchable
               nothingFound="Не найдено"
             />
@@ -227,7 +231,10 @@ export default function AssignModalFromCalendar({
                 value: t.id,
               }))}
               value={selectedTemplateId}
-              onChange={(val) => setSelectedTemplateId(val)}
+              onChange={(val) => {
+                blurActiveElement(); // ✅ добавлено
+                setSelectedTemplateId(val);
+              }}
               clearable
             />
           )}
@@ -266,7 +273,10 @@ export default function AssignModalFromCalendar({
                   { value: "online", label: "Онлайн" },
                 ]}
                 value={singlePaymentMethod}
-                onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
+                onChange={(val) => {
+                  blurActiveElement(); // ✅ добавлено
+                  setSinglePaymentMethod(val as "cash" | "online" | "");
+                }}
                 required
               />
             </>
