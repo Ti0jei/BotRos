@@ -1,5 +1,5 @@
 // 💾 ФАЙЛ: AssignModal.tsx
-import blurActiveElement from "@/utils/blurActiveElement";
+import { blurActiveElement } from "@/utils/blurActiveElement";
 import { useEffect, useState } from "react";
 import {
   Modal,
