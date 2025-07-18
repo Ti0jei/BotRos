@@ -1,4 +1,3 @@
-// backend/bot/middleware.mjs
 import fetch from 'node-fetch';
 import { API_URL, WEB_APP_URL } from './index.mjs';
 
@@ -13,15 +12,21 @@ export async function isRegistered(ctx, next) {
   }
 
   try {
-    const res = await fetch(`${API_URL}/api/auth/check-telegram?telegramId=${telegramId}`);
+    const url = `${API_URL}/api/auth/check-telegram?telegramId=${telegramId}`;
+    console.log(`🔍 Проверка регистрации: ${url}`);
+
+    const res = await fetch(url);
 
     if (!res.ok) {
-      throw new Error(`Сервер вернул ${res.status}`);
+      console.error(`❌ Ответ сервера: ${res.status}`);
+      throw new Error(`Ошибка fetch: ${res.status}`);
     }
 
-    const { exists, user, token } = await res.json();
+    const json = await res.json();
 
-    if (!exists) {
+    if (!json?.exists || !json?.user) {
+      console.warn(`⚠️ Пользователь не найден: ${telegramId}`);
+
       const msg = await ctx.reply('❌ У вас нет доступа. Зарегистрируйтесь через приложение.', {
         reply_markup: {
           inline_keyboard: [[
@@ -34,17 +39,19 @@ export async function isRegistered(ctx, next) {
         ctx.telegram.deleteMessage(ctx.chat.id, msg.message_id).catch(() => {});
       }, 3000);
 
-      return; // ← ПРЕРЫВАЕМ выполнение
+      return;
     }
 
-    // ✅ Всё хорошо — сохраняем данные в ctx.state и продолжаем
+    // ✅ Всё успешно
     ctx.state ??= {};
-    ctx.state.user = user;
-    ctx.state.token = token;
+    ctx.state.user = json.user;
+    ctx.state.token = json.token;
 
-    return await next(); // ← Важно
+    console.log(`✅ Доступ разрешён: ${json.user.name} (${json.user.role})`);
+
+    return await next();
   } catch (e) {
-    console.error('❌ isRegistered error:', e);
+    console.error('❌ Ошибка isRegistered:', e.message);
     const fail = await ctx.reply('⚠️ Ошибка при проверке доступа.');
     setTimeout(() => {
       ctx.telegram.deleteMessage(ctx.chat.id, fail.message_id).catch(() => {});
