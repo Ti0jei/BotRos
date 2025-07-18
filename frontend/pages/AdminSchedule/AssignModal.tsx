@@ -271,10 +271,8 @@ export default function AssignModal({
                 label="Стоимость"
                 placeholder="Введите сумму"
                 value={singlePrice}
-                onChange={(val) => {
-                  blurActiveElement();
-                  setSinglePrice(typeof val === "number" ? val : null);
-                }}
+                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                onBlur={blurActiveElement}
                 min={0}
               />
               <Select
@@ -285,10 +283,8 @@ export default function AssignModal({
                   { label: "Онлайн", value: "online" },
                 ]}
                 value={singlePaymentMethod}
-                onChange={(val) => {
-                  blurActiveElement();
-                  setSinglePaymentMethod(val);
-                }}
+                onChange={(val) => setSinglePaymentMethod(val)}
+                onBlur={blurActiveElement}
                 clearable
               />
             </>
