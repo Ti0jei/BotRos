@@ -99,6 +99,12 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, [date]);
 
+  // Обёртка: сохраняем дату в localStorage при каждом изменении
+  const handleDateChange = (d: dayjs.Dayjs) => {
+    setDate(d);
+    localStorage.setItem("calendarSelectedDate", d.format("YYYY-MM-DD"));
+  };
+
   return (
     <Box
       style={{
@@ -108,7 +114,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       }}
     >
       <Container size="xs" py="md">
-        <ScheduleHeader date={date} setDate={setDate} />
+        <ScheduleHeader date={date} setDate={handleDateChange} />
 
         <Title order={3} mt="md" mb="xs" c="#1a1a1a">
           Расписание
@@ -154,7 +160,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         onClose={() => {
           setModalOpen(false);
           setSelectedHour(null);
-          onBack(); // 👈 ДОБАВЛЕНО: возврат к профилю
+          onBack();
         }}
         clients={clients}
         blocks={blocks}

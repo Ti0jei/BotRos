@@ -50,6 +50,11 @@ export default function CustomModalDatePicker({
   const isSameDay = (a: Dayjs, b: Dayjs) =>
     a.format("YYYY-MM-DD") === b.format("YYYY-MM-DD");
 
+  const handleSetDate = (d: Dayjs) => {
+    setDate(d);
+    localStorage.setItem("assignDate", d.toISOString());
+  };
+
   return (
     <>
       <Group position="center" spacing="xs" mt="sm">
@@ -57,7 +62,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.subtract(1, "day"))}
+          onClick={() => handleSetDate(date.subtract(1, "day"))}
         >
           Назад
         </Button>
@@ -75,7 +80,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.add(1, "day"))}
+          onClick={() => handleSetDate(date.add(1, "day"))}
         >
           Вперёд
         </Button>
@@ -149,7 +154,7 @@ export default function CustomModalDatePicker({
                 <Center>
                   <Box
                     onClick={() => {
-                      setDate(d); // ✅ передаём именно Dayjs
+                      handleSetDate(d);
                       setOpened(false);
                     }}
                     style={{

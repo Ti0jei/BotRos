@@ -124,6 +124,10 @@ export default function AssignModalFromCalendar({
     setSelectedTemplateId(null);
     setLastTemplate(null);
     setTemplates([]);
+
+    if (selectedDate) {
+      localStorage.setItem("calendarSelectedDate", selectedDate);
+    }
   }, [opened]);
 
   useEffect(() => {
@@ -156,11 +160,10 @@ export default function AssignModalFromCalendar({
     }
   }, [selectedUser]);
 
-  // Замер высоты фиксированного нижнего элемента
   useEffect(() => {
     const resize = () => {
       if (footerRef.current) {
-        setBottomOffset(footerRef.current.offsetHeight + 24); // отступ с запасом
+        setBottomOffset(footerRef.current.offsetHeight + 24);
       }
     };
     resize();
@@ -288,7 +291,6 @@ export default function AssignModalFromCalendar({
         </Stack>
       </Modal>
 
-      {/* Фиксированная нижняя кнопка */}
       <div
         ref={footerRef}
         style={{
