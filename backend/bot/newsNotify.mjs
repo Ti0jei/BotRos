@@ -1,8 +1,6 @@
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyBroadcast } from '../utils/broadcast.mjs'; // 📦 Из utils
-
-const notifyStates = new Map();
+import { notifyBroadcast } from '../utils/broadcast.mjs'; // 📦 Рассылка
 
 /**
  * Настройка механизма новостной рассылки для админов
@@ -11,10 +9,7 @@ const notifyStates = new Map();
 export function setupNewsNotification(bot) {
   // Старт: выбор получателей
   bot.action('notify_start', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    if (!telegramId) return;
-
-    notifyStates.set(telegramId, { step: 'choose_role' });
+    ctx.session.notifyState = { step: 'choose_role' };
 
     await ctx.answerCbQuery('✅');
     await ctx.reply('Кому отправить рассылку?', Markup.inlineKeyboard([
@@ -25,8 +20,7 @@ export function setupNewsNotification(bot) {
 
   // Выбор: пользователи
   bot.action('notify_to_users', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    const state = notifyStates.get(telegramId);
+    const state = ctx.session?.notifyState;
     if (!state || state.step !== 'choose_role') return;
 
     state.role = 'USER';
@@ -38,8 +32,7 @@ export function setupNewsNotification(bot) {
 
   // Выбор: админы
   bot.action('notify_to_admins', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    const state = notifyStates.get(telegramId);
+    const state = ctx.session?.notifyState;
     if (!state || state.step !== 'choose_role') return;
 
     state.role = 'ADMIN';
@@ -51,12 +44,9 @@ export function setupNewsNotification(bot) {
 
   // Ввод текста
   bot.on('text', isRegistered, async (ctx, next) => {
-    const telegramId = ctx.from?.id;
-    const state = notifyStates.get(telegramId);
+    const state = ctx.session?.notifyState;
 
-    if (!state || state.step !== 'awaiting_text') {
-      return next(); // ❗ Важно: передать дальше другим хендлерам
-    }
+    if (!state || state.step !== 'awaiting_text') return next(); // передаём другим хендлерам
 
     const message = ctx.message.text.trim();
     if (message.length < 10) {
@@ -77,8 +67,7 @@ export function setupNewsNotification(bot) {
 
   // Подтверждение
   bot.action('notify_confirm', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    const state = notifyStates.get(telegramId);
+    const state = ctx.session?.notifyState;
 
     if (!state?.text || !state?.role) return;
 
@@ -87,19 +76,18 @@ export function setupNewsNotification(bot) {
 
     try {
       const result = await notifyBroadcast(state.text, state.role); // 📨
-      notifyStates.delete(telegramId);
+      delete ctx.session.notifyState;
       await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} (${state.role}).`);
     } catch (err) {
       console.error('❌ Ошибка при рассылке:', err);
-      notifyStates.delete(telegramId);
+      delete ctx.session.notifyState;
       await ctx.reply('❌ Произошла ошибка при рассылке.');
     }
   });
 
   // Отмена
   bot.action('notify_cancel', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    notifyStates.delete(telegramId);
+    delete ctx.session.notifyState;
     await ctx.answerCbQuery('❌');
     await ctx.reply('❌ Рассылка отменена.');
   });

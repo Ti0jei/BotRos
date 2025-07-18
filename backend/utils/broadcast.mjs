@@ -10,6 +10,10 @@ const API_URL = process.env.API_BASE_URL;
  */
 export async function notifyBroadcast(text, role = 'USER') {
   try {
+    if (!API_URL) {
+      throw new Error('❌ API_BASE_URL не определён');
+    }
+
     console.log(`📡 notifyBroadcast → ${API_URL}/api/telegram/notify`);
 
     const res = await fetch(`${API_URL}/api/telegram/notify`, {
@@ -21,13 +25,14 @@ export async function notifyBroadcast(text, role = 'USER') {
     });
 
     if (!res.ok) {
-      throw new Error(`Ответ сервера: ${res.status}`);
+      const errText = await res.text();
+      throw new Error(`❌ Ошибка сервера ${res.status}: ${errText}`);
     }
 
-    const result = await res.json(); // { success, total }
+    const result = await res.json();
     return result;
   } catch (err) {
-    console.error('❌ Ошибка при notifyBroadcast:', err);
+    console.error('❌ notifyBroadcast FAILED:', err);
     throw err;
   }
 }
