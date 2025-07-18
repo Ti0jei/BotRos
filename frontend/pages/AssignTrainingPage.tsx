@@ -7,7 +7,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date()); // ✅ выбранная дата
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isSinglePaid, setIsSinglePaid] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -48,10 +48,13 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
     localStorage.removeItem("assignSinglePaid");
   }, []);
 
-  const assignTraining = async () => {
-    if (!selectedUser || selectedHour === null || !selectedDate) return;
-
-    const dateStr = selectedDate.toISOString().split("T")[0]; // ✅ используем выбранную дату
+  const assignTraining = async (
+    templateId: string | null,
+    selectedDateStr: string,
+    singlePrice?: number | null,
+    singlePaymentMethod?: string | null
+  ) => {
+    if (!selectedUser || selectedHour === null || !selectedDateStr) return;
 
     try {
       const res = await fetch(`${API}/api/trainings`, {
@@ -62,9 +65,12 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
         },
         body: JSON.stringify({
           userId: selectedUser,
-          date: dateStr,
+          date: selectedDateStr, // ✅ передаётся выбранная дата
           hour: selectedHour,
           isSinglePaid,
+          templateId,
+          singlePrice,
+          singlePaymentMethod
         }),
       });
 
@@ -96,7 +102,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
       setIsSinglePaid={setIsSinglePaid}
       selectedHour={selectedHour}
       setSelectedHour={setSelectedHour}
-      selectedDate={selectedDate} // ✅ передаём в модалку
+      selectedDate={selectedDate}
       setSelectedDate={setSelectedDate}
       blocks={blocks}
     />
