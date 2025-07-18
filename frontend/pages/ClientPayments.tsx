@@ -1,3 +1,4 @@
+// ...весь импорт остаётся без изменений
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import {
@@ -98,7 +99,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       headers,
       body: JSON.stringify({
         userId: client.id,
-        paidAt: date,
+        paidAt: dayjs(date).format("YYYY-MM-DD"), // ✅ fix
         paidTrainings,
         pricePerTraining,
         pricePerBlock,
@@ -121,7 +122,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       method: "PATCH",
       headers,
       body: JSON.stringify({
-        paidAt: date,
+        paidAt: dayjs(date).format("YYYY-MM-DD"), // ✅ fix
         paidTrainings,
         pricePerTraining,
         pricePerBlock,
