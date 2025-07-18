@@ -1,7 +1,10 @@
 import { Paper, Text, Badge, Group, Button, Box, Stack } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { Training, PaymentBlock } from "./types";
+
+dayjs.extend(isSameOrBefore); // ✅ добавили расширение
 
 export default function TrainingCard({
   training,
@@ -36,9 +39,7 @@ export default function TrainingCard({
 
       modals.openConfirmModal({
         title: "Подтверждение",
-        children: (
-          <Text size="sm">Удалить эту разовую тренировку?</Text>
-        ),
+        children: <Text size="sm">Удалить эту разовую тренировку?</Text>,
         labels: { confirm: "Да, удалить", cancel: "Нет" },
         confirmProps: { color: "red" },
         onConfirm: onDelete,

@@ -3,6 +3,10 @@ import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser, shouldNotifyTrainer } from '../../lib/antiSpam.mjs';
 import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+
+dayjs.locale('ru');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -81,7 +85,7 @@ router.patch('/:id', async (req, res) => {
   const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
 
   if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
-    const dateStr = new Date(training.date).toLocaleDateString();
+    const dateStr = dayjs(training.date).format('DD.MM.YYYY');
     const msg =
       status === 'CONFIRMED'
         ? `👤 ${training.user.name} подтвердил участие ${dateStr} в ${training.hour}:00`

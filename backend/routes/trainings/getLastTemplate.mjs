@@ -1,4 +1,10 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { PrismaClient } from '@prisma/client';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const prisma = new PrismaClient();
 
@@ -22,7 +28,10 @@ export default async function getLastTemplate(req, res) {
           },
         },
       },
-      orderBy: [{ date: 'desc' }, { hour: 'desc' }],
+      orderBy: [
+        { date: 'desc' }, 
+        { hour: 'desc' }
+      ],
     });
 
     res.json(lastTraining?.template || null);

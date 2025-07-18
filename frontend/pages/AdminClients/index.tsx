@@ -246,7 +246,7 @@ export default function AdminClientsPage({
 
                   // ✅ сохраняем дату из календаря (если есть), иначе fallback на текущую
                   const calendarDate = localStorage.getItem("calendarSelectedDate");
-                  const selectedDate = calendarDate ?? new Date().toISOString();
+                  const selectedDate = calendarDate ?? dayjs().format("YYYY-MM-DD");
                   localStorage.setItem("assignDate", selectedDate);
 
                   setView("assign-training");

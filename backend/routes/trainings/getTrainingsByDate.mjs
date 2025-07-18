@@ -1,5 +1,11 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../../middleware/auth.mjs';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const prisma = new PrismaClient();
 
@@ -9,8 +15,8 @@ export default [
     const { date } = req.params;
 
     try {
-      const start = new Date(`${date}T00:00:00.000Z`);
-      const end = new Date(`${date}T23:59:59.999Z`);
+      const start = dayjs(date).startOf('day').toDate();
+      const end = dayjs(date).endOf('day').toDate();
 
       const trainings = await prisma.training.findMany({
         where: {

@@ -1,5 +1,11 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../../middleware/auth.mjs';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const prisma = new PrismaClient();
 
@@ -12,8 +18,8 @@ export default [
 
     let dateFilter = {};
     if (date) {
-      const start = new Date(`${date}T00:00:00`);
-      const end = new Date(`${date}T23:59:59`);
+      const start = dayjs(date).startOf('day').toDate();
+      const end = dayjs(date).endOf('day').toDate();
       dateFilter = { date: { gte: start, lte: end } };
     }
 
@@ -21,7 +27,6 @@ export default [
       ? { ...dateFilter }
       : { userId, ...dateFilter };
 
-    // 🔥 Новый фильтр по paymentBlockId
     if (blockId) {
       where.paymentBlockId = blockId;
     }

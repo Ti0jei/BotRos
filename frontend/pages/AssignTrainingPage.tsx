@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs'; // ✅ импорт Dayjs
 import AssignModal from './AdminSchedule/AssignModal';
 import { User, PaymentBlock } from './AdminSchedule/types';
 
@@ -7,7 +8,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(() => dayjs()); // ✅ Dayjs вместо Date
   const [isSinglePaid, setIsSinglePaid] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -65,7 +66,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
         },
         body: JSON.stringify({
           userId: selectedUser,
-          date: selectedDateStr, // ✅ передаётся выбранная дата
+          date: selectedDateStr, // ✅ уже в формате YYYY-MM-DD
           hour: selectedHour,
           isSinglePaid,
           templateId,
@@ -102,7 +103,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
       setIsSinglePaid={setIsSinglePaid}
       selectedHour={selectedHour}
       setSelectedHour={setSelectedHour}
-      selectedDate={selectedDate}
+      selectedDate={selectedDate} // ✅ передаём Dayjs
       setSelectedDate={setSelectedDate}
       blocks={blocks}
     />

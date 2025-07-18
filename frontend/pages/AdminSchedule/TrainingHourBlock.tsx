@@ -2,6 +2,9 @@ import { Box, Group, Text, Button, Stack } from "@mantine/core";
 import { Training, PaymentBlock } from "./types";
 import TrainingCard from "./TrainingCard";
 import dayjs from "dayjs";
+import isToday from "dayjs/plugin/isToday"; // ✅ подключаем плагин
+
+dayjs.extend(isToday); // ✅ активируем
 
 interface Props {
   hour: number;

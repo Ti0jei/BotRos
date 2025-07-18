@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
 import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
+import { Dayjs } from "dayjs";
 
 interface Props {
   opened: boolean;
@@ -20,7 +21,7 @@ interface Props {
   clients: User[];
   blocks: Record<string, PaymentBlock | null>;
   selectedHour: number | null;
-  selectedDate: string; // YYYY-MM-DD
+  selectedDate: Dayjs; // ✅ Dayjs вместо string
   onSuccess: () => void;
 }
 
@@ -80,7 +81,7 @@ export default function AssignModalFromCalendar({
       body: JSON.stringify({
         userId: selectedUser,
         hour: selectedHour,
-        date: selectedDate,
+        date: selectedDate.format("YYYY-MM-DD"), // ✅ формируем строку
         isSinglePaid,
         singlePrice: isSinglePaid ? parseInt(singlePrice) : undefined,
         singlePaymentMethod: isSinglePaid ? singlePaymentMethod : undefined,
@@ -126,7 +127,7 @@ export default function AssignModalFromCalendar({
     setTemplates([]);
 
     if (selectedDate) {
-      localStorage.setItem("calendarSelectedDate", selectedDate);
+      localStorage.setItem("calendarSelectedDate", selectedDate.format("YYYY-MM-DD")); // ✅
     }
   }, [opened]);
 

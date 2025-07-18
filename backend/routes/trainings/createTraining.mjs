@@ -1,6 +1,12 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { PrismaClient } from '@prisma/client';
 import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser } from '../../lib/antiSpam.mjs';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const prisma = new PrismaClient();
 
@@ -28,10 +34,9 @@ export default async function createTraining(req, res) {
     return res.status(400).json({ error: 'Неверный формат часа' });
   }
 
-  // 📌 Правильное создание даты без смещения (локально)
-  const [year, month, day] = date.split("-");
-  const trainingDate = new Date(Number(year), Number(month) - 1, Number(day));
-  if (isNaN(trainingDate.getTime())) {
+  // ✅ Используем dayjs — безопасное создание даты
+  const trainingDate = dayjs(date, 'YYYY-MM-DD');
+  if (!trainingDate.isValid()) {
     return res.status(400).json({ error: 'Неверная дата' });
   }
 
@@ -64,7 +69,7 @@ export default async function createTraining(req, res) {
     const training = await prisma.training.create({
       data: {
         userId,
-        date: trainingDate,
+        date: trainingDate.toDate(), // 👈 сохраняем нормализованную дату
         hour: parsedHour,
         isSinglePaid,
         singlePrice: isSinglePaid ? singlePrice : null,
@@ -73,21 +78,20 @@ export default async function createTraining(req, res) {
       },
     });
 
+    // Уведомление
     try {
-      const now = new Date();
-      const trainingDateTime = new Date(trainingDate);
-      trainingDateTime.setHours(parsedHour, 0, 0, 0);
-
       const user = await prisma.user.findUnique({ where: { id: userId } });
+
+      const trainingDateTime = trainingDate.hour(parsedHour).minute(0).second(0);
 
       if (
         user?.telegramId &&
-        trainingDateTime > now &&
+        trainingDateTime.isAfter(dayjs()) &&
         shouldNotifyUser(user.telegramId)
       ) {
         await notifyTelegram(
           user.telegramId,
-          `📅 Вам назначена тренировка на ${date} в ${parsedHour}:00\nПодтвердите участие:`,
+          `📅 Вам назначена тренировка на ${trainingDate.format('DD.MM.YYYY')} в ${parsedHour}:00\nПодтвердите участие:`,
           training.id
         );
       }

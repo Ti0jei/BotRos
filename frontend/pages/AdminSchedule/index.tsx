@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isToday from "dayjs/plugin/isToday";
 import {
@@ -26,7 +26,11 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isToday);
 
 export default function AdminSchedule({ onBack }: { onBack: () => void }) {
-  const [date, setDate] = useState(() => dayjs().startOf("day"));
+  const [date, setDate] = useState<Dayjs>(() => {
+    const stored = localStorage.getItem("calendarSelectedDate");
+    return stored ? dayjs(stored) : dayjs().startOf("day");
+  });
+
   const [clients, setClients] = useState<User[]>([]);
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
@@ -99,8 +103,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, [date]);
 
-  // Обёртка: сохраняем дату в localStorage при каждом изменении
-  const handleDateChange = (d: dayjs.Dayjs) => {
+  const handleDateChange = (d: Dayjs) => {
     setDate(d);
     localStorage.setItem("calendarSelectedDate", d.format("YYYY-MM-DD"));
   };
@@ -165,7 +168,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         clients={clients}
         blocks={blocks}
         selectedHour={selectedHour}
-        selectedDate={date.format("YYYY-MM-DD")}
+        selectedDate={date} // ✅ передаём Dayjs, не .format!
         onSuccess={loadTrainings}
         singlePrice={singlePrice}
         setSinglePrice={setSinglePrice}
