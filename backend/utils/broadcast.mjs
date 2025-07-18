@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { API_URL } from '../bot/index.mjs';
+import { API_BASE_URL } from '../bot/index.mjs';
 
 /**
  * Отправка рассылки по роли
