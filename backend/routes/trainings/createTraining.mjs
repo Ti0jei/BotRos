@@ -28,7 +28,9 @@ export default async function createTraining(req, res) {
     return res.status(400).json({ error: 'Неверный формат часа' });
   }
 
-  const trainingDate = new Date(`${date}T00:00:00+03:00`);
+  // 📌 Правильное создание даты без смещения (локально)
+  const [year, month, day] = date.split("-");
+  const trainingDate = new Date(Number(year), Number(month) - 1, Number(day));
   if (isNaN(trainingDate.getTime())) {
     return res.status(400).json({ error: 'Неверная дата' });
   }
@@ -73,7 +75,9 @@ export default async function createTraining(req, res) {
 
     try {
       const now = new Date();
-      const trainingDateTime = new Date(`${date}T${parsedHour.toString().padStart(2, '0')}:00:00`);
+      const trainingDateTime = new Date(trainingDate);
+      trainingDateTime.setHours(parsedHour, 0, 0, 0);
+
       const user = await prisma.user.findUnique({ where: { id: userId } });
 
       if (
