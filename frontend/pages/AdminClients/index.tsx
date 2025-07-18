@@ -244,8 +244,9 @@ export default function AdminClientsPage({
                   const isSinglePaid = !block || block.paidTrainings <= block.used;
                   localStorage.setItem("assignSinglePaid", String(isSinglePaid));
 
-                  // ✅ фиксированное сохранение выбранной даты
-                  const selectedDate = new Date().toISOString(); // замените, если есть другой источник
+                  // ✅ сохраняем дату из календаря (если есть), иначе fallback на текущую
+                  const calendarDate = localStorage.getItem("calendarSelectedDate");
+                  const selectedDate = calendarDate ?? new Date().toISOString();
                   localStorage.setItem("assignDate", selectedDate);
 
                   setView("assign-training");
