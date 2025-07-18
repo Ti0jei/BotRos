@@ -92,9 +92,15 @@ export default function AssignModal({
     if (!selectedUser && opened) {
       const savedUser = localStorage.getItem("assignUserId");
       const savedPaid = localStorage.getItem("assignSinglePaid") === "true";
+      const savedDate = localStorage.getItem("assignDate");
+
       if (savedUser) {
         setSelectedUser(savedUser);
         setIsSinglePaid(savedPaid);
+      }
+
+      if (savedDate) {
+        setDate(dayjs(savedDate));
       }
     }
   }, [opened]);
@@ -157,6 +163,7 @@ export default function AssignModal({
   const handleClose = () => {
     localStorage.removeItem("assignUserId");
     localStorage.removeItem("assignSinglePaid");
+    localStorage.removeItem("assignDate");
     onClose();
   };
 
