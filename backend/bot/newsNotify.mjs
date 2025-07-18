@@ -1,8 +1,6 @@
-// bot/newsNotify.mjs
-
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyBroadcast } from './notifications.mjs'; // 🔁 Исправлено: правильная функция
+import { notifyBroadcast } from './notifications.mjs';
 
 const notifyStates = new Map();
 
@@ -11,23 +9,51 @@ const notifyStates = new Map();
  * @param {Telegraf} bot
  */
 export function setupNewsNotification(bot) {
-  // Старт рассылки
+  // Старт: показать выбор аудитории
   bot.action('notify_start', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
 
-    notifyStates.set(telegramId, { step: 'awaiting_text' });
+    notifyStates.set(telegramId, { step: 'choose_role' });
+
     await ctx.answerCbQuery('✅');
-    await ctx.reply('📝 Введите текст новости, которую хотите разослать всем пользователям.');
+    await ctx.reply('Кому отправить рассылку?', Markup.inlineKeyboard([
+      [Markup.button.callback('👥 Пользователям', 'notify_to_users')],
+      [Markup.button.callback('👑 Администраторам', 'notify_to_admins')],
+    ]));
+  });
+
+  // Выбор: пользователи
+  bot.action('notify_to_users', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    const state = notifyStates.get(telegramId);
+    if (!state || state.step !== 'choose_role') return;
+
+    state.role = 'USER';
+    state.step = 'awaiting_text';
+
+    await ctx.answerCbQuery();
+    await ctx.reply('📝 Введите текст новости для пользователей:');
+  });
+
+  // Выбор: админы
+  bot.action('notify_to_admins', isRegistered, async (ctx) => {
+    const telegramId = ctx.from?.id;
+    const state = notifyStates.get(telegramId);
+    if (!state || state.step !== 'choose_role') return;
+
+    state.role = 'ADMIN';
+    state.step = 'awaiting_text';
+
+    await ctx.answerCbQuery();
+    await ctx.reply('📝 Введите текст новости для администраторов:');
   });
 
   // Ввод текста
   bot.on('text', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
-    if (!telegramId || !notifyStates.has(telegramId)) return;
-
     const state = notifyStates.get(telegramId);
-    if (state.step !== 'awaiting_text') return;
+    if (!state || state.step !== 'awaiting_text') return;
 
     const message = ctx.message.text.trim();
     if (message.length < 10) {
@@ -37,26 +63,28 @@ export function setupNewsNotification(bot) {
     state.text = message;
     state.step = 'awaiting_confirm';
 
-    await ctx.reply(`📨 Вот что вы хотите отправить:\n\n${state.text}`, Markup.inlineKeyboard([
-      Markup.button.callback('✅ Подтвердить', 'notify_confirm'),
-      Markup.button.callback('❌ Отменить', 'notify_cancel'),
-    ]));
+    await ctx.reply(
+      `📨 Вот что вы хотите отправить:\n\n${state.text}`,
+      Markup.inlineKeyboard([
+        Markup.button.callback('✅ Подтвердить', 'notify_confirm'),
+        Markup.button.callback('❌ Отменить', 'notify_cancel'),
+      ])
+    );
   });
 
   // Подтверждение рассылки
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     const state = notifyStates.get(telegramId);
-    if (!state?.text) return;
+    if (!state?.text || !state?.role) return;
 
     await ctx.answerCbQuery('🚀');
     await ctx.reply('🚀 Рассылаю...');
 
     try {
-      // 🔁 Используем notifyBroadcast вместо notifyAllUsers
-      const result = await notifyBroadcast(state.text);
+      const result = await notifyBroadcast(state.text, state.role); // передаём роль
       notifyStates.delete(telegramId);
-      await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} пользователям.`);
+      await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} (${state.role}).`);
     } catch (err) {
       console.error('❌ Ошибка при рассылке:', err);
       notifyStates.delete(telegramId);
