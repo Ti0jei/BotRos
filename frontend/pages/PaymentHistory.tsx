@@ -59,7 +59,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         fetch(`${API}/api/payment-blocks/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${API}/api/trainings/single/${userId}`, {
+        fetch(`${API}/api/trainings`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -70,9 +70,9 @@ export default function PaymentHistory({ userId, onBack }: Props) {
       }
 
       if (trainingsRes.ok) {
-        const all = await trainingsRes.json();
-        setBlockTrainings(all.filter((t: TrainingRecord) => t.paymentBlockId));
-        setSingleTrainings(all.filter((t: TrainingRecord) => !t.paymentBlockId));
+        const all: TrainingRecord[] = await trainingsRes.json();
+        setBlockTrainings(all.filter((t) => t.paymentBlockId));
+        setSingleTrainings(all.filter((t) => !t.paymentBlockId));
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
