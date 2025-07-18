@@ -4,7 +4,7 @@ import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser, shouldNotifyTrainer } from '../../lib/antiSpam.mjs';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
-import 'dayjs/locale/ru';
+import 'dayjs/locale/ru.js';
 
 dayjs.locale('ru');
 
