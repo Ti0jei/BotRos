@@ -1,6 +1,6 @@
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyBroadcast } from '../utils/broadcast.mjs'; // ✅ правильный импорт из /utils
+import { notifyBroadcast } from '../utils/broadcast.mjs'; // 📦 Из utils
 
 const notifyStates = new Map();
 
@@ -9,7 +9,7 @@ const notifyStates = new Map();
  * @param {Telegraf} bot
  */
 export function setupNewsNotification(bot) {
-  // Старт: показать выбор аудитории
+  // Старт: выбор получателей
   bot.action('notify_start', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
@@ -50,10 +50,13 @@ export function setupNewsNotification(bot) {
   });
 
   // Ввод текста
-  bot.on('text', isRegistered, async (ctx) => {
+  bot.on('text', isRegistered, async (ctx, next) => {
     const telegramId = ctx.from?.id;
     const state = notifyStates.get(telegramId);
-    if (!state || state.step !== 'awaiting_text') return;
+
+    if (!state || state.step !== 'awaiting_text') {
+      return next(); // ❗ Важно: передать дальше другим хендлерам
+    }
 
     const message = ctx.message.text.trim();
     if (message.length < 10) {
@@ -72,17 +75,18 @@ export function setupNewsNotification(bot) {
     );
   });
 
-  // Подтверждение рассылки
+  // Подтверждение
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     const state = notifyStates.get(telegramId);
+
     if (!state?.text || !state?.role) return;
 
     await ctx.answerCbQuery('🚀');
     await ctx.reply('🚀 Рассылаю...');
 
     try {
-      const result = await notifyBroadcast(state.text, state.role); // ✅ вызываем твою функцию
+      const result = await notifyBroadcast(state.text, state.role); // 📨
       notifyStates.delete(telegramId);
       await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} (${state.role}).`);
     } catch (err) {
@@ -92,7 +96,7 @@ export function setupNewsNotification(bot) {
     }
   });
 
-  // Отмена рассылки
+  // Отмена
   bot.action('notify_cancel', isRegistered, async (ctx) => {
     const telegramId = ctx.from?.id;
     notifyStates.delete(telegramId);

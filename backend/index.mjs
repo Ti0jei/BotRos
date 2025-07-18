@@ -20,6 +20,7 @@ import nutritionRoutes from './routes/nutrition.mjs';
 import resetPasswordRoutes from './routes/reset-password.mjs';
 import workoutRoutes from './routes/workoutTemplates.mjs';
 import exercisesRoutes from './routes/exercises.mjs';
+import telegramRoutes from './routes/telegram.mjs';
 
 import { authMiddleware } from './middleware/auth.mjs';
 import { resend } from './utils/resend.mjs';
@@ -57,6 +58,7 @@ app.get('/health', (req, res) => {
 });
 
 // -------------------- API маршруты --------------------
+app.use('/api/telegram', telegramRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', authMiddleware, profileRoutes);
 app.use('/api/clients', authMiddleware, clientsRoutes);
