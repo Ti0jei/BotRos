@@ -1,5 +1,5 @@
 // 💾 ФАЙЛ: AssignModal.tsx
-
+import blurActiveElement from "@/utils/blurActiveElement";
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -219,7 +219,10 @@ export default function AssignModal({
                 label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
               }))}
               value={selectedUser}
-              onChange={(val) => setSelectedUser(val || null)}
+              onChange={(val) => {
+                blurActiveElement();
+                setSelectedUser(val || null);
+              }}
               radius="md"
               size="md"
               withinPortal
@@ -268,7 +271,10 @@ export default function AssignModal({
                 label="Стоимость"
                 placeholder="Введите сумму"
                 value={singlePrice}
-                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                onChange={(val) => {
+                  blurActiveElement();
+                  setSinglePrice(typeof val === "number" ? val : null);
+                }}
                 min={0}
               />
               <Select
@@ -279,7 +285,10 @@ export default function AssignModal({
                   { label: "Онлайн", value: "online" },
                 ]}
                 value={singlePaymentMethod}
-                onChange={(val) => setSinglePaymentMethod(val)}
+                onChange={(val) => {
+                  blurActiveElement();
+                  setSinglePaymentMethod(val);
+                }}
                 clearable
               />
             </>
