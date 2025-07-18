@@ -14,22 +14,28 @@ router.post('/notify', async (req, res) => {
   const { message, role } = req.body;
 
   if (!message || !role) {
+    console.warn('⚠️ Пустые параметры message или role');
     return res.status(400).json({ error: 'Требуются message и role' });
   }
 
   try {
     const users = await getUsersFromDb(role);
+    console.log(`📋 Найдено ${users.length} пользователей с ролью ${role}`);
 
     let success = 0;
 
     for (const user of users) {
+      console.log(`📤 Пытаюсь отправить сообщение пользователю ${user.telegramId}...`);
       try {
         await bot.telegram.sendMessage(user.telegramId, `📰 ${message}`);
+        console.log(`✅ Успешно: ${user.telegramId}`);
         success++;
       } catch (err) {
         console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
       }
     }
+
+    console.log(`📬 Рассылка завершена: ${success}/${users.length} успешно`);
 
     return res.json({ success, total: users.length });
   } catch (err) {
@@ -45,7 +51,8 @@ export default router;
  * @param {string} role 'USER' или 'ADMIN'
  */
 async function getUsersFromDb(role) {
-  return await prisma.user.findMany({
+  console.log(`🔍 Поиск пользователей с ролью: ${role}`);
+  const result = await prisma.user.findMany({
     where: {
       role: role.toUpperCase(),
       telegramId: {
@@ -56,4 +63,10 @@ async function getUsersFromDb(role) {
       telegramId: true,
     },
   });
+
+  if (!result.length) {
+    console.warn(`⚠️ Пользователи с ролью ${role} и telegramId не найдены`);
+  }
+
+  return result;
 }
