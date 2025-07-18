@@ -18,7 +18,8 @@ export default function ScheduleHeader({
 
   return (
     <Group position="center" spacing="xs" mb="md">
-      <CustomModalDatePicker date={date} setDate={setDate} />
+      {/* Преобразуем Date → Dayjs, чтобы не ломался формат */}
+      <CustomModalDatePicker date={date} setDate={(d) => setDate(dayjs(d))} />
     </Group>
   );
 }

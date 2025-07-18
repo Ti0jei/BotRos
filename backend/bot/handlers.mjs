@@ -5,15 +5,12 @@ import { clearSession } from './context.mjs';
 import { isRegistered } from './middleware.mjs';
 import fetch from 'node-fetch';
 
-const newsContexts = new Map(); // Для хранения состояния рассылки
-
 export async function showMainMenu(ctx) {
   const telegramId = ctx.from?.id;
   const name = ctx.from?.first_name || 'Гость';
 
   aiContexts.delete(telegramId);
   clearSession(telegramId);
-  newsContexts.delete(telegramId);
 
   const role = ctx.state?.user?.role;
 
@@ -42,55 +39,6 @@ export function setupHandlers(bot) {
       await ctx.deleteMessage(ctx.message.message_id);
     } catch (_) {}
     await showMainMenu(ctx);
-  });
-
-  // Новостная рассылка — начало
-  bot.action('notify_start', isRegistered, async (ctx) => {
-    const role = ctx.state?.user?.role;
-    const telegramId = ctx.from?.id;
-
-    if (role !== 'ADMIN') return ctx.answerCbQuery('⛔ Нет доступа');
-
-    newsContexts.set(telegramId, true);
-    await ctx.answerCbQuery();
-    await ctx.reply('📝 Введите текст новости, которую хотите разослать всем пользователям.');
-  });
-
-  // Обработка текста новости
-  bot.on('text', isRegistered, async (ctx) => {
-    const telegramId = ctx.from?.id;
-    const token = ctx.state?.token;
-
-    // Если админ вводит новость
-    if (newsContexts.has(telegramId)) {
-      const newsText = ctx.message.text;
-
-      try {
-        const res = await fetch(`${API_URL}/api/admin/notify`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: newsText }),
-        });
-
-        if (!res.ok) throw new Error('Ошибка отправки');
-
-        await ctx.reply('📬 Рассылка отправлена ✅');
-      } catch (err) {
-        console.error('Ошибка рассылки:', err.message);
-        await ctx.reply('❌ Не удалось отправить рассылку');
-      } finally {
-        newsContexts.delete(telegramId);
-      }
-      return;
-    }
-
-    // Сообщение вне AI и вне новостной рассылки
-    if (!aiContexts.has(telegramId)) {
-      await ctx.reply('📋 Меню доступно снизу ⬇️', Markup.keyboard([['📋 Меню']]).resize());
-    }
   });
 
   // Кнопка "✅ Буду"

@@ -21,6 +21,31 @@ export default function TrainingCard({
   };
 
   const handleDeleteWithConfirm = () => {
+    if (training.isSinglePaid) {
+      if (training.wasCounted) {
+        modals.open({
+          title: "Удаление невозможно",
+          children: (
+            <Text size="sm">
+              Эта разовая тренировка уже учтена в оплате и не может быть отменена.
+            </Text>
+          ),
+        });
+        return;
+      }
+
+      modals.openConfirmModal({
+        title: "Подтверждение",
+        children: (
+          <Text size="sm">Удалить эту разовую тренировку?</Text>
+        ),
+        labels: { confirm: "Да, удалить", cancel: "Нет" },
+        confirmProps: { color: "red" },
+        onConfirm: onDelete,
+      });
+      return;
+    }
+
     if (training.blockId) {
       modals.open({
         title: "Удаление невозможно",
@@ -35,9 +60,7 @@ export default function TrainingCard({
 
     modals.openConfirmModal({
       title: "Подтверждение",
-      children: (
-        <Text size="sm">Вы точно хотите отменить эту тренировку?</Text>
-      ),
+      children: <Text size="sm">Вы точно хотите отменить эту тренировку?</Text>,
       labels: { confirm: "Да, отменить", cancel: "Нет" },
       confirmProps: { color: "red" },
       onConfirm: onDelete,
