@@ -219,10 +219,8 @@ export default function AssignModal({
                 label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
               }))}
               value={selectedUser}
-              onChange={(val) => {
-                blurActiveElement();
-                setSelectedUser(val || null);
-              }}
+              onChange={(val) => setSelectedUser(val || null)}
+              onBlur={blurActiveElement}
               radius="md"
               size="md"
               withinPortal
