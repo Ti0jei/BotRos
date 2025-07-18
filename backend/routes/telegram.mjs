@@ -1,6 +1,8 @@
+// backend/routes/telegram.mjs
+
 import express from 'express';
 import { bot } from '../bot/index.mjs';
-import { prisma } from '../lib/prisma.mjs'; // или ../utils/db.mjs — смотри по проекту
+import prisma from '../prisma/index.mjs'; // ✅ правильный путь к PrismaClient
 
 const router = express.Router();
 
@@ -25,25 +27,30 @@ router.post('/notify', async (req, res) => {
         await bot.telegram.sendMessage(user.telegramId, `📰 ${message}`);
         success++;
       } catch (err) {
-        console.error(`Не удалось отправить ${user.telegramId}:`, err.message);
+        console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
       }
     }
 
     return res.json({ success, total: users.length });
   } catch (err) {
-    console.error('Ошибка при рассылке:', err);
+    console.error('❌ Ошибка при рассылке:', err);
     return res.status(500).json({ error: 'Ошибка при рассылке' });
   }
 });
 
 export default router;
 
-// ✅ Реальный запрос из БД
+/**
+ * Получение пользователей по роли из БД
+ * @param {string} role 'USER' или 'ADMIN'
+ */
 async function getUsersFromDb(role) {
   return await prisma.user.findMany({
     where: {
       role: role.toUpperCase(),
-      telegramId: { not: null },
+      telegramId: {
+        not: null,
+      },
     },
     select: {
       telegramId: true,
