@@ -1,6 +1,6 @@
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
-import { notifyBroadcast } from './notifications.mjs';
+import { notifyBroadcast } from '../utils/broadcast.mjs'; // ✅ правильный импорт из /utils
 
 const notifyStates = new Map();
 
@@ -82,7 +82,7 @@ export function setupNewsNotification(bot) {
     await ctx.reply('🚀 Рассылаю...');
 
     try {
-      const result = await notifyBroadcast(state.text, state.role); // передаём роль
+      const result = await notifyBroadcast(state.text, state.role); // ✅ вызываем твою функцию
       notifyStates.delete(telegramId);
       await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} (${state.role}).`);
     } catch (err) {
