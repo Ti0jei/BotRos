@@ -1,6 +1,5 @@
-// ...весь импорт остаётся без изменений
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import {
   IconEdit,
   IconArrowLeft,
@@ -38,6 +37,10 @@ interface PaymentBlock {
   paymentMethod?: "cash" | "online";
 }
 
+// ✅ безопасное форматирование
+const safeFormat = (d: unknown, f: string) =>
+  dayjs(d).isValid() ? dayjs(d).format(f) : "--.--.----";
+
 export default function ClientPayments({ client, onBack }: { client: Client; onBack: () => void }) {
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -47,7 +50,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
 
-  const [date, setDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
+  const [date, setDate] = useState<Dayjs>(dayjs()); // ✅ Dayjs, не string
   const [paidTrainings, setPaidTrainings] = useState<number>(8);
   const [pricePerTraining, setPricePerTraining] = useState<number>(600);
   const [pricePerBlock, setPricePerBlock] = useState<number>(4800);
@@ -78,7 +81,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
     if (res.ok) {
       const data = await res.json();
       setBlock(data);
-      setDate(dayjs(data.paidAt || data.date).format("YYYY-MM-DD"));
+      setDate(dayjs(data.paidAt || data.date));
       setPaidTrainings(data.paidTrainings);
       setPricePerTraining(data.pricePerTraining);
       setPricePerBlock(data.pricePerBlock || data.pricePerTraining * data.paidTrainings);
@@ -99,7 +102,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       headers,
       body: JSON.stringify({
         userId: client.id,
-        paidAt: dayjs(date).format("YYYY-MM-DD"), // ✅ fix
+        paidAt: safeFormat(date, "YYYY-MM-DD"),
         paidTrainings,
         pricePerTraining,
         pricePerBlock,
@@ -122,7 +125,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
       method: "PATCH",
       headers,
       body: JSON.stringify({
-        paidAt: dayjs(date).format("YYYY-MM-DD"), // ✅ fix
+        paidAt: safeFormat(date, "YYYY-MM-DD"),
         paidTrainings,
         pricePerTraining,
         pricePerBlock,
@@ -181,7 +184,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                     </Text>
                     <CustomModalDatePicker
                       date={date}
-                      setDate={(d) => setDate(d)}
+                      setDate={(d) => setDate(dayjs(d))}
                     />
                   </Stack>
 
@@ -208,12 +211,16 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 </Stack>
               ) : (
                 <Stack spacing={4}>
-                  <Text size="sm">Дата оплаты: {dayjs(block.paidAt || block.date).format("DD.MM.YYYY")}</Text>
+                  <Text size="sm">
+                    Дата оплаты: {safeFormat(block.paidAt || block.date, "DD.MM.YYYY")}
+                  </Text>
                   <Text size="sm">Цена за тренировку: {block.pricePerTraining}₽</Text>
                   <Text size="sm">Всего: {block.paidTrainings}</Text>
                   <Text size="sm">Использовано: {block.used}</Text>
                   <Text size="sm">Осталось: {block.paidTrainings - block.used}</Text>
-                  <Text size="sm">Способ оплаты: {block.paymentMethod === "cash" ? "Наличные" : "Онлайн"}</Text>
+                  <Text size="sm">
+                    Способ оплаты: {block.paymentMethod === "cash" ? "Наличные" : "Онлайн"}
+                  </Text>
                   <Text size="sm" fw={500}>Сумма: {block.pricePerBlock || pricePerBlock}₽</Text>
 
                   <ActionButton variant="outline" onClick={() => setEditMode(true)} leftIcon={<IconEdit size={16} />} fullWidth>
@@ -234,7 +241,7 @@ export default function ClientPayments({ client, onBack }: { client: Client; onB
                 </Text>
                 <CustomModalDatePicker
                   date={date}
-                  setDate={(d) => setDate(d)}
+                  setDate={(d) => setDate(dayjs(d))}
                 />
               </Stack>
 
