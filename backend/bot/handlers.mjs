@@ -9,7 +9,7 @@ export async function showMainMenu(ctx) {
   const name = ctx.from?.first_name || 'Гость';
 
   aiContexts.delete(telegramId);
-  delete ctx.session; // 🔥 удалили вручную session, больше не нужно context.mjs
+  ctx.session = {};
 
   const role = ctx.state?.user?.role;
 
