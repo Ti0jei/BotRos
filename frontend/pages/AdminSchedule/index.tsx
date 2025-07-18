@@ -28,7 +28,9 @@ dayjs.extend(isToday);
 export default function AdminSchedule({ onBack }: { onBack: () => void }) {
   const [date, setDate] = useState<Dayjs>(() => {
     const stored = localStorage.getItem("calendarSelectedDate");
-    return stored ? dayjs(stored) : dayjs().startOf("day");
+    return stored && dayjs(stored).isValid()
+      ? dayjs(stored).startOf("day")
+      : dayjs().startOf("day");
   });
 
   const [clients, setClients] = useState<User[]>([]);
