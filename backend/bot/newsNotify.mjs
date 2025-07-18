@@ -1,20 +1,18 @@
-// bot/newsNotification.mjs
-
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
 import { notifyBroadcast } from '../utils/broadcast.mjs';
 
 /**
- * Настройка механизма новостной рассылки для админов
+ * Настройка механизма новостной рассылки
  * @param {Telegraf} bot
  */
 export function setupNewsNotification(bot) {
-  // 🟢 Шаг 1: Запуск рассылки
+  // 🟢 Шаг 1: Старт рассылки
   bot.action('notify_start', isRegistered, async (ctx) => {
-    ctx.session ??= {};
+    ctx.session = ctx.session || {};
     ctx.session.notifyState = { step: 'choose_role' };
 
-    await ctx.answerCbQuery('✅');
+    await ctx.answerCbQuery();
     await ctx.reply(
       'Кому отправить рассылку?',
       Markup.inlineKeyboard([
@@ -24,7 +22,7 @@ export function setupNewsNotification(bot) {
     );
   });
 
-  // 🟡 Шаг 2: Выбор — пользователи
+  // 🟡 Шаг 2 — выбор получателей
   bot.action('notify_to_users', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
     if (!state || state.step !== 'choose_role') return;
@@ -36,7 +34,6 @@ export function setupNewsNotification(bot) {
     await ctx.reply('📝 Введите текст новости для пользователей:');
   });
 
-  // 🟡 Шаг 2: Выбор — админы
   bot.action('notify_to_admins', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
     if (!state || state.step !== 'choose_role') return;
@@ -48,22 +45,22 @@ export function setupNewsNotification(bot) {
     await ctx.reply('📝 Введите текст новости для администраторов:');
   });
 
-  // 📝 Шаг 3: Ввод текста рассылки
+  // 📝 Шаг 3 — ввод текста
   bot.on('text', isRegistered, async (ctx, next) => {
     const state = ctx.session?.notifyState;
+
     if (!state || state.step !== 'awaiting_text') return next?.();
 
-    const message = ctx.message.text.trim();
-
-    if (message.length < 10) {
-      return ctx.reply('⚠️ Текст слишком короткий. Введите минимум 10 символов.');
+    const text = ctx.message.text.trim();
+    if (text.length < 10) {
+      return ctx.reply('⚠️ Текст слишком короткий. Минимум 10 символов.');
     }
 
-    state.text = message;
+    state.text = text;
     state.step = 'awaiting_confirm';
 
     await ctx.reply(
-      `📨 Вот что вы хотите отправить:\n\n${state.text}`,
+      `📨 Вот что вы хотите отправить:\n\n${text}`,
       Markup.inlineKeyboard([
         [Markup.button.callback('✅ Подтвердить', 'notify_confirm')],
         [Markup.button.callback('❌ Отменить', 'notify_cancel')],
@@ -71,33 +68,31 @@ export function setupNewsNotification(bot) {
     );
   });
 
-  // ✅ Шаг 4: Подтверждение рассылки
+  // ✅ Подтверждение
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
-
     if (!state?.text || !state?.role) {
-      return ctx.reply('⚠️ Нет данных для рассылки. Начните сначала с /start.');
+      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /start.');
     }
 
     await ctx.answerCbQuery('🚀');
-    await ctx.reply('🚀 Рассылаю...');
+    await ctx.reply('🚀 Отправка сообщений...');
 
     try {
       const result = await notifyBroadcast(state.text, state.role);
-      await ctx.reply(`✅ Готово! Уведомления отправлены ${result.success}/${result.total} (${state.role}).`);
+      await ctx.reply(`✅ Готово! Отправлено ${result.success}/${result.total} (${state.role})`);
     } catch (err) {
       console.error('❌ Ошибка при рассылке:', err);
-      await ctx.reply('❌ Произошла ошибка при рассылке. Попробуйте позже.');
+      await ctx.reply('❌ Ошибка при рассылке. Попробуйте позже.');
     }
 
-    // ❗ Важно: НЕ delete! — session это прокси
+    // Очистка состояния
     ctx.session.notifyState = undefined;
   });
 
-  // ❌ Отмена рассылки
+  // ❌ Отмена
   bot.action('notify_cancel', isRegistered, async (ctx) => {
     ctx.session.notifyState = undefined;
-
     await ctx.answerCbQuery('❌');
     await ctx.reply('❌ Рассылка отменена.');
   });

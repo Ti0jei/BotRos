@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Telegraf, session } from 'telegraf';
+import { Telegraf } from 'telegraf';
+import LocalSession from 'telegraf-session-local';
 import { OpenAI } from 'openai';
 
 export const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -16,29 +17,33 @@ if (!TOKEN || !API_URL || !WEB_APP_URL || !OPENAI_API_KEY) {
 
 export const bot = new Telegraf(TOKEN);
 
-// 🧠 ВАЖНО: session() — ДО любых setup-хендлеров
-bot.use(session());
+// ✅ Подключаем устойчивые сессии (сохраняются в файл session.json)
+const localSession = new LocalSession({
+  database: 'session.json',
+  storage: LocalSession.storageFileAsync,
+});
+bot.use(localSession.middleware());
 
 export const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-// 📦 Модули подключаем только после session
+// 📦 Подключаем модули
 import { setupCommands } from './commands.mjs';
 import { setupAiFeatures } from './ai.mjs';
 import { setupNewsNotification } from './newsNotify.mjs';
 import { setupHandlers } from './handlers.mjs';
 
-// Подключение функционала
+// ⚙️ Инициализация
 setupCommands(bot);
 setupAiFeatures(bot);
 setupNewsNotification(bot);
 setupHandlers(bot);
 
-// 🛡️ Глобальный catcher
+// 🛡️ Отлов ошибок
 bot.catch((err, ctx) => {
   console.error('❌ Unhandled error for update', ctx.update, err);
 });
 
-// 🚀 Запуск
+// 🚀 Запуск бота
 bot.launch().then(() => {
   console.log('🤖 Бот успешно запущен');
 });
