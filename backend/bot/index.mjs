@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Telegraf } from 'telegraf';
+import { Telegraf, session } from 'telegraf'; // ← добавлено session
 import { OpenAI } from 'openai';
 
 import { setupCommands } from './commands.mjs';           // 📋 Главное меню и команды
@@ -20,6 +20,8 @@ if (!TOKEN || !API_URL || !WEB_APP_URL || !OPENAI_API_KEY) {
 }
 
 export const bot = new Telegraf(TOKEN);
+bot.use(session()); // ← ОБЯЗАТЕЛЬНО: включаем поддержку ctx.session
+
 export const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 // Основные фичи
