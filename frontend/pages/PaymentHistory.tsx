@@ -35,7 +35,7 @@ interface TrainingRecord {
   date: string;
   hour: number;
   isSinglePaid: boolean;
-  paymentBlockId?: string;
+  blockId?: string; // 🟢 исправлено здесь
 }
 
 export default function PaymentHistory({ userId, onBack }: Props) {
@@ -71,8 +71,8 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
       if (trainingsRes.ok) {
         const all: TrainingRecord[] = await trainingsRes.json();
-        setBlockTrainings(all.filter((t) => t.paymentBlockId));
-        setSingleTrainings(all.filter((t) => !t.paymentBlockId));
+        setBlockTrainings(all.filter((t) => t.blockId)); // 🟢 исправлено здесь
+        setSingleTrainings(all.filter((t) => !t.blockId)); // 🟢 исправлено здесь
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
@@ -90,8 +90,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}` },
         body: JSON.stringify({ active: false }),
       });
       await loadData();
@@ -148,7 +147,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
             {blocks.map((block) => {
               const usedTrainings = blockTrainings.filter(
-                (t) => t.paymentBlockId === block.id
+                (t) => t.blockId === block.id // 🟢 исправлено здесь
               );
               const expanded = expandedBlocks[block.id] ?? false;
 
