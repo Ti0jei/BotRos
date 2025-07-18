@@ -47,8 +47,10 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     where: { userId: training.userId, active: true },
   });
 
+  // ✅ Защита от пустого paidAt
   if (
     !activeBlock ||
+    !activeBlock.paidAt ||
     trainingDate.isBefore(dayjs(activeBlock.paidAt).startOf('day'))
   ) {
     return res.status(400).json({ error: 'Нет подходящего активного блока для списания' });
