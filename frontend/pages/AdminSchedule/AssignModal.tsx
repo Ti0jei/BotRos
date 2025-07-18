@@ -27,6 +27,7 @@ interface AssignModalProps {
   onClose: () => void;
   onAssign: (
     templateId: string | null,
+    date: string,
     singlePrice?: number | null,
     singlePaymentMethod?: string | null
   ) => void;
@@ -335,7 +336,14 @@ export default function AssignModal({
             radius="xl"
             color="dark"
             size="md"
-            onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
+            onClick={() =>
+              onAssign(
+                selectedTemplateId,
+                date.format("YYYY-MM-DD"),
+                singlePrice,
+                singlePaymentMethod
+              )
+            }
             style={{ fontWeight: 600 }}
             disabled={!selectedUser || selectedHour === null}
           >
