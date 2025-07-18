@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
-import { API_BASE_URL } from '../bot/index.mjs';
+
+const API_URL = process.env.API_BASE_URL;
 
 /**
  * Отправка рассылки по роли
@@ -9,6 +10,8 @@ import { API_BASE_URL } from '../bot/index.mjs';
  */
 export async function notifyBroadcast(text, role = 'USER') {
   try {
+    console.log(`📡 notifyBroadcast → ${API_URL}/api/telegram/notify`);
+
     const res = await fetch(`${API_URL}/api/telegram/notify`, {
       method: 'POST',
       headers: {
