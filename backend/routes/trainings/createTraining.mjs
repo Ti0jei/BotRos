@@ -28,7 +28,7 @@ export default async function createTraining(req, res) {
     return res.status(400).json({ error: 'Неверный формат часа' });
   }
 
-  const trainingDate = new Date(`${date}T00:00:00`);
+  const trainingDate = new Date(`${date}T00:00:00+03:00`);
   if (isNaN(trainingDate.getTime())) {
     return res.status(400).json({ error: 'Неверная дата' });
   }

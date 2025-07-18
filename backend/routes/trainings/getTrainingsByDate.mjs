@@ -9,8 +9,16 @@ export default [
     const { date } = req.params;
 
     try {
+      const start = new Date(`${date}T00:00:00.000Z`);
+      const end = new Date(`${date}T23:59:59.999Z`);
+
       const trainings = await prisma.training.findMany({
-        where: { date: new Date(`${date}T00:00:00`) },
+        where: {
+          date: {
+            gte: start,
+            lte: end,
+          },
+        },
         include: {
           user: {
             select: {
