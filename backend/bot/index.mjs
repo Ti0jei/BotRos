@@ -1,13 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Telegraf, session } from 'telegraf'; // ← добавлено session
+import { Telegraf, session } from 'telegraf';
 import { OpenAI } from 'openai';
-
-import { setupCommands } from './commands.mjs';           // 📋 Главное меню и команды
-import { setupAiFeatures } from './ai.mjs';                // 🤖 ИИ-питание
-import { setupNewsNotification } from './newsNotify.mjs';  // 📰 Новостная рассылка
-import { setupHandlers } from './handlers.mjs';            // ✅ Обработчики кнопок (attend / decline)
 
 export const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const API_URL = process.env.API_BASE_URL;
@@ -20,26 +15,33 @@ if (!TOKEN || !API_URL || !WEB_APP_URL || !OPENAI_API_KEY) {
 }
 
 export const bot = new Telegraf(TOKEN);
-bot.use(session()); // ← ОБЯЗАТЕЛЬНО: включаем поддержку ctx.session
+
+// 🧠 ВАЖНО: session() — ДО любых setup-хендлеров
+bot.use(session());
 
 export const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-// Основные фичи
-setupCommands(bot);              // 📋 Главное меню и команды
-setupAiFeatures(bot);           // 🤖 ИИ-питание
-setupNewsNotification(bot);     // 📰 Новостная рассылка
-setupHandlers(bot);             // ✅ Важно: подключаем обработку inline-кнопок
+// 📦 Модули подключаем только после session
+import { setupCommands } from './commands.mjs';
+import { setupAiFeatures } from './ai.mjs';
+import { setupNewsNotification } from './newsNotify.mjs';
+import { setupHandlers } from './handlers.mjs';
 
-// Ловим необработанные ошибки
+// Подключение функционала
+setupCommands(bot);
+setupAiFeatures(bot);
+setupNewsNotification(bot);
+setupHandlers(bot);
+
+// 🛡️ Глобальный catcher
 bot.catch((err, ctx) => {
   console.error('❌ Unhandled error for update', ctx.update, err);
 });
 
-// Выход по сигналам
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-// Старт
+// 🚀 Запуск
 bot.launch().then(() => {
   console.log('🤖 Бот успешно запущен');
 });
+
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
