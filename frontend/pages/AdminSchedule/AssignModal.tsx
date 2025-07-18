@@ -1,4 +1,58 @@
-// ... импорты остаются как есть ...
+import { useEffect, useState } from "react";
+import {
+  Modal,
+  Stack,
+  Text,
+  Select,
+  Checkbox,
+  Button,
+  Card,
+  Divider,
+  Title,
+  Group,
+  Badge,
+  NumberInput,
+  Box,
+  ScrollArea,
+} from "@mantine/core";
+import { IconClock, IconX } from "@tabler/icons-react";
+import dayjs, { Dayjs } from "dayjs";
+import "dayjs/locale/ru";
+
+import { PaymentBlock, User } from "./types";
+import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
+
+interface AssignModalProps {
+  opened: boolean;
+  onClose: () => void;
+  onAssign: (
+    templateId: string | null,
+    singlePrice?: number | null,
+    singlePaymentMethod?: string | null
+  ) => void;
+  clients: User[];
+  selectedUser: string | null;
+  setSelectedUser: (id: string | null) => void;
+  isSinglePaid: boolean;
+  setIsSinglePaid: (v: boolean) => void;
+  selectedHour: number | null;
+  setSelectedHour: (hour: number) => void;
+  blocks: Record<string, PaymentBlock | null>;
+}
+
+interface AssignedClient {
+  user: {
+    id: string;
+    name: string;
+    lastName?: string;
+  };
+  hour: number;
+}
+
+interface WorkoutTemplate {
+  id: string;
+  title: string;
+}
 
 export default function AssignModal({
   opened,
@@ -13,11 +67,7 @@ export default function AssignModal({
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
-  const [date, setDate] = useState<Dayjs>(() => {
-    const saved = localStorage.getItem("assignDate");
-    return saved ? dayjs(saved) : dayjs();
-  });
-
+  const [date, setDate] = useState<Dayjs>(dayjs());
   const [showWarning, setShowWarning] = useState(false);
   const [assignedClients, setAssignedClients] = useState<AssignedClient[]>([]);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
@@ -41,13 +91,9 @@ export default function AssignModal({
     if (!selectedUser && opened) {
       const savedUser = localStorage.getItem("assignUserId");
       const savedPaid = localStorage.getItem("assignSinglePaid") === "true";
-      const savedDate = localStorage.getItem("assignDate");
       if (savedUser) {
         setSelectedUser(savedUser);
         setIsSinglePaid(savedPaid);
-      }
-      if (savedDate) {
-        setDate(dayjs(savedDate));
       }
     }
   }, [opened]);
@@ -110,23 +156,7 @@ export default function AssignModal({
   const handleClose = () => {
     localStorage.removeItem("assignUserId");
     localStorage.removeItem("assignSinglePaid");
-    localStorage.removeItem("assignDate");
     onClose();
-  };
-
-  const handleAssign = () => {
-    if (!selectedUser || selectedHour === null) return;
-
-    localStorage.setItem("assignUserId", selectedUser);
-    localStorage.setItem("assignSinglePaid", isSinglePaid.toString());
-    localStorage.setItem("assignDate", date.toISOString());
-
-    onAssign(
-      selectedTemplateId,
-      date.format("YYYY-MM-DD"),
-      singlePrice,
-      singlePaymentMethod
-    );
   };
 
   return (
@@ -305,7 +335,7 @@ export default function AssignModal({
             radius="xl"
             color="dark"
             size="md"
-            onClick={handleAssign}
+            onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
             style={{ fontWeight: 600 }}
             disabled={!selectedUser || selectedHour === null}
           >
