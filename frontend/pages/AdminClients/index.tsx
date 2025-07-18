@@ -237,6 +237,10 @@ export default function AdminClientsPage({
                   const block = blockMap[client.id];
                   const isSinglePaid = !block || block.paidTrainings <= block.used;
                   localStorage.setItem("assignSinglePaid", String(isSinglePaid));
+
+                  // ✅ fix — сохраняем дату
+                  localStorage.setItem("assignDate", new Date().toISOString());
+
                   setView("assign-training");
                 }}
                 onToggleExpand={() => toggleExpanded(client.id)}
