@@ -1,3 +1,5 @@
+// frontend/pages/FinishedBlocksPage.tsx
+
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -11,9 +13,9 @@ import {
   Title,
   Loader,
   Box,
-  Button,
 } from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import BackToProfileButton from '@/components/BackToProfileButton';
 
 interface PaymentBlock {
   id: string;
@@ -31,7 +33,13 @@ interface TrainingRecord {
   blockId?: string;
 }
 
-export default function FinishedBlocksPage() {
+export default function FinishedBlocksPage({
+  userId,
+  onBack,
+}: {
+  userId: string;
+  onBack: () => void;
+}) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
   const [blockTrainings, setBlockTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,10 +56,10 @@ export default function FinishedBlocksPage() {
     setLoading(true);
     try {
       const [blocksRes, trainingsRes] = await Promise.all([
-        fetch(`${API}/api/payment-blocks`, {
+        fetch(`${API}/api/payment-blocks?userId=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${API}/api/trainings`, {
+        fetch(`${API}/api/trainings?userId=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -107,7 +115,7 @@ export default function FinishedBlocksPage() {
               const expanded = expandedBlocks[block.id] ?? false;
 
               return (
-                <Paper key={block.id} style={cardStyle}>
+                <Paper key={block.id} style={cardStyle} withBorder>
                   <Group position="apart" mb="xs">
                     <Text fw={600} size="sm">
                       Оплата от {new Date(block.paidAt).toLocaleDateString()}
@@ -151,6 +159,8 @@ export default function FinishedBlocksPage() {
           </Stack>
         )}
       </Container>
+
+      <BackToProfileButton onBack={onBack} fixed />
     </Box>
   );
 }

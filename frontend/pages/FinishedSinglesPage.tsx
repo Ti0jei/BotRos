@@ -116,7 +116,7 @@ export default function FinishedSinglesPage({ onBack }: { onBack: () => void }) 
         )}
       </Container>
 
-      <BackToProfileButton onBack={onBack} fixed />
+      <BackToProfileButton onClick={onBack} label="Назад к клиентам" fixed />
     </Box>
   );
 }
