@@ -265,8 +265,8 @@ function App() {
         />
       )}
 
-      {view === 'finished-blocks' && <FinishedBlocksPageWrapper />}
-      {view === 'finished-singles' && <FinishedSinglesPageWrapper />}
+      {view === 'finished-blocks' && <FinishedBlocksPageWrapper onBack={() => setView('clients')} />}
+      {view === 'finished-singles' && <FinishedSinglesPageWrapper onBack={() => setView('clients')} />}
     </Box>
   );
 }

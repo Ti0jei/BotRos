@@ -1,5 +1,3 @@
-// frontend/pages/FinishedSinglesPage.tsx
-
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -14,6 +12,7 @@ import {
   Loader,
 } from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import BackToProfileButton from '@/components/BackToProfileButton';
 
 interface TrainingRecord {
   id: string;
@@ -23,7 +22,7 @@ interface TrainingRecord {
   attended?: boolean;
 }
 
-export default function FinishedSinglesPage() {
+export default function FinishedSinglesPage({ onBack }: { onBack: () => void }) {
   const [trainings, setTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -35,9 +34,9 @@ export default function FinishedSinglesPage() {
     fetch(`${API}/api/trainings`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.ok ? res.json() : [])
+      .then((res) => (res.ok ? res.json() : []))
       .then((data: TrainingRecord[]) => {
-        const singles = data.filter(t => t.isSinglePaid && t.attended);
+        const singles = data.filter((t) => t.isSinglePaid && t.attended);
         setTrainings(singles);
       })
       .finally(() => setLoading(false));
@@ -84,10 +83,11 @@ export default function FinishedSinglesPage() {
 
               return (
                 <Paper key={monthKey} shadow="xs" radius="md" p="md" withBorder>
-                  <Group position="apart" mb="sm">
+                  <Group position="apart" mb="sm" noWrap>
                     <Text fw={600}>{formatMonth(monthKey)}</Text>
                     <ActionIcon
-                      variant="light"
+                      variant="default"
+                      color="dark"
                       radius="xl"
                       onClick={() =>
                         setExpanded((prev) => ({
@@ -115,6 +115,8 @@ export default function FinishedSinglesPage() {
           </Stack>
         )}
       </Container>
+
+      <BackToProfileButton onBack={onBack} fixed />
     </Box>
   );
 }
