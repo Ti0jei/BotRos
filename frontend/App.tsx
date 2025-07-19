@@ -17,8 +17,8 @@ import AssignTrainingPage from './pages/AssignTrainingPage';
 import WorkoutTemplatesPage from './admin/workouts';
 import CreateWorkoutTemplate from './admin/create';
 import EditWorkoutTemplate from './admin/id';
-import FinishedBlocksPageWrapper from './pages/FinishedBlocksPageWrapper';
-import FinishedSinglesPageWrapper from './pages/FinishedSinglesPageWrapper';
+import FinishedBlocksPageWrapper from './pages/FinishedBlocksPage';
+import FinishedSinglesPageWrapper from './pages/FinishedSinglesPage';
 
 import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
