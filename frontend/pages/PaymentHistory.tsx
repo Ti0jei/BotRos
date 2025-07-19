@@ -11,11 +11,11 @@ import {
   Loader,
   Divider,
   Box,
-  Collapse,
-  ActionIcon,
   Drawer,
+  ActionIcon,
 } from '@mantine/core';
-import { IconChevronDown, IconChevronUp, IconMenu2 } from '@tabler/icons-react';
+import { IconMenu2 } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 
 interface Props {
   userId: string;
@@ -43,10 +43,8 @@ interface TrainingRecord {
 
 export default function PaymentHistory({ userId, onBack, setView }: Props) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
-  const [blockTrainings, setBlockTrainings] = useState<TrainingRecord[]>([]);
-  const [singleTrainings, setSingleTrainings] = useState<TrainingRecord[]>([]);
+  const [trainings, setTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
   const [drawerOpened, setDrawerOpened] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
@@ -75,8 +73,7 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
       if (trainingsRes.ok) {
         const all: TrainingRecord[] = await trainingsRes.json();
-        setBlockTrainings(all.filter((t) => t.blockId));
-        setSingleTrainings(all.filter((t) => t.isSinglePaid && t.attended === true));
+        setTrainings(all);
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
@@ -85,31 +82,15 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
     }
   };
 
-  const markInactive = async (blockId: string) => {
-    const confirmed = window.confirm('Завершить этот блок?');
-    if (!confirmed) return;
+  const today = dayjs();
+  const activeBlock = blocks.find((b) => b.active);
 
-    try {
-      await fetch(`${API}/api/payment-blocks/${blockId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ active: false }),
-      });
-      await loadData();
-    } catch (e) {
-      console.error('Ошибка завершения блока:', e);
-    }
-  };
+  const pastTrainings = trainings
+    .filter((t) => t.attended && dayjs(t.date).isBefore(today))
+    .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+    .slice(0, 3);
 
-  const toggleExpand = (blockId: string) => {
-    setExpandedBlocks((prev) => ({
-      ...prev,
-      [blockId]: !prev[blockId],
-    }));
-  };
+  const futureTrainings = trainings.filter((t) => dayjs(t.date).isAfter(today));
 
   const cardStyle = {
     backgroundColor: '#fff',
@@ -135,25 +116,22 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
   return (
     <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80, position: 'relative' }}>
-      {!drawerOpened && (
-        <ActionIcon
-          size="lg"
-          onClick={() => setDrawerOpened(true)}
-          title="Меню"
-          style={{
-            position: 'fixed',
-            top: 12,
-            right: 12,
-            background: 'transparent',
-            color: '#1a1a1a',
-            zIndex: 9999,
-            border: '1px solid #1a1a1a',
-            borderRadius: 12,
-          }}
-        >
-          <IconMenu2 size={20} />
-        </ActionIcon>
-      )}
+      <ActionIcon
+        size="lg"
+        onClick={() => setDrawerOpened(true)}
+        title="Меню"
+        style={{
+          position: 'fixed',
+          top: 12,
+          right: 12,
+          background: 'transparent',
+          color: '#1a1a1a',
+          zIndex: 9999,
+        }}
+        variant="subtle"
+      >
+        <IconMenu2 size={20} />
+      </ActionIcon>
 
       <Container size="xs" py="md">
         <Group position="apart" mb="md">
@@ -166,79 +144,41 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
           <Loader />
         ) : (
           <Stack spacing="md">
-            {blocks.length === 0 && singleTrainings.length === 0 && (
-              <Text size="sm" c="dimmed">
-                Пока нет данных об оплатах
-              </Text>
+            {activeBlock && (
+              <Paper style={cardStyle}>
+                <Group position="apart" mb="xs">
+                  <Text fw={600} size="sm">
+                    Оплата от {new Date(activeBlock.paidAt).toLocaleDateString()}
+                  </Text>
+                  <Badge color="green">АКТИВЕН</Badge>
+                </Group>
+                <Text size="sm" c="dimmed">
+                  {activeBlock.paidTrainings} тренировок • {activeBlock.used} использовано • {activeBlock.pricePerTraining} ₽
+                </Text>
+              </Paper>
             )}
 
-            {blocks.map((block) => {
-              const usedTrainings = blockTrainings.filter((t) => t.blockId === block.id);
-              const expanded = expandedBlocks[block.id] ?? false;
-
-              return (
-                <Paper key={block.id} style={cardStyle}>
-                  <Group position="apart" mb="xs">
-                    <Text fw={600} size="sm">
-                      Оплата от {new Date(block.paidAt).toLocaleDateString()}
-                    </Text>
-                    <Badge color={block.active ? 'green' : 'gray'}>
-                      {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
-                    </Badge>
-                  </Group>
-
-                  <Group position="apart" align="center">
-                    <Text size="sm" c="dimmed">
-                      {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
-                    </Text>
-
-                    <ActionIcon
-                      variant="light"
-                      color="dark"
-                      radius="xl"
-                      onClick={() => toggleExpand(block.id)}
-                    >
-                      {expanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
-                    </ActionIcon>
-                  </Group>
-
-                  <Collapse in={expanded}>
-                    <Stack spacing={4} mt="xs">
-                      {usedTrainings.length > 0 ? (
-                        usedTrainings.map((t) => (
-                          <Text key={t.id} size="xs" c="dimmed">
-                            {new Date(t.date).toLocaleDateString()} — {t.hour}:00
-                          </Text>
-                        ))
-                      ) : (
-                        <Text size="xs" c="dimmed">
-                          Пока нет посещений
-                        </Text>
-                      )}
-                    </Stack>
-                  </Collapse>
-
-                  {block.active && (
-                    <Button
-                      size="xs"
-                      color="red"
-                      fullWidth
-                      mt="sm"
-                      onClick={() => markInactive(block.id)}
-                      radius="md"
-                    >
-                      Завершить блок
-                    </Button>
-                  )}
-                </Paper>
-              );
-            })}
-
-            {singleTrainings.length > 0 && (
+            {pastTrainings.length > 0 && (
               <>
-                <Divider label="Разовые тренировки" labelPosition="center" />
+                <Divider label="Последние тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {singleTrainings.map((t) => (
+                  {pastTrainings.map((t) => (
+                    <Paper key={t.id} style={cardStyle} p="sm">
+                      <Group position="apart">
+                        <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                        <Text size="sm" c="dimmed">{t.hour}:00</Text>
+                      </Group>
+                    </Paper>
+                  ))}
+                </Stack>
+              </>
+            )}
+
+            {futureTrainings.length > 0 && (
+              <>
+                <Divider label="Будущие тренировки" labelPosition="center" />
+                <Stack spacing="xs">
+                  {futureTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
