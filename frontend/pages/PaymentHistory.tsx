@@ -20,6 +20,7 @@ import { IconChevronDown, IconChevronUp, IconMenu2 } from '@tabler/icons-react';
 interface Props {
   userId: string;
   onBack: () => void;
+  setView: (v: string) => void;
 }
 
 interface PaymentBlock {
@@ -40,7 +41,7 @@ interface TrainingRecord {
   blockId?: string;
 }
 
-export default function PaymentHistory({ userId, onBack }: Props) {
+export default function PaymentHistory({ userId, onBack, setView }: Props) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
   const [blockTrainings, setBlockTrainings] = useState<TrainingRecord[]>([]);
   const [singleTrainings, setSingleTrainings] = useState<TrainingRecord[]>([]);
@@ -269,7 +270,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             styles={buttonStyle}
             onClick={() => {
               setDrawerOpened(false);
-              console.log('Завершённые абонементы');
+              setView('finished-blocks');
             }}
           >
             Завершённые абонементы
@@ -280,7 +281,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             styles={buttonStyle}
             onClick={() => {
               setDrawerOpened(false);
-              console.log('Завершённые разовые посещения');
+              setView('finished-singles');
             }}
           >
             Завершённые разовые посещения
