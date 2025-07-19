@@ -133,21 +133,31 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80, position: 'relative' }}>
+      {/* ☰ Бургер-кнопка */}
+      <ActionIcon
+        size="lg"
+        onClick={() => setDrawerOpened(true)}
+        title="Меню"
+        style={{
+          position: 'fixed',
+          top: 12,
+          right: 12,
+          background: 'transparent',
+          color: '#1a1a1a',
+          zIndex: 9999,
+          border: '1px solid #1a1a1a',
+          borderRadius: 12,
+        }}
+      >
+        <IconMenu2 size={20} />
+      </ActionIcon>
+
       <Container size="xs" py="md">
         <Group position="apart" mb="md">
           <Title order={3} c="#1a1a1a">
             История оплат
           </Title>
-          <ActionIcon
-            variant="light"
-            size="lg"
-            radius="md"
-            onClick={() => setDrawerOpened(true)}
-            style={{ border: '1px solid #1a1a1a', color: '#1a1a1a' }}
-          >
-            <IconMenu2 size={20} />
-          </ActionIcon>
         </Group>
 
         {loading ? (
