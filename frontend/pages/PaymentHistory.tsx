@@ -13,8 +13,9 @@ import {
   Box,
   Collapse,
   ActionIcon,
+  Drawer,
 } from '@mantine/core';
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { IconChevronDown, IconChevronUp, IconMenu2 } from '@tabler/icons-react';
 
 interface Props {
   userId: string;
@@ -45,6 +46,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   const [singleTrainings, setSingleTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
+  const [drawerOpened, setDrawerOpened] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
@@ -137,22 +139,9 @@ export default function PaymentHistory({ userId, onBack }: Props) {
           <Title order={3} c="#1a1a1a">
             История оплат
           </Title>
-          <Group spacing="xs">
-            <Button
-              size="xs"
-              onClick={() => console.log('Завершённые абонементы')}
-              styles={buttonStyle}
-            >
-              Завершённые абонементы
-            </Button>
-            <Button
-              size="xs"
-              onClick={() => console.log('Завершённые разовые посещения')}
-              styles={buttonStyle}
-            >
-              Завершённые разовые посещения
-            </Button>
-          </Group>
+          <ActionIcon variant="outline" onClick={() => setDrawerOpened(true)} size="lg" radius="xl">
+            <IconMenu2 size={20} />
+          </ActionIcon>
         </Group>
 
         {loading ? (
@@ -245,6 +234,38 @@ export default function PaymentHistory({ userId, onBack }: Props) {
           </Stack>
         )}
       </Container>
+
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => setDrawerOpened(false)}
+        title="Опции"
+        padding="md"
+        position="right"
+        size="xs"
+        overlayOpacity={0.55}
+        overlayBlur={3}
+      >
+        <Stack spacing="sm">
+          <Button
+            fullWidth
+            onClick={() => {
+              setDrawerOpened(false);
+              console.log('Завершённые абонементы');
+            }}
+          >
+            Завершённые абонементы
+          </Button>
+          <Button
+            fullWidth
+            onClick={() => {
+              setDrawerOpened(false);
+              console.log('Завершённые разовые посещения');
+            }}
+          >
+            Завершённые разовые посещения
+          </Button>
+        </Stack>
+      </Drawer>
 
       <Box
         style={{
