@@ -1,3 +1,5 @@
+// 💾 ФАЙЛ: AssignModal.tsx
+import { blurActiveElement } from "@/utils/blurActiveElement";
 import { useEffect, useState } from "react";
 import {
   Modal,
@@ -27,6 +29,7 @@ interface AssignModalProps {
   onClose: () => void;
   onAssign: (
     templateId: string | null,
+    date: string,
     singlePrice?: number | null,
     singlePaymentMethod?: string | null
   ) => void;
@@ -67,7 +70,10 @@ export default function AssignModal({
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
-  const [date, setDate] = useState<Dayjs>(dayjs());
+  const [date, setDate] = useState<Dayjs>(() => {
+    const savedDate = localStorage.getItem("assignDate");
+    return savedDate ? dayjs(savedDate) : dayjs();
+  });
   const [showWarning, setShowWarning] = useState(false);
   const [assignedClients, setAssignedClients] = useState<AssignedClient[]>([]);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
@@ -91,9 +97,15 @@ export default function AssignModal({
     if (!selectedUser && opened) {
       const savedUser = localStorage.getItem("assignUserId");
       const savedPaid = localStorage.getItem("assignSinglePaid") === "true";
+      const savedDate = localStorage.getItem("assignDate");
+
       if (savedUser) {
         setSelectedUser(savedUser);
         setIsSinglePaid(savedPaid);
+      }
+
+      if (savedDate) {
+        setDate(dayjs(savedDate));
       }
     }
   }, [opened]);
@@ -156,6 +168,7 @@ export default function AssignModal({
   const handleClose = () => {
     localStorage.removeItem("assignUserId");
     localStorage.removeItem("assignSinglePaid");
+    localStorage.removeItem("assignDate");
     onClose();
   };
 
@@ -199,18 +212,19 @@ export default function AssignModal({
 
           {!isClientPreselected ? (
             <Select
-              label="Клиент"
-              placeholder="Выберите клиента"
-              data={clients.map((c) => ({
-                value: c.id,
-                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-              }))}
-              value={selectedUser}
-              onChange={(val) => setSelectedUser(val || null)}
-              radius="md"
-              size="md"
-              withinPortal
-            />
+            label="Клиент"
+            placeholder="Выберите клиента"
+            data={clients.map((c) => ({
+              value: c.id,
+              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+            }))}
+            value={selectedUser}
+            onChange={(val) => setSelectedUser(val || null)}
+            onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+            radius="md"
+            size="md"
+            withinPortal
+          />
           ) : (
             <Text size="sm">
               Клиент: <b>{clients.find((c) => c.id === selectedUser)?.name} {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}</b>
@@ -225,13 +239,14 @@ export default function AssignModal({
 
           {templates.length > 0 && (
             <Select
-              label="Программа тренировки"
-              placeholder="Авто (ротация) или выберите вручную"
-              data={templates.map((t) => ({ label: t.title, value: t.id }))}
-              value={selectedTemplateId}
-              onChange={setSelectedTemplateId}
-              clearable
-            />
+            label="Программа тренировки"
+            placeholder="Авто (ротация) или выберите вручную"
+            data={templates.map((t) => ({ label: t.title, value: t.id }))}
+            value={selectedTemplateId}
+            onChange={setSelectedTemplateId}
+            onDropdownClose={() => blurActiveElement()} // ← добавлено
+            clearable
+          />
           )}
 
           {remaining !== null && !isSinglePaid && (
@@ -256,6 +271,7 @@ export default function AssignModal({
                 placeholder="Введите сумму"
                 value={singlePrice}
                 onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                onBlur={blurActiveElement}
                 min={0}
               />
               <Select
@@ -267,6 +283,7 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
+                onDropdownClose={() => blurActiveElement()} // ← вот это нужно
                 clearable
               />
             </>
@@ -335,7 +352,14 @@ export default function AssignModal({
             radius="xl"
             color="dark"
             size="md"
-            onClick={() => onAssign(selectedTemplateId, singlePrice, singlePaymentMethod)}
+            onClick={() =>
+              onAssign(
+                selectedTemplateId,
+                date.format("YYYY-MM-DD"),
+                singlePrice,
+                singlePaymentMethod
+              )
+            }
             style={{ fontWeight: 600 }}
             disabled={!selectedUser || selectedHour === null}
           >

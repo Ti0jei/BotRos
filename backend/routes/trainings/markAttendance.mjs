@@ -1,8 +1,9 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../../middleware/auth.mjs';
-import { notifyTelegram } from '../../utils/telegram.mjs';
+import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyTrainer } from '../../lib/antiSpam.mjs';
+import dayjs from 'dayjs';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -40,14 +41,18 @@ router.patch('/:id/attended', authMiddleware, async (req, res) => {
     return res.json(updated);
   }
 
-  const dateOnly = (d) => d.toISOString().slice(0, 10);
-  const trainingDate = new Date(training.date);
+  const trainingDate = dayjs(training.date).startOf('day');
 
   const activeBlock = await prisma.paymentBlock.findFirst({
     where: { userId: training.userId, active: true },
   });
 
-  if (!activeBlock || dateOnly(trainingDate) < dateOnly(activeBlock.paidAt)) {
+  // ✅ Защита от пустого paidAt
+  if (
+    !activeBlock ||
+    !activeBlock.paidAt ||
+    trainingDate.isBefore(dayjs(activeBlock.paidAt).startOf('day'))
+  ) {
     return res.status(400).json({ error: 'Нет подходящего активного блока для списания' });
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isToday from "dayjs/plugin/isToday";
 import {
@@ -26,7 +26,13 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isToday);
 
 export default function AdminSchedule({ onBack }: { onBack: () => void }) {
-  const [date, setDate] = useState(() => dayjs().startOf("day"));
+  const [date, setDate] = useState<Dayjs>(() => {
+    const stored = localStorage.getItem("calendarSelectedDate");
+    return stored && dayjs(stored).isValid()
+      ? dayjs(stored).startOf("day")
+      : dayjs().startOf("day");
+  });
+
   const [clients, setClients] = useState<User[]>([]);
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
@@ -99,6 +105,11 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     loadTrainings();
   }, [date]);
 
+  const handleDateChange = (d: Dayjs) => {
+    setDate(d);
+    localStorage.setItem("calendarSelectedDate", d.format("YYYY-MM-DD"));
+  };
+
   return (
     <Box
       style={{
@@ -108,7 +119,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
       }}
     >
       <Container size="xs" py="md">
-        <ScheduleHeader date={date} setDate={setDate} />
+        <ScheduleHeader date={date} setDate={handleDateChange} />
 
         <Title order={3} mt="md" mb="xs" c="#1a1a1a">
           Расписание
@@ -154,11 +165,12 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         onClose={() => {
           setModalOpen(false);
           setSelectedHour(null);
+          onBack();
         }}
         clients={clients}
         blocks={blocks}
         selectedHour={selectedHour}
-        selectedDate={date.format("YYYY-MM-DD")}
+        selectedDate={date} // ✅ передаём Dayjs, не .format!
         onSuccess={loadTrainings}
         singlePrice={singlePrice}
         setSinglePrice={setSinglePrice}

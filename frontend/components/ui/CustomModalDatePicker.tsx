@@ -23,6 +23,10 @@ dayjs.locale("ru");
 
 const weekDays = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
+// ✅ безопасная обёртка
+const safeDayjs = (d: unknown) =>
+  dayjs(d).isValid() ? dayjs(d) : dayjs();
+
 export default function CustomModalDatePicker({
   date,
   setDate,
@@ -31,14 +35,16 @@ export default function CustomModalDatePicker({
   setDate: (d: Dayjs) => void;
 }) {
   const [opened, setOpened] = useState(false);
-  const [viewMonth, setViewMonth] = useState(date.startOf("month"));
+  const [viewMonth, setViewMonth] = useState(() =>
+    safeDayjs(date).startOf("month")
+  );
 
   useEffect(() => {
-    setViewMonth(date.startOf("month"));
+    setViewMonth(safeDayjs(date).startOf("month"));
   }, [date]);
 
-  const startDay = viewMonth.startOf("week");
-  const endDay = viewMonth.endOf("month").endOf("week");
+  const startDay = safeDayjs(viewMonth).startOf("week");
+  const endDay = safeDayjs(viewMonth).endOf("month").endOf("week");
 
   const dayList: Dayjs[] = [];
   let day = startDay.clone();
@@ -50,6 +56,11 @@ export default function CustomModalDatePicker({
   const isSameDay = (a: Dayjs, b: Dayjs) =>
     a.format("YYYY-MM-DD") === b.format("YYYY-MM-DD");
 
+  const handleSetDate = (d: Dayjs) => {
+    setDate(d);
+    localStorage.setItem("assignDate", d.toISOString());
+  };
+
   return (
     <>
       <Group position="center" spacing="xs" mt="sm">
@@ -57,7 +68,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.subtract(1, "day"))}
+          onClick={() => handleSetDate(date.subtract(1, "day"))}
         >
           Назад
         </Button>
@@ -75,7 +86,7 @@ export default function CustomModalDatePicker({
           size="xs"
           variant="outline"
           color="dark"
-          onClick={() => setDate(date.add(1, "day"))}
+          onClick={() => handleSetDate(date.add(1, "day"))}
         >
           Вперёд
         </Button>
@@ -103,7 +114,9 @@ export default function CustomModalDatePicker({
           <Button
             variant="subtle"
             color="dark"
-            onClick={() => setViewMonth(viewMonth.subtract(1, "month"))}
+            onClick={() =>
+              setViewMonth(safeDayjs(viewMonth).subtract(1, "month"))
+            }
             compact
           >
             <IconChevronLeft size={20} />
@@ -112,15 +125,21 @@ export default function CustomModalDatePicker({
           <Text
             fw={600}
             size="lg"
-            style={{ flex: 1, textAlign: "center", textTransform: "capitalize" }}
+            style={{
+              flex: 1,
+              textAlign: "center",
+              textTransform: "capitalize",
+            }}
           >
-            {viewMonth.format("MMMM YYYY")}
+            {safeDayjs(viewMonth).format("MMMM YYYY")}
           </Text>
 
           <Button
             variant="subtle"
             color="dark"
-            onClick={() => setViewMonth(viewMonth.add(1, "month"))}
+            onClick={() =>
+              setViewMonth(safeDayjs(viewMonth).add(1, "month"))
+            }
             compact
           >
             <IconChevronRight size={20} />
@@ -149,7 +168,7 @@ export default function CustomModalDatePicker({
                 <Center>
                   <Box
                     onClick={() => {
-                      setDate(d);
+                      handleSetDate(d);
                       setOpened(false);
                     }}
                     style={{

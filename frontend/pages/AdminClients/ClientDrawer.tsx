@@ -1,5 +1,6 @@
 // frontend/pages/AdminClients/ClientDrawer.tsx
 import { Drawer, Stack, Button } from "@mantine/core";
+import dayjs from "dayjs";
 
 interface ClientDrawerProps {
   opened: boolean;
@@ -18,9 +19,18 @@ export default function ClientDrawer({
 }: ClientDrawerProps) {
   const handleAction = (action: "workouts" | "create-workout" | "exercise-admin") => {
     if (action !== "exercise-admin" && !clientId) return;
+
     if (clientId) {
       localStorage.setItem("clientId", clientId);
     }
+
+    // ✅ Сохраняем дату, чтобы AssignModal корректно прочитал её
+    if (action === "create-workout") {
+      const selectedDate = localStorage.getItem("calendarSelectedDate");
+      const finalDate = selectedDate || dayjs().format("YYYY-MM-DD");
+      localStorage.setItem("assignDate", finalDate);
+    }
+
     setView(action);
     onClose();
   };

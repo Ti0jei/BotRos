@@ -9,10 +9,12 @@ import {
   Box,
   TextInput,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { User, PaymentBlock, WorkoutTemplate } from "./types";
 import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
+import { Dayjs } from "dayjs";
+import { blurActiveElement } from "@/utils/blurActiveElement"; // ✅ добавлен импорт
 
 interface Props {
   opened: boolean;
@@ -20,7 +22,7 @@ interface Props {
   clients: User[];
   blocks: Record<string, PaymentBlock | null>;
   selectedHour: number | null;
-  selectedDate: string; // YYYY-MM-DD
+  selectedDate: Dayjs;
   onSuccess: () => void;
 }
 
@@ -40,6 +42,9 @@ export default function AssignModalFromCalendar({
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [bottomOffset, setBottomOffset] = useState(100);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
@@ -77,7 +82,7 @@ export default function AssignModalFromCalendar({
       body: JSON.stringify({
         userId: selectedUser,
         hour: selectedHour,
-        date: selectedDate,
+        date: selectedDate.format("YYYY-MM-DD"),
         isSinglePaid,
         singlePrice: isSinglePaid ? parseInt(singlePrice) : undefined,
         singlePaymentMethod: isSinglePaid ? singlePaymentMethod : undefined,
@@ -121,6 +126,10 @@ export default function AssignModalFromCalendar({
     setSelectedTemplateId(null);
     setLastTemplate(null);
     setTemplates([]);
+
+    if (selectedDate) {
+      localStorage.setItem("calendarSelectedDate", selectedDate.format("YYYY-MM-DD"));
+    }
   }, [opened]);
 
   useEffect(() => {
@@ -147,124 +156,181 @@ export default function AssignModalFromCalendar({
     };
 
     fetchTemplates();
+
+    if (selectedUser && !hasActiveBlock) {
+      setIsSinglePaid(true);
+    }
   }, [selectedUser]);
 
+  useEffect(() => {
+    const resize = () => {
+      if (footerRef.current) {
+        setBottomOffset(footerRef.current.offsetHeight + 24);
+      }
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title="Назначить тренировку"
-      centered
-      size="sm"
-      radius="xl"
-      scrollAreaComponent="div"
-      styles={{
-        title: { fontWeight: 700, fontSize: 20 },
-        header: { borderBottom: "1px solid #ddd" },
-        body: {
-          padding: 16,
-          maxHeight: "75vh",
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
-        },
-      }}
-    >
-      <Stack spacing="md">
-        <Box>
-          <Text fw={600} mb={4}>
-            Клиент
-          </Text>
-          <Select
-            data={clients.map((c) => ({
-              label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-              value: c.id,
-            }))}
-            placeholder="Выберите клиента"
-            value={selectedUser}
-            onChange={setSelectedUser}
-            searchable
-            nothingFound="Не найдено"
-          />
-        </Box>
-
-        {selectedUser && lastTemplate && (
-          <Text size="sm" c="dimmed">
-            Прошлая тренировка: <b>{lastTemplate.title}</b>
-          </Text>
-        )}
-
-        {selectedUser && (
-          <Select
-            label="Следующая программа тренировок"
-            placeholder="По очереди или выбрать вручную"
-            data={templates.map((t) => ({
-              label: t.title,
-              value: t.id,
-            }))}
-            value={selectedTemplateId}
-            onChange={(val) => setSelectedTemplateId(val)}
-            clearable
-          />
-        )}
-
-        {selectedUser && !hasActiveBlock && (
-          <Text color="red" size="sm">
-            У клиента нет активного блока — доступна только разовая оплата
-          </Text>
-        )}
-
-        <Checkbox
-          label="Разовая оплата"
-          checked={isSinglePaid}
-          onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          disabled={!selectedUser || !hasActiveBlock}
-        />
-
-        {isSinglePaid && (
-          <>
-            <TextInput
-              label="Сумма (₽)"
-              placeholder="Введите сумму"
-              type="number"
-              value={singlePrice}
-              onChange={(e) => setSinglePrice(e.currentTarget.value)}
-              required
-              inputMode="numeric"
-              pattern="[0-9]*"
-              onBlur={() => window.scrollTo({ top: 0 })}
-            />
+    <>
+      <Modal
+        opened={opened}
+        onClose={onClose}
+        title="Назначить тренировку"
+        centered
+        size="sm"
+        radius="xl"
+        scrollAreaComponent="div"
+        styles={{
+          title: { fontWeight: 700, fontSize: 20 },
+          header: { borderBottom: "1px solid #ddd" },
+          body: {
+            padding: 16,
+            maxHeight: "75vh",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+            paddingBottom: bottomOffset,
+          },
+        }}
+      >
+        <Stack spacing="md">
+          <Box>
+            <Text fw={600} mb={4}>
+              Клиент
+            </Text>
             <Select
-              label="Способ оплаты"
-              placeholder="Выберите способ"
-              data={[
-                { value: "cash", label: "Наличные" },
-                { value: "online", label: "Онлайн" },
-              ]}
-              value={singlePaymentMethod}
-              onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
-              required
+              data={clients.map((c) => ({
+                label: `${c.lastName || ""} ${c.name}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+                value: c.id,
+              }))}
+              placeholder="Выберите клиента"
+              value={selectedUser}
+              onChange={(val) => {
+                blurActiveElement(); // ✅ добавлено
+                setSelectedUser(val);
+              }}
+              searchable
+              nothingFound="Не найдено"
             />
-          </>
-        )}
+          </Box>
 
-        <Group position="right" mt="md">
-          <Button
-            onClick={handleAssign}
-            variant="outline"
-            style={{
-              borderRadius: 12,
-              fontWeight: 500,
-              paddingLeft: 20,
-              paddingRight: 20,
-              color: "#1a1a1a",
-              border: "1px solid #1a1a1a",
-              backgroundColor: "#fff",
-            }}
-          >
-            Назначить
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+          {selectedUser && lastTemplate && (
+            <Text size="sm" c="dimmed">
+              Прошлая тренировка: <b>{lastTemplate.title}</b>
+            </Text>
+          )}
+
+          {selectedUser && (
+            <Select
+              label="Следующая программа тренировок"
+              placeholder="По очереди или выбрать вручную"
+              data={templates.map((t) => ({
+                label: t.title,
+                value: t.id,
+              }))}
+              value={selectedTemplateId}
+              onChange={(val) => {
+                blurActiveElement(); // ✅ добавлено
+                setSelectedTemplateId(val);
+              }}
+              clearable
+            />
+          )}
+
+          {selectedUser && !hasActiveBlock && (
+            <Text color="red" size="sm">
+              У клиента нет активного блока — доступна только разовая оплата
+            </Text>
+          )}
+
+          <Checkbox
+            label="Разовая оплата"
+            checked={isSinglePaid}
+            onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
+            disabled={!hasActiveBlock}
+          />
+
+          {isSinglePaid && (
+            <>
+              <TextInput
+                label="Сумма (₽)"
+                placeholder="Введите сумму"
+                type="number"
+                value={singlePrice}
+                onChange={(e) => setSinglePrice(e.currentTarget.value)}
+                required
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onBlur={() => window.scrollTo({ top: 0 })}
+              />
+              <Select
+                label="Способ оплаты"
+                placeholder="Выберите способ"
+                data={[
+                  { value: "cash", label: "Наличные" },
+                  { value: "online", label: "Онлайн" },
+                ]}
+                value={singlePaymentMethod}
+                onChange={(val) => {
+                  blurActiveElement(); // ✅ добавлено
+                  setSinglePaymentMethod(val as "cash" | "online" | "");
+                }}
+                required
+              />
+            </>
+          )}
+
+          <Group position="right" mt="md">
+            <Button
+              onClick={handleAssign}
+              variant="outline"
+              style={{
+                borderRadius: 12,
+                fontWeight: 500,
+                paddingLeft: 20,
+                paddingRight: 20,
+                color: "#1a1a1a",
+                border: "1px solid #1a1a1a",
+                backgroundColor: "#fff",
+              }}
+            >
+              Назначить
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      <div
+        ref={footerRef}
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: "#fff",
+          borderTop: "1px solid #ddd",
+          padding: 12,
+          textAlign: "center",
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          variant="outline"
+          fullWidth
+          onClick={onClose}
+          style={{
+            borderRadius: 12,
+            fontWeight: 500,
+            color: "#1a1a1a",
+            border: "1px solid #1a1a1a",
+            backgroundColor: "#fff",
+          }}
+        >
+          Назад к профилю
+        </Button>
+      </div>
+    </>
   );
 }

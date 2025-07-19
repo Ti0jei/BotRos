@@ -37,7 +37,13 @@ export default function AdminClientsPage({
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [view, setInternalView] = useState<
-    "payments" | "nutrition" | "exercise-admin" | "workouts" | "create-workout" | "edit-workout" | null
+    | "payments"
+    | "nutrition"
+    | "exercise-admin"
+    | "workouts"
+    | "create-workout"
+    | "edit-workout"
+    | null
   >(null);
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const [blockMap, setBlockMap] = useState<Record<string, PaymentBlock | null>>({});
@@ -237,6 +243,12 @@ export default function AdminClientsPage({
                   const block = blockMap[client.id];
                   const isSinglePaid = !block || block.paidTrainings <= block.used;
                   localStorage.setItem("assignSinglePaid", String(isSinglePaid));
+
+                  // ✅ сохраняем дату из календаря (если есть), иначе fallback на текущую
+                  const calendarDate = localStorage.getItem("calendarSelectedDate");
+                  const selectedDate = calendarDate ?? dayjs().format("YYYY-MM-DD");
+                  localStorage.setItem("assignDate", selectedDate);
+
                   setView("assign-training");
                 }}
                 onToggleExpand={() => toggleExpanded(client.id)}

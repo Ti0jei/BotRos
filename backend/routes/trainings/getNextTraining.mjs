@@ -1,5 +1,11 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../../middleware/auth.mjs';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const prisma = new PrismaClient();
 
@@ -10,7 +16,8 @@ export default [
       return res.status(403).json({ error: 'Only admin can view next training' });
     }
 
-    const now = new Date();
+    const now = dayjs().toDate();
+
     const training = await prisma.training.findFirst({
       where: { date: { gte: now } },
       include: { user: true },

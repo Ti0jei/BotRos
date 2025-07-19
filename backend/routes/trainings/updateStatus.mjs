@@ -1,31 +1,74 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authMiddleware } from '../../middleware/auth.mjs';
-import { notifyTelegram } from '../../utils/telegram.mjs';
+import { notifyTelegram } from '../../bot/notifications.mjs';
 import { shouldNotifyUser, shouldNotifyTrainer } from '../../lib/antiSpam.mjs';
+import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru.js';
+
+dayjs.locale('ru');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.patch('/:id', authMiddleware, async (req, res) => {
+router.patch('/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-  const userId = req.user.userId;
+
+  let userId = null;
+
+  // Попробуем извлечь userId из JWT-токена (если он есть)
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = jwt.decode(token);
+      if (decoded && typeof decoded === 'object' && decoded.userId) {
+        userId = decoded.userId;
+      }
+    }
+  } catch (e) {
+    console.warn('⚠️ Ошибка парсинга токена:', e.message);
+  }
 
   const training = await prisma.training.findUnique({
     where: { id },
     include: { user: true },
   });
 
-  if (!training || training.userId !== userId) {
-    return res.status(404).json({ error: 'Not found' });
+  if (!training) {
+    return res.status(404).json({ error: 'Тренировка не найдена' });
+  }
+
+  // Если авторизован, проверим, это ли его тренировка
+  if (userId && training.userId !== userId) {
+    return res.status(403).json({ error: 'Доступ запрещён' });
+  }
+
+  const dataToUpdate = {
+    status,
+    attended: status === 'CONFIRMED',
+    wasCounted: status === 'CONFIRMED',
+  };
+
+  // Откат использования блока при отказе (если нужно)
+  if (status === 'DECLINED' && training.blockId && training.wasCounted) {
+    await prisma.paymentBlock.update({
+      where: { id: training.blockId },
+      data: {
+        used: { decrement: 1 },
+      },
+    });
+    dataToUpdate.wasCounted = false;
+    dataToUpdate.attended = false;
   }
 
   const updated = await prisma.training.update({
     where: { id },
-    data: { status },
+    data: dataToUpdate,
   });
 
+  // Уведомление пользователя
   if (training.user?.telegramId && shouldNotifyUser(training.user.telegramId)) {
     const msg =
       status === 'CONFIRMED'
@@ -38,10 +81,11 @@ router.patch('/:id', authMiddleware, async (req, res) => {
     );
   }
 
+  // Уведомление тренера (ADMIN)
   const trainer = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
 
   if (trainer?.telegramId && shouldNotifyTrainer(trainer.telegramId)) {
-    const dateStr = new Date(training.date).toLocaleDateString();
+    const dateStr = dayjs(training.date).format('DD.MM.YYYY');
     const msg =
       status === 'CONFIRMED'
         ? `👤 ${training.user.name} подтвердил участие ${dateStr} в ${training.hour}:00`

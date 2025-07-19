@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs'; // ✅ импорт Dayjs
 import AssignModal from './AdminSchedule/AssignModal';
 import { User, PaymentBlock } from './AdminSchedule/types';
 
@@ -7,12 +8,12 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
   const [blocks, setBlocks] = useState<Record<string, PaymentBlock | null>>({});
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(() => dayjs()); // ✅ Dayjs вместо Date
   const [isSinglePaid, setIsSinglePaid] = useState(false);
 
   const token = localStorage.getItem("token");
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  // Загрузка клиентов
   useEffect(() => {
     fetch(`${API}/api/clients`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -24,7 +25,6 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
       });
   }, []);
 
-  // Загрузка блоков
   const loadBlock = async (userId: string) => {
     try {
       const res = await fetch(`${API}/api/payment-blocks/user/${userId}/active`, {
@@ -37,7 +37,6 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
     }
   };
 
-  // Подхватываем данные из localStorage
   useEffect(() => {
     const uid = localStorage.getItem("assignUserId");
     const sp = localStorage.getItem("assignSinglePaid");
@@ -50,29 +49,35 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
     localStorage.removeItem("assignSinglePaid");
   }, []);
 
-  // Назначение
-  const assignTraining = async () => {
-    if (!selectedUser || selectedHour === null) return;
-
-    const today = new Date().toISOString().split("T")[0];
+  const assignTraining = async (
+    templateId: string | null,
+    selectedDateStr: string,
+    singlePrice?: number | null,
+    singlePaymentMethod?: string | null
+  ) => {
+    if (!selectedUser || selectedHour === null || !selectedDateStr) return;
 
     try {
       const res = await fetch(`${API}/api/trainings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
           userId: selectedUser,
-          date: today,
+          date: selectedDateStr, // ✅ уже в формате YYYY-MM-DD
           hour: selectedHour,
           isSinglePaid,
+          templateId,
+          singlePrice,
+          singlePaymentMethod
         }),
       });
 
       if (res.ok) {
         alert("Тренировка назначена ✅");
-        setView("clients"); // ✅ назад к клиентам
+        setView("clients");
       } else {
         const error = await res.json();
         alert("Ошибка: " + error.error);
@@ -88,7 +93,7 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
       opened={true}
       onClose={() => {
         console.log("Закрытие модалки через крестик");
-        setView("clients"); // ✅ назад к клиентам
+        setView("clients");
       }}
       onAssign={assignTraining}
       clients={clients}
@@ -98,6 +103,8 @@ export default function AssignTrainingPage({ setView }: { setView: (v: string) =
       setIsSinglePaid={setIsSinglePaid}
       selectedHour={selectedHour}
       setSelectedHour={setSelectedHour}
+      selectedDate={selectedDate} // ✅ передаём Dayjs
+      setSelectedDate={setSelectedDate}
       blocks={blocks}
     />
   );
