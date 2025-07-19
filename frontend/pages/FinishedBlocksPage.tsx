@@ -1,3 +1,5 @@
+// frontend/pages/FinishedBlocksPage.tsx
+
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -56,13 +58,16 @@ export default function FinishedBlocksPage({
       console.log('🟡 Загружаем данные для userId:', userId);
 
       const [blocksRes, trainingsRes] = await Promise.all([
-        fetch(`${API}/api/payment-blocks?userId=${userId}`, {
+        fetch(`${API}/api/payment-blocks/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(`${API}/api/trainings?userId=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+
+      if (!blocksRes.ok) throw new Error('❌ Ошибка загрузки блоков');
+      if (!trainingsRes.ok) throw new Error('❌ Ошибка загрузки тренировок');
 
       const allBlocks: PaymentBlock[] = await blocksRes.json();
       console.log('📦 Все блоки:', allBlocks);
@@ -167,6 +172,7 @@ export default function FinishedBlocksPage({
         )}
       </Container>
 
+      {/* Фиксированная кнопка "Назад" */}
       <Box
         component="footer"
         style={{
