@@ -73,7 +73,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
       if (trainingsRes.ok) {
         const all: TrainingRecord[] = await trainingsRes.json();
         setBlockTrainings(all.filter((t) => t.blockId));
-        setSingleTrainings(all.filter((t) => t.isSinglePaid && t.attended === true)); // ✅ исправлено
+        setSingleTrainings(all.filter((t) => t.isSinglePaid && t.attended === true));
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
@@ -91,7 +91,8 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ active: false }),
       });
       await loadData();
@@ -132,9 +133,27 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   return (
     <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Title order={3} mb="md" c="#1a1a1a">
-          История оплат
-        </Title>
+        <Group position="apart" mb="md">
+          <Title order={3} c="#1a1a1a">
+            История оплат
+          </Title>
+          <Group spacing="xs">
+            <Button
+              size="xs"
+              onClick={() => console.log('Завершённые абонементы')}
+              styles={buttonStyle}
+            >
+              Завершённые абонементы
+            </Button>
+            <Button
+              size="xs"
+              onClick={() => console.log('Завершённые разовые посещения')}
+              styles={buttonStyle}
+            >
+              Завершённые разовые посещения
+            </Button>
+          </Group>
+        </Group>
 
         {loading ? (
           <Loader />
@@ -147,9 +166,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
             )}
 
             {blocks.map((block) => {
-              const usedTrainings = blockTrainings.filter(
-                (t) => t.blockId === block.id
-              );
+              const usedTrainings = blockTrainings.filter((t) => t.blockId === block.id);
               const expanded = expandedBlocks[block.id] ?? false;
 
               return (
