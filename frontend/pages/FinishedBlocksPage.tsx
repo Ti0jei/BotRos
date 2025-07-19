@@ -13,9 +13,9 @@ import {
   Title,
   Loader,
   Box,
+  Button,
 } from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import BackToProfileButton from '@/components/BackToProfileButton';
 
 interface PaymentBlock {
   id: string;
@@ -158,9 +158,18 @@ export default function FinishedBlocksPage({
             })}
           </Stack>
         )}
-      </Container>
 
-      <BackToProfileButton onBack={onBack} fixed />
+        <Button
+          variant="default"
+          fullWidth
+          mt="xl"
+          radius="md"
+          size="md"
+          onClick={onBack}
+        >
+          Назад
+        </Button>
+      </Container>
     </Box>
   );
 }

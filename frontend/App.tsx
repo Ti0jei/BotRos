@@ -265,8 +265,13 @@ function App() {
         />
       )}
 
-      {view === 'finished-blocks' && <FinishedBlocksPageWrapper onBack={() => setView('clients')} />}
-      {view === 'finished-singles' && <FinishedSinglesPageWrapper onBack={() => setView('clients')} />}
+      {view === 'finished-blocks' && selectedClientId && (
+        <FinishedBlocksPageWrapper onBack={() => setView('history')} userId={selectedClientId} />
+      )}
+
+      {view === 'finished-singles' && selectedClientId && (
+        <FinishedSinglesPageWrapper onBack={() => setView('history')} userId={selectedClientId} />
+      )}
     </Box>
   );
 }

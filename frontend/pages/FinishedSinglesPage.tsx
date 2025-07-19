@@ -1,3 +1,5 @@
+// frontend/pages/FinishedSinglesPage.tsx
+
 import { useEffect, useState } from 'react';
 import {
   Box,
@@ -10,9 +12,9 @@ import {
   Collapse,
   ActionIcon,
   Loader,
+  Button,
 } from '@mantine/core';
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import BackToProfileButton from '@/components/BackToProfileButton';
 
 interface TrainingRecord {
   id: string;
@@ -114,9 +116,18 @@ export default function FinishedSinglesPage({ onBack }: { onBack: () => void }) 
             })}
           </Stack>
         )}
-      </Container>
 
-      <BackToProfileButton onClick={onBack} label="Назад к клиентам" fixed />
+        <Button
+          variant="default"
+          fullWidth
+          mt="xl"
+          radius="md"
+          size="md"
+          onClick={onBack}
+        >
+          Назад
+        </Button>
+      </Container>
     </Box>
   );
 }
