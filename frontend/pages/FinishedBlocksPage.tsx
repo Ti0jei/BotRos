@@ -15,7 +15,7 @@ import {
   Box,
   Button,
 } from '@mantine/core';
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { IconChevronDown, IconChevronUp, IconArrowLeft } from '@tabler/icons-react';
 
 interface PaymentBlock {
   id: string;
@@ -158,18 +158,46 @@ export default function FinishedBlocksPage({
             })}
           </Stack>
         )}
-
-        <Button
-          variant="default"
-          fullWidth
-          mt="xl"
-          radius="md"
-          size="md"
-          onClick={onBack}
-        >
-          Назад
-        </Button>
       </Container>
+
+      {/* Фиксированная кнопка "Назад" */}
+      <Box
+        component="footer"
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          background: 'white',
+          padding: '12px 16px',
+          borderTop: '1px solid #eee',
+          zIndex: 1000,
+        }}
+      >
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
+          <Button
+            fullWidth
+            size="md"
+            variant="outline"
+            color="black"
+            onClick={onBack}
+            leftIcon={<IconArrowLeft size={16} />}
+            styles={{
+              root: {
+                color: '#000',
+                border: '1px solid #000',
+                borderRadius: 12,
+                fontWeight: 500,
+                backgroundColor: '#fff',
+                transition: 'background 0.2s',
+                '&:hover': { backgroundColor: '#f2f2f2' },
+              },
+            }}
+          >
+            Назад
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 }
