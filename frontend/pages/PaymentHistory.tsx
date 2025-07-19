@@ -135,12 +135,18 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   return (
     <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Group position="apart" mb="md">
-          <Title order={3} c="#1a1a1a">
+        <Group position="apart" align="center" mb="md">
+          <Title order={3} c="#1a1a1a" style={{ marginBottom: 0 }}>
             История оплат
           </Title>
-          <ActionIcon variant="outline" onClick={() => setDrawerOpened(true)} size="lg" radius="xl">
-            <IconMenu2 size={20} />
+          <ActionIcon
+            variant="filled"
+            size="lg"
+            radius="xl"
+            onClick={() => setDrawerOpened(true)}
+            style={{ backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)' }}
+          >
+            <IconMenu2 size={18} />
           </ActionIcon>
         </Group>
 
