@@ -136,7 +136,7 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
       <Container size="xs" py="md">
         <Group position="apart" mb="md">
           <Title order={3} c="#1a1a1a">
-            История оплат
+            Запись
           </Title>
         </Group>
 
