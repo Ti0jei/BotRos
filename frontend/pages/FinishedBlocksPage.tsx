@@ -1,5 +1,3 @@
-// frontend/pages/FinishedBlocksPage.tsx
-
 import { useEffect, useState } from 'react';
 import {
   Container,
@@ -55,6 +53,8 @@ export default function FinishedBlocksPage({
   const loadData = async () => {
     setLoading(true);
     try {
+      console.log('🟡 Загружаем данные для userId:', userId);
+
       const [blocksRes, trainingsRes] = await Promise.all([
         fetch(`${API}/api/payment-blocks?userId=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -65,13 +65,20 @@ export default function FinishedBlocksPage({
       ]);
 
       const allBlocks: PaymentBlock[] = await blocksRes.json();
+      console.log('📦 Все блоки:', allBlocks);
+
       const finished = allBlocks.filter((b) => b.active === false);
+      console.log('✅ Завершённые блоки:', finished);
+
       setBlocks(finished);
 
       const allTrainings: TrainingRecord[] = await trainingsRes.json();
-      setBlockTrainings(allTrainings.filter((t) => t.blockId));
+      const onlyWithBlock = allTrainings.filter((t) => t.blockId);
+      console.log('📆 Тренировки с блоками:', onlyWithBlock);
+
+      setBlockTrainings(onlyWithBlock);
     } catch (e) {
-      console.error('Ошибка загрузки:', e);
+      console.error('❌ Ошибка загрузки:', e);
     } finally {
       setLoading(false);
     }
@@ -160,7 +167,6 @@ export default function FinishedBlocksPage({
         )}
       </Container>
 
-      {/* Фиксированная кнопка "Назад" */}
       <Box
         component="footer"
         style={{
