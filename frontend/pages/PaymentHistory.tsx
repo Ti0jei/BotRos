@@ -135,18 +135,18 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   return (
     <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
       <Container size="xs" py="md">
-        <Group position="apart" align="center" mb="md">
-          <Title order={3} c="#1a1a1a" style={{ marginBottom: 0 }}>
+        <Group position="apart" mb="md">
+          <Title order={3} c="#1a1a1a">
             История оплат
           </Title>
           <ActionIcon
-            variant="filled"
+            variant="light"
             size="lg"
-            radius="xl"
+            radius="md"
             onClick={() => setDrawerOpened(true)}
-            style={{ backgroundColor: '#fff', boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)' }}
+            style={{ border: '1px solid #1a1a1a', color: '#1a1a1a' }}
           >
-            <IconMenu2 size={18} />
+            <IconMenu2 size={20} />
           </ActionIcon>
         </Group>
 
@@ -254,6 +254,8 @@ export default function PaymentHistory({ userId, onBack }: Props) {
         <Stack spacing="sm">
           <Button
             fullWidth
+            variant="outline"
+            styles={buttonStyle}
             onClick={() => {
               setDrawerOpened(false);
               console.log('Завершённые абонементы');
@@ -263,6 +265,8 @@ export default function PaymentHistory({ userId, onBack }: Props) {
           </Button>
           <Button
             fullWidth
+            variant="outline"
+            styles={buttonStyle}
             onClick={() => {
               setDrawerOpened(false);
               console.log('Завершённые разовые посещения');
@@ -275,17 +279,17 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
       <Box
         style={{
-          position: "fixed",
+          position: 'fixed',
           bottom: 0,
           left: 0,
-          width: "100%",
-          background: "white",
-          padding: "10px 16px",
-          boxShadow: "0 -2px 6px rgba(0,0,0,0.05)",
+          width: '100%',
+          background: 'white',
+          padding: '10px 16px',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
           zIndex: 1000,
         }}
       >
-        <Box style={{ maxWidth: 420, margin: "0 auto" }}>
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Button
             onClick={onBack}
             variant="outline"
