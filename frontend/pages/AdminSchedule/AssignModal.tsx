@@ -183,6 +183,8 @@ export default function AssignModal({
       size="md"
       scrollAreaComponent="div"
       styles={{ body: { padding: 0 } }}
+      trapFocus={false}           // ✅ Добавлено
+      withinPortal={false}        // ✅ Добавлено
     >
       <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Stack spacing="md">
