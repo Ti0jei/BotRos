@@ -269,16 +269,25 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <TextInput
-                type="number"
+              <NumberInput
+                size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                value={singlePrice}
-                onChange={(e) => setSinglePrice(e.currentTarget.value)}
+                value={singlePrice ? parseInt(singlePrice) : undefined}
+                onChange={(val) => {
+                  if (typeof val === "number" && !isNaN(val)) {
+                    setSinglePrice(val.toString());
+                  } else {
+                    setSinglePrice("");
+                  }
+                }}
                 min={0}
                 radius="xl"
-                inputMode="numeric"
+                hideControls
                 onBlur={blurActiveElement}
+                trapFocus={false}
+                inputMode="numeric"
+                parser={(val) => val?.replace(/\D/g, "") ?? ""}
               />
               <Select
                 label="Способ оплаты"
