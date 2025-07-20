@@ -24,86 +24,86 @@ export function setupNewsNotification(bot) {
 
   // 🟡 Выбор роли
   bot.action('notify_to_users', isRegistered, async (ctx) => {
-    const state = ctx.session?.notifyState;
-    if (!state || state.step !== 'choose_role') return;
-
-    state.role = 'USER';
-    state.step = 'awaiting_text';
+    ctx.session = ctx.session || {};
+    ctx.session.notifyState = { role: 'USER', step: 'awaiting_text' };
 
     await ctx.answerCbQuery();
     await ctx.reply('📝 Введите текст новости для пользователей:');
   });
 
   bot.action('notify_to_admins', isRegistered, async (ctx) => {
-    const state = ctx.session?.notifyState;
-    if (!state || state.step !== 'choose_role') return;
-
-    state.role = 'ADMIN';
-    state.step = 'awaiting_text';
+    ctx.session = ctx.session || {};
+    ctx.session.notifyState = { role: 'ADMIN', step: 'awaiting_text' };
 
     await ctx.answerCbQuery();
     await ctx.reply('📝 Введите текст новости для администраторов:');
   });
+});
 
-  // 📝 Ввод текста
-  bot.on('text', isRegistered, async (ctx, next) => {
-    const state = ctx.session?.notifyState;
-    if (!state || state.step !== 'awaiting_text') return next?.();
+// 📝 Ввод текста
+bot.on('text', isRegistered, async (ctx, next) => {
+  const state = ctx.session?.notifyState;
+  console.log('🧪 notifyState:', ctx.session?.notifyState);
 
-    const text = ctx.message.text.trim();
-    if (text.length < 10) {
-      return ctx.reply('⚠️ Текст слишком короткий. Минимум 10 символов.');
-    }
+  if (!state || state.step !== 'awaiting_text') {
+    console.log('⛔ Не тот шаг. state:', state);
+    return next?.();
+  }
 
-    state.text = text;
-    state.step = 'awaiting_confirm';
+  const text = ctx.message.text.trim();
+  if (text.length < 10) {
+    return ctx.reply('⚠️ Текст слишком короткий. Минимум 10 символов.');
+  }
 
-    await ctx.reply(
-      `📨 Вот что вы хотите отправить:\n\n${text}`,
-      Markup.inlineKeyboard([
-        [Markup.button.callback('✅ Подтвердить', 'notify_confirm')],
-        [Markup.button.callback('❌ Отменить', 'notify_cancel')],
-      ])
-    );
-  });
+  state.text = text;
+  state.step = 'awaiting_confirm';
 
-  // ✅ Подтверждение
-  bot.action('notify_confirm', isRegistered, async (ctx) => {
-    const state = ctx.session?.notifyState;
-    if (!state?.text || !state?.role) {
-      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /menu');
-    }
+  await ctx.reply(
+    `📨 Вот что вы хотите отправить:\n\n${text}`,
+    Markup.inlineKeyboard([
+      [Markup.button.callback('✅ Подтвердить', 'notify_confirm')],
+      [Markup.button.callback('❌ Отменить', 'notify_cancel')],
+    ])
+  );
+});
 
-    await ctx.answerCbQuery('🚀');
+// ✅ Подтверждение
+bot.action('notify_confirm', isRegistered, async (ctx) => {
+  const state = ctx.session?.notifyState;
+  if (!state?.text || !state?.role) {
+    return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /menu');
+  }
 
-    // Удалим сообщение с кнопками подтверждения
-    if (ctx.callbackQuery?.message?.message_id) {
-      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
-    }
+  await ctx.answerCbQuery('🚀');
 
-    await ctx.reply('🚀 Отправка сообщений...');
+  // Удалим сообщение с кнопками подтверждения
+  if (ctx.callbackQuery?.message?.message_id) {
+    await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => { });
+  }
 
-    try {
-      const result = await notifyBroadcast(state.text, state.role);
-      await ctx.reply(`✅ Готово! Отправлено ${result.success}/${result.total} (${state.role})`);
-    } catch (err) {
-      console.error('❌ Ошибка при рассылке:', err);
-      await ctx.reply('❌ Ошибка при рассылке. Попробуйте позже.');
-    }
+  await ctx.reply('🚀 Отправка сообщений...');
 
-    ctx.session.notifyState = undefined;
-  });
+  try {
+    const result = await notifyBroadcast(state.text, state.role);
+    await ctx.reply(`✅ Готово! Отправлено ${result.success}/${result.total} (${state.role})`);
+  } catch (err) {
+    console.error('❌ Ошибка при рассылке:', err);
+    await ctx.reply('❌ Ошибка при рассылке. Попробуйте позже.');
+  }
 
-  // ❌ Отмена
-  bot.action('notify_cancel', isRegistered, async (ctx) => {
-    ctx.session.notifyState = undefined;
-    await ctx.answerCbQuery('❌');
+  ctx.session.notifyState = undefined;
+});
 
-    // Удалим сообщение с кнопками отмены
-    if (ctx.callbackQuery?.message?.message_id) {
-      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
-    }
+// ❌ Отмена
+bot.action('notify_cancel', isRegistered, async (ctx) => {
+  ctx.session.notifyState = undefined;
+  await ctx.answerCbQuery('❌');
 
-    await ctx.reply('❌ Рассылка отменена.\nЧтобы начать заново, нажмите /menu');
-  });
+  // Удалим сообщение с кнопками отмены
+  if (ctx.callbackQuery?.message?.message_id) {
+    await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => { });
+  }
+
+  await ctx.reply('❌ Рассылка отменена.\nЧтобы начать заново, нажмите /menu');
+});
 }
