@@ -207,10 +207,8 @@ export default function AssignModalFromCalendar({
               }))}
               placeholder="Выберите клиента"
               value={selectedUser}
-              onChange={(val) => {
-                blurActiveElement(); // ✅ добавлено
-                setSelectedUser(val);
-              }}
+              onChange={(val) => setSelectedUser(val)}
+              onDropdownClose={blurActiveElement}
               searchable
               nothingFound="Не найдено"
             />
@@ -231,11 +229,8 @@ export default function AssignModalFromCalendar({
                 value: t.id,
               }))}
               value={selectedTemplateId}
-              onChange={(val) => {
-                blurActiveElement(); // ✅ добавлено
-                setSelectedTemplateId(val);
-              }}
-              clearable
+              onChange={(val) => setSelectedTemplateId(val)}
+              onDropdownClose={blurActiveElement}
             />
           )}
 
@@ -263,7 +258,7 @@ export default function AssignModalFromCalendar({
                 required
                 inputMode="numeric"
                 pattern="[0-9]*"
-                onBlur={() => window.scrollTo({ top: 0 })}
+                onBlur={blurActiveElement}
               />
               <Select
                 label="Способ оплаты"
@@ -273,10 +268,8 @@ export default function AssignModalFromCalendar({
                   { value: "online", label: "Онлайн" },
                 ]}
                 value={singlePaymentMethod}
-                onChange={(val) => {
-                  blurActiveElement(); // ✅ добавлено
-                  setSinglePaymentMethod(val as "cash" | "online" | "");
-                }}
+                onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
+                onDropdownClose={blurActiveElement}
                 required
               />
             </>
