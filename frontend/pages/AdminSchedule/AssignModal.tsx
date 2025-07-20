@@ -270,6 +270,7 @@ export default function AssignModal({
           {isSinglePaid && (
             <>
               <NumberInput
+                size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
                 value={singlePrice ?? undefined}

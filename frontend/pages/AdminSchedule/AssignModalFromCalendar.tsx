@@ -250,6 +250,7 @@ export default function AssignModalFromCalendar({
           {isSinglePaid && (
             <>
               <NumberInput
+                size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
                 value={singlePrice ? parseInt(singlePrice) : undefined}
