@@ -7,7 +7,7 @@ import { notifyBroadcast } from '../utils/broadcast.mjs';
  * @param {Telegraf} bot
  */
 export function setupNewsNotification(bot) {
-  // 🟢 Шаг 1: Старт рассылки
+  // 🟢 Старт рассылки
   bot.action('notify_start', isRegistered, async (ctx) => {
     ctx.session = ctx.session || {};
     ctx.session.notifyState = { step: 'choose_role' };
@@ -22,7 +22,7 @@ export function setupNewsNotification(bot) {
     );
   });
 
-  // 🟡 Шаг 2 — выбор получателей
+  // 🟡 Выбор роли
   bot.action('notify_to_users', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
     if (!state || state.step !== 'choose_role') return;
@@ -45,10 +45,9 @@ export function setupNewsNotification(bot) {
     await ctx.reply('📝 Введите текст новости для администраторов:');
   });
 
-  // 📝 Шаг 3 — ввод текста
+  // 📝 Ввод текста
   bot.on('text', isRegistered, async (ctx, next) => {
     const state = ctx.session?.notifyState;
-
     if (!state || state.step !== 'awaiting_text') return next?.();
 
     const text = ctx.message.text.trim();
@@ -72,10 +71,16 @@ export function setupNewsNotification(bot) {
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
     if (!state?.text || !state?.role) {
-      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /start.');
+      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /menu');
     }
 
     await ctx.answerCbQuery('🚀');
+
+    // Удалим сообщение с кнопками подтверждения
+    if (ctx.callbackQuery?.message?.message_id) {
+      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
+    }
+
     await ctx.reply('🚀 Отправка сообщений...');
 
     try {
@@ -86,7 +91,6 @@ export function setupNewsNotification(bot) {
       await ctx.reply('❌ Ошибка при рассылке. Попробуйте позже.');
     }
 
-    // Очистка состояния
     ctx.session.notifyState = undefined;
   });
 
@@ -94,6 +98,12 @@ export function setupNewsNotification(bot) {
   bot.action('notify_cancel', isRegistered, async (ctx) => {
     ctx.session.notifyState = undefined;
     await ctx.answerCbQuery('❌');
-    await ctx.reply('❌ Рассылка отменена.');
+
+    // Удалим сообщение с кнопками отмены
+    if (ctx.callbackQuery?.message?.message_id) {
+      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
+    }
+
+    await ctx.reply('❌ Рассылка отменена.\nЧтобы начать заново, нажмите /menu');
   });
 }

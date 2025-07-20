@@ -31,19 +31,19 @@ router.post('/notify', async (req, res) => {
     const users = await getUsersFromDb(role);
     console.log(`📋 Найдено ${users.length} пользователей с ролью ${role}`);
 
-    let success = 0;
-    const errors = [];
+    const results = await Promise.allSettled(
+      users.map((user) =>
+        bot.telegram.sendMessage(user.telegramId, `📰 ${message}`)
+      )
+    );
 
-    for (const user of users) {
-      try {
-        await bot.telegram.sendMessage(user.telegramId, `📰 ${message}`);
-        console.log(`✅ Успешно отправлено: ${user.telegramId}`);
-        success++;
-      } catch (err) {
-        console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
-        errors.push({ telegramId: user.telegramId, error: err.message });
-      }
-    }
+    const success = results.filter(r => r.status === 'fulfilled').length;
+    const errors = results
+      .map((r, i) => r.status === 'rejected' ? {
+        telegramId: users[i].telegramId,
+        error: r.reason.message || 'Неизвестная ошибка',
+      } : null)
+      .filter(Boolean);
 
     console.log(`📬 Рассылка завершена: ${success}/${users.length} успешно`);
 

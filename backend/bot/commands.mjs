@@ -7,9 +7,23 @@ import { showMainMenu } from './handlers.mjs';
  * @param {Telegraf} bot
  */
 export function setupCommands(bot) {
+  // Команда /start
+  bot.start(isRegistered, async (ctx) => {
+    await ctx.reply('👋 Добро пожаловать!');
+    await showMainMenu(ctx);
+  });
+
   // Команда /menu
   bot.command('menu', isRegistered, async (ctx) => {
     await showMainMenu(ctx);
+  });
+
+  // Команда /testme
+  bot.command('testme', isRegistered, async (ctx) => {
+    const tgId = ctx.from?.id;
+    const username = ctx.from?.username || ctx.from?.first_name || 'пользователь';
+
+    await ctx.reply(`✅ Бот работает!\nТвой Telegram ID: ${tgId}\nИмя: ${username}`);
   });
 
   // Кнопка 📋 Меню
