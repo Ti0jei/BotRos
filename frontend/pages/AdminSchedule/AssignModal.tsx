@@ -23,7 +23,6 @@ import "dayjs/locale/ru";
 
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
-import { NumberInput } from "@mantine/core"; // убедись, что импорт есть
 
 interface AssignModalProps {
   opened: boolean;
@@ -285,6 +284,8 @@ export default function AssignModal({
                 radius="xl"
                 hideControls
                 onBlur={blurActiveElement}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               <Select
                 label="Способ оплаты"
