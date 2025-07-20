@@ -220,7 +220,8 @@ export default function AssignModal({
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
-              onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+              onClick={blurActiveElement} // ✅ для iOS
+              onDropdownClose={blurActiveElement} // ✅ для Android
               radius="md"
               size="md"
               withinPortal
@@ -244,7 +245,8 @@ export default function AssignModal({
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}
               onChange={setSelectedTemplateId}
-              onDropdownClose={() => blurActiveElement()} // ← добавлено
+              onClick={blurActiveElement} // ✅ для iOS
+              onDropdownClose={blurActiveElement}
               clearable
             />
           )}
@@ -271,7 +273,7 @@ export default function AssignModal({
                 placeholder="Введите сумму"
                 value={singlePrice}
                 onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                onBlur={blurActiveElement}
+                onBlur={blurActiveElement} // ✅ скрытие клавы на iOS при выходе из поля
                 min={0}
               />
               <Select
@@ -283,93 +285,93 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onDropdownClose={() => blurActiveElement()} // ← вот это нужно
+                onClick={blurActiveElement} // ✅ для iOS
+                onDropdownClose={blurActiveElement}
                 clearable
               />
-            </>
           )}
 
-          {showWarning && (
-            <Text
-              size="sm"
-              style={{
-                backgroundColor: "#fff4f4",
-                padding: "8px 12px",
-                borderRadius: 8,
-                color: "#c92a2a",
-                border: "1px solid #f3c0c0",
-              }}
-            >
-              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
-            </Text>
-          )}
+              {showWarning && (
+                <Text
+                  size="sm"
+                  style={{
+                    backgroundColor: "#fff4f4",
+                    padding: "8px 12px",
+                    borderRadius: 8,
+                    color: "#c92a2a",
+                    border: "1px solid #f3c0c0",
+                  }}
+                >
+                  У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
+                </Text>
+              )}
 
-          <Divider />
+              <Divider />
 
-          <Text size="sm" fw={500}>Выберите время:</Text>
+              <Text size="sm" fw={500}>Выберите время:</Text>
 
-          <ScrollArea h={200} offsetScrollbars>
-            <Stack spacing={6}>
-              {hours.map((h) => {
-                const usersAtThisHour = assignedClients
-                  .filter((a) => a.hour === h)
-                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
-                  .join(", ");
+              <ScrollArea h={200} offsetScrollbars>
+                <Stack spacing={6}>
+                  {hours.map((h) => {
+                    const usersAtThisHour = assignedClients
+                      .filter((a) => a.hour === h)
+                      .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                      .join(", ");
 
-                return (
-                  <Group key={h} spacing="xs" align="center" noWrap>
-                    <Button
-                      variant={selectedHour === h ? "filled" : "outline"}
-                      color="dark"
-                      size="xs"
-                      radius="xl"
-                      onClick={() => setSelectedHour(h)}
-                      style={{ minWidth: 60 }}
-                    >
-                      {h}:00
-                    </Button>
-                    {usersAtThisHour && (
-                      <Text
-                        size="xs"
-                        c="dimmed"
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {usersAtThisHour}
-                      </Text>
-                    )}
-                  </Group>
-                );
-              })}
+                    return (
+                      <Group key={h} spacing="xs" align="center" noWrap>
+                        <Button
+                          variant={selectedHour === h ? "filled" : "outline"}
+                          color="dark"
+                          size="xs"
+                          radius="xl"
+                          onClick={() => setSelectedHour(h)}
+                          style={{ minWidth: 60 }}
+                        >
+                          {h}:00
+                        </Button>
+                        {usersAtThisHour && (
+                          <Text
+                            size="xs"
+                            c="dimmed"
+                            style={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {usersAtThisHour}
+                          </Text>
+                        )}
+                      </Group>
+                    );
+                  })}
+                </Stack>
+              </ScrollArea>
+
+              <Button
+                fullWidth
+                radius="xl"
+                color="dark"
+                size="md"
+                onClick={() =>
+                  onAssign(
+                    selectedTemplateId,
+                    date.format("YYYY-MM-DD"),
+                    singlePrice,
+                    singlePaymentMethod
+                  )
+                }
+                style={{ fontWeight: 600 }}
+                disabled={
+                  !selectedUser ||
+                  selectedHour === null ||
+                  date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+                }
+              >
+                Назначить
+              </Button>
             </Stack>
-          </ScrollArea>
-
-          <Button
-            fullWidth
-            radius="xl"
-            color="dark"
-            size="md"
-            onClick={() =>
-              onAssign(
-                selectedTemplateId,
-                date.format("YYYY-MM-DD"),
-                singlePrice,
-                singlePaymentMethod
-              )
-            }
-            style={{ fontWeight: 600 }}
-            disabled={
-              !selectedUser ||
-              selectedHour === null ||
-              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
-            }
-          >
-            Назначить
-          </Button>
-        </Stack>
       </Card>
     </Modal>
   );

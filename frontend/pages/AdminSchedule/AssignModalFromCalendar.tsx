@@ -208,7 +208,8 @@ export default function AssignModalFromCalendar({
               placeholder="Выберите клиента"
               value={selectedUser}
               onChange={(val) => setSelectedUser(val)}
-              onDropdownClose={blurActiveElement}
+              onClick={blurActiveElement} // ✅ для iOS
+              onDropdownClose={blurActiveElement} // ✅ для Android + iOS
               searchable
               nothingFound="Не найдено"
             />
@@ -230,6 +231,7 @@ export default function AssignModalFromCalendar({
               }))}
               value={selectedTemplateId}
               onChange={(val) => setSelectedTemplateId(val)}
+              onClick={blurActiveElement} // ✅ для iOS
               onDropdownClose={blurActiveElement}
             />
           )}
@@ -269,6 +271,7 @@ export default function AssignModalFromCalendar({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
+                onClick={blurActiveElement} // ✅ для iOS
                 onDropdownClose={blurActiveElement}
                 required
               />
