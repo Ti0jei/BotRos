@@ -15,6 +15,7 @@ import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import { Dayjs } from "dayjs";
 import { blurActiveElement } from "@/utils/blurActiveElement"; // ✅ добавлен импорт
+import { NumberInput } from "@mantine/core"; // убедись, что импорт есть
 
 interface Props {
   opened: boolean;
@@ -248,16 +249,21 @@ export default function AssignModalFromCalendar({
 
           {isSinglePaid && (
             <>
-              <TextInput
+              <NumberInput
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                type="text" // ⛔️ было "number" — заменено на "text" для iOS
-                inputMode="numeric" // ✅ отображает цифровую клаву
-                pattern="[0-9]*"     // ✅ только цифры
-                value={singlePrice}
-                onChange={(e) => setSinglePrice(e.currentTarget.value)}
-                required
-                onBlur={blurActiveElement} // ✅ скрытие клавы при выходе
+                value={singlePrice ? parseInt(singlePrice) : undefined}
+                onChange={(val) => {
+                  if (typeof val === "number" && !isNaN(val)) {
+                    setSinglePrice(val.toString());
+                  } else {
+                    setSinglePrice("");
+                  }
+                }}
+                min={0}
+                radius="xl"
+                hideControls
+                onBlur={blurActiveElement}
               />
               <Select
                 label="Способ оплаты"

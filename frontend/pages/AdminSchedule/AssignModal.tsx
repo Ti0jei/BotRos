@@ -23,6 +23,7 @@ import "dayjs/locale/ru";
 
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
+import { NumberInput } from "@mantine/core"; // убедись, что импорт есть
 
 interface AssignModalProps {
   opened: boolean;
@@ -266,20 +267,22 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <TextInput
-                label="Стоимость"
+              <NumberInput
+                label="Сумма (₽)"
                 placeholder="Введите сумму"
-                type="text" // заменили с number → text
-                inputMode="numeric" // цифровая клавиатура
-                pattern="[0-9]*"
-                value={singlePrice !== null ? singlePrice.toString() : ""}
-                onChange={(e) => {
-                  const numeric = e.currentTarget.value.replace(/\D/g, "");
-                  setSinglePrice(numeric ? parseInt(numeric) : null);
+                value={singlePrice ?? undefined}
+                onChange={(val) => {
+                  if (typeof val === "number") {
+                    setSinglePrice(val);
+                  } else {
+                    setSinglePrice(null);
+                  }
                 }}
+                min={0}
+                radius="xl"
+                hideControls
                 onBlur={blurActiveElement}
               />
-
               <Select
                 label="Способ оплаты"
                 placeholder="Выберите"
