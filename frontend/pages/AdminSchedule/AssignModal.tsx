@@ -16,11 +16,11 @@ import {
   NumberInput,
   Box,
   ScrollArea,
-  TextInput
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
+
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
 
@@ -79,7 +79,7 @@ export default function AssignModal({
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
-  const [singlePrice, setSinglePrice] = useState<string>("");
+  const [singlePrice, setSinglePrice] = useState<number | null>(null);
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
@@ -182,8 +182,6 @@ export default function AssignModal({
       size="md"
       scrollAreaComponent="div"
       styles={{ body: { padding: 0 } }}
-      trapFocus={false}           // ✅ Добавлено
-      withinPortal={false}        // ✅ Добавлено
     >
       <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <Stack spacing="md">
@@ -222,7 +220,8 @@ export default function AssignModal({
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
-              onDropdownClose={blurActiveElement} // ✅ ТОЛЬКО ОН!
+              onClick={blurActiveElement} // ✅ для iOS
+              onDropdownClose={blurActiveElement} // ✅ для Android
               radius="md"
               size="md"
               withinPortal
@@ -246,6 +245,7 @@ export default function AssignModal({
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}
               onChange={setSelectedTemplateId}
+              onClick={blurActiveElement} // ✅ для iOS
               onDropdownClose={blurActiveElement}
               clearable
             />
@@ -268,17 +268,13 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <TextInput
-                size="md"
-                label="Сумма (₽)"
+              <NumberInput
+                label="Стоимость"
                 placeholder="Введите сумму"
-                type="number"
                 value={singlePrice}
-                onChange={(e) => setSinglePrice(e.currentTarget.value)}
+                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+                onBlur={blurActiveElement} // ✅ скрытие клавы на iOS при выходе из поля
                 min={0}
-                radius="xl"
-                inputMode="numeric"
-                onBlur={blurActiveElement}
               />
               <Select
                 label="Способ оплаты"
@@ -289,6 +285,7 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
+                onClick={blurActiveElement} // ✅ для iOS
                 onDropdownClose={blurActiveElement}
                 clearable
               />
@@ -362,7 +359,7 @@ export default function AssignModal({
               onAssign(
                 selectedTemplateId,
                 date.format("YYYY-MM-DD"),
-                singlePrice ? parseInt(singlePrice) : undefined,
+                singlePrice,
                 singlePaymentMethod
               )
             }
