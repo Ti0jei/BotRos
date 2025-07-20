@@ -97,8 +97,8 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
   const trainingsForActiveBlock = activeBlock
     ? trainings
-        .filter((t) => t.blockId === activeBlock.id && t.attended)
-        .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+      .filter((t) => t.blockId === activeBlock.id && t.attended)
+      .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
     : [];
 
   const cardStyle = {
@@ -189,6 +189,22 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </Accordion>
             )}
 
+            {futureTrainings.length > 0 && (
+              <>
+                <Divider label="Будущие тренировки" labelPosition="center" />
+                <Stack spacing="xs">
+                  {futureTrainings.map((t) => (
+                    <Paper key={t.id} style={cardStyle} p="sm">
+                      <Group position="apart">
+                        <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                        <Text size="sm" c="dimmed">{t.hour}:00</Text>
+                      </Group>
+                    </Paper>
+                  ))}
+                </Stack>
+              </>
+            )}
+
             {pastTrainings.length > 0 && (
               <>
                 <Divider label="Последние тренировки" labelPosition="center" />
@@ -205,21 +221,6 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </>
             )}
 
-            {futureTrainings.length > 0 && (
-              <>
-                <Divider label="Будущие тренировки" labelPosition="center" />
-                <Stack spacing="xs">
-                  {futureTrainings.map((t) => (
-                    <Paper key={t.id} style={cardStyle} p="sm">
-                      <Group position="apart">
-                        <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
-                        <Text size="sm" c="dimmed">{t.hour}:00</Text>
-                      </Group>
-                    </Paper>
-                  ))}
-                </Stack>
-              </>
-            )}
           </Stack>
         )}
       </Container>
