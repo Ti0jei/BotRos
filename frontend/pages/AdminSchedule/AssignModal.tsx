@@ -266,13 +266,18 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <NumberInput
+              <TextInput
                 label="Стоимость"
                 placeholder="Введите сумму"
-                value={singlePrice}
-                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                onBlur={blurActiveElement} // ✅ скрываем клавиатуру на iOS при выходе из поля
-                min={0}
+                type="text" // заменили с number → text
+                inputMode="numeric" // цифровая клавиатура
+                pattern="[0-9]*"
+                value={singlePrice !== null ? singlePrice.toString() : ""}
+                onChange={(e) => {
+                  const numeric = e.currentTarget.value.replace(/\D/g, "");
+                  setSinglePrice(numeric ? parseInt(numeric) : null);
+                }}
+                onBlur={blurActiveElement}
               />
 
               <Select

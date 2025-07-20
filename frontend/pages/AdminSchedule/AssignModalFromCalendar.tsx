@@ -251,13 +251,13 @@ export default function AssignModalFromCalendar({
               <TextInput
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                type="number"
+                type="text" // ⛔️ было "number" — заменено на "text" для iOS
+                inputMode="numeric" // ✅ отображает цифровую клаву
+                pattern="[0-9]*"     // ✅ только цифры
                 value={singlePrice}
                 onChange={(e) => setSinglePrice(e.currentTarget.value)}
                 required
-                inputMode="numeric"
-                pattern="[0-9]*"
-                onBlur={blurActiveElement} // ✅ оставляем для iOS
+                onBlur={blurActiveElement} // ✅ скрытие клавы при выходе
               />
               <Select
                 label="Способ оплаты"
