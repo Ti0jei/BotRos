@@ -91,12 +91,14 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
     .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
     .slice(0, 3);
 
-  const futureTrainings = trainings.filter((t) => dayjs(t.date).isAfter(today));
+  const futureTrainings = trainings
+    .filter((t) => dayjs(t.date).isAfter(today))
+    .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
 
   const trainingsForActiveBlock = activeBlock
-    ? trainings.filter(
-        (t) => t.blockId === activeBlock.id && t.attended
-      ).sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+    ? trainings
+        .filter((t) => t.blockId === activeBlock.id && t.attended)
+        .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
     : [];
 
   const cardStyle = {
@@ -150,7 +152,7 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
         ) : (
           <Stack spacing="md">
             {activeBlock && (
-              <Accordion variant="separated" defaultValue="block">
+              <Accordion variant="separated">
                 <Accordion.Item value="block">
                   <Accordion.Control>
                     <Group position="apart" style={{ width: '100%' }}>
@@ -185,11 +187,11 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </Accordion>
             )}
 
-            {pastTrainings.length > 0 && (
+            {futureTrainings.length > 0 && (
               <>
-                <Divider label="Последние тренировки" labelPosition="center" />
+                <Divider label="Будущие тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {pastTrainings.map((t) => (
+                  {futureTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
@@ -201,11 +203,11 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </>
             )}
 
-            {futureTrainings.length > 0 && (
+            {pastTrainings.length > 0 && (
               <>
-                <Divider label="Будущие тренировки" labelPosition="center" />
+                <Divider label="Последние тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {futureTrainings.map((t) => (
+                  {pastTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
