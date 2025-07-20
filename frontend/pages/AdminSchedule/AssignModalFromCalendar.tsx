@@ -42,7 +42,7 @@ export default function AssignModalFromCalendar({
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-
+  const isPast = selectedDate.startOf("day").isBefore(new Date().setHours(0, 0, 0, 0));
   const footerRef = useRef<HTMLDivElement>(null);
   const [bottomOffset, setBottomOffset] = useState(100);
 
@@ -286,14 +286,16 @@ export default function AssignModalFromCalendar({
             <Button
               onClick={handleAssign}
               variant="outline"
+              disabled={isPast}
               style={{
                 borderRadius: 12,
                 fontWeight: 500,
                 paddingLeft: 20,
                 paddingRight: 20,
-                color: "#1a1a1a",
+                color: isPast ? "#aaa" : "#1a1a1a",
                 border: "1px solid #1a1a1a",
                 backgroundColor: "#fff",
+                cursor: isPast ? "not-allowed" : "pointer",
               }}
             >
               Назначить

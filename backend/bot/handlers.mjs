@@ -24,9 +24,14 @@ export async function showMainMenu(ctx) {
     keyboard.push([{ text: '📞 Задать вопрос', url: 'https://t.me/krippsii' }]);
   }
 
-  await ctx.reply(`👋 ${name}, выбери действие ниже:`, {
+  const msg = await ctx.reply(`👋 ${name}, выбери действие ниже:`, {
     reply_markup: { inline_keyboard: keyboard },
   });
+
+  // Удалить сообщение с меню через 1 минуту
+  setTimeout(() => {
+    ctx.telegram.deleteMessage(ctx.chat.id, msg.message_id).catch(() => {});
+  }, 60 * 1000);
 }
 
 export function setupHandlers(bot) {
@@ -56,6 +61,15 @@ export function setupHandlers(bot) {
       });
 
       await ctx.answerCbQuery('✅ Статус обновлён');
+
+      // Удаляем клавиатуру
+      await ctx.editMessageReplyMarkup();
+
+      // Удаляем оригинальное сообщение с кнопками
+      try {
+        await ctx.deleteMessage();
+      } catch (_) {}
+
       await ctx.reply('🟢 Отлично! Вы придёте на тренировку');
     } catch (err) {
       console.error('❌ Ошибка обновления статуса:', err.message);
@@ -80,6 +94,15 @@ export function setupHandlers(bot) {
       });
 
       await ctx.answerCbQuery('❌ Статус обновлён');
+
+      // Удаляем клавиатуру
+      await ctx.editMessageReplyMarkup();
+
+      // Удаляем оригинальное сообщение с кнопками
+      try {
+        await ctx.deleteMessage();
+      } catch (_) {}
+
       await ctx.reply('🔴 Окей! Мы учтём, что вы не придёте');
     } catch (err) {
       console.error('❌ Ошибка обновления статуса:', err.message);

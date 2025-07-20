@@ -110,6 +110,8 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
     localStorage.setItem("calendarSelectedDate", d.format("YYYY-MM-DD"));
   };
 
+  const isPast = date.isBefore(dayjs().startOf("day"));
+
   return (
     <Box
       style={{
@@ -147,6 +149,14 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
                 trainings={trainings.filter((t) => t.hour === hour)}
                 blocks={blocks}
                 onOpenAssign={() => {
+                  if (isPast) {
+                    showNotification({
+                      title: "Нельзя назначить на прошедшую дату",
+                      message: "Запись в прошлом недоступна. Можно только отмечать факт посещения.",
+                      color: "red",
+                    });
+                    return;
+                  }
                   setSelectedHour(hour);
                   setModalOpen(true);
                 }}
@@ -170,7 +180,7 @@ export default function AdminSchedule({ onBack }: { onBack: () => void }) {
         clients={clients}
         blocks={blocks}
         selectedHour={selectedHour}
-        selectedDate={date} // ✅ передаём Dayjs, не .format!
+        selectedDate={date}
         onSuccess={loadTrainings}
         singlePrice={singlePrice}
         setSinglePrice={setSinglePrice}

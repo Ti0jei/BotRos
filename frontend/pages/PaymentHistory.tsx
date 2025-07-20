@@ -11,14 +11,17 @@ import {
   Loader,
   Divider,
   Box,
-  Collapse,
+  Drawer,
   ActionIcon,
+  Accordion,
 } from '@mantine/core';
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { IconMenu2 } from '@tabler/icons-react';
+import dayjs from 'dayjs';
 
 interface Props {
   userId: string;
   onBack: () => void;
+  setView: (v: string) => void;
 }
 
 interface PaymentBlock {
@@ -39,12 +42,11 @@ interface TrainingRecord {
   blockId?: string;
 }
 
-export default function PaymentHistory({ userId, onBack }: Props) {
+export default function PaymentHistory({ userId, onBack, setView }: Props) {
   const [blocks, setBlocks] = useState<PaymentBlock[]>([]);
-  const [blockTrainings, setBlockTrainings] = useState<TrainingRecord[]>([]);
-  const [singleTrainings, setSingleTrainings] = useState<TrainingRecord[]>([]);
+  const [trainings, setTrainings] = useState<TrainingRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedBlocks, setExpandedBlocks] = useState<Record<string, boolean>>({});
+  const [drawerOpened, setDrawerOpened] = useState(false);
 
   const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem('token');
@@ -72,8 +74,7 @@ export default function PaymentHistory({ userId, onBack }: Props) {
 
       if (trainingsRes.ok) {
         const all: TrainingRecord[] = await trainingsRes.json();
-        setBlockTrainings(all.filter((t) => t.blockId));
-        setSingleTrainings(all.filter((t) => t.isSinglePaid && t.attended === true)); // ✅ исправлено
+        setTrainings(all);
       }
     } catch (e) {
       console.error('Ошибка загрузки истории оплат:', e);
@@ -82,30 +83,23 @@ export default function PaymentHistory({ userId, onBack }: Props) {
     }
   };
 
-  const markInactive = async (blockId: string) => {
-    const confirmed = window.confirm('Завершить этот блок?');
-    if (!confirmed) return;
+  const today = dayjs();
+  const activeBlock = blocks.find((b) => b.active);
 
-    try {
-      await fetch(`${API}/api/payment-blocks/${blockId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ active: false }),
-      });
-      await loadData();
-    } catch (e) {
-      console.error('Ошибка завершения блока:', e);
-    }
-  };
+  const pastTrainings = trainings
+    .filter((t) => t.attended && dayjs(t.date).isBefore(today))
+    .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+    .slice(0, 3);
 
-  const toggleExpand = (blockId: string) => {
-    setExpandedBlocks((prev) => ({
-      ...prev,
-      [blockId]: !prev[blockId],
-    }));
-  };
+  const futureTrainings = trainings
+    .filter((t) => dayjs(t.date).isAfter(today))
+    .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+
+  const trainingsForActiveBlock = activeBlock
+    ? trainings
+      .filter((t) => t.blockId === activeBlock.id && t.attended)
+      .sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+    : [];
 
   const cardStyle = {
     backgroundColor: '#fff',
@@ -130,91 +124,76 @@ export default function PaymentHistory({ userId, onBack }: Props) {
   };
 
   return (
-    <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80 }}>
+    <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80, position: 'relative' }}>
+      {!drawerOpened && (
+        <ActionIcon
+          size="lg"
+          onClick={() => setDrawerOpened(true)}
+          title="Меню"
+          style={{
+            position: 'fixed',
+            top: 12,
+            right: 12,
+            background: 'transparent',
+            color: '#1a1a1a',
+            zIndex: 9999,
+          }}
+          variant="subtle"
+        >
+          <IconMenu2 size={20} />
+        </ActionIcon>
+      )}
+
       <Container size="xs" py="md">
-        <Title order={3} mb="md" c="#1a1a1a">
-          История оплат
-        </Title>
+        <Group position="apart" mb="md">
+          <Title order={3} c="#1a1a1a">Запись</Title>
+        </Group>
 
         {loading ? (
           <Loader />
         ) : (
           <Stack spacing="md">
-            {blocks.length === 0 && singleTrainings.length === 0 && (
-              <Text size="sm" c="dimmed">
-                Пока нет данных об оплатах
-              </Text>
-            )}
-
-            {blocks.map((block) => {
-              const usedTrainings = blockTrainings.filter(
-                (t) => t.blockId === block.id
-              );
-              const expanded = expandedBlocks[block.id] ?? false;
-
-              return (
-                <Paper key={block.id} style={cardStyle}>
-                  <Group position="apart" mb="xs">
-                    <Text fw={600} size="sm">
-                      Оплата от {new Date(block.paidAt).toLocaleDateString()}
-                    </Text>
-                    <Badge color={block.active ? 'green' : 'gray'}>
-                      {block.active ? 'АКТИВЕН' : 'ЗАВЕРШЁН'}
-                    </Badge>
-                  </Group>
-
-                  <Group position="apart" align="center">
-                    <Text size="sm" c="dimmed">
-                      {block.paidTrainings} тренировок • {block.used} использовано • {block.pricePerTraining} ₽
-                    </Text>
-
-                    <ActionIcon
-                      variant="light"
-                      color="dark"
-                      radius="xl"
-                      onClick={() => toggleExpand(block.id)}
-                    >
-                      {expanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
-                    </ActionIcon>
-                  </Group>
-
-                  <Collapse in={expanded}>
-                    <Stack spacing={4} mt="xs">
-                      {usedTrainings.length > 0 ? (
-                        usedTrainings.map((t) => (
-                          <Text key={t.id} size="xs" c="dimmed">
-                            {new Date(t.date).toLocaleDateString()} — {t.hour}:00
-                          </Text>
+            {activeBlock && (
+              <Accordion variant="separated">
+                <Accordion.Item value="block">
+                  <Accordion.Control>
+                    <Group position="apart" style={{ width: '100%' }}>
+                      <div>
+                        <Text fw={600} size="sm">
+                          Оплата от {new Date(activeBlock.paidAt).toLocaleDateString()}
+                        </Text>
+                        <Text size="sm" c="dimmed">
+                          {activeBlock.paidTrainings} тренировок • {activeBlock.used} использовано • {activeBlock.pricePerTraining} ₽
+                        </Text>
+                      </div>
+                      <Badge color="green">АКТИВЕН</Badge>
+                    </Group>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Stack spacing="xs" mt="sm">
+                      {trainingsForActiveBlock.length > 0 ? (
+                        trainingsForActiveBlock.map((t) => (
+                          <Paper key={t.id} style={cardStyle} p="sm">
+                            <Group position="apart">
+                              <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                              <Text size="sm" c="dimmed">{t.hour}:00</Text>
+                            </Group>
+                          </Paper>
                         ))
                       ) : (
-                        <Text size="xs" c="dimmed">
-                          Пока нет посещений
-                        </Text>
+                        <Text size="sm" c="dimmed">Нет использованных тренировок</Text>
                       )}
                     </Stack>
-                  </Collapse>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
+            )}
 
-                  {block.active && (
-                    <Button
-                      size="xs"
-                      color="red"
-                      fullWidth
-                      mt="sm"
-                      onClick={() => markInactive(block.id)}
-                      radius="md"
-                    >
-                      Завершить блок
-                    </Button>
-                  )}
-                </Paper>
-              );
-            })}
-
-            {singleTrainings.length > 0 && (
+            {futureTrainings.length > 0 && (
               <>
-                <Divider label="Разовые тренировки" labelPosition="center" />
+                <Divider label="Будущие тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {singleTrainings.map((t) => (
+                  {futureTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
@@ -225,23 +204,76 @@ export default function PaymentHistory({ userId, onBack }: Props) {
                 </Stack>
               </>
             )}
+
+            {pastTrainings.length > 0 && (
+              <>
+                <Divider label="Последние тренировки" labelPosition="center" />
+                <Stack spacing="xs">
+                  {pastTrainings.map((t) => (
+                    <Paper key={t.id} style={cardStyle} p="sm">
+                      <Group position="apart">
+                        <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                        <Text size="sm" c="dimmed">{t.hour}:00</Text>
+                      </Group>
+                    </Paper>
+                  ))}
+                </Stack>
+              </>
+            )}
+
           </Stack>
         )}
       </Container>
 
+      <Drawer
+        opened={drawerOpened}
+        onClose={() => setDrawerOpened(false)}
+        title="Опции"
+        padding="md"
+        position="right"
+        size="xs"
+        overlayOpacity={0.55}
+        overlayBlur={3}
+      >
+        <Stack spacing="sm">
+          <Button
+            fullWidth
+            variant="outline"
+            styles={buttonStyle}
+            onClick={() => {
+              setDrawerOpened(false);
+              setView('finished-blocks');
+            }}
+          >
+            Завершённые абонементы
+          </Button>
+          <Button
+            fullWidth
+            variant="outline"
+            styles={buttonStyle}
+            onClick={() => {
+              setDrawerOpened(false);
+              setView('finished-singles');
+            }}
+          >
+            Завершённые разовые посещения
+          </Button>
+        </Stack>
+      </Drawer>
+
       <Box
         style={{
-          position: "fixed",
+          position: 'fixed',
           bottom: 0,
           left: 0,
-          width: "100%",
-          background: "white",
-          padding: "10px 16px",
-          boxShadow: "0 -2px 6px rgba(0,0,0,0.05)",
+          width: '100%',
+          background: 'white',
+          padding: '10px 16px',
+          boxShadow: '0 -2px 6px rgba(0,0,0,0.05)',
           zIndex: 1000,
         }}
       >
-        <Box style={{ maxWidth: 420, margin: "0 auto" }}>
+        <Box style={{ maxWidth: 420, margin: '0 auto' }}>
           <Button
             onClick={onBack}
             variant="outline"

@@ -1,5 +1,5 @@
 import { bot } from './index.mjs';
-import prisma from '../prisma/index.mjs'; // ← импорт Prisma клиента
+import prisma from '../prisma/index.mjs';
 
 /**
  * Отправка персонального уведомления пользователю
@@ -27,8 +27,19 @@ export async function notifyTelegram(telegramId, text, trainingId = null) {
         }
       : {};
 
-    await bot.telegram.sendMessage(telegramId, text, extra);
+    const sentMessage = await bot.telegram.sendMessage(telegramId, text, extra);
     console.log(`✅ Уведомление отправлено: ${telegramId}${trainingId ? ' (с кнопками)' : ''}`);
+
+    // Удаление сообщения через:
+    // - 5 дней для сообщений с кнопками
+    // - 60 секунд для обычных уведомлений
+    const timeoutMs = trainingId ? 5 * 24 * 60 * 60 * 1000 : 60 * 1000;
+
+    setTimeout(() => {
+      bot.telegram.deleteMessage(telegramId, sentMessage.message_id).catch(() => {
+        console.warn(`⚠️ Не удалось удалить сообщение ${sentMessage.message_id} для ${telegramId}`);
+      });
+    }, timeoutMs);
   } catch (err) {
     console.error(`❌ Ошибка отправки пользователю ${telegramId}:`, err.message);
   }
@@ -52,17 +63,20 @@ export async function notifyBroadcast(text, role = 'USER') {
         role,
         telegramId: { not: null },
       },
-      select: {
-        telegramId: true,
-      },
+      select: { telegramId: true },
     });
 
     let success = 0;
 
     for (const user of users) {
       try {
-        await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
+        const sent = await bot.telegram.sendMessage(user.telegramId, `📰 ${text}`);
         success++;
+
+        // Удаление через 60 сек
+        setTimeout(() => {
+          bot.telegram.deleteMessage(user.telegramId, sent.message_id).catch(() => {});
+        }, 60 * 1000);
       } catch (err) {
         console.error(`❌ Не удалось отправить ${user.telegramId}:`, err.message);
       }

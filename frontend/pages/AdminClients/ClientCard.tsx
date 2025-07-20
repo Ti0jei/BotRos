@@ -189,7 +189,7 @@ export default function ClientCard({
                     leftIcon={<IconGift size={12} />}
                     onClick={onOpenHistory}
                   >
-                    История оплат
+                    Запись
                   </Button>
                 </Group>
                 <Button

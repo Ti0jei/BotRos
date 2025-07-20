@@ -14,10 +14,11 @@ import RequestReset from './pages/RequestReset';
 import ResetPassword from './pages/ResetPassword';
 import ClientNutrition from './pages/ClientNutrition';
 import AssignTrainingPage from './pages/AssignTrainingPage';
-
 import WorkoutTemplatesPage from './admin/workouts';
 import CreateWorkoutTemplate from './admin/create';
 import EditWorkoutTemplate from './admin/id';
+import FinishedBlocksPageWrapper from './pages/FinishedBlocksPage';
+import FinishedSinglesPageWrapper from './pages/FinishedSinglesPage';
 
 import { Box, Center, Loader } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
@@ -39,6 +40,8 @@ function App() {
     | 'workouts'
     | 'create-workout'
     | 'edit-workout'
+    | 'finished-blocks'
+    | 'finished-singles'
   >('login');
 
   const [profile, setProfile] = useState<any>(null);
@@ -229,7 +232,11 @@ function App() {
       )}
 
       {view === 'history' && selectedClientId && (
-        <PaymentHistory userId={selectedClientId} onBack={() => setView('clients')} />
+        <PaymentHistory
+          userId={selectedClientId}
+          onBack={() => setView('clients')}
+          setView={setView}
+        />
       )}
 
       {view === 'assign-training' && profile?.role === 'ADMIN' && (
@@ -256,6 +263,14 @@ function App() {
           templateId={selectedTemplateId}
           setView={setView}
         />
+      )}
+
+      {view === 'finished-blocks' && selectedClientId && (
+        <FinishedBlocksPageWrapper onBack={() => setView('history')} userId={selectedClientId} />
+      )}
+
+      {view === 'finished-singles' && selectedClientId && (
+        <FinishedSinglesPageWrapper onBack={() => setView('history')} userId={selectedClientId} />
       )}
     </Box>
   );

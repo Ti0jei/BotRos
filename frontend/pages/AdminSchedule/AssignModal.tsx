@@ -212,19 +212,19 @@ export default function AssignModal({
 
           {!isClientPreselected ? (
             <Select
-            label="Клиент"
-            placeholder="Выберите клиента"
-            data={clients.map((c) => ({
-              value: c.id,
-              label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-            }))}
-            value={selectedUser}
-            onChange={(val) => setSelectedUser(val || null)}
-            onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
-            radius="md"
-            size="md"
-            withinPortal
-          />
+              label="Клиент"
+              placeholder="Выберите клиента"
+              data={clients.map((c) => ({
+                value: c.id,
+                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+              }))}
+              value={selectedUser}
+              onChange={(val) => setSelectedUser(val || null)}
+              onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+              radius="md"
+              size="md"
+              withinPortal
+            />
           ) : (
             <Text size="sm">
               Клиент: <b>{clients.find((c) => c.id === selectedUser)?.name} {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}</b>
@@ -239,14 +239,14 @@ export default function AssignModal({
 
           {templates.length > 0 && (
             <Select
-            label="Программа тренировки"
-            placeholder="Авто (ротация) или выберите вручную"
-            data={templates.map((t) => ({ label: t.title, value: t.id }))}
-            value={selectedTemplateId}
-            onChange={setSelectedTemplateId}
-            onDropdownClose={() => blurActiveElement()} // ← добавлено
-            clearable
-          />
+              label="Программа тренировки"
+              placeholder="Авто (ротация) или выберите вручную"
+              data={templates.map((t) => ({ label: t.title, value: t.id }))}
+              value={selectedTemplateId}
+              onChange={setSelectedTemplateId}
+              onDropdownClose={() => blurActiveElement()} // ← добавлено
+              clearable
+            />
           )}
 
           {remaining !== null && !isSinglePaid && (
@@ -361,7 +361,11 @@ export default function AssignModal({
               )
             }
             style={{ fontWeight: 600 }}
-            disabled={!selectedUser || selectedHour === null}
+            disabled={
+              !selectedUser ||
+              selectedHour === null ||
+              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+            }
           >
             Назначить
           </Button>

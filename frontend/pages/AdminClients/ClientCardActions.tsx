@@ -95,7 +95,7 @@ export default function ClientCardActions({
             leftIcon={<IconGift size={16} />}
             onClick={onHistory}
           >
-            История оплат
+            Запись
           </Button>
           <Button
             styles={buttonStyle}

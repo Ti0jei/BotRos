@@ -5,11 +5,13 @@ export default function ConfirmModal({
   onClose,
   message,
   onConfirm,
+  extraInfo, // ✅ добавлен новый проп
 }: {
   opened: boolean;
   onClose: () => void;
   message: string;
   onConfirm: () => void;
+  extraInfo?: string; // ✅ типизация дополнительного текста
 }) {
   return (
     <Modal
@@ -29,6 +31,12 @@ export default function ConfirmModal({
           <Text size="sm" c="dimmed">
             {message}
           </Text>
+
+          {extraInfo && (
+            <Text size="xs" c="red">
+              {extraInfo}
+            </Text>
+          )}
 
           <Group grow>
             <Button
