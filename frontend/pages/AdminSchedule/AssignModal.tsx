@@ -21,7 +21,6 @@ import {
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ru";
-
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
 
@@ -269,25 +268,17 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <NumberInput
+              <TextInput
                 size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                value={singlePrice ? parseInt(singlePrice) : undefined}
-                onChange={(val) => {
-                  if (typeof val === "number" && !isNaN(val)) {
-                    setSinglePrice(val.toString());
-                  } else {
-                    setSinglePrice("");
-                  }
-                }}
+                type="number"
+                value={singlePrice}
+                onChange={(e) => setSinglePrice(e.currentTarget.value)}
                 min={0}
                 radius="xl"
-                hideControls
-                onBlur={blurActiveElement}
-                trapFocus={false}
                 inputMode="numeric"
-                parser={(val) => val?.replace(/\D/g, "") ?? ""}
+                onBlur={blurActiveElement}
               />
               <Select
                 label="Способ оплаты"
@@ -298,7 +289,7 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onDropdownClose={blurActiveElement} // ✅ закрытие Select — скрыть клаву, если она осталась
+                onDropdownClose={blurActiveElement}
                 clearable
               />
             </>
