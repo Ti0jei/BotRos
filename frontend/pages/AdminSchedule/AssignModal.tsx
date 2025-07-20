@@ -220,8 +220,7 @@ export default function AssignModal({
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
-              onClick={blurActiveElement} // ✅ для iOS
-              onDropdownClose={blurActiveElement} // ✅ для Android
+              onDropdownClose={blurActiveElement} // ✅ ТОЛЬКО ОН!
               radius="md"
               size="md"
               withinPortal
@@ -245,7 +244,6 @@ export default function AssignModal({
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}
               onChange={setSelectedTemplateId}
-              onClick={blurActiveElement} // ✅ для iOS
               onDropdownClose={blurActiveElement}
               clearable
             />
@@ -273,9 +271,10 @@ export default function AssignModal({
                 placeholder="Введите сумму"
                 value={singlePrice}
                 onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                onBlur={blurActiveElement} // ✅ скрытие клавы на iOS при выходе из поля
+                onBlur={blurActiveElement} // ✅ скрываем клавиатуру на iOS при выходе из поля
                 min={0}
               />
+
               <Select
                 label="Способ оплаты"
                 placeholder="Выберите"
@@ -285,8 +284,7 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onClick={blurActiveElement} // ✅ для iOS
-                onDropdownClose={blurActiveElement}
+                onDropdownClose={blurActiveElement} // ✅ закрытие Select — скрыть клаву, если она осталась
                 clearable
               />
             </>
