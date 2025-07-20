@@ -125,22 +125,24 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
   return (
     <Box style={{ backgroundColor: '#f7f7f7', minHeight: '100vh', paddingBottom: 80, position: 'relative' }}>
-      <ActionIcon
-        size="lg"
-        onClick={() => setDrawerOpened(true)}
-        title="Меню"
-        style={{
-          position: 'fixed',
-          top: 12,
-          right: 12,
-          background: 'transparent',
-          color: '#1a1a1a',
-          zIndex: 9999,
-        }}
-        variant="subtle"
-      >
-        <IconMenu2 size={20} />
-      </ActionIcon>
+      {!drawerOpened && (
+        <ActionIcon
+          size="lg"
+          onClick={() => setDrawerOpened(true)}
+          title="Меню"
+          style={{
+            position: 'fixed',
+            top: 12,
+            right: 12,
+            background: 'transparent',
+            color: '#1a1a1a',
+            zIndex: 9999,
+          }}
+          variant="subtle"
+        >
+          <IconMenu2 size={20} />
+        </ActionIcon>
+      )}
 
       <Container size="xs" py="md">
         <Group position="apart" mb="md">
@@ -187,11 +189,11 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </Accordion>
             )}
 
-            {futureTrainings.length > 0 && (
+            {pastTrainings.length > 0 && (
               <>
-                <Divider label="Будущие тренировки" labelPosition="center" />
+                <Divider label="Последние тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {futureTrainings.map((t) => (
+                  {pastTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
@@ -203,11 +205,11 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
               </>
             )}
 
-            {pastTrainings.length > 0 && (
+            {futureTrainings.length > 0 && (
               <>
-                <Divider label="Последние тренировки" labelPosition="center" />
+                <Divider label="Будущие тренировки" labelPosition="center" />
                 <Stack spacing="xs">
-                  {pastTrainings.map((t) => (
+                  {futureTrainings.map((t) => (
                     <Paper key={t.id} style={cardStyle} p="sm">
                       <Group position="apart">
                         <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
