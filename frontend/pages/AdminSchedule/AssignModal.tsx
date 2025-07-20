@@ -79,7 +79,7 @@ export default function AssignModal({
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
-  const [singlePrice, setSinglePrice] = useState<number | null>(null);
+  const [singlePrice, setSinglePrice] = useState<string>("");
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
@@ -272,20 +272,18 @@ export default function AssignModal({
                 size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                value={singlePrice ?? undefined}
+                value={singlePrice ? parseInt(singlePrice) : undefined}
                 onChange={(val) => {
-                  if (typeof val === "number") {
-                    setSinglePrice(val);
+                  if (typeof val === "number" && !isNaN(val)) {
+                    setSinglePrice(val.toString());
                   } else {
-                    setSinglePrice(null);
+                    setSinglePrice("");
                   }
                 }}
                 min={0}
                 radius="xl"
                 hideControls
                 onBlur={blurActiveElement}
-                inputMode="numeric"
-                pattern="[0-9]*"
               />
               <Select
                 label="Способ оплаты"
@@ -369,7 +367,7 @@ export default function AssignModal({
               onAssign(
                 selectedTemplateId,
                 date.format("YYYY-MM-DD"),
-                singlePrice,
+                singlePrice ? parseInt(singlePrice) : undefined,
                 singlePaymentMethod
               )
             }
