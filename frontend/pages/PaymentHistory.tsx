@@ -13,6 +13,7 @@ import {
   Box,
   Drawer,
   ActionIcon,
+  Accordion,
 } from '@mantine/core';
 import { IconMenu2 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
@@ -92,6 +93,12 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
   const futureTrainings = trainings.filter((t) => dayjs(t.date).isAfter(today));
 
+  const trainingsForActiveBlock = activeBlock
+    ? trainings.filter(
+        (t) => t.blockId === activeBlock.id && t.attended
+      ).sort((a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf())
+    : [];
+
   const cardStyle = {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -135,9 +142,7 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
 
       <Container size="xs" py="md">
         <Group position="apart" mb="md">
-          <Title order={3} c="#1a1a1a">
-            Запись
-          </Title>
+          <Title order={3} c="#1a1a1a">Запись</Title>
         </Group>
 
         {loading ? (
@@ -145,17 +150,39 @@ export default function PaymentHistory({ userId, onBack, setView }: Props) {
         ) : (
           <Stack spacing="md">
             {activeBlock && (
-              <Paper style={cardStyle}>
-                <Group position="apart" mb="xs">
-                  <Text fw={600} size="sm">
-                    Оплата от {new Date(activeBlock.paidAt).toLocaleDateString()}
-                  </Text>
-                  <Badge color="green">АКТИВЕН</Badge>
-                </Group>
-                <Text size="sm" c="dimmed">
-                  {activeBlock.paidTrainings} тренировок • {activeBlock.used} использовано • {activeBlock.pricePerTraining} ₽
-                </Text>
-              </Paper>
+              <Accordion variant="separated" defaultValue="block">
+                <Accordion.Item value="block">
+                  <Accordion.Control>
+                    <Group position="apart" style={{ width: '100%' }}>
+                      <div>
+                        <Text fw={600} size="sm">
+                          Оплата от {new Date(activeBlock.paidAt).toLocaleDateString()}
+                        </Text>
+                        <Text size="sm" c="dimmed">
+                          {activeBlock.paidTrainings} тренировок • {activeBlock.used} использовано • {activeBlock.pricePerTraining} ₽
+                        </Text>
+                      </div>
+                      <Badge color="green">АКТИВЕН</Badge>
+                    </Group>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Stack spacing="xs" mt="sm">
+                      {trainingsForActiveBlock.length > 0 ? (
+                        trainingsForActiveBlock.map((t) => (
+                          <Paper key={t.id} style={cardStyle} p="sm">
+                            <Group position="apart">
+                              <Text size="sm">{new Date(t.date).toLocaleDateString()}</Text>
+                              <Text size="sm" c="dimmed">{t.hour}:00</Text>
+                            </Group>
+                          </Paper>
+                        ))
+                      ) : (
+                        <Text size="sm" c="dimmed">Нет использованных тренировок</Text>
+                      )}
+                    </Stack>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
             )}
 
             {pastTrainings.length > 0 && (
