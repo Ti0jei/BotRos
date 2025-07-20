@@ -268,21 +268,15 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <NumberInput
-                size="md"
+              <TextInput
+                type="number"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                value={singlePrice ? parseInt(singlePrice) : undefined}
-                onChange={(val) => {
-                  if (typeof val === "number" && !isNaN(val)) {
-                    setSinglePrice(val.toString());
-                  } else {
-                    setSinglePrice("");
-                  }
-                }}
+                value={singlePrice}
+                onChange={(e) => setSinglePrice(e.currentTarget.value)}
                 min={0}
                 radius="xl"
-                hideControls
+                inputMode="numeric"
                 onBlur={blurActiveElement}
               />
               <Select
