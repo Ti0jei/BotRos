@@ -1,3 +1,5 @@
+// newsNotify.mjs
+
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
 import { notifyBroadcast } from '../utils/broadcast.mjs';
@@ -42,10 +44,9 @@ export function setupNewsNotification(bot) {
   // 📝 Ввод текста
   bot.on('text', isRegistered, async (ctx, next) => {
     const state = ctx.session?.notifyState;
-    console.log('🧪 notifyState:', ctx.session?.notifyState);
+    console.log('🧪 notifyState:', state);
 
     if (!state || state.step !== 'awaiting_text') {
-      console.log('⛔ Не тот шаг. state:', state);
       return next?.();
     }
 
@@ -75,6 +76,7 @@ export function setupNewsNotification(bot) {
 
     await ctx.answerCbQuery('🚀');
 
+    // Удалить сообщение с кнопками
     if (ctx.callbackQuery?.message?.message_id) {
       await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
     }
@@ -97,6 +99,7 @@ export function setupNewsNotification(bot) {
     ctx.session.notifyState = undefined;
     await ctx.answerCbQuery('❌');
 
+    // Удалить сообщение с кнопками
     if (ctx.callbackQuery?.message?.message_id) {
       await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
     }
