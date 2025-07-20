@@ -16,6 +16,7 @@ import {
   NumberInput,
   Box,
   ScrollArea,
+  TextInput
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
