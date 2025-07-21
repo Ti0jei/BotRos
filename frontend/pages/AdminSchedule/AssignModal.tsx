@@ -19,7 +19,10 @@ import {
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import "dayjs/locale/ru";
+
+dayjs.extend(isSameOrBefore);
 
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
