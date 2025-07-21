@@ -367,11 +367,12 @@ export default function AssignModal({
             disabled={
               !selectedUser ||
               selectedHour === null ||
-              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+              isPastDate // ✅ используем переменную
             }
           >
             Назначить
           </Button>
+
         </Stack>
       </Card>
     </Modal>
