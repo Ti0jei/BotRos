@@ -164,6 +164,8 @@ export default function AssignModal({
     };
     if (opened) loadAssigned();
   }, [date, opened]);
+  const today = dayjs(); // 👈 так ты точно "активируешь" dayjs
+  const isPastDate = date.isBefore(today, "day");
 
   const handleClose = () => {
     localStorage.removeItem("assignUserId");
