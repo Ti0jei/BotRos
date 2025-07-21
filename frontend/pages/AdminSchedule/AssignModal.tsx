@@ -164,8 +164,6 @@ export default function AssignModal({
     };
     if (opened) loadAssigned();
   }, [date, opened]);
-  const today = dayjs(); // 👈 так ты точно "активируешь" dayjs
-  const isPastDate = date.isBefore(today, "day");
 
   const handleClose = () => {
     localStorage.removeItem("assignUserId");
@@ -222,8 +220,8 @@ export default function AssignModal({
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
-              onClick={blurActiveElement} // ✅ для iOS
-              onDropdownClose={blurActiveElement} // ✅ для Android
+              onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+
               radius="md"
               size="md"
               withinPortal
@@ -247,8 +245,8 @@ export default function AssignModal({
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}
               onChange={setSelectedTemplateId}
-              onClick={blurActiveElement} // ✅ для iOS
-              onDropdownClose={blurActiveElement}
+              onDropdownClose={() => blurActiveElement()} // ← добавлено
+
               clearable
             />
           )}
@@ -275,7 +273,7 @@ export default function AssignModal({
                 placeholder="Введите сумму"
                 value={singlePrice}
                 onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                onBlur={blurActiveElement} // ✅ скрытие клавы на iOS при выходе из поля
+                onBlur={blurActiveElement}
                 min={0}
               />
               <Select
@@ -287,8 +285,8 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onClick={blurActiveElement} // ✅ для iOS
-                onDropdownClose={blurActiveElement}
+                onDropdownClose={() => blurActiveElement()} // ← вот это нужно
+
                 clearable
               />
             </>
@@ -369,12 +367,11 @@ export default function AssignModal({
             disabled={
               !selectedUser ||
               selectedHour === null ||
-              isPastDate // ✅ используем переменную
+              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
             }
           >
             Назначить
           </Button>
-
         </Stack>
       </Card>
     </Modal>
