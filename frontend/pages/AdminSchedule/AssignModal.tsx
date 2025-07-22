@@ -364,7 +364,7 @@ export default function AssignModal({
                 dayjs(date).format("YYYY-MM-DD"), // ✅ оборачиваем дату
                 singlePrice,
                 singlePaymentMethod
-              );
+              )
             }
           style={{ fontWeight: 600 }}
           disabled={
