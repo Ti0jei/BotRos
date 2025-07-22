@@ -270,20 +270,28 @@ export default function AssignModal({
           />
 
           {isSinglePaid && (
-            <>
-              <NumberInput
-                label="Стоимость"
-                placeholder="Введите сумму"
-                value={singlePrice}
-                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                min={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    blurActiveElement();
-                  }
-                }}
-                blurOnEscape
-              />
+            <Text
+            size="sm"
+            fw={500}
+            style={{ marginBottom: -4 }}
+          >
+            Стоимость
+          </Text>
+          
+          <TextInput
+            type="number"
+            placeholder="Введите сумму"
+            value={singlePrice ?? ""}
+            onChange={(e) => {
+              const val = parseFloat(e.currentTarget.value);
+              setSinglePrice(isNaN(val) ? null : val);
+            }}
+            onBlur={blurActiveElement}
+            inputMode="decimal"
+            pattern="[0-9]*"
+            radius="md"
+            size="md"
+          />
               <Select
                 label="Способ оплаты"
                 placeholder="Выберите"
@@ -300,88 +308,88 @@ export default function AssignModal({
             </>
           )}
 
-          {showWarning && (
-            <Text
-              size="sm"
-              style={{
-                backgroundColor: "#fff4f4",
-                padding: "8px 12px",
-                borderRadius: 8,
-                color: "#c92a2a",
-                border: "1px solid #f3c0c0",
-              }}
-            >
-              У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
-            </Text>
-          )}
-
-          <Divider />
-
-          <Text size="sm" fw={500}>Выберите время:</Text>
-
-          <ScrollArea h={200} offsetScrollbars>
-            <Stack spacing={6}>
-              {hours.map((h) => {
-                const usersAtThisHour = assignedClients
-                  .filter((a) => a.hour === h)
-                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
-                  .join(", ");
-
-                return (
-                  <Group key={h} spacing="xs" align="center" noWrap>
-                    <Button
-                      variant={selectedHour === h ? "filled" : "outline"}
-                      color="dark"
-                      size="xs"
-                      radius="xl"
-                      onClick={() => setSelectedHour(h)}
-                      style={{ minWidth: 60 }}
-                    >
-                      {h}:00
-                    </Button>
-                    {usersAtThisHour && (
-                      <Text
-                        size="xs"
-                        c="dimmed"
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {usersAtThisHour}
-                      </Text>
-                    )}
-                  </Group>
-                );
-              })}
-            </Stack>
-          </ScrollArea>
-
-          <Button
-            fullWidth
-            radius="xl"
-            color="dark"
-            size="md"
-            onClick={() =>
-              onAssign(
-                selectedTemplateId,
-                dayjs(date).format("YYYY-MM-DD"), // ✅ оборачиваем дату
-                singlePrice,
-                singlePaymentMethod
-              )
-            }
-            style={{ fontWeight: 600 }}
-            disabled={
-              !selectedUser ||
-              selectedHour === null ||
-              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
-            }
+        {showWarning && (
+          <Text
+            size="sm"
+            style={{
+              backgroundColor: "#fff4f4",
+              padding: "8px 12px",
+              borderRadius: 8,
+              color: "#c92a2a",
+              border: "1px solid #f3c0c0",
+            }}
           >
-            Назначить
-          </Button>
-        </Stack>
-      </Card>
+            У клиента нет активного блока. Чтобы продолжить, выберите "Разовая оплата".
+          </Text>
+        )}
+
+        <Divider />
+
+        <Text size="sm" fw={500}>Выберите время:</Text>
+
+        <ScrollArea h={200} offsetScrollbars>
+          <Stack spacing={6}>
+            {hours.map((h) => {
+              const usersAtThisHour = assignedClients
+                .filter((a) => a.hour === h)
+                .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                .join(", ");
+
+              return (
+                <Group key={h} spacing="xs" align="center" noWrap>
+                  <Button
+                    variant={selectedHour === h ? "filled" : "outline"}
+                    color="dark"
+                    size="xs"
+                    radius="xl"
+                    onClick={() => setSelectedHour(h)}
+                    style={{ minWidth: 60 }}
+                  >
+                    {h}:00
+                  </Button>
+                  {usersAtThisHour && (
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {usersAtThisHour}
+                    </Text>
+                  )}
+                </Group>
+              );
+            })}
+          </Stack>
+        </ScrollArea>
+
+        <Button
+          fullWidth
+          radius="xl"
+          color="dark"
+          size="md"
+          onClick={() =>
+            onAssign(
+              selectedTemplateId,
+              dayjs(date).format("YYYY-MM-DD"), // ✅ оборачиваем дату
+              singlePrice,
+              singlePaymentMethod
+            )
+          }
+          style={{ fontWeight: 600 }}
+          disabled={
+            !selectedUser ||
+            selectedHour === null ||
+            date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+          }
+        >
+          Назначить
+        </Button>
+      </Stack>
+    </Card>
     </Modal >
   );
 }
