@@ -361,22 +361,22 @@ export default function AssignModal({
             onClick={() =>
               onAssign(
                 selectedTemplateId,
-                date.format("YYYY-MM-DD"),
+                dayjs(date).format("YYYY-MM-DD"), // ✅ оборачиваем дату
                 singlePrice,
                 singlePaymentMethod
-              )
+              );
             }
-            style={{ fontWeight: 600 }}
-            disabled={
-              !selectedUser ||
-              selectedHour === null ||
-              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
-            }
+          style={{ fontWeight: 600 }}
+          disabled={
+            !selectedUser ||
+            selectedHour === null ||
+            date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+          }
           >
-            Назначить
-          </Button>
-        </Stack>
-      </Card>
-    </Modal>
+          Назначить
+        </Button>
+      </Stack>
+    </Card>
+    </Modal >
   );
 }
