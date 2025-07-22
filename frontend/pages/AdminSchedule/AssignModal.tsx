@@ -185,6 +185,8 @@ export default function AssignModal({
       radius="xl"
       size="md"
       scrollAreaComponent="div"
+      trapFocus={false}
+      withinPortal={false}
       styles={{ body: { padding: 0 } }}
     >
       <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
@@ -272,35 +274,35 @@ export default function AssignModal({
 
           {isSinglePaid && (
             <>
-              <Text size="sm" fw={500} style={{ marginBottom: -4 }}>
-                Стоимость
-              </Text>
-
-              <TextInput
-                placeholder="Введите сумму"
-                value={singlePrice ?? ""}
-                onChange={(e) => {
-                  const val = parseFloat(e.currentTarget.value);
-                  setSinglePrice(isNaN(val) ? null : val);
-                }}
-                onBlur={blurActiveElement}
-                inputMode="decimal"
-                pattern="[0-9]*"
-                radius="md"
+              <NumberInput
                 size="md"
+                label="Сумма (₽)"
+                placeholder="Введите сумму"
+                value={singlePrice ?? undefined}
+                onChange={(val) => {
+                  if (typeof val === "number" && !isNaN(val)) {
+                    setSinglePrice(val);
+                  } else {
+                    setSinglePrice(null);
+                  }
+                }}
+                min={0}
+                hideControls
+                radius="md"
+                onBlur={blurActiveElement}
               />
 
               <Select
                 label="Способ оплаты"
-                placeholder="Выберите"
+                placeholder="Выберите способ"
                 data={[
-                  { label: "Наличные", value: "cash" },
-                  { label: "Онлайн", value: "online" },
+                  { value: "cash", label: "Наличные" },
+                  { value: "online", label: "Онлайн" },
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onDropdownClose={() => blurActiveElement()}
-                clearable
+                onDropdownClose={blurActiveElement}
+                required
               />
             </>
           )}
