@@ -276,8 +276,13 @@ export default function AssignModal({
                 placeholder="Введите сумму"
                 value={singlePrice}
                 onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
-                onBlur={blurActiveElement}
                 min={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    blurActiveElement();
+                  }
+                }}
+                blurOnEscape
               />
               <Select
                 label="Способ оплаты"
@@ -366,17 +371,17 @@ export default function AssignModal({
                 singlePaymentMethod
               )
             }
-          style={{ fontWeight: 600 }}
-          disabled={
-            !selectedUser ||
-            selectedHour === null ||
-            date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
-          }
+            style={{ fontWeight: 600 }}
+            disabled={
+              !selectedUser ||
+              selectedHour === null ||
+              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+            }
           >
-          Назначить
-        </Button>
-      </Stack>
-    </Card>
+            Назначить
+          </Button>
+        </Stack>
+      </Card>
     </Modal >
   );
 }
