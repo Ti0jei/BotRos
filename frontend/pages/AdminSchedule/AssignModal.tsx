@@ -287,8 +287,8 @@ export default function AssignModal({
                   }
                 }}
                 min={0}
+                radius="xl"
                 hideControls
-                radius="md"
                 onBlur={blurActiveElement}
               />
 
