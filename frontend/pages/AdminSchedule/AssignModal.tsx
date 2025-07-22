@@ -271,17 +271,8 @@ export default function AssignModal({
           />
 
           {isSinglePaid && (
-            <Text
-              size="sm"
-              fw={500}
-              style={{ marginBottom: -4 }}
-            >
-              Стоимость
-              <Text
-                size="sm"
-                fw={500}
-                style={{ marginBottom: -4 }}
-              >
+            <>
+              <Text size="sm" fw={500} style={{ marginBottom: -4 }}>
                 Стоимость
               </Text>
 
@@ -293,11 +284,12 @@ export default function AssignModal({
                   setSinglePrice(isNaN(val) ? null : val);
                 }}
                 onBlur={blurActiveElement}
-                inputMode="decimal" // ✅ для числовой клавиатуры
-                pattern="[0-9]*"     // ✅ только цифры
+                inputMode="decimal"
+                pattern="[0-9]*"
                 radius="md"
                 size="md"
               />
+
               <Select
                 label="Способ оплаты"
                 placeholder="Выберите"
@@ -307,8 +299,7 @@ export default function AssignModal({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val)}
-                onDropdownClose={() => blurActiveElement()} // ← вот это нужно
-
+                onDropdownClose={() => blurActiveElement()}
                 clearable
               />
             </>
