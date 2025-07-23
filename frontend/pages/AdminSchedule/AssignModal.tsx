@@ -118,7 +118,7 @@ export default function AssignModal({
     if (!selectedUser) return;
     const fetchTemplates = async () => {
       try {
-        const res = await fetch(${API}/api/workout-templates/user/${selectedUser}, {
+        const res = await fetch(`${API}/api/workout-templates/user/${selectedUser}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const list = res.ok ? await res.json() : [];
@@ -222,12 +222,11 @@ export default function AssignModal({
               placeholder="Выберите клиента"
               data={clients.map((c) => ({
                 value: c.id,
-                label: ${c.name} ${c.lastName ?? ""}${c.internalTag ?  (${c.internalTag}) : ""},
+                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
               onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
-
               radius="md"
               size="md"
               withinPortal
@@ -331,7 +330,7 @@ export default function AssignModal({
               {hours.map((h) => {
                 const usersAtThisHour = assignedClients
                   .filter((a) => a.hour === h)
-                  .map((a) => ${a.user.name}${a.user.lastName ?  ${a.user.lastName} : ""})
+                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
                   .join(", ");
 
                 return (
