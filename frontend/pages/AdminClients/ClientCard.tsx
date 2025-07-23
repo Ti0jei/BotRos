@@ -68,7 +68,6 @@ export default function ClientCard({
   return (
     <Card withBorder radius="xl" p="md" shadow="xs">
       <Stack spacing={6}>
-        {/* Верхняя строка: имя + иконки */}
         <Group position="apart" align="center">
           <Text fw={600} size="sm">
             {client.name} {client.lastName ?? ""}
@@ -106,12 +105,10 @@ export default function ClientCard({
           </Group>
         </Group>
 
-        {/* Возраст */}
         <Text size="xs" c="dimmed">
           {client.age} лет
         </Text>
 
-        {/* Бейджи и стрелка — в одной строке */}
         <Group position="apart" align="center">
           <Group spacing={8} align="center">
             <Box
@@ -145,7 +142,6 @@ export default function ClientCard({
           </ActionIcon>
         </Group>
 
-        {/* Раскрывающийся блок */}
         <Collapse in={isOpen}>
           <Stack spacing={6} mt="sm">
             {isEditing ? (
@@ -192,14 +188,18 @@ export default function ClientCard({
                     Запись
                   </Button>
                 </Group>
+
+                {/* 🔒 Кнопка в разработке */}
                 <Button
                   size="xs"
                   styles={buttonStyle}
                   leftIcon={<IconPlus size={12} />}
-                  onClick={onAssign}
+                  disabled
+                  color="gray"
                 >
-                  Записать на тренировку
+                  В разработке
                 </Button>
+
                 <Group grow>
                   <Button
                     size="xs"
