@@ -21,6 +21,7 @@ import ConfirmModal from "./ConfirmModal";
 import AssignModalFromCalendar from "./AssignModalFromCalendar";
 import BackToProfileButton from "@/components/BackToProfileButton";
 import { User, Training, PaymentBlock } from "./types";
+import dayjs from "dayjs";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isToday);

@@ -12,6 +12,7 @@ import {
   Button,
 } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
+import dayjs from "dayjs";
 
 import { Client, PaymentBlock } from "./types";
 import ClientCard from "./ClientCard";

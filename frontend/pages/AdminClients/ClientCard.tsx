@@ -23,6 +23,9 @@ import {
 } from "@tabler/icons-react";
 import { Dumbbell } from "lucide-react";
 import { Client, PaymentBlock } from "./types";
+import { useState } from "react";
+import AssignModalFromCalendar from "@/components/AssignModalFromCalendar";
+import dayjs from "dayjs";
 
 interface Props {
   client: Client;
@@ -38,10 +41,11 @@ interface Props {
   onOpenNutrition: () => void;
   onOpenPayments: () => void;
   onOpenHistory: () => void;
-  onAssign: () => void;
   onToggleExpand: () => void;
   onOpenDrawer: () => void;
   buttonStyle: any;
+  blocks: Record<string, PaymentBlock | null>;
+  clients: Client[];
 }
 
 export default function ClientCard({
@@ -58,12 +62,21 @@ export default function ClientCard({
   onOpenNutrition,
   onOpenPayments,
   onOpenHistory,
-  onAssign,
   onToggleExpand,
   onOpenDrawer,
   buttonStyle,
+  blocks,
+  clients,
 }: Props) {
   const remaining = block ? block.paidTrainings - block.used : 0;
+
+  const [assignOpened, setAssignOpened] = useState(false);
+
+  const handleAssignClick = () => {
+    localStorage.setItem("assignUserId", client.id);
+    localStorage.setItem("assignSinglePaid", "false");
+    setAssignOpened(true);
+  };
 
   return (
     <Card withBorder radius="xl" p="md" shadow="xs">
@@ -74,8 +87,7 @@ export default function ClientCard({
             {client.name} {client.lastName ?? ""}
             {client.internalTag && (
               <Text span c="dimmed" size="xs">
-                {" "}
-                ({client.internalTag})
+                {" "}({client.internalTag})
               </Text>
             )}
           </Text>
@@ -196,7 +208,7 @@ export default function ClientCard({
                   size="xs"
                   styles={buttonStyle}
                   leftIcon={<IconPlus size={12} />}
-                  onClick={onAssign}
+                  onClick={handleAssignClick}
                 >
                   Записать на тренировку
                 </Button>
@@ -224,6 +236,16 @@ export default function ClientCard({
           </Stack>
         </Collapse>
       </Stack>
+
+      <AssignModalFromCalendar
+        opened={assignOpened}
+        onClose={() => setAssignOpened(false)}
+        clients={clients}
+        blocks={blocks}
+        selectedHour={null}
+        selectedDate={dayjs()}
+        onSuccess={() => setAssignOpened(false)}
+      />
     </Card>
   );
 }

@@ -15,6 +15,7 @@ import { IconCheck } from "@tabler/icons-react";
 import { showNotification } from "@mantine/notifications";
 import { Dayjs } from "dayjs";
 import { blurActiveElement } from "@/utils/blurActiveElement"; // ✅ добавлен импорт
+import { NumberInput } from "@mantine/core"; // убедись, что импорт есть
 
 interface Props {
   opened: boolean;
@@ -183,15 +184,14 @@ export default function AssignModalFromCalendar({
         size="sm"
         radius="xl"
         scrollAreaComponent="div"
+        trapFocus={false} // ✅ отключает фокус-ловушку на iOS
+        withinPortal={false} // ✅ рендерит модалку не в Portal (иначе клики ломаются)
         styles={{
           title: { fontWeight: 700, fontSize: 20 },
           header: { borderBottom: "1px solid #ddd" },
           body: {
             padding: 16,
-            maxHeight: "75vh",
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch",
-            paddingBottom: bottomOffset,
+            paddingBottom: bottomOffset, // ✅ сохраняем отступ
           },
         }}
       >
@@ -208,10 +208,9 @@ export default function AssignModalFromCalendar({
               placeholder="Выберите клиента"
               value={selectedUser}
               onChange={(val) => setSelectedUser(val)}
-              onClick={blurActiveElement} // ✅ для iOS
-              onDropdownClose={blurActiveElement} // ✅ для Android + iOS
               searchable
               nothingFound="Не найдено"
+              onDropdownClose={blurActiveElement} // ✅ оставляем
             />
           </Box>
 
@@ -231,8 +230,7 @@ export default function AssignModalFromCalendar({
               }))}
               value={selectedTemplateId}
               onChange={(val) => setSelectedTemplateId(val)}
-              onClick={blurActiveElement} // ✅ для iOS
-              onDropdownClose={blurActiveElement}
+              onDropdownClose={blurActiveElement} // ✅ оставляем
             />
           )}
 
@@ -251,15 +249,21 @@ export default function AssignModalFromCalendar({
 
           {isSinglePaid && (
             <>
-              <TextInput
+              <NumberInput
+                size="md"
                 label="Сумма (₽)"
                 placeholder="Введите сумму"
-                type="number"
-                value={singlePrice}
-                onChange={(e) => setSinglePrice(e.currentTarget.value)}
-                required
-                inputMode="numeric"
-                pattern="[0-9]*"
+                value={singlePrice ? parseInt(singlePrice) : undefined}
+                onChange={(val) => {
+                  if (typeof val === "number" && !isNaN(val)) {
+                    setSinglePrice(val.toString());
+                  } else {
+                    setSinglePrice("");
+                  }
+                }}
+                min={0}
+                radius="xl"
+                hideControls
                 onBlur={blurActiveElement}
               />
               <Select
@@ -271,8 +275,7 @@ export default function AssignModalFromCalendar({
                 ]}
                 value={singlePaymentMethod}
                 onChange={(val) => setSinglePaymentMethod(val as "cash" | "online" | "")}
-                onClick={blurActiveElement} // ✅ для iOS
-                onDropdownClose={blurActiveElement}
+                onDropdownClose={blurActiveElement} // ✅ оставляем
                 required
               />
             </>
