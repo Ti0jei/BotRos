@@ -197,7 +197,7 @@ export default function ClientCard({
                   disabled
                   color="gray"
                 >
-                  В разработке
+                  Записать на тренировку (В разработке)
                 </Button>
 
                 <Group grow>
