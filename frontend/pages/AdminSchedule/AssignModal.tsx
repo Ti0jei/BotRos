@@ -119,7 +119,7 @@ export default function AssignModal({
     const fetchTemplates = async () => {
       try {
         const res = await fetch(${API}/api/workout-templates/user/${selectedUser}, {
-          headers: { Authorization: Bearer ${token} },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const list = res.ok ? await res.json() : [];
         setTemplates(Array.isArray(list) ? list : []);
@@ -134,8 +134,8 @@ export default function AssignModal({
     if (!selectedUser || !opened) return;
     const fetchLastTemplate = async () => {
       try {
-        const res = await fetch(${API}/api/workout-templates/last-template?userId=${selectedUser}, {
-          headers: { Authorization: Bearer ${token} },
+        const res = await fetch(${API}/api/workout-templates/last-template?userId=${selectedUser}, {  
+          headers: { Authorization: Bearer `${token}` },
         });
         const data = await res.json();
         setLastTemplate(data ?? null);
@@ -158,7 +158,7 @@ export default function AssignModal({
     const loadAssigned = async () => {
       try {
         const res = await fetch(${API}/api/trainings/date/${date.format("YYYY-MM-DD")}, {
-          headers: { Authorization: Bearer ${token} },
+          headers: { Authorization: Bearer `${token}` },
         });
         const data = await res.json();
         setAssignedClients(Array.isArray(data) ? data : []);
