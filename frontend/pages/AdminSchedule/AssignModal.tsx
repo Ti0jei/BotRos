@@ -28,15 +28,23 @@ dayjs.extend(isSameOrBefore);
 import { PaymentBlock, User } from "./types";
 import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
 
-
-
 interface AssignModalProps {
   opened: boolean;
   onClose: () => void;
   onAssign: (
     templateId: string | null,
     date: string,
-@@ -48,11 +43,7 @@ interface AssignModalProps {
+    singlePrice?: number | null,
+    singlePaymentMethod?: string | null
+  ) => void;
+  clients: User[];
+  selectedUser: string | null;
+  setSelectedUser: (id: string | null) => void;
+  isSinglePaid: boolean;
+  setIsSinglePaid: (v: boolean) => void;
+  selectedHour: number | null;
+  setSelectedHour: (hour: number) => void;
+  blocks: Record<string, PaymentBlock | null>;
 }
 
 interface AssignedClient {
@@ -48,7 +56,9 @@ interface AssignedClient {
   hour: number;
 }
 
-@@ -62,8 +53,6 @@ interface WorkoutTemplate {
+interface WorkoutTemplate {
+  id: string;
+  title: string;
 }
 
 export default function AssignModal({
@@ -57,7 +67,10 @@ export default function AssignModal({
   onAssign,
   clients,
   selectedUser,
-@@ -74,46 +63,25 @@ export default function AssignModal({
+  setSelectedUser,
+  isSinglePaid,
+  setIsSinglePaid,
+  selectedHour,
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
@@ -73,10 +86,8 @@ export default function AssignModal({
   const [singlePrice, setSinglePrice] = useState<number | null>(null);
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<string | null>(null);
 
-
   const token = localStorage.getItem("token");
   const API = import.meta.env.VITE_API_BASE_URL;
-
   const block = selectedUser ? blocks[selectedUser] : null;
   const remaining = block ? block.paidTrainings - block.used : null;
   const isClientPreselected = !!selectedUser;
@@ -106,7 +117,10 @@ export default function AssignModal({
   useEffect(() => {
     if (!selectedUser) return;
     const fetchTemplates = async () => {
-@@ -124,14 +92,14 @@ export default function AssignModal({
+      try {
+        const res = await fetch(${API}/api/workout-templates/user/${selectedUser}, {
+          headers: { Authorization: Bearer ${token} },
+        });
         const list = res.ok ? await res.json() : [];
         setTemplates(Array.isArray(list) ? list : []);
       } catch (e) {
@@ -120,8 +134,9 @@ export default function AssignModal({
     if (!selectedUser || !opened) return;
     const fetchLastTemplate = async () => {
       try {
-        const res = await fetch(`${API}/api/workout-templates/last-template?userId=${selectedUser}`, {
-@@ -140,255 +108,180 @@ export default function AssignModal({
+        const res = await fetch(${API}/api/workout-templates/last-template?userId=${selectedUser}, {
+          headers: { Authorization: Bearer ${token} },
+        });
         const data = await res.json();
         setLastTemplate(data ?? null);
       } catch (e) {
@@ -142,8 +157,8 @@ export default function AssignModal({
   useEffect(() => {
     const loadAssigned = async () => {
       try {
-        const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await fetch(${API}/api/trainings/date/${date.format("YYYY-MM-DD")}, {
+          headers: { Authorization: Bearer ${token} },
         });
         const data = await res.json();
         setAssignedClients(Array.isArray(data) ? data : []);
@@ -207,35 +222,15 @@ export default function AssignModal({
               placeholder="Выберите клиента"
               data={clients.map((c) => ({
                 value: c.id,
-                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+                label: ${c.name} ${c.lastName ?? ""}${c.internalTag ?  (${c.internalTag}) : ""},
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
               onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
 
               radius="md"
-
-
-
-
-
-
-
               size="md"
               withinPortal
-
-
-
-
-
-
-
-
-
-
-
-
-
             />
           ) : (
             <Text size="sm">
@@ -259,6 +254,7 @@ export default function AssignModal({
               onDropdownClose={() => blurActiveElement()} // ← добавлено
 
               clearable
+            />
           )}
 
           {remaining !== null && !isSinglePaid && (
@@ -335,7 +331,7 @@ export default function AssignModal({
               {hours.map((h) => {
                 const usersAtThisHour = assignedClients
                   .filter((a) => a.hour === h)
-                  .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
+                  .map((a) => ${a.user.name}${a.user.lastName ?  ${a.user.lastName} : ""})
                   .join(", ");
 
                 return (
