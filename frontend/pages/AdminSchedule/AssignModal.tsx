@@ -1,31 +1,35 @@
-// 💾 AssignModal.tsx (без Modal, без зависаний на iPhone)
+// 💾 ФАЙЛ: AssignModal.tsx
+import { blurActiveElement } from "@/utils/blurActiveElement";
 import { useEffect, useState } from "react";
 import {
-  Card,
+  Modal,
   Stack,
   Text,
   Select,
   Checkbox,
   Button,
+  Card,
   Divider,
   Title,
   Group,
   Badge,
   NumberInput,
+  Box,
   ScrollArea,
 } from "@mantine/core";
-import { IconClock } from "@tabler/icons-react";
+import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import "dayjs/locale/ru";
-import { blurActiveElement } from "@/utils/blurActiveElement";
-
-import { PaymentBlock, User } from "./types";
-import CustomModalDatePicker from "@/components/ui/CustomModalDatePicker";
 
 dayjs.extend(isSameOrBefore);
 
+import { PaymentBlock, User } from "./types";
+import CustomModalDatePicker from "../../components/ui/CustomModalDatePicker";
+
 interface AssignModalProps {
+  opened: boolean;
+  onClose: () => void;
   onAssign: (
     templateId: string | null,
     date: string,
@@ -43,7 +47,11 @@ interface AssignModalProps {
 }
 
 interface AssignedClient {
-  user: { id: string; name: string; lastName?: string };
+  user: {
+    id: string;
+    name: string;
+    lastName?: string;
+  };
   hour: number;
 }
 
@@ -53,6 +61,8 @@ interface WorkoutTemplate {
 }
 
 export default function AssignModal({
+  opened,
+  onClose,
   onAssign,
   clients,
   selectedUser,
@@ -63,24 +73,45 @@ export default function AssignModal({
   setSelectedHour,
   blocks,
 }: AssignModalProps) {
-  const [date, setDate] = useState<Dayjs>(() => dayjs());
+  const [date, setDate] = useState<Dayjs>(() => {
+    const savedDate = localStorage.getItem("assignDate");
+    return savedDate ? dayjs(savedDate) : dayjs();
+  });
+  const [showWarning, setShowWarning] = useState(false);
   const [assignedClients, setAssignedClients] = useState<AssignedClient[]>([]);
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [lastTemplate, setLastTemplate] = useState<WorkoutTemplate | null>(null);
   const [singlePrice, setSinglePrice] = useState<number | null>(null);
   const [singlePaymentMethod, setSinglePaymentMethod] = useState<string | null>(null);
-  const [showWarning, setShowWarning] = useState(false);
 
-  const API = import.meta.env.VITE_API_BASE_URL;
   const token = localStorage.getItem("token");
+  const API = import.meta.env.VITE_API_BASE_URL;
   const block = selectedUser ? blocks[selectedUser] : null;
   const remaining = block ? block.paidTrainings - block.used : null;
+  const isClientPreselected = !!selectedUser;
   const hours = Array.from({ length: 15 }, (_, i) => i + 8);
 
   useEffect(() => {
     dayjs.locale("ru");
   }, []);
+
+  useEffect(() => {
+    if (!selectedUser && opened) {
+      const savedUser = localStorage.getItem("assignUserId");
+      const savedPaid = localStorage.getItem("assignSinglePaid") === "true";
+      const savedDate = localStorage.getItem("assignDate");
+
+      if (savedUser) {
+        setSelectedUser(savedUser);
+        setIsSinglePaid(savedPaid);
+      }
+
+      if (savedDate) {
+        setDate(dayjs(savedDate));
+      }
+    }
+  }, [opened]);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -92,14 +123,14 @@ export default function AssignModal({
         const list = res.ok ? await res.json() : [];
         setTemplates(Array.isArray(list) ? list : []);
       } catch (e) {
-        console.error("Ошибка загрузки программ:", e);
+        console.error("Ошибка загрузки программы тренировок:", e);
       }
     };
     fetchTemplates();
   }, [selectedUser]);
 
   useEffect(() => {
-    if (!selectedUser) return;
+    if (!selectedUser || !opened) return;
     const fetchLastTemplate = async () => {
       try {
         const res = await fetch(`${API}/api/workout-templates/last-template?userId=${selectedUser}`, {
@@ -108,21 +139,22 @@ export default function AssignModal({
         const data = await res.json();
         setLastTemplate(data ?? null);
       } catch (e) {
-        console.error("Ошибка загрузки последней программы:", e);
+        console.error("Ошибка загрузки последней программы тренировок:", e);
       }
     };
     fetchLastTemplate();
-  }, [selectedUser]);
+  }, [selectedUser, opened]);
 
   useEffect(() => {
     if (!selectedUser) return;
+    const block = blocks[selectedUser];
     const hasBlock = block && block.paidTrainings > block.used;
     setShowWarning(!hasBlock && !isSinglePaid);
     setIsSinglePaid(!hasBlock);
   }, [selectedUser, blocks]);
 
   useEffect(() => {
-    const fetchAssigned = async () => {
+    const loadAssigned = async () => {
       try {
         const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -130,158 +162,146 @@ export default function AssignModal({
         const data = await res.json();
         setAssignedClients(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.error("Ошибка загрузки клиентов:", e);
+        console.error("Ошибка загрузки клиентов по дате:", e);
       }
     };
-    fetchAssigned();
-  }, [date]);
+    if (opened) loadAssigned();
+  }, [date, opened]);
+
+  const handleClose = () => {
+    localStorage.removeItem("assignUserId");
+    localStorage.removeItem("assignSinglePaid");
+    localStorage.removeItem("assignDate");
+    onClose();
+  };
 
   return (
-    <Card radius="xl" p="lg" withBorder shadow="xs">
-      <Stack spacing="md">
-        <Group>
-          <IconClock size={20} />
-          <Title order={4}>Назначить тренировку</Title>
-        </Group>
-
-        <CustomModalDatePicker date={date} setDate={setDate} />
-
-        <Select
-          label="Клиент"
-          placeholder="Выберите клиента"
-          data={clients.map((c) => ({
-            value: c.id,
-            label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
-          }))}
-          value={selectedUser}
-          onChange={(val) => setSelectedUser(val || null)}
-          radius="md"
-          size="md"
-          onDropdownClose={blurActiveElement}
-        />
-
-        {selectedUser && lastTemplate && (
-          <Text size="sm" c="dimmed">
-            Прошлая: <Text span fw={500}>{lastTemplate.title}</Text>
-          </Text>
-        )}
-
-        {templates.length > 0 && (
-          <Select
-            label="Программа тренировки"
-            placeholder="Выберите или оставьте авто"
-            data={templates.map((t) => ({ label: t.title, value: t.id }))}
-            value={selectedTemplateId}
-            onChange={setSelectedTemplateId}
-            clearable
-            onDropdownClose={blurActiveElement}
-          />
-        )}
-
-        {remaining !== null && !isSinglePaid && (
-          <Badge color={remaining > 0 ? "green" : "red"} size="sm">
-            Осталось тренировок: {remaining}
-          </Badge>
-        )}
-
-        <Checkbox
-          label="Разовая оплата"
-          checked={isSinglePaid}
-          onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
-          radius="md"
-          size="md"
-          disabled={!block}
-        />
-
-        {isSinglePaid && (
-          <>
-            <NumberInput
-              size="md"
-              label="Сумма (₽)"
-              placeholder="Введите сумму"
-              value={singlePrice ?? undefined}
-              onChange={(val) => {
-                if (typeof val === "number" && !isNaN(val)) {
-                  setSinglePrice(val);
-                } else {
-                  setSinglePrice(null);
-                }
+    <Modal
+      opened={opened}
+      onClose={handleClose}
+      withCloseButton={false}
+      centered
+      radius="xl"
+      size="md"
+      scrollAreaComponent="div"
+      styles={{ body: { padding: 0 } }}
+    >
+      <Card radius="xl" p="lg" withBorder shadow="xs" style={{ maxHeight: "80vh", overflowY: "auto" }}>
+        <Stack spacing="md">
+          <Group position="apart">
+            <Group spacing={8}>
+              <IconClock size={20} />
+              <Title order={4}>Назначить тренировку</Title>
+            </Group>
+            <Button
+              onClick={handleClose}
+              variant="subtle"
+              color="dark"
+              px={0}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              min={0}
-              radius="xl"
-              hideControls
-              onBlur={blurActiveElement}
-            />
+            >
+              <IconX size={18} />
+            </Button>
+          </Group>
 
+          <CustomModalDatePicker date={date} setDate={setDate} />
+
+          {!isClientPreselected ? (
             <Select
-              label="Способ оплаты"
-              placeholder="Выберите способ"
-              data={[
-                { value: "cash", label: "Наличные" },
-                { value: "online", label: "Онлайн" },
-              ]}
-              value={singlePaymentMethod}
-              onChange={(val) => setSinglePaymentMethod(val)}
-              onDropdownClose={blurActiveElement}
+              label="Клиент"
+              placeholder="Выберите клиента"
+              data={clients.map((c) => ({
+                value: c.id,
+                label: `${c.name} ${c.lastName ?? ""}${c.internalTag ? ` (${c.internalTag})` : ""}`,
+              }))}
+              value={selectedUser}
+              onChange={(val) => setSelectedUser(val || null)}
+              onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+
+              radius="md"
+              size="md"
+              withinPortal
             />
-          </>
-        )}
-
-        {showWarning && (
-          <Text size="sm" style={{ background: "#fff4f4", padding: 8, border: "1px solid #f3c0c0", borderRadius: 8, color: "#c92a2a" }}>
-            У клиента нет активного абонемента. Выберите "Разовая оплата".
-          </Text>
-        )}
-
-        <Divider />
-
-        <Text size="sm" fw={500}>Выберите время:</Text>
-        <ScrollArea h={200} offsetScrollbars>
-          <Stack spacing={6}>
-            {hours.map((h) => {
-              const usersAtThisHour = assignedClients
-                .filter((a) => a.hour === h)
-                .map((a) => `${a.user.name}${a.user.lastName ? ` ${a.user.lastName}` : ""}`)
-                .join(", ");
-              return (
-                <Group key={h} spacing="xs" align="center" noWrap>
-                  <Button
-                    variant={selectedHour === h ? "filled" : "outline"}
-                    color="dark"
-                    size="xs"
-                    radius="xl"
-                    onClick={() => setSelectedHour(h)}
-                    style={{ minWidth: 60 }}
-                  >
-                    {h}:00
-                  </Button>
-                  {usersAtThisHour && (
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {usersAtThisHour}
-                    </Text>
-                  )}
-                </Group>
-              );
-            })}
-          </Stack>
-        </ScrollArea>
-
-        <Button
-          fullWidth
-          radius="xl"
-          color="dark"
-          size="md"
-          onClick={() => onAssign(
-            selectedTemplateId,
-            dayjs(date).format("YYYY-MM-DD"),
-            singlePrice,
-            singlePaymentMethod
+          ) : (
+            <Text size="sm">
+              Клиент: <b>{clients.find((c) => c.id === selectedUser)?.name} {clients.find((c) => c.id === selectedUser)?.lastName ?? ""}</b>
+            </Text>
           )}
-          disabled={!selectedUser || selectedHour === null || date.isBefore(dayjs(), "day")}
-        >
-          Назначить
-        </Button>
-      </Stack>
-    </Card>
+
+          {selectedUser && lastTemplate && (
+            <Text size="sm" c="dimmed" mt="xs">
+              Прошлая тренировка: <Text span fw={500} c="dark">{lastTemplate.title}</Text>
+            </Text>
+          )}
+
+          {templates.length > 0 && (
+            <Select
+              label="Программа тренировки"
+              placeholder="Авто (ротация) или выберите вручную"
+              data={templates.map((t) => ({ label: t.title, value: t.id }))}
+              value={selectedTemplateId}
+              onChange={setSelectedTemplateId}
+              onDropdownClose={() => blurActiveElement()} // ← добавлено
+
+              clearable
+            />
+          )}
+
+          {remaining !== null && !isSinglePaid && (
+            <Badge color={remaining > 0 ? "green" : "red"} size="sm">
+              Осталось тренировок: {remaining}
+            </Badge>
+          )}
+
+          <Checkbox
+            label="Разовая оплата"
+            checked={isSinglePaid}
+            onChange={(e) => setIsSinglePaid(e.currentTarget.checked)}
+            radius="md"
+            size="md"
+            disabled={!block}
+          />
+
+          {isSinglePaid && (
+            <>
+              <NumberInput
+                label="Стоимость"
+                placeholder="Введите сумму"
+                value={singlePrice}
+                onChange={(val) => setSinglePrice(typeof val === "number" ? val : null)}
+
+                min={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    blurActiveElement();
+                  }
+                }}
+                blurOnEscape
+              />
+              <Select
+                label="Способ оплаты"
+@@ -366,17 +371,17 @@
+                singlePaymentMethod
+              )
+            }
+            style={{ fontWeight: 600 }}
+            disabled={
+              !selectedUser ||
+              selectedHour === null ||
+              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+            }
+          >
+            Назначить
+          </Button>
+        </Stack>
+      </Card>
+    </Modal >
   );
 }
