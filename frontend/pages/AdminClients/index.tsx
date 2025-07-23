@@ -1,5 +1,4 @@
-// ✅ ДОРАБОТАННЫЙ КОД: frontend/pages/AdminClients/index.tsx
-
+// frontend/pages/AdminClients/index.tsx
 import { useEffect, useState } from "react";
 import {
   Container,
@@ -193,71 +192,73 @@ export default function AdminClientsPage({
           <Text color="red">{error}</Text>
         ) : (
           <Stack spacing="md">
-            {Array.isArray(clients) &&
-              clients.map((client) => (
-                <ClientCard
-                  key={client.id}
-                  client={client}
-                  block={blockMap[client.id]}
-                  isEditing={editingId === client.id}
-                  isOpen={!!expandedCards[client.id]}
-                  internalTagValue={internalTagValue}
-                  buttonStyle={buttonStyle}
-                  onTagChange={(val) => setInternalTagValue(val)}
-                  onSaveTag={async () => {
-                    try {
-                      const res = await fetch(`${API}/api/clients/${client.id}`, {
-                        method: "PATCH",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ internalTag: internalTagValue }),
-                      });
-                      if (res.ok) {
-                        loadClients();
-                        setEditingId(null);
-                        setInternalTagValue("");
-                      } else {
-                        alert("Ошибка при сохранении");
-                      }
-                    } catch {}
-                  }}
-                  onCancelTag={() => {
-                    setEditingId(null);
-                    setInternalTagValue("");
-                  }}
-                  onStartEdit={() => {
-                    setEditingId(client.id);
-                    setInternalTagValue(client.internalTag ?? "");
-                  }}
-                  onDelete={() => deleteClient(client.id)}
-                  onOpenNutrition={() => {
-                    setSelectedClient(client);
-                    setInternalView("nutrition");
-                  }}
-                  onOpenPayments={() => {
-                    setSelectedClient(client);
-                    setInternalView("payments");
-                  }}
-                  onOpenHistory={() => onOpenHistory(client.id)}
-                  onAssign={() => {
-                    localStorage.setItem("assignUserId", client.id);
-                    const block = blockMap[client.id];
-                    const isSinglePaid = !block || block.paidTrainings <= block.used;
-                    localStorage.setItem("assignSinglePaid", String(isSinglePaid));
-                    const calendarDate = localStorage.getItem("calendarSelectedDate");
-                    const selectedDate = calendarDate ?? dayjs().format("YYYY-MM-DD");
-                    localStorage.setItem("assignDate", selectedDate);
-                    setView("assign-training");
-                  }}
-                  onToggleExpand={() => toggleExpanded(client.id)}
-                  onOpenDrawer={() => {
-                    setSelectedClient(client);
-                    setIsDrawerOpened(true);
-                  }}
-                />
-              ))}
+            {clients.map((client) => (
+              <ClientCard
+                key={client.id}
+                client={client}
+                block={blockMap[client.id]}
+                isEditing={editingId === client.id}
+                isOpen={!!expandedCards[client.id]}
+                internalTagValue={internalTagValue}
+                buttonStyle={buttonStyle}
+                onTagChange={(val) => setInternalTagValue(val)}
+                onSaveTag={async () => {
+                  try {
+                    const res = await fetch(`${API}/api/clients/${client.id}`, {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ internalTag: internalTagValue }),
+                    });
+                    if (res.ok) {
+                      loadClients();
+                      setEditingId(null);
+                      setInternalTagValue("");
+                    } else {
+                      alert("Ошибка при сохранении");
+                    }
+                  } catch {}
+                }}
+                onCancelTag={() => {
+                  setEditingId(null);
+                  setInternalTagValue("");
+                }}
+                onStartEdit={() => {
+                  setEditingId(client.id);
+                  setInternalTagValue(client.internalTag ?? "");
+                }}
+                onDelete={() => deleteClient(client.id)}
+                onOpenNutrition={() => {
+                  setSelectedClient(client);
+                  setInternalView("nutrition");
+                }}
+                onOpenPayments={() => {
+                  setSelectedClient(client);
+                  setInternalView("payments");
+                }}
+                onOpenHistory={() => onOpenHistory(client.id)}
+                onAssign={() => {
+                  localStorage.setItem("assignUserId", client.id);
+                  const block = blockMap[client.id];
+                  const isSinglePaid = !block || block.paidTrainings <= block.used;
+                  localStorage.setItem("assignSinglePaid", String(isSinglePaid));
+
+                  // ✅ сохраняем дату из календаря (если есть), иначе fallback на текущую
+                  const calendarDate = localStorage.getItem("calendarSelectedDate");
+                  const selectedDate = calendarDate ?? dayjs().format("YYYY-MM-DD");
+                  localStorage.setItem("assignDate", selectedDate);
+
+                  setView("assign-training");
+                }}
+                onToggleExpand={() => toggleExpanded(client.id)}
+                onOpenDrawer={() => {
+                  setSelectedClient(client);
+                  setIsDrawerOpened(true);
+                }}
+              />
+            ))}
           </Stack>
         )}
 

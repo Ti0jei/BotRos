@@ -12,25 +12,17 @@ export async function isRegistered(ctx, next) {
   }
 
   try {
-    const baseUrl = API_URL.replace(/\/$/, '');
-    const url = `${baseUrl}/api/auth/check-telegram?telegramId=${telegramId}`;
+    const url = `${API_URL}/api/auth/check-telegram?telegramId=${telegramId}`;
     console.log(`🔍 Проверка регистрации: ${url}`);
 
     const res = await fetch(url);
+
     if (!res.ok) {
       console.error(`❌ Ответ сервера: ${res.status}`);
       throw new Error(`Ошибка fetch: ${res.status}`);
     }
 
-    let json;
-    try {
-      json = await res.json();
-    } catch (err) {
-      console.error('❌ Ошибка при чтении JSON:', err);
-      return ctx.reply('⚠️ Некорректный ответ от сервера.');
-    }
-
-    console.log('🔍 Ответ от check-telegram:', json);
+    const json = await res.json();
 
     if (!json?.exists || !json?.user) {
       console.warn(`⚠️ Пользователь не найден: ${telegramId}`);
@@ -57,12 +49,9 @@ export async function isRegistered(ctx, next) {
 
     console.log(`✅ Доступ разрешён: ${json.user.name} (${json.user.role})`);
 
-    if (typeof next === 'function') {
-      return await next();
-    }
+    return await next();
   } catch (e) {
     console.error('❌ Ошибка isRegistered:', e.message);
-
     const fail = await ctx.reply('⚠️ Ошибка при проверке доступа.');
     setTimeout(() => {
       ctx.telegram.deleteMessage(ctx.chat.id, fail.message_id).catch(() => {});

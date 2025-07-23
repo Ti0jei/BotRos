@@ -1,5 +1,3 @@
-// newsNotify.mjs
-
 import { Markup } from 'telegraf';
 import { isRegistered } from './middleware.mjs';
 import { notifyBroadcast } from '../utils/broadcast.mjs';
@@ -9,7 +7,7 @@ import { notifyBroadcast } from '../utils/broadcast.mjs';
  * @param {Telegraf} bot
  */
 export function setupNewsNotification(bot) {
-  // 🟢 Старт рассылки
+  // 🟢 Шаг 1: Старт рассылки
   bot.action('notify_start', isRegistered, async (ctx) => {
     ctx.session = ctx.session || {};
     ctx.session.notifyState = { step: 'choose_role' };
@@ -24,31 +22,34 @@ export function setupNewsNotification(bot) {
     );
   });
 
-  // 🟡 Выбор роли
+  // 🟡 Шаг 2 — выбор получателей
   bot.action('notify_to_users', isRegistered, async (ctx) => {
-    ctx.session = ctx.session || {};
-    ctx.session.notifyState = { role: 'USER', step: 'awaiting_text' };
+    const state = ctx.session?.notifyState;
+    if (!state || state.step !== 'choose_role') return;
+
+    state.role = 'USER';
+    state.step = 'awaiting_text';
 
     await ctx.answerCbQuery();
     await ctx.reply('📝 Введите текст новости для пользователей:');
   });
 
   bot.action('notify_to_admins', isRegistered, async (ctx) => {
-    ctx.session = ctx.session || {};
-    ctx.session.notifyState = { role: 'ADMIN', step: 'awaiting_text' };
+    const state = ctx.session?.notifyState;
+    if (!state || state.step !== 'choose_role') return;
+
+    state.role = 'ADMIN';
+    state.step = 'awaiting_text';
 
     await ctx.answerCbQuery();
     await ctx.reply('📝 Введите текст новости для администраторов:');
   });
 
-  // 📝 Ввод текста
+  // 📝 Шаг 3 — ввод текста
   bot.on('text', isRegistered, async (ctx, next) => {
     const state = ctx.session?.notifyState;
-    console.log('🧪 notifyState:', state);
 
-    if (!state || state.step !== 'awaiting_text') {
-      return next?.();
-    }
+    if (!state || state.step !== 'awaiting_text') return next?.();
 
     const text = ctx.message.text.trim();
     if (text.length < 10) {
@@ -71,16 +72,10 @@ export function setupNewsNotification(bot) {
   bot.action('notify_confirm', isRegistered, async (ctx) => {
     const state = ctx.session?.notifyState;
     if (!state?.text || !state?.role) {
-      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /menu');
+      return ctx.reply('⚠️ Нет данных. Запустите рассылку заново через /start.');
     }
 
     await ctx.answerCbQuery('🚀');
-
-    // Удалить сообщение с кнопками
-    if (ctx.callbackQuery?.message?.message_id) {
-      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
-    }
-
     await ctx.reply('🚀 Отправка сообщений...');
 
     try {
@@ -91,6 +86,7 @@ export function setupNewsNotification(bot) {
       await ctx.reply('❌ Ошибка при рассылке. Попробуйте позже.');
     }
 
+    // Очистка состояния
     ctx.session.notifyState = undefined;
   });
 
@@ -98,12 +94,6 @@ export function setupNewsNotification(bot) {
   bot.action('notify_cancel', isRegistered, async (ctx) => {
     ctx.session.notifyState = undefined;
     await ctx.answerCbQuery('❌');
-
-    // Удалить сообщение с кнопками
-    if (ctx.callbackQuery?.message?.message_id) {
-      await ctx.telegram.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id).catch(() => {});
-    }
-
-    await ctx.reply('❌ Рассылка отменена.\nЧтобы начать заново, нажмите /menu');
+    await ctx.reply('❌ Рассылка отменена.');
   });
 }
