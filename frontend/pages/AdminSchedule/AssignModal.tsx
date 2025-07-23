@@ -16,7 +16,6 @@ import {
   NumberInput,
   Box,
   ScrollArea,
-  TextInput,
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import dayjs, { Dayjs } from "dayjs";
@@ -134,8 +133,8 @@ export default function AssignModal({
     if (!selectedUser || !opened) return;
     const fetchLastTemplate = async () => {
       try {
-        const res = await fetch(${API}/api/workout-templates/last-template?userId=${selectedUser}, {  
-          headers: { Authorization: Bearer `${token}` },
+        const res = await fetch(`${API}/api/workout-templates/last-template?userId=${selectedUser}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         setLastTemplate(data ?? null);
@@ -157,8 +156,8 @@ export default function AssignModal({
   useEffect(() => {
     const loadAssigned = async () => {
       try {
-        const res = await fetch(${API}/api/trainings/date/${date.format("YYYY-MM-DD")}, {
-          headers: { Authorization: Bearer `${token}` },
+        const res = await fetch(`${API}/api/trainings/date/${date.format("YYYY-MM-DD")}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         setAssignedClients(Array.isArray(data) ? data : []);
@@ -226,7 +225,7 @@ export default function AssignModal({
               }))}
               value={selectedUser}
               onChange={(val) => setSelectedUser(val || null)}
-              onDropdownClose={() => blurActiveElement()} // ← вот это ВАЖНО
+              onDropdownClose={blurActiveElement}
               radius="md"
               size="md"
               withinPortal
@@ -250,8 +249,7 @@ export default function AssignModal({
               data={templates.map((t) => ({ label: t.title, value: t.id }))}
               value={selectedTemplateId}
               onChange={setSelectedTemplateId}
-              onDropdownClose={() => blurActiveElement()} // ← добавлено
-
+              onDropdownClose={blurActiveElement}
               clearable
             />
           )}
@@ -372,22 +370,20 @@ export default function AssignModal({
             onClick={() =>
               onAssign(
                 selectedTemplateId,
-                dayjs(date).format("YYYY-MM-DD"), // ✅ оборачиваем дату
+                dayjs(date).format("YYYY-MM-DD"),
                 singlePrice,
                 singlePaymentMethod
               )
             }
             style={{ fontWeight: 600 }}
             disabled={
-              !selectedUser ||
-              selectedHour === null ||
-              date.isBefore(dayjs(), "day") // 🔒 запрещаем запись в прошлое
+              !selectedUser || selectedHour === null || date.isBefore(dayjs(), "day")
             }
           >
             Назначить
           </Button>
         </Stack>
       </Card>
-    </Modal >
+    </Modal>
   );
 }
