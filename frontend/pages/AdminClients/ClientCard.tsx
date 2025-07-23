@@ -24,7 +24,7 @@ import {
 import { Dumbbell } from "lucide-react";
 import { Client, PaymentBlock } from "./types";
 import { useState } from "react";
-import AssignModalFromCalendar from "@/components/AssignModalFromCalendar";
+import AssignModalFromCalendar from "@/pages/AdminSchedule/AssignModalFromCalendar";
 import dayjs from "dayjs";
 
 interface Props {
